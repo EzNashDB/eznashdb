@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,3 +122,19 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#######################################################################
+#               Static files (CSS, JavaScript, Images)                #
+#                                                                     #
+# References:                                                         #
+# - https://docs.djangoproject.com/en/2.1/howto/static-files/         #
+# - https://stackoverflow.com/a/66279089/12726253                     #
+# - https://stackoverflow.com/a/38954680                              #
+#######################################################################
+
+STATIC_URL = "/static/"  # Url to find the static files at
+STATIC_ROOT = os.path.join(
+    BASE_DIR, "staticfiles"
+)  # place to prepare the static files for serving in production
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Where our static files live in the codebase
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"  # which type of static file storage we are using
