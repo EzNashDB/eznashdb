@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-lo*q=01+khs@we11ljr3fx73&^2-q0i8b0@y-duyq^70gzg1uq
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'eznashdb.herokuapp.com'
+    'eznashdb.herokuapp.com',
+    'localhost'
 ]
 
 
@@ -117,8 +118,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
