@@ -17,6 +17,10 @@ pytest-django = "^4.5.2"
 pytest-testmon = "^1.2.2"
 pytest-watch = "^4.2.0"
 pytest-spec = "^3.2.0"
+dj-rest-auth = {extras = ["with_social"], version = "^2.2.2"}
+django-rest-framework = "^0.1.0"
+djangorestframework-simplejwt = "^5.0.0"
+django-cors-headers = "^3.11.0"
 
 [tool.poetry.dev-dependencies]
 
