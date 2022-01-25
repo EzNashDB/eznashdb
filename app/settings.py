@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import json
 from pathlib import Path
 import os
 from os.path import dirname, join
@@ -30,11 +31,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-lo*q=01+khs@we11ljr3fx73&^2-q0i8b0@y-duyq^70gzg1uq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", False)
 
 ALLOWED_HOSTS = [
     'eznashdb.herokuapp.com',
-    'localhost'
+    'localhost',
+    '127.0.0.1',
 ]
 
 
@@ -47,9 +49,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'corsheaders',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth.registration',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
 ]
 
+SITE_ID = 1
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -61,6 +76,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'app.urls'
+
+CORS_ORIGIN_WHITELIST = json.loads(os.getenv('CORS_ORIGIN_WHITELIST', '[]'))
 
 TEMPLATES = [
     {
@@ -143,3 +160,18 @@ STATIC_ROOT = os.path.join(
 )  # place to prepare the static files for serving in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Where our static files live in the codebase
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"  # which type of static file storage we are using
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
+
+REST_USE_JWT = True
+
+JWT_AUTH_COOKIE = 'eznashdb-auth'
+
+JWT_AUTH_REFRESH_COOKIE = 'eznashdb-refresh-token'
+
+GOOGLE_AUTH_CALLBACK_URL = os.getenv('GOOGLE_AUTH_CALLBACK_URL', None)
