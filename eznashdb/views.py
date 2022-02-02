@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from rest_framework import generics
+from eznashdb.models import Shul
+from eznashdb.serializers import ShulSerializer
 
-# Create your views here.
+
+class ShulDetail(generics.RetrieveAPIView):
+    """
+    Retrieve a shul
+    """
+    queryset = Shul.objects.all()
+    serializer_class = ShulSerializer
