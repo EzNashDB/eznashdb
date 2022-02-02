@@ -18,6 +18,7 @@ social_account_urls = [
 ]
 
 urlpatterns = [
+    path('', include('eznashdb.urls')),
     path('admin/', admin.site.urls),
     path('dj-rest-auth/', include(dj_rest_auth_urls)),
     path('socialaccounts/', include(social_account_urls)),
