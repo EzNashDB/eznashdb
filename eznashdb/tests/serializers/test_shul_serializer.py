@@ -1,21 +1,13 @@
 from eznashdb.enums import KaddishAlone, RelativeSize, SeeHearScore
-from eznashdb.models import Room, Shul, City, Region, Country
+from eznashdb.models import Room, Shul
 from eznashdb.serializers import ShulSerializer, CitySerializer
-
-
-"""
-Helpers
-"""
-def create_city() -> City:
-    country = Country.objects.create()
-    region = Region.objects.create(country=country)
-    city = City.objects.create(region=region)
-    return city
+from eznashdb.testing_utils.model_creators import create_city
 
 """
 Tests
 """
 def test_converts_shul_to_dict(django_user_model):
+    # Arrange
     name = "test shul"
     has_female_leadership = True
     has_childcare = False
@@ -37,9 +29,12 @@ def test_converts_shul_to_dict(django_user_model):
         enum_has_kaddish_alone=enum_has_kaddish_alone,
         editted_by=[user1.id, user2.id]
     )
+    # Act
     serializer = ShulSerializer(shul, context={'request': None})
-    city_data = CitySerializer(city).data
     data = serializer.data
+
+    # Assert
+    city_data = CitySerializer(city).data
     assert data["id"] == shul.id
     assert data["name"] == name
     assert data["created_by"]["username"] == username
@@ -54,6 +49,7 @@ def test_converts_shul_to_dict(django_user_model):
 
 
 def test_includes_room_data(django_user_model):
+    # Arrange
     user1 = django_user_model.objects.create()
     city = create_city()
     shul = Shul.objects.create(
@@ -76,9 +72,12 @@ def test_includes_room_data(django_user_model):
         is_mixed_seating=True,
         is_wheelchair_accessible=False,
     )
+
+    # Act
     serializer = ShulSerializer(shul, context={'request': None})
     data = serializer.data
 
+    # Assert
     room_data = data["rooms"][0]
     assert room_data['id'] == room.id
     assert room_data['name'] == room.name

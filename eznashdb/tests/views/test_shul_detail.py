@@ -1,12 +1,7 @@
 from eznashdb.views import ShulDetail
-from eznashdb.models import Shul, City, Region, Country
+from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
-
-def create_city() -> City:
-    country = Country.objects.create()
-    region = Region.objects.create(country=country)
-    city = City.objects.create(region=region)
-    return city
+from eznashdb.testing_utils.model_creators import create_city
 
 def test_returns_serialized_shul_from_id(rf, django_user_model):
     shul = Shul.objects.create(city=create_city(), created_by=django_user_model.objects.create())
