@@ -9,3 +9,10 @@ class ShulDetail(generics.RetrieveAPIView):
     """
     queryset = Shul.objects.all()
     serializer_class = ShulSerializer
+
+class ShulList(generics.ListAPIView):
+    """
+    List all code snippets, or create a new snippet
+    """
+    queryset = Shul.objects.all()
+    serializer_class = ShulSerializer
