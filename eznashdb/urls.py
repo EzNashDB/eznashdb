@@ -4,5 +4,6 @@ from django.urls import path
 app_name = "eznashdb"
 
 urlpatterns = [
-    path("shul/<int:pk>", views.ShulDetail.as_view(), name="shul_detail"),
+    path("shuls/", views.ShulList.as_view(), name="shul_list"),
+    path("shuls/<int:pk>", views.ShulDetail.as_view(), name="shul_detail"),
 ]
