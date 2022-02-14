@@ -5,5 +5,5 @@ app_name = "eznashdb"
 
 urlpatterns = [
     path("shuls/", views.ShulList.as_view(), name="shul_list"),
-    path("shuls/<int:pk>", views.ShulDetail.as_view(), name="shul_detail"),
+    path("shuls/<int:pk>/", views.ShulDetail.as_view(), name="shul_detail"),
 ]
