@@ -8,8 +8,8 @@ def test_returns_all_shuls(rf, django_user_model):
     test_user = django_user_model.objects.create()
     shul1 = Shul.objects.create(city=create_city(), created_by=test_user)
     shul2 = Shul.objects.create(city=create_city(), created_by=test_user)
-    Room.objects.create(shul=shul1)
-    Room.objects.create(shul=shul1)
+    Room.objects.create(shul=shul1, created_by=test_user)
+    Room.objects.create(shul=shul1, created_by=test_user)
     request = rf.get("/")
 
     # Act
