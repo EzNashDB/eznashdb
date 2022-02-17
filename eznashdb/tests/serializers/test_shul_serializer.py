@@ -27,7 +27,7 @@ def test_converts_shul_to_dict(django_user_model):
         has_childcare=has_childcare,
         has_kaddish_with_men=has_kaddish_with_men,
         enum_has_kaddish_alone=enum_has_kaddish_alone,
-        editted_by=[user1.id, user2.id]
+        updated_by=[user1.id, user2.id]
     )
     # Act
     serializer = ShulSerializer(shul, context={'request': None})
@@ -40,8 +40,8 @@ def test_converts_shul_to_dict(django_user_model):
     assert data["created_by"]["username"] == username
     assert data["created_by"]["email"] == user_email
     assert data["city"] == city_data
-    assert data["editted_by"][0]["username"] == user1.username
-    assert data["editted_by"][1]["username"] == user2.username
+    assert data["updated_by"][0]["username"] == user1.username
+    assert data["updated_by"][1]["username"] == user2.username
     assert data["has_female_leadership"] == has_female_leadership
     assert data["has_childcare"] == has_childcare
     assert data["has_kaddish_with_men"] == has_kaddish_with_men
@@ -57,6 +57,7 @@ def test_includes_room_data(django_user_model):
         created_by=user1,
     )
     room = Room.objects.create(
+        created_by=user1,
         shul=shul,
         name="test room",
         relative_size=RelativeSize.SAME_SIZE,

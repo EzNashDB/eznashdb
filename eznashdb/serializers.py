@@ -57,7 +57,7 @@ class UserFromIDField(serializers.PrimaryKeyRelatedField):
 class ShulSerializer(serializers.ModelSerializer):
     city = CitySerializer()
     created_by = UserSerializer()
-    editted_by = UserFromIDField(many=True)
+    updated_by = UserFromIDField(many=True)
 
     class Meta:
         model = Shul
@@ -65,7 +65,7 @@ class ShulSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "created_by",
-            "editted_by",
+            "updated_by",
             "has_female_leadership",
             "has_childcare",
             "has_kaddish_with_men",
@@ -99,7 +99,7 @@ class RoomSerializer(serializers.ModelSerializer):
 class ShulSerializer(serializers.ModelSerializer):
     city = CitySerializer()
     created_by = UserSerializer()
-    editted_by = UserFromIDField(many=True)
+    updated_by = UserFromIDField(many=True)
     rooms = RoomSerializer(many=True)
 
     class Meta:
@@ -108,7 +108,7 @@ class ShulSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "created_by",
-            "editted_by",
+            "updated_by",
             "has_female_leadership",
             "has_childcare",
             "has_kaddish_with_men",

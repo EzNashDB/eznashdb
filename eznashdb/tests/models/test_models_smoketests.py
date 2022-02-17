@@ -25,7 +25,7 @@ def test_models_smoketest(django_user_model):
     shul = Shul.objects.create(
         city=city,
         created_by=user,
-        editted_by=[user.id],
+        updated_by=[user.id],
         name="Test shul",
         has_female_leadership=True,
         has_kaddish_with_men=True,
@@ -35,6 +35,7 @@ def test_models_smoketest(django_user_model):
 
     # Create room
     room = Room.objects.create(
+        created_by=user,
         shul=shul,
         name="Test Room",
         relative_size=RelativeSize.SOMEWHAT_SMALLER,

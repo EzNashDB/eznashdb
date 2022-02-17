@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-
 from eznashdb.enums import KaddishAlone, RelativeSize, SeeHearScore
 
 
@@ -46,9 +45,11 @@ class City(models.Model):
 
 class Shul(models.Model):
     id = models.BigAutoField(primary_key=True)
-    city = models.ForeignKey('eznashdb.City', on_delete=models.PROTECT, related_name="shuls")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls")
-    editted_by = ArrayField(models.IntegerField(), null=True, blank=True, default=list)
+    updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
+    city = models.ForeignKey('eznashdb.City', on_delete=models.PROTECT, related_name="shuls")
     name = models.CharField(max_length=50)
     has_female_leadership = models.BooleanField(null=True, blank=True)
     has_childcare = models.BooleanField(null=True, blank=True)
@@ -65,6 +66,10 @@ class Shul(models.Model):
 
 class Room(models.Model):
     id = models.BigAutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms")
+    updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     shul = models.ForeignKey('eznashdb.Shul', on_delete=models.PROTECT, related_name="rooms")
     name = models.CharField(max_length=50)
     relative_size = models.CharField(max_length=50, null=True, blank=True, choices=RelativeSize.choices)
