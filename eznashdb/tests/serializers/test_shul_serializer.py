@@ -109,3 +109,28 @@ def test_includes_room_data(django_user_model):
     assert room_data['is_only_men'] == room.is_only_men
     assert room_data['is_mixed_seating'] == room.is_mixed_seating
     assert room_data['is_wheelchair_accessible'] == room.is_wheelchair_accessible
+
+def test_includes_timestamps(django_user_model):
+    # Arrange
+    user1 = django_user_model.objects.create()
+    city = create_city()
+    shul = Shul.objects.create(
+        city=city,
+        created_by=user1,
+        updated_by=[user1.id]
+    )
+    room = Room.objects.create(
+        created_by=user1,
+        shul=shul,
+    )
+
+    # Act
+    shul_serializer = ShulSerializer(shul, context={'request': None})
+    shul_data = shul_serializer.data
+    room_data = shul_data["rooms"][0]
+
+    # Assert
+    assert "created_at" in shul_data
+    assert "updated_at" in shul_data
+    assert "created_at" in room_data
+    assert "updated_at" in room_data

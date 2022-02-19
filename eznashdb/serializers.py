@@ -61,6 +61,8 @@ class RoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = [
             "id",
+            "created_at",
+            "updated_at",
             "shul",
             "name",
             "relative_size", 
@@ -86,6 +88,8 @@ class ShulSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "created_at",
+            "updated_at",
             "has_female_leadership",
             "has_childcare",
             "has_kaddish_with_men",
