@@ -79,8 +79,6 @@ class RoomSerializer(serializers.ModelSerializer):
 
 class ShulSerializer(serializers.ModelSerializer):
     city = CitySerializer()
-    created_by = UserSerializer()
-    updated_by = UserFromIDField(many=True)
     rooms = RoomSerializer(many=True)
 
     class Meta:
@@ -88,8 +86,6 @@ class ShulSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "created_by",
-            "updated_by",
             "has_female_leadership",
             "has_childcare",
             "has_kaddish_with_men",
@@ -97,4 +93,3 @@ class ShulSerializer(serializers.ModelSerializer):
             "city",
             "rooms",
         ]
-
