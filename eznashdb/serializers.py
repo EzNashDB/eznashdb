@@ -54,25 +54,6 @@ class UserFromIDField(serializers.PrimaryKeyRelatedField):
         user = User.objects.get(pk=value)
         return UserSerializer(user).data
 
-class ShulSerializer(serializers.ModelSerializer):
-    city = CitySerializer()
-    created_by = UserSerializer()
-    updated_by = UserFromIDField(many=True)
-
-    class Meta:
-        model = Shul
-        fields = [
-            "id",
-            "name",
-            "created_by",
-            "updated_by",
-            "has_female_leadership",
-            "has_childcare",
-            "has_kaddish_with_men",
-            "enum_has_kaddish_alone",
-            "city",
-        ]
-
 
 class RoomSerializer(serializers.ModelSerializer):
 
