@@ -37,15 +37,30 @@ def test_converts_shul_to_dict(django_user_model):
     city_data = CitySerializer(city).data
     assert data["id"] == shul.id
     assert data["name"] == name
-    assert data["created_by"]["username"] == username
-    assert data["created_by"]["email"] == user_email
     assert data["city"] == city_data
-    assert data["updated_by"][0]["username"] == user1.username
-    assert data["updated_by"][1]["username"] == user2.username
     assert data["has_female_leadership"] == has_female_leadership
     assert data["has_childcare"] == has_childcare
     assert data["has_kaddish_with_men"] == has_kaddish_with_men
     assert data["enum_has_kaddish_alone"] == enum_has_kaddish_alone
+
+
+def test_does_not_include_user_data(django_user_model):
+    # Arrange
+    user1 = django_user_model.objects.create()
+    city = create_city()
+    shul = Shul.objects.create(
+        city=city,
+        created_by=user1,
+        updated_by=[user1.id]
+    )
+
+    # Act
+    serializer = ShulSerializer(shul, context={'request': None})
+    data = serializer.data
+
+    # Assert
+    assert "created_by" not in data
+    assert "updated_by" not in data
 
 
 def test_includes_room_data(django_user_model):
