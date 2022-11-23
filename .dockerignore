@@ -1,0 +1,13 @@
+# flyctl launch added from .gitignore
+**/.venv
+**/__pycache__
+__pycache__
+**/.env
+**/.pytest_cache
+.pytest_cache
+**/.testmondata
+**/.vscode
+
+# flyctl launch added from .venv/.gitignore
+# created by virtualenv automatically
+.venv/**/*
