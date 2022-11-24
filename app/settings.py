@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-lo*q=01+khs@we11ljr3fx73&^2-q0i8b0@y-duyq^70gzg1uq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = os.getenv("DEBUG", False) != "True"
 
 ALLOWED_HOSTS = [
     'eznashdb.herokuapp.com',
@@ -40,6 +40,11 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*eznashdb.fly.dev',
+    'https://localhost'
+    'https://*.127.0.0.1'
+]
 
 # Application definition
 
