@@ -35,9 +35,9 @@ DEBUG = os.getenv("DEBUG", False)
 
 ALLOWED_HOSTS = [
     'eznashdb.herokuapp.com',
+    'eznashdb.fly.dev',
     'localhost',
     '127.0.0.1',
-    '*',
 ]
 
 
