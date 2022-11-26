@@ -109,8 +109,10 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-database = dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=0)
-if DEBUG:
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    database = dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=0)
+else:
     database = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.environ.get("DATABASE_NAME"),
