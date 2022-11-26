@@ -14,7 +14,7 @@ WORKDIR /code
 COPY poetry.lock pyproject.toml /code/
 
 RUN poetry config virtualenvs.create false \
-  && poetry install $(test "$DEBUG" != True && echo "--no-dev") --no-interaction --no-ansi
+  && poetry install $(test "$DEBUG" != True && echo "--only main") --no-interaction --no-ansi
 
 COPY . /code/
 
