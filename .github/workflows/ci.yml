@@ -1,0 +1,57 @@
+# Based on:
+#   - https://jacobian.org/til/github-actions-poetry/
+#   - https://www.hacksoft.io/blog/github-actions-in-action-setting-up-django-and-postgres
+
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+    POETRY_VERSION: 1.2.2
+    DATABASE_NAME: github_actions
+    DATABASE_USER: postgres
+    DATABASE_PASSWORD: postgres
+    DATABASE_HOST: 127.0.0.1
+    DATABASE_PORT: 5432
+
+jobs:
+  CI_Process:
+    # Run on a Ubuntu VM
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      # Checkout the GitHub repo
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.2.2
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - name: Run tests
+        run: poetry run pytest
