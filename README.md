@@ -1,2 +1,2 @@
-# eznashdb-backend-django
-Backend repo for EzNashDB (django)
+# eznashdb
+Source code for The Ezrat Nashim Database

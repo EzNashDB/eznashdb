@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "eznashdb-backend-django"
+name = "eznashdb"
 version = "0.1.0"
-description = "Backend repo for EzNashDB (django)"
+description = "The Ezrat Nashim Database"
 authors = ["Ari Abramowitz <ari.abramowitz1@gmail.com>"]
 
 [tool.poetry.dependencies]
