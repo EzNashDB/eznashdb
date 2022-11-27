@@ -23,5 +23,4 @@ urlpatterns = [
     path('dj-rest-auth/', include(dj_rest_auth_urls)),
     path('socialaccounts/', include(social_account_urls)),
     path('accounts/', include('allauth.urls'), name='socialaccount_signup'),
-    path("fly", include("fly.urls")),
 ]
