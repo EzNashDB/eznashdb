@@ -17,7 +17,7 @@ env:
     DATABASE_PORT: 5432
 
 jobs:
-  CI_Process:
+  CI:
     # Run on a Ubuntu VM
     runs-on: ubuntu-latest
 
