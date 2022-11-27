@@ -1,7 +1,7 @@
 import pytest
 from django.urls import resolve, reverse
 
-from eznashdb.views import ShulDetail, ShulList
+from eznashdb.views import ShulDetail, ShulList, HomeView
 
 
 @pytest.mark.parametrize(
@@ -9,6 +9,7 @@ from eznashdb.views import ShulDetail, ShulList
     [
         ("eznashdb:shul_detail", ShulDetail, [1]),
         ("eznashdb:shul_list", ShulList, []),
+        ("eznashdb:home", HomeView, []),
     ],
 )
 def test_urls_with_class_based_views(view_name, view, args):
