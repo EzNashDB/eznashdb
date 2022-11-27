@@ -2,7 +2,11 @@ from rest_framework import generics
 from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
 from rest_framework import permissions
+from django.views.generic import TemplateView
 
+
+class HomeView(TemplateView):
+    template_name = "eznashdb/home.html"
 
 class ShulDetail(generics.RetrieveDestroyAPIView):
     """
