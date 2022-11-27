@@ -66,7 +66,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dj_rest_auth',
     'eznashdb',
-    'fly',
 ]
 
 SITE_ID = 1
