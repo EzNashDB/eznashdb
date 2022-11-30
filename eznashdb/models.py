@@ -4,52 +4,12 @@ from django.contrib.postgres.fields import ArrayField
 from eznashdb.enums import KaddishAlone, RelativeSize, SeeHearScore
 
 
-class Country(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    short_name = models.CharField(max_length=10)
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        verbose_name = "country"
-        verbose_name_plural = "countries"
-
-class Region(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    country = models.ForeignKey('eznashdb.Country', on_delete=models.PROTECT, related_name="regions")
-    name = models.CharField(max_length=50)
-    is_default_region = models.BooleanField(null=True, blank=True, default=False)
-
-    def __str__(self) -> str:
-        return f"{self.name}, {self.country.short_name}"
-
-    class Meta:
-        verbose_name = "region"
-        verbose_name_plural = "regions"
-
-class City(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    region = models.ForeignKey('eznashdb.Region', on_delete=models.PROTECT, related_name="cities")
-    name = models.CharField(max_length=50)
-    latitude = models.CharField(max_length=50)
-    longitude = models.CharField(max_length=50)
-
-    def __str__(self) -> str:
-        return f"{self.name}, {self.region}"
-
-    class Meta:
-        verbose_name = "city"
-        verbose_name_plural = "cities"
-
 class Shul(models.Model):
     id = models.BigAutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls")
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
-    city = models.ForeignKey('eznashdb.City', on_delete=models.PROTECT, related_name="shuls")
     name = models.CharField(max_length=50)
     has_female_leadership = models.BooleanField(null=True, blank=True)
     has_childcare = models.BooleanField(null=True, blank=True)
