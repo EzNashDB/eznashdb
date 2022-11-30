@@ -57,18 +57,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'corsheaders',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'dj_rest_auth.registration',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'dj_rest_auth',
     'eznashdb',
 ]
-
-SITE_ID = 1
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -184,18 +174,3 @@ STATIC_ROOT = os.path.join(
 )  # place to prepare the static files for serving in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Where our static files live in the codebase
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"  # which type of static file storage we are using
-
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
-}
-
-REST_USE_JWT = True
-
-JWT_AUTH_COOKIE = 'eznashdb-auth'
-
-JWT_AUTH_REFRESH_COOKIE = 'eznashdb-refresh-token'
-
-GOOGLE_AUTH_CALLBACK_URL = os.getenv('GOOGLE_AUTH_CALLBACK_URL', None)
