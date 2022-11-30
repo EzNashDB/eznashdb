@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'corsheaders',
     'eznashdb',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +119,7 @@ DATABASES = {
     'default': database
 }
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'users.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
