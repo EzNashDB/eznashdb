@@ -1,14 +1,12 @@
 import pytest
 from django.urls import resolve, reverse
 
-from eznashdb.views import ShulDetail, ShulList, HomeView
+from eznashdb.views import HomeView
 
 
 @pytest.mark.parametrize(
     "view_name,view,args",
     [
-        ("eznashdb:shul_detail", ShulDetail, [1]),
-        ("eznashdb:shul_list", ShulList, []),
         ("eznashdb:home", HomeView, []),
     ],
 )
