@@ -1,29 +1,12 @@
-from eznashdb.models import Country, Region, City, Shul, Room
+from eznashdb.models import Shul, Room
 from eznashdb.enums import SeeHearScore, KaddishAlone, RelativeSize
 
 def test_models_smoketest(django_user_model):
-    # Create country, region, city
-    country = Country.objects.create(
-        name="United States",
-        short_name="US"
-    )
-    region = Region.objects.create(
-        country=country,
-        name="New York",
-    )
-    city = City.objects.create(
-        region=region,
-        name="New York",
-        latitude="40.7128",
-        longitude="-74.0060"
-    )
-
     # Create user
     user = django_user_model.objects.create()
 
     # Create shul (with city, user)
     shul = Shul.objects.create(
-        city=city,
         created_by=user,
         updated_by=[user.id],
         name="Test shul",
@@ -53,6 +36,6 @@ def test_models_smoketest(django_user_model):
     )
 
     # Assert all created
-    for model in [django_user_model, Country, Region, City, Shul, Room]:
+    for model in [django_user_model, Shul, Room]:
         assert model.objects.count() == 1
 
