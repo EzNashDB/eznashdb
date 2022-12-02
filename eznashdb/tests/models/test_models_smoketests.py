@@ -5,7 +5,7 @@ def test_models_smoketest(django_user_model):
     # Create user
     user = django_user_model.objects.create()
 
-    # Create shul (with city, user)
+    # Create shul
     shul = Shul.objects.create(
         created_by=user,
         updated_by=[user.id],
