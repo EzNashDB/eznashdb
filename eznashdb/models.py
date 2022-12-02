@@ -18,7 +18,7 @@ class Shul(models.Model):
 
 
     def __str__(self) -> str:
-        return f"{self.name}, {self.city}"
+        return f"{self.name}"
 
     class Meta:
         verbose_name = "shul"
