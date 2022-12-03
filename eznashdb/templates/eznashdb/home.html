@@ -27,4 +27,12 @@
     {% endfor %}
   </table>
 
+  {% if not shuls %}
+  <div class="w-100 p-3 text-center">
+    <span class="text-muted h3">
+      -- No Shuls Found --
+    </span>
+  </div>
+  {% endif %}
+
 {% endblock content %}

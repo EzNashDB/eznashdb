@@ -22,3 +22,12 @@ def test_lists_shuls(rf, test_user):
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
     assert shul.name in soup.get_text()
+
+def test_shows_message_if_no_shuls(rf):
+    request = (
+        rf.get("/")
+    )
+    response = HomeView.as_view()(request)
+    soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+    assert "No Shuls Found" in soup.get_text()
