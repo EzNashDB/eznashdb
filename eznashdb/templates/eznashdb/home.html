@@ -1,4 +1,30 @@
 {% extends "base.html" %}
+{% load eznashdb_tags %}
 {% block content %}
+
+<table class="table table-sm table-bordered m-auto">
+    <thead>
+      <tr>
+        <th scope="col" colspan="1">General Info</th>
+        <th scope="col" colspan="3">Other Info</th>
+      </tr>
+      <tr class="thead-dark">
+        <th scope="col"><small>Name</small></th>
+        <th scope="col"><small>Fem. Ldshp.</small></th>
+        <th scope="col"><small>Childcare</small></th>
+      </tr>
+    </thead>
+    {% for shul in shuls %}
+        <tr class="table-secondary">
+            <td><b>{{shul.name}}</b></td>
+            <td>
+                {{ shul.has_female_leadership|bool_to_icon }}
+            </td>
+            <td>
+                {{ shul.has_childcare|bool_to_icon }}
+            </td>
+        </tr>
+    {% endfor %}
+  </table>
 
 {% endblock content %}
