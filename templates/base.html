@@ -11,13 +11,7 @@
         <link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     </head>
     <body>
-        <nav class="navbar navbar-dark bg-dark">
-            <div class="container-fluid text-center m-auto">
-                <a class="navbar-brand" href="#">
-                    The Ezrat Nashim Database
-                </a>
-            </div>
-        </nav>
+        {% include 'includes/navbar.html' %}
         <div class="container-fluid p-3">
             {% block content %}{% endblock %}
         </div>
