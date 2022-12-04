@@ -8,4 +8,6 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["shuls"] = Shul.objects.all()
         return context
-    
+
+class CreateUpdateShulView(TemplateView):
+    template_name = "eznashdb/create_update_shul.html"
