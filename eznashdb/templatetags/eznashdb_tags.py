@@ -2,6 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 register = template.Library()
 
+
 @register.filter
 def bool_to_icon(value: bool) -> str:
     icons = {
