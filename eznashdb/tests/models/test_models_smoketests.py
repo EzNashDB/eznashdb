@@ -1,5 +1,6 @@
 from eznashdb.models import Shul, Room
-from eznashdb.enums import SeeHearScore, KaddishAlone, RelativeSize
+from eznashdb.enums import SeeHearScore, RelativeSize
+
 
 def test_models_smoketest(django_user_model):
     # Create user
@@ -11,9 +12,8 @@ def test_models_smoketest(django_user_model):
         updated_by=[user.id],
         name="Test shul",
         has_female_leadership=True,
-        has_kaddish_with_men=True,
-        enum_has_kaddish_alone=KaddishAlone.MAN_ALWAYS_SAYS_KADDISH,
         has_childcare=True,
+        can_say_kaddish=False,
     )
 
     # Create room
@@ -38,4 +38,3 @@ def test_models_smoketest(django_user_model):
     # Assert all created
     for model in [django_user_model, Shul, Room]:
         assert model.objects.count() == 1
-
