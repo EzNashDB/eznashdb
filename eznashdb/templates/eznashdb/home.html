@@ -6,14 +6,13 @@
     <thead>
       <tr>
         <th scope="col" colspan="1">General Info</th>
-        <th scope="col" colspan="4">Other Info</th>
+        <th scope="col" colspan="3">Other Info</th>
       </tr>
       <tr class="thead-dark">
         <th scope="col"><small>Name</small></th>
         <th scope="col"><small>Fem. Ldshp.</small></th>
         <th scope="col"><small>Childcare</small></th>
-        <th scope="col"><small>Kaddish With Men</small></th>
-        <th scope="col"><small>Kaddish Alone</small></th>
+        <th scope="col"><small>Can Say Kaddish</small></th>
       </tr>
     </thead>
     {% for shul in shuls %}
@@ -26,11 +25,8 @@
                 {{ shul.has_childcare|bool_to_icon }}
             </td>
             <td>
-              {{ shul.has_kaddish_with_men|bool_to_icon }}
+              {{ shul.can_say_kaddish|bool_to_icon }}
           </td>
-          <td>
-            {{ shul.enum_has_kaddish_alone }}
-        </td>
         </tr>
     {% endfor %}
   </table>

@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from eznashdb.enums import KaddishAlone, RelativeSize, SeeHearScore
+from eznashdb.enums import RelativeSize, SeeHearScore
 
 
 class Shul(models.Model):
@@ -9,14 +9,13 @@ class Shul(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls")
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls"
+    )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     name = models.CharField(max_length=50)
     has_female_leadership = models.BooleanField(null=True, blank=True)
     has_childcare = models.BooleanField(null=True, blank=True)
-    has_kaddish_with_men = models.BooleanField(null=True, blank=True)
-    enum_has_kaddish_alone = models.CharField(
-        max_length=50, null=True, blank=True, choices=KaddishAlone.choices)
+    can_say_kaddish = models.BooleanField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -31,15 +30,19 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms")
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms"
+    )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     shul = models.ForeignKey(
-        'eznashdb.Shul', on_delete=models.PROTECT, related_name="rooms")
+        "eznashdb.Shul", on_delete=models.PROTECT, related_name="rooms"
+    )
     name = models.CharField(max_length=50)
     relative_size = models.CharField(
-        max_length=50, null=True, blank=True, choices=RelativeSize.choices)
+        max_length=50, null=True, blank=True, choices=RelativeSize.choices
+    )
     see_hear_score = models.IntegerField(
-        null=True, blank=True, choices=SeeHearScore.choices)
+        null=True, blank=True, choices=SeeHearScore.choices
+    )
     is_centered = models.BooleanField(blank=True, default=False)
     is_same_floor_side = models.BooleanField(blank=True, default=False)
     is_same_floor_back = models.BooleanField(blank=True, default=False)
