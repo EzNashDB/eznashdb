@@ -7,6 +7,7 @@
       <tr>
         <th scope="col" colspan="1">General Info</th>
         <th scope="col" colspan="3">Other Info</th>
+        <th scope="col" colspan="1" rowspan="2"></th>
       </tr>
       <tr class="thead-dark">
         <th scope="col"><small>Name</small></th>
@@ -26,6 +27,12 @@
             </td>
             <td>
               {{ shul.can_say_kaddish|bool_to_icon }}
+          </td>
+          <td class="text-center">
+            <form action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </form>
           </td>
         </tr>
     {% endfor %}

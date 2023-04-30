@@ -1,16 +1,17 @@
 import pytest
 from django.urls import resolve, reverse
 
-from eznashdb.views import HomeView, CreateUpdateShulView
+from eznashdb.views import HomeView, CreateUpdateShulView, DeleteShulView
 
 
 @pytest.mark.parametrize(
-    "view_name,view,args",
+    "view_name,view,args,kwargs",
     [
-        ("eznashdb:home", HomeView, []),
-        ("eznashdb:create_shul", CreateUpdateShulView, []),
+        ("eznashdb:home", HomeView, [], {}),
+        ("eznashdb:create_shul", CreateUpdateShulView, [], {}),
+        ("eznashdb:delete_shul", DeleteShulView, [], {"pk": 1}),
     ],
 )
-def test_urls_with_class_based_views(view_name, view, args):
-    url = reverse(view_name, args=(args if args else None))
+def test_urls_with_class_based_views(view_name, view, args, kwargs):
+    url = reverse(view_name, args=args or None, kwargs=kwargs or None)
     assert resolve(url).func.view_class == view
