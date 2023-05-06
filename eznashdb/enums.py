@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class RelativeSize(models.TextChoices):
     MUCH_SMALLER = ("MUCH_SMALLER", _("Much smaller"))
     SOMEWHAT_SMALLER = ("SOMEWHAT_SMALLER", _("Somewhat smaller"))
     SAME_SIZE = ("SAME_SIZE", _("Same size"))
     LARGER = ("LARGER", _("Larger"))
+
 
 class SeeHearScore(models.IntegerChoices):
     _1_VERY_DIFFICULT = 1

@@ -31,11 +31,22 @@ class Command(BaseCommand):
             self._create_shul_rooms(shul)
 
     def _create_shul_rooms(self, shul):
-        shul_num = shul.name[-1]
+        shul_num = int(shul.name[-1])
         for j in range(self.rooms_per_shul):
+            base_num = shul_num * j
             shul.rooms.update_or_create(
                 name=f"Seeded Room {shul_num}-{j+1}",
                 defaults={
                     "created_by": self.user,
+                    "is_centered": bool(base_num % 2),
+                    "is_same_floor_side": bool((base_num + 1) % 2),
+                    "is_same_floor_back": bool(base_num % 2),
+                    "is_same_floor_elevated": bool((base_num + 1) % 2),
+                    "is_same_floor_level": bool(base_num % 2),
+                    "is_balcony_side": bool((base_num + 1) % 2),
+                    "is_balcony_back": bool(base_num % 2),
+                    "is_only_men": bool((base_num + 1) % 2),
+                    "is_mixed_seating": bool(base_num % 2),
+                    "is_wheelchair_accessible": bool((base_num + 1) % 2),
                 },
             )

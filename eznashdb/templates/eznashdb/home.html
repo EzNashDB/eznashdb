@@ -4,30 +4,33 @@
 
 <table class="table table-sm table-bordered m-auto">
     <thead>
-      <tr>
-        <th scope="col" colspan="1">General Info</th>
-        <th scope="col" colspan="3">Other Info</th>
-        <th scope="col" colspan="1" rowspan="2"></th>
-      </tr>
       <tr class="thead-dark">
-        <th scope="col"><small>Name</small></th>
-        <th scope="col"><small>Fem. Ldshp.</small></th>
-        <th scope="col"><small>Childcare</small></th>
-        <th scope="col"><small>Can Say Kaddish</small></th>
+        <th scope="col"><small>--</small></th>
+        <th scope="col"><small>--</small></th>
       </tr>
     </thead>
     {% for shul in shuls %}
         <tr class="table-secondary">
-            <td><b>{{shul.name}}</b></td>
-            <td>
-                {{ shul.has_female_leadership|bool_to_icon }}
+            <td colspan="2">
+              <div class="d-flex justify-content-between">
+                <div class="fw-bold ms-2">
+
+                  {{shul.name}}
+                </div>
+                <div>
+
+                  <div class="pe-2 d-inline-block">
+                    Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+                  </div>
+                  <div class="pe-2 d-inline-block">
+                    Childcare: {{ shul.has_childcare|bool_to_icon }}
+                  </div>
+                  <div class="pe-2 d-inline-block">
+                    Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
+                  </div>
+                </div>
+              </div>
             </td>
-            <td>
-                {{ shul.has_childcare|bool_to_icon }}
-            </td>
-            <td>
-              {{ shul.can_say_kaddish|bool_to_icon }}
-          </td>
           <td class="text-center">
             <form action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST">
               {% csrf_token %}
@@ -35,6 +38,36 @@
             </form>
           </td>
         </tr>
+        {% for room in shul.rooms.all %}
+        <tr>
+          <td>
+            <div class="ms-4 fw-bold">
+              {{room.name}}
+            </div>
+          </td>
+            <td>
+              <small class="p-0">
+                {% for layout_display_data in room|get_layout_type_display_data_list %}
+                  {% if layout_display_data.as_bool %}
+                  <div class="row">
+                    <div class="col-lg-5" style="padding-right:0"><b>{{layout_display_data.layout_type}}:</b></div>
+                    <div class="col-lg-7">{{layout_display_data.as_string}}</div>
+                  </div>
+                  <hr class="m-0">
+                  {% endif %}
+                {% endfor %}
+                {% if room.is_wheelchair_accessible %}
+                <hr style="margin:0">
+                <div class="row">
+                  <div class="col-12">
+                    Wheelchair Accessible
+                  </div>
+                </div>
+                {% endif %}
+              </small>
+            </td>
+          </tr>
+          {% endfor %}
     {% endfor %}
   </table>
 
