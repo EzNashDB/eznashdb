@@ -1,3 +1,4 @@
+from eznashdb.enums import RelativeSize
 from eznashdb.views import HomeView
 from bs4 import BeautifulSoup
 from eznashdb.models import Shul
@@ -74,7 +75,9 @@ def test_shows_room_name(GET_request, test_user):
         ("is_wheelchair_accessible", ["wheelchair accessible"]),
     ],
 )
-def test_shows_boolean_room_details(GET_request, test_user, field_name, display_values):
+def test_shows_boolean_room_layout_details(
+    GET_request, test_user, field_name, display_values
+):
     shul = Shul.objects.create(created_by=test_user, name="test shul")
     shul.rooms.create(created_by=test_user, name="test_room", **{field_name: True})
 
@@ -83,6 +86,19 @@ def test_shows_boolean_room_details(GET_request, test_user, field_name, display_
 
     for value in display_values:
         assert value.lower() in str(soup).lower()
+
+
+@pytest.mark.parametrize(("relative_size"), list(RelativeSize))
+def test_shows_room_relative_size(GET_request, test_user, relative_size):
+    shul = Shul.objects.create(created_by=test_user, name="test shul")
+    shul.rooms.create(
+        created_by=test_user, name="test_room", relative_size=relative_size
+    )
+
+    response = HomeView.as_view()(GET_request)
+    soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+    assert relative_size.value in str(soup)
 
 
 def test_shows_message_if_no_shuls(GET_request):

@@ -4,38 +4,43 @@
 
 <table class="table table-sm table-bordered m-auto">
     <thead>
-      <tr class="thead-dark">
-        <th scope="col"><small>--</small></th>
-        <th scope="col"><small>--</small></th>
+      <tr class="thead-dark text-center">
+        <small>
+          <th scope="col"><small>Name</small></th>
+          <th scope="col"><small>Room Layout</small></th>
+          <th scope="col"><small>Size of Women's Section</small></th>
+        </small>
       </tr>
     </thead>
     {% for shul in shuls %}
         <tr class="table-secondary">
-            <td colspan="2">
+            <td colspan="3">
               <div class="d-flex justify-content-between">
                 <div class="fw-bold ms-2">
-
                   {{shul.name}}
                 </div>
                 <div>
-
-                  <div class="pe-2 d-inline-block">
-                    Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+                  <div class="pe-3 d-inline-block">
+                    <div class="pe-2 d-inline-block">
+                      Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+                    </div>
+                    <div class="pe-2 d-inline-block">
+                      Childcare: {{ shul.has_childcare|bool_to_icon }}
+                    </div>
+                    <div class="pe-2 d-inline-block">
+                      Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
+                    </div>
                   </div>
-                  <div class="pe-2 d-inline-block">
-                    Childcare: {{ shul.has_childcare|bool_to_icon }}
-                  </div>
-                  <div class="pe-2 d-inline-block">
-                    Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
-                  </div>
+                  <form 
+                    action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
+                    class="d-inline-block"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-times" aria-hidden="true"></i></button>
+                  </form>
                 </div>
               </div>
-            </td>
-          <td class="text-center">
-            <form action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-times" aria-hidden="true"></i></button>
-            </form>
+
           </td>
         </tr>
         {% for room in shul.rooms.all %}
@@ -45,27 +50,32 @@
               {{room.name}}
             </div>
           </td>
-            <td>
-              <small class="p-0">
-                {% for layout_display_data in room|get_layout_type_display_data_list %}
-                  {% if layout_display_data.as_bool %}
-                  <div class="row">
-                    <div class="col-lg-5" style="padding-right:0"><b>{{layout_display_data.layout_type}}:</b></div>
-                    <div class="col-lg-7">{{layout_display_data.as_string}}</div>
-                  </div>
-                  <hr class="m-0">
-                  {% endif %}
-                {% endfor %}
-                {% if room.is_wheelchair_accessible %}
-                <hr style="margin:0">
+          <td>
+            <small class="p-0">
+              {% for layout_display_data in room|get_layout_type_display_data_list %}
+                {% if layout_display_data.as_bool %}
                 <div class="row">
-                  <div class="col-12">
-                    Wheelchair Accessible
-                  </div>
+                  <div class="col-lg-5" style="padding-right:0"><b>{{layout_display_data.layout_type}}:</b></div>
+                  <div class="col-lg-7">{{layout_display_data.as_string}}</div>
                 </div>
+                <hr class="m-0">
                 {% endif %}
-              </small>
-            </td>
+              {% endfor %}
+              {% if room.is_wheelchair_accessible %}
+              <hr style="margin:0">
+              <div class="row">
+                <div class="col-12">
+                  Wheelchair Accessible
+                </div>
+              </div>
+              {% endif %}
+            </small>
+          </td>
+          <td>
+            <div class="fw-bold text-center">
+              {{room.relative_size}}
+            </div>
+          </td>
           </tr>
           {% endfor %}
     {% endfor %}
