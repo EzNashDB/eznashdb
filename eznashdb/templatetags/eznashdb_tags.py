@@ -21,6 +21,26 @@ def bool_to_icon(value: bool) -> str:
     return mark_safe(f'<i class="fa {icon}" aria-hidden="true"></i>')
 
 
+EMPTY_STAR_HTML = '<i class="fa-regular fa-star"></i>'
+FILLED_STAR_HTML = '<i class="fa-solid fa-star"></i>'
+
+
+@register.filter
+def score_to_stars(value) -> str:
+    try:
+        value = int(value)
+    except TypeError:
+        return value
+    if not 1 <= value <= 5:
+        return value
+    stars = ""
+    for _ in range(value):
+        stars += FILLED_STAR_HTML
+    for _ in range(5 - value):
+        stars += EMPTY_STAR_HTML
+    return mark_safe(f'<span class="text-nowrap text-warning">{stars}</span>')
+
+
 ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE = {
     "Balcony": {
         "is_balcony_side": "Side",

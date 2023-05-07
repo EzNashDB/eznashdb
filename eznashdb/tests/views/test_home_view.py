@@ -144,7 +144,14 @@ def test_shows_room_see_hear_score(GET_request, test_user, see_hear_score):
     response = HomeView.as_view()(GET_request)
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-    assert see_hear_score.value in soup.text
+    expected_filled_star_count = int(see_hear_score.value)
+    expected_empty_star_count = 5 - expected_filled_star_count
+
+    filled_class = "fa-solid fa-star"
+    empty_class = "fa-regular fa-star"
+
+    assert str(soup).count(filled_class) == expected_filled_star_count
+    assert str(soup).count(empty_class) == expected_empty_star_count
 
 
 def test_shows_dashes_for_unknown_see_hear_score(GET_request, test_user):
