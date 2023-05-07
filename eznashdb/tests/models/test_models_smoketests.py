@@ -22,7 +22,7 @@ def test_models_smoketest(django_user_model):
         shul=shul,
         name="Test Room",
         relative_size=RelativeSize.S,
-        see_hear_score=SeeHearScore._5_VERY_EASY,
+        see_hear_score=SeeHearScore._5,
         is_centered=True,
         is_same_floor_side=True,
         is_same_floor_back=True,

@@ -40,8 +40,8 @@ class Room(models.Model):
     relative_size = models.CharField(
         max_length=50, null=True, blank=True, choices=RelativeSize.choices
     )
-    see_hear_score = models.IntegerField(
-        null=True, blank=True, choices=SeeHearScore.choices
+    see_hear_score = models.CharField(
+        max_length=50, null=True, blank=True, choices=SeeHearScore.choices
     )
     is_centered = models.BooleanField(blank=True, default=False)
     is_same_floor_side = models.BooleanField(blank=True, default=False)
