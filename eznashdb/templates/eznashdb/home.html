@@ -9,12 +9,13 @@
           <th scope="col"><small>Name</small></th>
           <th scope="col"><small>Room Layout</small></th>
           <th scope="col"><small>Size of Women's Section</small></th>
+          <th scope="col"><small>Audibility/Visibility Score</small></th>
         </small>
       </tr>
     </thead>
     {% for shul in shuls %}
         <tr class="table-secondary">
-            <td colspan="3">
+            <td colspan="4">
               <div class="d-flex justify-content-between">
                 <div class="fw-bold ms-2">
                   {{shul.name}}
@@ -73,7 +74,12 @@
           </td>
           <td>
             <div class="fw-bold text-center">
-              {{room.relative_size}}
+              {{room.relative_size|default:"--"}}
+            </div>
+          </td>
+          <td>
+            <div class="fw-bold text-center">
+              {{room.see_hear_score|default:"--"}}
             </div>
           </td>
           </tr>

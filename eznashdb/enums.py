@@ -9,9 +9,9 @@ class RelativeSize(models.TextChoices):
     L = ("L", _("Larger"))
 
 
-class SeeHearScore(models.IntegerChoices):
-    _1_VERY_DIFFICULT = 1
-    _2_DIFFICULT = 2
-    _3_AVERAGE = 3
-    _4_EASY = 4
-    _5_VERY_EASY = 5
+class SeeHearScore(models.TextChoices):
+    _1 = ("1", _("Very difficult"))
+    _2 = ("2", _("Difficult"))
+    _3 = ("3", _("Moderate"))
+    _4 = ("4", _("Easy"))
+    _5 = ("5", _("Very easy"))
