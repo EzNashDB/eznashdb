@@ -69,19 +69,28 @@
             </small>
           </td>
           <td>
-            <div class="fw-bold text-center">
+            <div class="text-center">
               {% if room.relative_size %}
-                <span class="badge bg-secondary w-100">
+              <small>
+
+                <span class="badge bg-secondary fw-bold w-100">
                   {{room.relative_size}}
                 </span>
+              </small>
               {% else %}
                 --
               {% endif %}
             </div>
           </td>
           <td>
-            <div class="fw-bold text-center">
-              {{room.see_hear_score|default:"--"}}
+            <div class="text-center">
+              {% if room.see_hear_score %}
+              <small>
+                {{room.see_hear_score|score_to_stars}}
+              </small>
+              {% else %}
+                --
+              {% endif %}
             </div>
           </td>
           <td>
