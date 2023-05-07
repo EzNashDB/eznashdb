@@ -72,7 +72,6 @@ def test_shows_room_name(GET_request, test_user):
         ("is_balcony_back", ["balcony", "back"]),
         ("is_only_men", ["no", "only men"]),
         ("is_mixed_seating", ["no", "mixed seating"]),
-        ("is_wheelchair_accessible", ["wheelchair accessible"]),
     ],
 )
 def test_shows_boolean_room_layout_details(
@@ -86,6 +85,25 @@ def test_shows_boolean_room_layout_details(
 
     for value in display_values:
         assert value.lower() in str(soup).lower()
+
+
+@pytest.mark.parametrize(
+    ("is_wheelchair_accessible", "expected"), [(True, "check"), (False, "times")]
+)
+def test_shows_wheelchair_data(
+    GET_request, test_user, is_wheelchair_accessible, expected
+):
+    shul = Shul.objects.create(created_by=test_user, name="test shul")
+    shul.rooms.create(
+        created_by=test_user,
+        name="test_room",
+        is_wheelchair_accessible=is_wheelchair_accessible,
+    )
+
+    response = HomeView.as_view()(GET_request)
+    soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+    assert expected in str(soup)
 
 
 @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
