@@ -4,9 +4,9 @@
 
 <table class="table table-sm table-bordered m-auto">
     <thead>
-      <tr class="thead-dark text-center">
+      <tr class="thead-dark text-center bg-secondary text-light">
         <small>
-          <th scope="col"><small>Name</small></th>
+          <th scope="col"><small></small></th>
           <th scope="col"><small>Room Layout</small></th>
           <th scope="col"><small>Size</small></th>
           <th scope="col"><small>Audibility / Visibility</small></th>
@@ -15,14 +15,21 @@
       </tr>
     </thead>
     {% for shul in shuls %}
-        <tr class="table-secondary">
-            <td colspan="5">
-              <div class="d-flex justify-content-between">
-                <div class="fw-bold ms-2">
+        <tr>
+            <td colspan="5" class="border-start-0 border-end-0 px-0">
+              <div class="d-flex justify-content-between shadow-sm bg-light rounded border">
+                <div class="ms-2 fw-bold">
                   {{shul.name}}
                 </div>
                 <div>
                   <div class="pe-3 d-inline-block">
+                    <form 
+                      action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
+                      class="d-inline-block"
+                    >
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm text-danger link-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete Shul</button>
+                    </form>
                     <div class="pe-2 d-inline-block">
                       Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
                     </div>
@@ -33,13 +40,6 @@
                       Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
                     </div>
                   </div>
-                  <form 
-                    action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
-                    class="d-inline-block"
-                  >
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-times" aria-hidden="true"></i></button>
-                  </form>
                 </div>
               </div>
 
@@ -48,7 +48,7 @@
         {% for room in shul.rooms.all %}
         <tr>
           <td>
-            <div class="ms-4 fw-bold">
+            <div class="ms-2">
               {{room.name}}
             </div>
           </td>
