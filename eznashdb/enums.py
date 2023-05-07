@@ -3,10 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RelativeSize(models.TextChoices):
-    MUCH_SMALLER = ("MUCH_SMALLER", _("Much smaller"))
-    SOMEWHAT_SMALLER = ("SOMEWHAT_SMALLER", _("Somewhat smaller"))
-    SAME_SIZE = ("SAME_SIZE", _("Same size"))
-    LARGER = ("LARGER", _("Larger"))
+    XS = ("XS", _("Much smaller"))
+    S = ("S", _("Smaller"))
+    M = ("M", _("Same size"))
+    L = ("L", _("Larger"))
 
 
 class SeeHearScore(models.IntegerChoices):
