@@ -70,7 +70,13 @@
           </td>
           <td>
             <div class="fw-bold text-center">
-              {{room.relative_size|default:"--"}}
+              {% if room.relative_size %}
+                <span class="badge bg-secondary w-100">
+                  {{room.relative_size}}
+                </span>
+              {% else %}
+                --
+              {% endif %}
             </div>
           </td>
           <td>
