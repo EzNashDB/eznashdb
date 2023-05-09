@@ -2,63 +2,85 @@
 {% load eznashdb_tags %}
 {% block content %}
 
-<table class="table table-sm table-bordered m-auto">
-    <thead>
-      <tr class="thead-dark text-center bg-secondary text-light">
-        <small>
-          <th scope="col"><small></small></th>
-          <th scope="col"><small>Room Layout</small></th>
-          <th scope="col"><small>Size</small></th>
-          <th scope="col"><small>Audibility / Visibility</small></th>
-          <th scope="col"><small>Wheelchair Access</small></th>
-        </small>
-      </tr>
-    </thead>
+  <div>
     {% for shul in shuls %}
-        <tr>
-            <td colspan="5" class="border-start-0 border-end-0 px-0">
-              <div class="d-flex justify-content-between shadow-sm bg-light rounded border">
-                <div class="ms-2 fw-bold">
-                  {{shul.name}}
+      <div class="px-2 d-flex justify-content-between shadow-sm bg-light rounded border">
+        <div class="fw-bold">{{shul.name}}</div>
+        <div>
+          <form 
+            action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
+            class="d-inline-block"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm text-danger link-danger">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+              Delete Shul
+            </button>
+          </form>
+          <span>
+            Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+          </span>
+          <span class="ps-2">
+            Childcare: {{ shul.has_childcare|bool_to_icon }}
+          </span>
+          <span class="ps-2">
+            Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
+          </span>
+        </div>
+      </div>
+      {% for room in shul.rooms.all %}
+        <div class="w-100 card">
+          <div class="card-header">{{room.name}}</div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between px-1 pb-2">
+              <div class="text-center">
+                <div class="room-size-badge">
+                  {% if room.relative_size %}
+                  <small>
+                    <span class="badge bg-secondary fw-bold w-100">
+                      {{room.relative_size}}
+                    </span>
+                  </small>
+                  {% else %}
+                    --
+                  {% endif %}
                 </div>
-                <div>
-                  <div class="pe-3 d-inline-block">
-                    <form 
-                      action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
-                      class="d-inline-block"
-                    >
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-sm text-danger link-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete Shul</button>
-                    </form>
-                    <div class="pe-2 d-inline-block">
-                      Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
-                    </div>
-                    <div class="pe-2 d-inline-block">
-                      Childcare: {{ shul.has_childcare|bool_to_icon }}
-                    </div>
-                    <div class="pe-2 d-inline-block">
-                      Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
-                    </div>
+              </div>
+              <div>
+                <div class="d-inline-block me-1">
+                  <small><small>
+                    <span>
+                      <i class="fa-solid fa-volume-high"></i>
+                      /
+                      <i class="fa-solid fa-eye"></i>
+                    </span>
+                  </small></small>
+                </div>
+                <div class="d-inline-block">
+                  <div class="see-hear-score">
+                    {% if room.see_hear_score %}
+                    <small>
+                      {{room.see_hear_score|score_to_stars}}
+                    </small>
+                    {% else %}
+                    --
+                    {% endif %}
                   </div>
                 </div>
               </div>
-
-          </td>
-        </tr>
-        {% for room in shul.rooms.all %}
-        <tr>
-          <td>
-            <div class="ms-2">
-              {{room.name}}
+              <small>
+                <div class="text-center">
+                  <i class="fa-solid fa-wheelchair"></i> 
+                  {{room.is_wheelchair_accessible|bool_to_icon}}
+                </div>
+              </small>
             </div>
-          </td>
-          <td>
-            <small class="p-0">
+            <small>
               <div class="row m-0">
                 {% for layout_display_data in room|get_layout_type_display_data_list %}
-                  <div class="col-12 col-lg-6 col-xl-4">
+                  <div class="col-12 px-0">
                     {% if layout_display_data.as_bool %}
-                      <span class="pe-4">
+                      <span>
                         <span class="pe-1 fw-bold">{{layout_display_data.layout_type}}:</span>
                         <span>{{layout_display_data.as_string}}</span>
                       </span>
@@ -67,41 +89,11 @@
                 {% endfor %}
               </div>
             </small>
-          </td>
-          <td>
-            <div class="text-center">
-              {% if room.relative_size %}
-              <small>
-
-                <span class="badge bg-secondary fw-bold w-100">
-                  {{room.relative_size}}
-                </span>
-              </small>
-              {% else %}
-                --
-              {% endif %}
-            </div>
-          </td>
-          <td>
-            <div class="text-center">
-              {% if room.see_hear_score %}
-              <small>
-                {{room.see_hear_score|score_to_stars}}
-              </small>
-              {% else %}
-                --
-              {% endif %}
-            </div>
-          </td>
-          <td>
-            <div class="fw-bold text-center">
-              {{room.is_wheelchair_accessible|bool_to_icon}}
-            </div>
-          </td>
-          </tr>
-          {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
     {% endfor %}
-  </table>
+  </div>
 
   {% if not shuls %}
   <div class="w-100 p-3 text-center">
