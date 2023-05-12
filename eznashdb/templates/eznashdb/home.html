@@ -20,12 +20,12 @@
       </div>
     </div>
     <div class="collapse show" id="collapseShul{{shul.id}}">
-      <div class="card-body pb-0">
+      <div class="card-body">
         {% for room in shul.rooms.all %}
           {% if forloop.counter != 1 %}
           <hr>
           {% endif %}
-          <div class="mb-3">
+          <div>
             {% include "eznashdb/includes/room_info.html" %}
           </div>
         {% endfor %}

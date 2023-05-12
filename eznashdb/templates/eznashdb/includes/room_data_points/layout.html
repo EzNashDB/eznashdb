@@ -1,0 +1,14 @@
+{% load eznashdb_tags %}
+
+<small>
+    <span>
+        {% for layout_display_data in room|get_layout_type_display_data_list %}
+            {% if layout_display_data.as_bool %}
+                <div class="pe-2 d-inline-block">
+                    <span class="fw-bold">{{layout_display_data.layout_type}}</span>
+                    <span>({{layout_display_data.as_string}})</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </span>
+</small>
