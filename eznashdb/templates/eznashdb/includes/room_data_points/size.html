@@ -1,11 +1,7 @@
-<div class="room-size-badge">
+<span class="badge text-dark border fw-bold w-100 w-45px">
     {% if room.relative_size %}
-        <small>
-            <span class="badge bg-secondary fw-bold w-100">
-            {{room.relative_size}}
-            </span>
-        </small>
+        {{room.relative_size}}
     {% else %}
         --
     {% endif %}
-</div>
+</span>

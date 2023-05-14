@@ -1,25 +1,22 @@
 {% load eznashdb_tags %}
 
-
-<div class="text-nowrap">
-    <div class="d-inline-block me-1">
-        <small><small>
+<span class="badge text-dark border w-125px">
+    <div class="d-flex flex-direction-row">
+        <div class="pe-2">
+            <i class="fa-solid fa-volume-high"></i>
+            /
+            <i class="fa-solid fa-eye"></i>
+        </div>
+        <div class="flex-grow-1">
             <span>
-                <i class="fa-solid fa-volume-high"></i>
-                /
-                <i class="fa-solid fa-eye"></i>
+                {% if room.see_hear_score %}
+                <small>
+                    {{room.see_hear_score|score_to_stars}}
+                </small>
+                {% else %}
+                --
+                {% endif %}
             </span>
-        </small></small>
-    </div>
-    <div class="d-inline-block">
-        <div class="see-hear-score">
-            {% if room.see_hear_score %}
-            <small>
-                {{room.see_hear_score|score_to_stars}}
-            </small>
-            {% else %}
-            --
-            {% endif %}
         </div>
     </div>
-</div>
+</span>
