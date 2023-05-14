@@ -1,10 +1,6 @@
 {% load eznashdb_tags %}
 
-
-<div class="fw-bold p-1">
-    {{shul.name}}
-</div>
-<div class="text-end">
+<div class="me-2">
     <form 
         action="{% url 'eznashdb:delete_shul' shul.pk %}" method="POST"
         class="d-inline-block"
@@ -12,16 +8,22 @@
         {% csrf_token %}
         <button type="submit" class="btn btn-sm text-danger link-danger">
             <i class="fa fa-trash" aria-hidden="true"></i>
-            Delete Shul
         </button>
     </form>
-    <span>
-        Fem. Leadership: {{ shul.has_female_leadership|bool_to_icon }}
-    </span>
-    <span class="ps-2">
-        Childcare: {{ shul.has_childcare|bool_to_icon }}
-    </span>
-    <span class="ps-2">
-        Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
-    </span>
+</div>
+<div class="fw-bold flex-grow-1">
+    {{shul.name}}
+</div>
+<div class="d-flex align-items-center">
+    <div class="text-end">
+        <span class="badge text-bg-light border fw-normal">
+            Female Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+        </span>
+        <span class="badge text-bg-light border fw-normal">
+            Childcare: {{ shul.has_childcare|bool_to_icon }}
+        </span>
+        <span class="badge text-bg-light border fw-normal">
+            Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}
+        </span>
+    </div>
 </div>

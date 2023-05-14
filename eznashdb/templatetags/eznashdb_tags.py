@@ -18,7 +18,7 @@ def bool_to_icon(value: bool) -> str:
         icon = icons[value]
     except KeyError:
         return value
-    return mark_safe(f'<i class="fa {icon}" aria-hidden="true"></i>')
+    return mark_safe(f'<i class="fa {icon} w-12px text-center" aria-hidden="true"></i>')
 
 
 EMPTY_STAR_HTML = '<i class="fa-regular fa-star"></i>'
