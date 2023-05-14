@@ -1,13 +1,13 @@
-.room-size-badge {
-    width: 36px;
-    min-width: 36px;
-    max-width: 36px;
+.w-45px {
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
 }
 
-.see-hear-score {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
+.w-125px {
+    width: 125px;
+    min-width: 125px;
+    max-width: 125px;
 }
 
 .btn .fa-chevron-up {

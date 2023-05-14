@@ -1,22 +1,22 @@
 <div>
-    <div class="float-end ps-2 pb-2">
-        <div class="row">
-            <div class="col-6 text-start">
+    <div class="row w-100 gx-0">
+        <div class="col-4 col-sm-5 col-md-5 col-lg-2">
+            <h6>
+                {{room.name}}
+            </h6>
+        </div>
+        <div class="col-8 col-sm-7 col-md-7 col-lg-4 col-xl-3 text-end text-lg-start">
+            <div class="d-inline-block">
                 {% include "eznashdb/includes/room_data_points/size.html" %}
             </div>
-            <div class="col-6 text-end">
+            <div class="d-inline-block">
                 {% include "eznashdb/includes/room_data_points/wheelchair_access.html" %}
             </div>
+            <div class="d-inline-block">
+                {% include "eznashdb/includes/room_data_points/see_hear_score.html" %}
+            </div>
         </div>
-        <div class="text-center">
-            {% include "eznashdb/includes/room_data_points/see_hear_score.html" %}
-        </div>
-    </div>
-    <div>
-        <h6>
-            {{room.name}}
-        </h6>
-        <div>
+        <div class="col-12 col-md-12 col-lg-6 col-xl-7">
             {% include "eznashdb/includes/room_data_points/layout.html" %}
         </div>
     </div>
