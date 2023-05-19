@@ -38,6 +38,8 @@ ALLOWED_HOSTS = [
     "eznashdb.fly.dev",
     "localhost",
     "127.0.0.1",
+    # Additional allowed hosts can be defined as a JSON list in the .env
+    *json.loads(os.environ.get("EXTRA_HOSTS", "[]")),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
