@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('eznashdb', '0009_remove_room_is_centered'),
+        ("eznashdb", "0009_remove_room_is_centered"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='room',
-            name='is_balcony',
+            model_name="room",
+            name="is_balcony",
             field=models.BooleanField(blank=True, default=False),
         ),
     ]

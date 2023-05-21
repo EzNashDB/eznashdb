@@ -34,16 +34,10 @@ class Room(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms"
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
-    shul = models.ForeignKey(
-        "eznashdb.Shul", on_delete=models.PROTECT, related_name="rooms"
-    )
+    shul = models.ForeignKey("eznashdb.Shul", on_delete=models.PROTECT, related_name="rooms")
     name = models.CharField(max_length=50)
-    relative_size = models.CharField(
-        max_length=50, null=True, blank=True, choices=RelativeSize.choices
-    )
-    see_hear_score = models.CharField(
-        max_length=50, null=True, blank=True, choices=SeeHearScore.choices
-    )
+    relative_size = models.CharField(max_length=50, null=True, blank=True, choices=RelativeSize.choices)
+    see_hear_score = models.CharField(max_length=50, null=True, blank=True, choices=SeeHearScore.choices)
     is_same_floor_side = models.BooleanField(blank=True, default=False)
     is_same_floor_back = models.BooleanField(blank=True, default=False)
     is_same_floor_elevated = models.BooleanField(blank=True, default=False)

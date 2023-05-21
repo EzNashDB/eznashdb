@@ -5,30 +5,25 @@ from django.db.models import Q
 
 
 def migrate(apps, schema_editor):
-    Shul = apps.get_model('eznashdb', 'Shul')
+    Shul = apps.get_model("eznashdb", "Shul")
     bad_shuls = Shul.objects.filter(
-        Q(created_by=None) |
-        Q(updated_by=None) |
-        Q(created_at=None) |
-        Q(updated_at=None)
+        Q(created_by=None) | Q(updated_by=None) | Q(created_at=None) | Q(updated_at=None)
     )
     bad_shuls.delete()
-    Room = apps.get_model('eznashdb', 'Room')
+    Room = apps.get_model("eznashdb", "Room")
     bad_rooms = Room.objects.filter(
-        Q(created_by=None) |
-        Q(updated_by=None) |
-        Q(created_at=None) |
-        Q(updated_at=None)
+        Q(created_by=None) | Q(updated_by=None) | Q(created_at=None) | Q(updated_at=None)
     )
     bad_rooms.delete()
+
 
 def revert(apps, schema_editor):
     pass
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('eznashdb', '0002_rename_editted_by_shul_updated_by_room_created_at_and_more'),
+        ("eznashdb", "0002_rename_editted_by_shul_updated_by_room_created_at_and_more"),
     ]
 
     operations = [

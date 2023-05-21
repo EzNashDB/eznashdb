@@ -34,3 +34,9 @@ repos:
       entry: .venv/bin/pycln
       args: [--config=pyproject.toml]
       language: system
+
+    - id: black
+      name: Python Black Formatter
+      entry: .venv/bin/black
+      language: system
+      files: '.*\.py$'

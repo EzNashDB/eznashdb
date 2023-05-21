@@ -7,9 +7,7 @@ from django.urls import resolve, reverse
 
 @pytest.fixture(autouse=True)
 def _override_settings_for_testing(settings):
-    settings.STATICFILES_STORAGE = (
-        "django.contrib.staticfiles.storage.StaticFilesStorage"
-    )
+    settings.STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 
 @pytest.fixture(autouse=True)

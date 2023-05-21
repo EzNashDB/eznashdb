@@ -38,12 +38,8 @@ def test_shows_shul_name(GET_request, test_user):
         ("can_say_kaddish", False, "fa-times"),
     ],
 )
-def test_shows_shul_details(
-    GET_request, test_user, field_name, field_value, display_value
-):
-    Shul.objects.create(
-        created_by=test_user, name="test shul", **{field_name: field_value}
-    )
+def test_shows_shul_details(GET_request, test_user, field_name, field_value, display_value):
+    Shul.objects.create(created_by=test_user, name="test shul", **{field_name: field_value})
 
     response = HomeView.as_view()(GET_request)
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -73,9 +69,7 @@ def test_shows_room_name(GET_request, test_user):
         ("is_mixed_seating", ["no", "mixed seating"]),
     ],
 )
-def test_shows_boolean_room_layout_details(
-    GET_request, test_user, field_name, display_values
-):
+def test_shows_boolean_room_layout_details(GET_request, test_user, field_name, display_values):
     shul = Shul.objects.create(created_by=test_user, name="test shul")
     shul.rooms.create(created_by=test_user, name="test_room", **{field_name: True})
 
@@ -86,12 +80,8 @@ def test_shows_boolean_room_layout_details(
         assert value.lower() in str(soup).lower()
 
 
-@pytest.mark.parametrize(
-    ("is_wheelchair_accessible", "expected"), [(True, "check"), (False, "times")]
-)
-def test_shows_wheelchair_data(
-    GET_request, test_user, is_wheelchair_accessible, expected
-):
+@pytest.mark.parametrize(("is_wheelchair_accessible", "expected"), [(True, "check"), (False, "times")])
+def test_shows_wheelchair_data(GET_request, test_user, is_wheelchair_accessible, expected):
     shul = Shul.objects.create(created_by=test_user, name="test shul")
     shul.rooms.create(
         created_by=test_user,
@@ -108,9 +98,7 @@ def test_shows_wheelchair_data(
 @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
 def test_shows_room_relative_size(GET_request, test_user, relative_size):
     shul = Shul.objects.create(created_by=test_user, name="test shul")
-    shul.rooms.create(
-        created_by=test_user, name="test_room", relative_size=relative_size
-    )
+    shul.rooms.create(created_by=test_user, name="test_room", relative_size=relative_size)
 
     response = HomeView.as_view()(GET_request)
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -136,9 +124,7 @@ def test_displays_dashes_for_unknown_relative_size(GET_request, test_user):
 @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
 def test_shows_room_see_hear_score(GET_request, test_user, see_hear_score):
     shul = Shul.objects.create(created_by=test_user, name="test shul")
-    shul.rooms.create(
-        created_by=test_user, name="test_room", see_hear_score=see_hear_score
-    )
+    shul.rooms.create(created_by=test_user, name="test_room", see_hear_score=see_hear_score)
 
     response = HomeView.as_view()(GET_request)
     soup = BeautifulSoup(str(response.render().content), features="html.parser")

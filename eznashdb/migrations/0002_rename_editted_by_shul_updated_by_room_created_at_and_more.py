@@ -7,46 +7,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('eznashdb', '0001_initial'),
+        ("eznashdb", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='shul',
-            old_name='editted_by',
-            new_name='updated_by',
+            model_name="shul",
+            old_name="editted_by",
+            new_name="updated_by",
         ),
         migrations.AddField(
-            model_name='room',
-            name='created_at',
+            model_name="room",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='room',
-            name='created_by',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='created_rooms', to=settings.AUTH_USER_MODEL),
+            model_name="room",
+            name="created_by",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_rooms",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='room',
-            name='updated_at',
+            model_name="room",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='room',
-            name='updated_by',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), blank=True, default=list, null=True, size=None),
+            model_name="room",
+            name="updated_by",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.IntegerField(), blank=True, default=list, null=True, size=None
+            ),
         ),
         migrations.AddField(
-            model_name='shul',
-            name='created_at',
+            model_name="shul",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='shul',
-            name='updated_at',
+            model_name="shul",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('eznashdb', '0008_alter_room_see_hear_score'),
+        ("eznashdb", "0008_alter_room_see_hear_score"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='room',
-            name='is_centered',
+            model_name="room",
+            name="is_centered",
         ),
     ]
