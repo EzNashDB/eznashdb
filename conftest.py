@@ -4,6 +4,8 @@ import pytest
 from django.core.handlers.wsgi import WSGIRequest
 from django.urls import resolve, reverse
 
+from eznashdb.constants import DEFAULT_ARG
+
 
 @pytest.fixture(autouse=True)
 def _override_settings_for_testing(settings):
@@ -25,10 +27,12 @@ def test_user(django_user_model):
 
 
 @pytest.fixture()
-def GET_request_factory(rf) -> Callable:
-    def _GET_request(view_name: str) -> WSGIRequest:
+def rf_GET(rf) -> Callable:
+    def _GET_request(view_name: str, params: dict = DEFAULT_ARG) -> WSGIRequest:
+        if params == DEFAULT_ARG:
+            params = {}
         url = reverse(view_name)
-        request = rf.get(url)
+        request = rf.get(url, params)
         request.resolver_match = resolve(url)
         return request
 
