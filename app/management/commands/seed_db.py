@@ -1,8 +1,10 @@
-from django.core.management.base import BaseCommand
 from typing import Any, Optional
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 

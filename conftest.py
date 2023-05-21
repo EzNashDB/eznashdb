@@ -1,7 +1,8 @@
-import pytest
-from django.urls import resolve, reverse
-from django.core.handlers.wsgi import WSGIRequest
 from typing import Callable
+
+import pytest
+from django.core.handlers.wsgi import WSGIRequest
+from django.urls import resolve, reverse
 
 
 @pytest.fixture(autouse=True)

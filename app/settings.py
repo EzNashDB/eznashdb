@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import json
-from pathlib import Path
 import os
 from os.path import dirname, join
+from pathlib import Path
+
 import dj_database_url
 from dotenv import load_dotenv
 

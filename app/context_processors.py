@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+
 def navbar(request):
     NavbarItem = namedtuple("NavbarItem", "label view_name")
     current_app_name = request.resolver_match.app_names[0]

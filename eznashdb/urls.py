@@ -1,5 +1,6 @@
-from eznashdb import views
 from django.urls import path
+
+from eznashdb import views
 
 app_name = "eznashdb"
 

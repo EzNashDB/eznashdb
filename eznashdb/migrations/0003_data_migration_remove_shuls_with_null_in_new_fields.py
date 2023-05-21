@@ -3,6 +3,7 @@
 from django.db import migrations
 from django.db.models import Q
 
+
 def migrate(apps, schema_editor):
     Shul = apps.get_model('eznashdb', 'Shul')
     bad_shuls = Shul.objects.filter(

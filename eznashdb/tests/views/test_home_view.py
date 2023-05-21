@@ -1,8 +1,9 @@
-from eznashdb.enums import RelativeSize, SeeHearScore
-from eznashdb.views import HomeView
-from bs4 import BeautifulSoup
-from eznashdb.models import Shul
 import pytest
+from bs4 import BeautifulSoup
+
+from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.models import Shul
+from eznashdb.views import HomeView
 
 
 @pytest.fixture()
