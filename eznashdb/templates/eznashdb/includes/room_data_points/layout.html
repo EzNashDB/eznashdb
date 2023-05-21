@@ -4,7 +4,10 @@
     {% for layout_display_data in room|get_layout_type_display_data_list %}
         {% if layout_display_data.as_bool %}
             <div class="d-inline-block badge text-dark border">
-                <span>{{layout_display_data.layout_type}}</span>
+                <div class="w-12px d-inline-block text-center">
+                    <i class="{{layout_display_data.icon}}"></i>
+                </div>
+                <span class="ms-1">{{layout_display_data.layout_type}}</span>
                 {% if layout_display_data.as_string %}
                     <span class="ps-2 fw-normal">{{layout_display_data.as_string}}</span>
                 {% endif %}

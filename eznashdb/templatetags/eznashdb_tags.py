@@ -43,17 +43,26 @@ def score_to_stars(value) -> str:
 
 ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE = {
     "Same floor": {
-        "is_same_floor_side": "Side",
-        "is_same_floor_back": "Back",
-        "is_same_floor_elevated": "Elevated",
-        "is_same_floor_level": "Level",
+        "icon": "fa-solid fa-arrows-left-right",
+        "fields": {
+            "is_same_floor_side": "Side",
+            "is_same_floor_back": "Back",
+            "is_same_floor_elevated": "Elevated",
+            "is_same_floor_level": "Level",
+        },
     },
     "Balcony": {
-        "is_balcony": "",
+        "icon": "fa-solid fa-stairs",
+        "fields": {
+            "is_balcony": "",
+        },
     },
     "No women's section": {
-        "is_only_men": "Only men",
-        "is_mixed_seating": "Mixed seating",
+        "icon": "fa-solid fa-xmark",
+        "fields": {
+            "is_only_men": "Only men",
+            "is_mixed_seating": "Mixed seating",
+        },
     },
 }
 
@@ -64,20 +73,23 @@ class RoomLayoutTypeDisplayData:
     layout_type: str
 
     @property
+    def icon(self):
+        return ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE[self.layout_type]["icon"]
+
+    @property
+    def fields_dict(self):
+        return ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE[self.layout_type]["fields"]
+
+    @property
     def as_bool(self):
-        return any(
-            getattr(self.room, field)
-            for field in ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE[self.layout_type].keys()
-        )
+        return any(getattr(self.room, field) for field in self.fields_dict.keys())
 
     @property
     def as_string(self) -> str:
-        display_values_dict = ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE[self.layout_type]
-        if len(display_values_dict.values()) == 1:
+        fields_dict = self.fields_dict
+        if len(fields_dict.values()) == 1:
             return
-        display_values = [
-            v for k, v in display_values_dict.items() if getattr(self.room, k)
-        ]
+        display_values = [v for k, v in fields_dict.items() if getattr(self.room, k)]
         return ", ".join(display_values)
 
 
