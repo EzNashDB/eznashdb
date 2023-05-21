@@ -4,7 +4,7 @@ from eznashdb.templatetags.eznashdb_tags import bool_to_icon
 
 
 @pytest.mark.parametrize(
-    "value,icon_class",
+    ("value", "icon_class"),
     [
         (True, "fa-check"),
         (False, "fa-times"),

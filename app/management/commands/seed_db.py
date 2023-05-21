@@ -41,8 +41,8 @@ class Command(BaseCommand):
                 name=f"Seeded Room {shul_num}-{j+1}",
                 defaults={
                     "created_by": self.user,
-                    "relative_size": [None, *list(RelativeSize)][base_num - 1],
-                    "see_hear_score": [None, *list(SeeHearScore)][base_num - 1],
+                    "relative_size": ["", *list(RelativeSize)][base_num - 1],
+                    "see_hear_score": ["", *list(SeeHearScore)][base_num - 1],
                     "is_same_floor_side": bool((base_num + 1) % 2),
                     "is_same_floor_back": bool(base_num % 2),
                     "is_same_floor_elevated": bool((base_num + 1) % 2),

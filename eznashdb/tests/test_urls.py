@@ -5,7 +5,7 @@ from eznashdb.views import CreateUpdateShulView, DeleteShulView, HomeView
 
 
 @pytest.mark.parametrize(
-    "view_name,view,args,kwargs",
+    ("view_name", "view", "args", "kwargs"),
     [
         ("eznashdb:home", HomeView, [], {}),
         ("eznashdb:create_shul", CreateUpdateShulView, [], {}),

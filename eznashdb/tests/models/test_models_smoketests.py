@@ -17,7 +17,7 @@ def test_models_smoketest(django_user_model):
     )
 
     # Create room
-    room = Room.objects.create(
+    Room.objects.create(
         created_by=user,
         shul=shul,
         name="Test Room",
