@@ -1,10 +1,7 @@
 {% load eznashdb_tags %}
-
 <div class="d-flex flex-direction-row badge text-dark border fw-bold w-45px">
     <div>
         <i class="fa-solid fa-wheelchair"></i>
     </div>
-    <div class="flex-grow-1 text-center">
-        {{room.is_wheelchair_accessible|bool_to_icon}}
-    </div>
+    <div class="flex-grow-1 text-center">{{ room.is_wheelchair_accessible|bool_to_icon }}</div>
 </div>
