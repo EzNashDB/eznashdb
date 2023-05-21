@@ -1,5 +1,4 @@
 {% load eznashdb_tags %}
-
 <span class="badge text-dark border w-125px">
     <div class="d-flex flex-direction-row">
         <div class="pe-2">
@@ -10,11 +9,9 @@
         <div class="flex-grow-1">
             <span>
                 {% if room.see_hear_score %}
-                <small>
-                    {{room.see_hear_score|score_to_stars}}
-                </small>
+                    <small>{{ room.see_hear_score|score_to_stars }}</small>
                 {% else %}
-                --
+                    --
                 {% endif %}
             </span>
         </div>

@@ -15,3 +15,9 @@ repos:
       entry: .venv/bin/isort
       language: system
       files: '.*\.py$'
+
+    - id: djlint-django
+      name: Django djLint
+      entry: .venv/bin/djlint --profile=django --quiet --reformat
+      language: system
+      files: '.*\.html$'
