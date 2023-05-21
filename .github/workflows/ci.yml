@@ -53,5 +53,8 @@ jobs:
         run: poetry install --no-interaction --no-root
         if: steps.cache-deps.outputs.cache-hit != 'true'
 
+      - name: Run Pre-commit
+        run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files --hook-stage push
+
       - name: Run tests
         run: poetry run pytest
