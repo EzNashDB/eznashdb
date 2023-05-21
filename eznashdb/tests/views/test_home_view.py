@@ -63,7 +63,6 @@ def test_shows_room_name(GET_request, test_user):
 @pytest.mark.parametrize(
     ("field_name", "display_values"),
     [
-        ("is_centered", ["same floor", "centered"]),
         ("is_same_floor_side", ["same floor", "side"]),
         ("is_same_floor_back", ["same floor", "back"]),
         ("is_same_floor_elevated", ["same floor", "elevated"]),

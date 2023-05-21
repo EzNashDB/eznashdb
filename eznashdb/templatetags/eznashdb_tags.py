@@ -47,7 +47,6 @@ ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE = {
         "is_balcony_back": "Back",
     },
     "Same floor": {
-        "is_centered": "Centered Mechitza",
         "is_same_floor_side": "Side",
         "is_same_floor_back": "Back",
         "is_same_floor_elevated": "Elevated",
