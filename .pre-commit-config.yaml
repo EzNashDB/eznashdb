@@ -21,3 +21,10 @@ repos:
       entry: .venv/bin/djlint --profile=django --quiet --reformat
       language: system
       files: '.*\.html$'
+
+    - id: migrations
+      name: Django Migrations
+      entry: .venv/bin/python manage.py makemigrations --check --no-input
+      language: system
+      pass_filenames: false
+      files: '.*\.py$'
