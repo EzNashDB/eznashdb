@@ -40,3 +40,9 @@ repos:
       entry: .venv/bin/black
       language: system
       files: '.*\.py$'
+
+    - id: flake8
+      name: Python Flake8 Linter
+      entry: .venv/bin/flake8heavened
+      language: system
+      files: '.*\.py$'

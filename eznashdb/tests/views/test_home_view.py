@@ -111,7 +111,7 @@ def test_displays_dashes_for_unknown_relative_size(GET_request, test_user):
     shul.rooms.create(
         created_by=test_user,
         name="test_room",
-        relative_size=None,
+        relative_size="",
         see_hear_score=SeeHearScore._3,
     )
 
@@ -144,7 +144,7 @@ def test_shows_dashes_for_unknown_see_hear_score(GET_request, test_user):
     shul.rooms.create(
         created_by=test_user,
         name="test_room",
-        see_hear_score=None,
+        see_hear_score="",
         relative_size=RelativeSize.M,
     )
 

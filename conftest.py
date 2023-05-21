@@ -11,7 +11,7 @@ def _override_settings_for_testing(settings):
 
 
 @pytest.fixture(autouse=True)
-def enable_db_access_for_all_tests(db):
+def _enable_db_access_for_all_tests(db):
     pass
 
 

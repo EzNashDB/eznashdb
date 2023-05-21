@@ -27,6 +27,34 @@ exclude = '''
 )/
 '''
 
+[tool.djlint]
+profile = "django"
+blank_line_before_tag="block"
+blank_line_after_tag="endblock,extends"
+format_attribute_template_tags=true
+max_line_length=105
+preserve_leading_space=false
+preserve_blank_lines=false
+
+[tool.flakeheaven]
+# PIE786 covered by bugbear with better message
+ignore = ["E203", "E266", "E501", "W503", "F403", "F401", "E231", "-PIE786"]
+format = "colored"
+max_line_length = 105
+max_complexity = 18
+show_source = true
+select = ["B","C","E","F","W","T4","B9"]
+exclude = [".git","__pycache__","old","build","dist",".venv"]
+baseline = "flakeheaven_baseline.txt"
+
+[tool.flakeheaven.plugins]
+pyflakes = ["+*"]
+# E722 covered by bugbear with better message
+pycodestyle = ["+*", "-E501", "-E722", "-W503"]
+flake8-bugbear = ["+*"]
+flake8-django = ["+*"]
+flake8-pytest-style = ["+*"]
+
 [tool.poetry.dependencies]
 python = "^3.8"
 Django = "^4.0"
@@ -51,6 +79,12 @@ isort = "^5.12.0"
 pre-commit = "^3.3.2"
 djlint = "^1.19.7"
 pycln = "^2.1.3"
+flakeheaven = "^3.3.0"
+flake8-pytest-style = "^1.7.2"
+flake8-bugbear = "^22.1.11"
+flake8-comprehensions = "^3.12.0"
+flake8-django = "^1.2"
+flake8-mutable = "^1.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
