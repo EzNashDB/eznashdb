@@ -6,7 +6,8 @@ from eznashdb.views import CreateUpdateShulView
 
 @pytest.fixture()
 def GET_request(GET_request_factory):
-    return GET_request_factory('eznashdb:create_shul')
+    return GET_request_factory("eznashdb:create_shul")
+
 
 def test_shows_page_title(GET_request):
     response = CreateUpdateShulView.as_view()(GET_request)

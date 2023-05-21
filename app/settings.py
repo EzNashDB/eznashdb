@@ -106,9 +106,7 @@ WSGI_APPLICATION = "app.wsgi.application"
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
-    database = dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"), conn_max_age=0
-    )
+    database = dj_database_url.config(default=os.environ.get("DATABASE_URL"), conn_max_age=0)
 else:
     database = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -176,7 +174,5 @@ STATIC_URL = "/static/"  # Url to find the static files at
 STATIC_ROOT = os.path.join(
     BASE_DIR, "staticfiles"
 )  # place to prepare the static files for serving in production
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-]  # Where our static files live in the codebase
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Where our static files live in the codebase
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

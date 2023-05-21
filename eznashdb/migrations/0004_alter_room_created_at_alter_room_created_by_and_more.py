@@ -7,46 +7,53 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('eznashdb', '0003_data_migration_remove_shuls_with_null_in_new_fields'),
+        ("eznashdb", "0003_data_migration_remove_shuls_with_null_in_new_fields"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='room',
-            name='created_at',
+            model_name="room",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True),
         ),
         migrations.AlterField(
-            model_name='room',
-            name='created_by',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='created_rooms', to=settings.AUTH_USER_MODEL),
+            model_name="room",
+            name="created_by",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_rooms",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='room',
-            name='updated_at',
+            model_name="room",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='room',
-            name='updated_by',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), blank=True, default=list, size=None),
+            model_name="room",
+            name="updated_by",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.IntegerField(), blank=True, default=list, size=None
+            ),
         ),
         migrations.AlterField(
-            model_name='shul',
-            name='created_at',
+            model_name="shul",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True),
         ),
         migrations.AlterField(
-            model_name='shul',
-            name='updated_at',
+            model_name="shul",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='shul',
-            name='updated_by',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), blank=True, default=list, size=None),
+            model_name="shul",
+            name="updated_by",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.IntegerField(), blank=True, default=list, size=None
+            ),
         ),
     ]

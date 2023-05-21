@@ -4,27 +4,26 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('eznashdb', '0004_alter_room_created_at_alter_room_created_by_and_more'),
+        ("eznashdb", "0004_alter_room_created_at_alter_room_created_by_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='region',
-            name='country',
+            model_name="region",
+            name="country",
         ),
         migrations.RemoveField(
-            model_name='shul',
-            name='city',
+            model_name="shul",
+            name="city",
         ),
         migrations.DeleteModel(
-            name='City',
+            name="City",
         ),
         migrations.DeleteModel(
-            name='Country',
+            name="Country",
         ),
         migrations.DeleteModel(
-            name='Region',
+            name="Region",
         ),
     ]
