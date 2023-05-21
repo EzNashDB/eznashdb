@@ -1,5 +1,6 @@
-from eznashdb.templatetags.eznashdb_tags import bool_to_icon
 import pytest
+
+from eznashdb.templatetags.eznashdb_tags import bool_to_icon
 
 
 @pytest.mark.parametrize(

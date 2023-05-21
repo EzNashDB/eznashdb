@@ -1,5 +1,5 @@
-from eznashdb.models import Shul, Room
-from eznashdb.enums import SeeHearScore, RelativeSize
+from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.models import Room, Shul
 
 
 def test_models_smoketest(django_user_model):

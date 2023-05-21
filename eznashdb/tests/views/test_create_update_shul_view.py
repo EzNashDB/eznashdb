@@ -1,6 +1,8 @@
-from eznashdb.views import CreateUpdateShulView
-from bs4 import BeautifulSoup
 import pytest
+from bs4 import BeautifulSoup
+
+from eznashdb.views import CreateUpdateShulView
+
 
 @pytest.fixture()
 def GET_request(GET_request_factory):
