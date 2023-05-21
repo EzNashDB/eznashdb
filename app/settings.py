@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "crispy_forms",
+    "crispy_bootstrap5",
     "app",
     "eznashdb",
     "users",
@@ -176,3 +178,8 @@ STATIC_ROOT = os.path.join(
 )  # place to prepare the static files for serving in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Where our static files live in the codebase
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+# Crispy forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
