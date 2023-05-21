@@ -65,6 +65,7 @@ python-dotenv = "^0.19.2"
 django-cors-headers = "^3.11.0"
 psycopg2-binary = "^2.9.5"
 black = "^23.3.0"
+django-filter = "^23.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
@@ -85,6 +86,7 @@ flake8-bugbear = "^22.1.11"
 flake8-comprehensions = "^3.12.0"
 flake8-django = "^1.2"
 flake8-mutable = "^1.2.0"
+pytest-describe = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

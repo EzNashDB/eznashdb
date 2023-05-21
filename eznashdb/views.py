@@ -2,17 +2,15 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import DeleteView, TemplateView
+from django_filters.views import FilterView
 
+from eznashdb.filtersets import ShulFilterSet
 from eznashdb.models import Shul
 
 
-class HomeView(TemplateView):
-    template_name = "eznashdb/home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["shuls"] = Shul.objects.all()
-        return context
+class ShulsFilterView(FilterView):
+    template_name = "eznashdb/shuls.html"
+    filterset_class = ShulFilterSet
 
 
 class CreateUpdateShulView(TemplateView):
@@ -23,7 +21,7 @@ class DeleteShulView(DeleteView):
     model = Shul
 
     def get_success_url(self) -> str:
-        return reverse("eznashdb:home")
+        return reverse("eznashdb:shuls")
 
     def form_valid(self, form):
         success_url = self.get_success_url()
