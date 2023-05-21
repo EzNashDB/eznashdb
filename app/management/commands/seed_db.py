@@ -41,7 +41,6 @@ class Command(BaseCommand):
                     "created_by": self.user,
                     "relative_size": [None, *list(RelativeSize)][base_num - 1],
                     "see_hear_score": [None, *list(SeeHearScore)][base_num - 1],
-                    "is_centered": bool(base_num % 2),
                     "is_same_floor_side": bool((base_num + 1) % 2),
                     "is_same_floor_back": bool(base_num % 2),
                     "is_same_floor_elevated": bool((base_num + 1) % 2),

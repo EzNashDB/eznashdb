@@ -43,7 +43,6 @@ class Room(models.Model):
     see_hear_score = models.CharField(
         max_length=50, null=True, blank=True, choices=SeeHearScore.choices
     )
-    is_centered = models.BooleanField(blank=True, default=False)
     is_same_floor_side = models.BooleanField(blank=True, default=False)
     is_same_floor_back = models.BooleanField(blank=True, default=False)
     is_same_floor_elevated = models.BooleanField(blank=True, default=False)
