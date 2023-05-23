@@ -38,3 +38,7 @@ body {
 .btn.collapsed .fa-chevron-up {
     transform: rotate(-180deg);
 }
+
+.ts-dropdown .has-items .clear-button {
+    opacity: 1;
+}
