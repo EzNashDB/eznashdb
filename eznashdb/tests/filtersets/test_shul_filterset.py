@@ -33,7 +33,9 @@ def describe_shul_name():
         assert ShulFilterSet({"name": "no match"}, request=test_request).qs.count() == 0
 
 
-def describe_has_female_leadership():
+class YesNoUnknownFilterTest:
+    shul_model_field = None
+
     @pytest.mark.parametrize(
         ("value", "query"),
         [
@@ -42,10 +44,11 @@ def describe_has_female_leadership():
             (None, "--"),
         ],
     )
-    def includes_shuls_that_match_single_value(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_female_leadership=value)
+    @pytest.mark.usefixtures("test_user", "test_request", "value", "query")
+    def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
+        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({"has_female_leadership": [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
 
     @pytest.mark.parametrize(
         ("value", "query"),
@@ -55,51 +58,12 @@ def describe_has_female_leadership():
             (None, ["True", "--"]),
         ],
     )
-    def includes_shuls_that_match_any_of_multiple_values(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_female_leadership=value)
+    def test_includes_shuls_that_match_any_of_multiple_values(
+        self, test_user, test_request, value, query
+    ):
+        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({"has_female_leadership": [query]}, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["False", "--"]),
-            (False, ["True", "--"]),
-            (None, ["True", "False"]),
-        ],
-    )
-    def excludes_shuls_that_do_not_match_any_of_value(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_female_leadership=value)
-
-        assert ShulFilterSet({"has_female_leadership": [query]}, request=test_request).qs.count() == 1
-
-
-def describe_has_childcare():
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, "True"),
-            (False, "False"),
-            (None, "--"),
-        ],
-    )
-    def includes_shuls_that_match_single_value(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_childcare=value)
-
-        assert ShulFilterSet({"has_childcare": [query]}, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["True", "False"]),
-            (False, ["False", "--"]),
-            (None, ["True", "--"]),
-        ],
-    )
-    def includes_shuls_that_match_any_of_multiple_values(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_childcare=value)
-
-        assert ShulFilterSet({"has_childcare": [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
 
     @pytest.mark.parametrize(
         ("value", "query"),
@@ -109,7 +73,15 @@ def describe_has_childcare():
             (None, ["True", "False"]),
         ],
     )
-    def excludes_shuls_that_do_not_match_any_of_value(test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, has_childcare=value)
+    def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
+        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({"has_childcare": [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
+
+
+class TestFemaleLeadershipFilter(YesNoUnknownFilterTest):
+    shul_model_field = "has_female_leadership"
+
+
+class TestChildcareFilter(YesNoUnknownFilterTest):
+    shul_model_field = "has_childcare"
