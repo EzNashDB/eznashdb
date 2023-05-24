@@ -10,6 +10,7 @@ class ShulFilterSet(FilterSet):
         label="Female Leadership", model_field="has_female_leadership"
     )
     has_childcare = YesNoUnknownFilter(label="Childcare", model_field="has_childcare")
+    can_say_kaddish = YesNoUnknownFilter(label="Kaddish", model_field="can_say_kaddish")
 
     class Meta:
         model = Shul
