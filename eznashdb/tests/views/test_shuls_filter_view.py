@@ -197,3 +197,15 @@ def describe_filter():
         soup_text = soup.get_text().lower()
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
+
+    def filters_by_can_say_kaddish(rf_GET, test_user):
+        Shul.objects.create(created_by=test_user, name="shul 1", can_say_kaddish=False)
+        Shul.objects.create(created_by=test_user, name="shul 2", can_say_kaddish=True)
+        request = rf_GET("eznashdb:shuls", {"can_say_kaddish": ["True"]})
+
+        response = ShulsFilterView.as_view()(request)
+
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+        soup_text = soup.get_text().lower()
+        assert "shul 2" in soup_text
+        assert "shul 1" not in soup_text

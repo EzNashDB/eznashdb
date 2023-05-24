@@ -39,16 +39,16 @@ class YesNoUnknownFilterTest:
     @pytest.mark.parametrize(
         ("value", "query"),
         [
-            (True, "True"),
-            (False, "False"),
-            (None, "--"),
+            (True, ["True"]),
+            (False, ["False"]),
+            (None, ["--"]),
         ],
     )
     @pytest.mark.usefixtures("test_user", "test_request", "value", "query")
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
         Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
     @pytest.mark.parametrize(
         ("value", "query"),
@@ -63,7 +63,7 @@ class YesNoUnknownFilterTest:
     ):
         Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
     @pytest.mark.parametrize(
         ("value", "query"),
@@ -76,7 +76,7 @@ class YesNoUnknownFilterTest:
     def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
         Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
 
-        assert ShulFilterSet({self.shul_model_field: [query]}, request=test_request).qs.count() == 1
+        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
 
 
 class TestFemaleLeadershipFilter(YesNoUnknownFilterTest):
@@ -85,3 +85,7 @@ class TestFemaleLeadershipFilter(YesNoUnknownFilterTest):
 
 class TestChildcareFilter(YesNoUnknownFilterTest):
     shul_model_field = "has_childcare"
+
+
+class TestKaddishFilter(YesNoUnknownFilterTest):
+    shul_model_field = "can_say_kaddish"
