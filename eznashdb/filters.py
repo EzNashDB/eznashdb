@@ -31,4 +31,4 @@ class YesNoUnknownFilter(MultipleChoiceFilter):
         query = Q(**{f"{self.model_field}__in": values})
         if include_None:
             query |= Q(**{f"{self.model_field}__isnull": True})
-        return qs.filter(query)
+        return qs.filter(query).distinct()
