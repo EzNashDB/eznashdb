@@ -4,7 +4,7 @@ from django_filters import MultipleChoiceFilter
 from eznashdb.widgets import TomSelectWidget
 
 
-class YesNoUnsureFilter(MultipleChoiceFilter):
+class YesNoUnknownFilter(MultipleChoiceFilter):
     widget = TomSelectWidget
 
     def __init__(
