@@ -265,3 +265,75 @@ class TestSeeHearScoreFilter:
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
+
+
+class TestRoomLayoutFilter:
+    @pytest.mark.parametrize(
+        ("layout_field", "query"),
+        [
+            ("is_same_floor_side",) * 2,
+            ("is_same_floor_back",) * 2,
+            ("is_same_floor_elevated",) * 2,
+            ("is_same_floor_level",) * 2,
+            ("is_balcony",) * 2,
+            ("is_only_men",) * 2,
+            ("is_mixed_seating",) * 2,
+            ("", ["--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_single_value(self, test_user, test_request, layout_field, query):
+        shul = Shul.objects.create(created_by=test_user)
+        room = shul.rooms.create(created_by=test_user)
+        if layout_field:
+            setattr(room, layout_field, True)
+            room.save()
+
+        data = {"rooms__layout": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, is_same_floor_back=True)
+        shul.rooms.create(created_by=test_user, is_same_floor_back=True)
+
+        data = {"rooms__layout": ["is_same_floor_back"]}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("layout_field", "query"),
+        [
+            ("is_same_floor_side", ["is_same_floor_side", "is_balcony"]),
+            ("is_same_floor_side", ["is_same_floor_side", "--"]),
+            ("", ["is_same_floor_side", "--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_any_of_multiple_values(
+        self, test_user, test_request, layout_field, query
+    ):
+        shul = Shul.objects.create(created_by=test_user)
+        room = shul.rooms.create(created_by=test_user)
+        if layout_field:
+            setattr(room, layout_field, True)
+            room.save()
+
+        data = {"rooms__layout": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("layout_field", "query"),
+        [
+            ("is_same_floor_side", ["is_same_floor_back", "is_balcony"]),
+            ("is_same_floor_side", ["is_same_floor_back", "--"]),
+            ("", ["is_same_floor_side", "is_same_floor_back"]),
+        ],
+    )
+    def test_excludes_shuls_that_do_not_match_any_value(
+        self, test_user, test_request, layout_field, query
+    ):
+        shul = Shul.objects.create(created_by=test_user)
+        room = shul.rooms.create(created_by=test_user)
+        if layout_field:
+            setattr(room, layout_field, True)
+            room.save()
+        data = {"rooms__layout": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 0
