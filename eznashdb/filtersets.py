@@ -1,6 +1,6 @@
 from django_filters import CharFilter, FilterSet
 
-from eznashdb.enums import RelativeSize
+from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filters import BoolOrUnknownFilter, MultipleChoiceOrUnknownCharFilter
 from eznashdb.models import Shul
 
@@ -19,6 +19,11 @@ class ShulFilterSet(FilterSet):
         label="Women's Section Size",
         model_field="rooms__relative_size",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in RelativeSize],
+    )
+    rooms__see_hear_score = MultipleChoiceOrUnknownCharFilter(
+        label="Audibility / Visibility",
+        model_field="rooms__see_hear_score",
+        choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in SeeHearScore],
     )
 
     class Meta:

@@ -1,7 +1,7 @@
 import pytest
 from django.urls import resolve, reverse
 
-from eznashdb.enums import RelativeSize
+from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.models import Shul
 
@@ -204,4 +204,64 @@ class TestRelativeSizeFilter:
         shul.rooms.create(created_by=test_user, relative_size=value)
 
         data = {"rooms__relative_size": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 0
+
+
+class TestSeeHearScoreFilter:
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (SeeHearScore._1.value, ["1"]),
+            (SeeHearScore._2.value, ["2"]),
+            (SeeHearScore._3.value, ["3"]),
+            (SeeHearScore._4.value, ["4"]),
+            (SeeHearScore._5.value, ["5"]),
+            ("", ["--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, see_hear_score=value)
+
+        data = {"rooms__see_hear_score": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, see_hear_score=SeeHearScore._3.value)
+        shul.rooms.create(created_by=test_user, see_hear_score=SeeHearScore._3.value)
+
+        data = {"rooms__see_hear_score": ["M"]}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (SeeHearScore._3.value, ["3", "5"]),
+            (SeeHearScore._3.value, ["3", "--"]),
+            ("", ["4", "--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_any_of_multiple_values(
+        self, test_user, test_request, value, query
+    ):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, see_hear_score=value)
+
+        data = {"rooms__see_hear_score": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (SeeHearScore._3.value, ["4", "5"]),
+            (SeeHearScore._3.value, ["4", "--"]),
+            ("", ["4", "3"]),
+        ],
+    )
+    def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, see_hear_score=value)
+
+        data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
