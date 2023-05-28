@@ -10,13 +10,18 @@ from eznashdb.widgets import TomSelectWidget
 class TomSelectWithUnknownFilter(MultipleChoiceFilter):
     widget = TomSelectWidget
 
+    def __init__(self, label, choices: List[Tuple[str, str]] = DEFAULT_ARG, *args, **kwargs):
+        if choices == DEFAULT_ARG:
+            choices = getattr(self, "choices", [])
+        choices.insert(0, ("--", "Unknown"))
+        super().__init__(*args, widget=TomSelectWidget, choices=tuple(choices), label=label, **kwargs)
+
+
+class MultipleChoiceModelFieldWithUnknownFilter(TomSelectWithUnknownFilter):
     def __init__(
         self, label, model_field, choices: List[Tuple[str, str]] = DEFAULT_ARG, *args, **kwargs
     ):
-        if choices == DEFAULT_ARG:
-            choices = self.choices
-        choices.append(("--", "Unknown"))
-        super().__init__(*args, widget=TomSelectWidget, choices=tuple(choices), label=label, **kwargs)
+        super().__init__(label, choices, *args, **kwargs)
         self.model_field = model_field
         self.method = self.filter_method
 
@@ -24,13 +29,13 @@ class TomSelectWithUnknownFilter(MultipleChoiceFilter):
         raise NotImplementedError
 
 
-class MultipleChoiceOrUnknownCharFilter(TomSelectWithUnknownFilter):
+class MultipleChoiceOrUnknownCharFilter(MultipleChoiceModelFieldWithUnknownFilter):
     def filter_method(self, qs, name, value):
         value = ["" if v == "--" else v for v in value]
         return qs.filter(**{f"{self.model_field}__in": value}).distinct()
 
 
-class BoolOrUnknownFilter(TomSelectWithUnknownFilter):
+class BoolOrUnknownFilter(MultipleChoiceModelFieldWithUnknownFilter):
     choices = [(True, "Yes"), (False, "No")]
 
     def filter_method(self, qs, name, value):

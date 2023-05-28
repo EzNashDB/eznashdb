@@ -266,3 +266,17 @@ def describe_filter():
         soup_text = soup.get_text().lower()
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
+
+    def filters_by_room_layout(rf_GET, test_user):
+        Shul.objects.create(created_by=test_user, name="shul 1")
+        Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
+            created_by=test_user, is_same_floor_side=True
+        )
+        request = rf_GET("eznashdb:shuls", {"rooms__layout": ["is_same_floor_side"]})
+
+        response = ShulsFilterView.as_view()(request)
+
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+        soup_text = soup.get_text().lower()
+        assert "shul 2" in soup_text
+        assert "shul 1" not in soup_text
