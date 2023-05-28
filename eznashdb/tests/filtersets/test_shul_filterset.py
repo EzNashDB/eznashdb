@@ -1,6 +1,7 @@
 import pytest
 from django.urls import resolve, reverse
 
+from eznashdb.enums import RelativeSize
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.models import Shul
 
@@ -90,9 +91,7 @@ class TestKaddishFilter(YesNoUnknownFilterTest):
     shul_model_field = "can_say_kaddish"
 
 
-class TestWheelChairAccessFilter:
-    shul_model_field = None
-
+class TestWheelchairAccessFilter:
     @pytest.mark.parametrize(
         ("value", "query"),
         [
@@ -146,4 +145,63 @@ class TestWheelChairAccessFilter:
         shul.rooms.create(created_by=test_user, is_wheelchair_accessible=value)
 
         data = {"rooms__is_wheelchair_accessible": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 0
+
+
+class TestRelativeSizeFilter:
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (RelativeSize.XS.value, ["XS"]),
+            (RelativeSize.S.value, ["S"]),
+            (RelativeSize.M.value, ["M"]),
+            (RelativeSize.L.value, ["L"]),
+            ("", ["--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, relative_size=value)
+
+        data = {"rooms__relative_size": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, relative_size=RelativeSize.M.value)
+        shul.rooms.create(created_by=test_user, relative_size=RelativeSize.M.value)
+
+        data = {"rooms__relative_size": ["M"]}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (RelativeSize.M.value, ["M", "L"]),
+            (RelativeSize.M.value, ["M", "--"]),
+            ("", ["M", "--"]),
+        ],
+    )
+    def test_includes_shuls_that_match_any_of_multiple_values(
+        self, test_user, test_request, value, query
+    ):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, relative_size=value)
+
+        data = {"rooms__relative_size": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (RelativeSize.M.value, ["L", "S"]),
+            (RelativeSize.M.value, ["L", "--"]),
+            ("", ["S", "M"]),
+        ],
+    )
+    def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
+        shul = Shul.objects.create(created_by=test_user)
+        shul.rooms.create(created_by=test_user, relative_size=value)
+
+        data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0

@@ -1,18 +1,24 @@
 from django_filters import CharFilter, FilterSet
 
-from eznashdb.filters import YesNoUnknownFilter
+from eznashdb.enums import RelativeSize
+from eznashdb.filters import BoolOrUnknownFilter, MultipleChoiceOrUnknownCharFilter
 from eznashdb.models import Shul
 
 
 class ShulFilterSet(FilterSet):
     name = CharFilter(lookup_expr="icontains", label="Shul Name")
-    has_female_leadership = YesNoUnknownFilter(
+    has_female_leadership = BoolOrUnknownFilter(
         label="Female Leadership", model_field="has_female_leadership"
     )
-    has_childcare = YesNoUnknownFilter(label="Childcare", model_field="has_childcare")
-    can_say_kaddish = YesNoUnknownFilter(label="Kaddish", model_field="can_say_kaddish")
-    rooms__is_wheelchair_accessible = YesNoUnknownFilter(
+    has_childcare = BoolOrUnknownFilter(label="Childcare", model_field="has_childcare")
+    can_say_kaddish = BoolOrUnknownFilter(label="Kaddish", model_field="can_say_kaddish")
+    rooms__is_wheelchair_accessible = BoolOrUnknownFilter(
         label="Wheelchair Access", model_field="rooms__is_wheelchair_accessible"
+    )
+    rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
+        label="Women's Section Size",
+        model_field="rooms__relative_size",
+        choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in RelativeSize],
     )
 
     class Meta:
