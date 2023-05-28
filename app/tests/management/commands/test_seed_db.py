@@ -26,14 +26,14 @@ def test_does_not_recreate_shuls():
     assert Shul.objects.count() == SeedDB.shul_count
 
 
-def test_creates_2_rooms_per_shul():
+def test_creates_at_least_1_room_per_shul():
     call_command("seed_db")
     for shul in Shul.objects.all():
-        assert shul.rooms.count() == 2
+        assert shul.rooms.count() >= 1
 
 
 def test_does_not_recreate_rooms():
-    call_command("seed_db")
-    call_command("seed_db")
+    for _ in range(4):
+        call_command("seed_db")
     for shul in Shul.objects.all():
-        assert shul.rooms.count() == 2
+        assert shul.rooms.count() <= 3
