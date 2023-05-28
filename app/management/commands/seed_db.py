@@ -1,4 +1,3 @@
-import random
 from typing import Any, Optional
 
 from django.contrib.auth import get_user_model
@@ -6,26 +5,9 @@ from django.core.management.base import BaseCommand
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
+from eznashdb.random import random_bool, random_bool_or_None, random_choice_or_blank
 
 User = get_user_model()
-
-
-def random_choice_or_None(choices: list) -> Any:
-    choices.append(None)
-    return random.choice(choices)
-
-
-def random_choice_or_blank(choices: list) -> Any:
-    choices.append("")
-    return random.choice(choices)
-
-
-def random_bool_or_None():
-    return random_choice_or_None([True, False])
-
-
-def random_bool():
-    return random.choice([True, False])
 
 
 class Command(BaseCommand):
