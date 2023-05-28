@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -10,7 +10,9 @@ register = template.Library()
 
 
 @register.filter
-def bool_to_icon(value: bool) -> str:
+def bool_to_icon(value: Optional[bool]) -> str:
+    if value is None:
+        return mark_safe('<div class="w-12px d-inline-block text-center">--</div>')
     icons = {
         True: "fa-check text-bold",
         False: "fa-times text-bold",
