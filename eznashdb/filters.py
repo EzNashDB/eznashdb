@@ -8,8 +8,6 @@ from eznashdb.widgets import TomSelectWidget
 
 
 class TomSelectWithUnknownFilter(MultipleChoiceFilter):
-    widget = TomSelectWidget
-
     def __init__(self, label, choices: List[Tuple[str, str]] = DEFAULT_ARG, *args, **kwargs):
         if choices == DEFAULT_ARG:
             choices = getattr(self, "choices", [])
