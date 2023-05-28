@@ -1,3 +1,4 @@
+import random
 from typing import Any, Optional
 
 from django.contrib.auth import get_user_model
@@ -24,7 +25,7 @@ class Command(BaseCommand):
     def _create_shuls(self):
         for i in range(self.shul_count):
             shul, _ = Shul.objects.update_or_create(
-                name=f"Seeded Shul {i+1}",
+                name=f"Dummy Shul {i+1}",
                 defaults={
                     "created_by": self.user,
                     "has_female_leadership": random_bool_or_None(),
@@ -35,10 +36,10 @@ class Command(BaseCommand):
             self._create_shul_rooms(shul)
 
     def _create_shul_rooms(self, shul):
-        shul_num = int(shul.name[-1])
-        for j in range(self.rooms_per_shul):
+        room_count = random.choice([1, 2, 3])
+        for j in range(room_count):
             shul.rooms.update_or_create(
-                name=f"Seeded Room {shul_num}-{j+1}",
+                name=f"Dummy Room {j+1}",
                 defaults={
                     "created_by": self.user,
                     "relative_size": random_choice_or_blank(list(RelativeSize)),
