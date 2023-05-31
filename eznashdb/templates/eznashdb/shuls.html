@@ -1,13 +1,9 @@
 {% extends "base.html" %}
 
-{% load crispy_forms_tags %}
-
 {% block content %}
-    <div class="mb-3">
-        <form method="get">
-            {{ filter.form|crispy }}
-            <input type="submit" class="btn btn-primary btn-sm" />
-        </form>
+    <div class="d-flex flex-row justify-content-between">
+        <div>{{ filter.qs.count }} Shuls found</div>
+        <div class="mb-1">{% include "eznashdb/includes/shul_filters.html" %}</div>
     </div>
     {% for shul in filter.qs %}
         {% include "eznashdb/includes/shul_card.html" %}
