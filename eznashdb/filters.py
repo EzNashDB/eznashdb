@@ -4,18 +4,18 @@ from django.db.models import Q
 from django_filters import MultipleChoiceFilter
 
 from eznashdb.constants import DEFAULT_ARG
-from eznashdb.widgets import TomSelectWidget
+from eznashdb.widgets import MultiSelectWidget
 
 
-class TomSelectWithUnknownFilter(MultipleChoiceFilter):
+class MultiSelectWithUnknownFilter(MultipleChoiceFilter):
     def __init__(self, label, choices: List[Tuple[str, str]] = DEFAULT_ARG, *args, **kwargs):
         if choices == DEFAULT_ARG:
             choices = getattr(self, "choices", [])
         choices.insert(0, ("--", "Unknown"))
-        super().__init__(*args, widget=TomSelectWidget, choices=tuple(choices), label=label, **kwargs)
+        super().__init__(*args, widget=MultiSelectWidget, choices=tuple(choices), label=label, **kwargs)
 
 
-class MultipleChoiceModelFieldWithUnknownFilter(TomSelectWithUnknownFilter):
+class MultiSelectModelFieldWithUnknownFilter(MultiSelectWithUnknownFilter):
     def __init__(
         self, label, model_field, choices: List[Tuple[str, str]] = DEFAULT_ARG, *args, **kwargs
     ):
@@ -27,13 +27,13 @@ class MultipleChoiceModelFieldWithUnknownFilter(TomSelectWithUnknownFilter):
         raise NotImplementedError
 
 
-class MultipleChoiceOrUnknownCharFilter(MultipleChoiceModelFieldWithUnknownFilter):
+class MultipleChoiceOrUnknownCharFilter(MultiSelectModelFieldWithUnknownFilter):
     def filter_method(self, qs, name, value):
         value = ["" if v == "--" else v for v in value]
         return qs.filter(**{f"{self.model_field}__in": value}).distinct()
 
 
-class BoolOrUnknownFilter(MultipleChoiceModelFieldWithUnknownFilter):
+class BoolOrUnknownFilter(MultiSelectModelFieldWithUnknownFilter):
     choices = [(True, "Yes"), (False, "No")]
 
     def filter_method(self, qs, name, value):
