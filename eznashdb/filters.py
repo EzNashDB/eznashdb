@@ -34,7 +34,9 @@ class MultipleChoiceOrUnknownCharFilter(MultiSelectModelFieldWithUnknownFilter):
 
 
 class BoolOrUnknownFilter(MultiSelectModelFieldWithUnknownFilter):
-    choices = [(True, "Yes"), (False, "No")]
+    def __init__(self, label, model_field, *args, **kwargs):
+        self.choices = [(True, "Yes"), (False, "No")]
+        super().__init__(label, model_field, *args, **kwargs)
 
     def filter_method(self, qs, name, value):
         include_None = "--" in value
