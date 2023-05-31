@@ -6,11 +6,34 @@
     resetBodyHeight();
 })();
 
-document.querySelectorAll('.tom-select').forEach((el)=>{
-	let settings = {
-        allowEmptyOption: true,
-        maxItems: null,
-        plugins: ["remove_button", "checkbox_options", "clear_button"],
-    };
- 	new TomSelect(el,settings);
+$(document).ready(function() {
+    $('.bs-multiselect').multiselect({
+        includeSelectAllOption: true,
+        buttonClass: 'form-select',
+        buttonWidth: '100%',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return '--------';
+            }
+            else if (options.length > 1) {
+                return `${options.length} selected`;
+            }
+            else {
+                var labels = [];
+                options.each(function() {
+                    if ($(this).attr('label') !== undefined) {
+                        labels.push($(this).attr('label'));
+                    }
+                    else {
+                        labels.push($(this).html());
+                    }
+                });
+                return labels.join(', ') + '';
+            }
+        },
+        templates: {
+            button: '<button type="button" class="multiselect dropdown-toggle d-block" data-bs-toggle="dropdown"><div class="multiselect-selected-text text-start"></div></button>',
+
+        }
+    });
 });
