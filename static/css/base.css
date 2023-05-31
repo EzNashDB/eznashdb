@@ -7,6 +7,16 @@ body {
     height: var(--doc-height);
 }
 
+/* bootstrap collapse */
+.btn .fa-chevron-up {
+    transition: transform 0.3s ease;
+}
+
+.btn.collapsed .fa-chevron-up {
+    transform: rotate(-180deg);
+}
+
+/* width utils */
 .w-12px {
     width: 12px;
     min-width: 12px;
@@ -31,14 +41,8 @@ body {
     max-width: 125px;
 }
 
-.btn .fa-chevron-up {
-    transition: transform 0.3s ease;
-}
-
-.btn.collapsed .fa-chevron-up {
-    transform: rotate(-180deg);
-}
-
-.ts-dropdown .has-items .clear-button {
-    opacity: 1;
+/* bootstrap multiselect */
+.multiselect-selected-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
