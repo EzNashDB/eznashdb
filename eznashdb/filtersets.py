@@ -5,7 +5,7 @@ from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filters import (
     BoolOrUnknownFilter,
     MultipleChoiceOrUnknownCharFilter,
-    TomSelectWithUnknownFilter,
+    MultiSelectWithUnknownFilter,
 )
 from eznashdb.models import Shul
 
@@ -31,7 +31,7 @@ class ShulFilterSet(FilterSet):
         model_field="rooms__see_hear_score",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in SeeHearScore],
     )
-    rooms__layout = TomSelectWithUnknownFilter(
+    rooms__layout = MultiSelectWithUnknownFilter(
         label="Women's Section Location",
         choices=[
             ("is_same_floor_side", "Same floor - Side"),
