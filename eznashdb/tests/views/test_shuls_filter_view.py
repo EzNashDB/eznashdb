@@ -89,6 +89,15 @@ def describe_shul_cards():
             for value in display_values:
                 assert value.lower() in str(soup).lower()
 
+        def test_shows_dashes_if_all_boolean_layout_fields_are_False(test_user, GET_request):
+            shul = Shul.objects.create(created_by=test_user, name="test shul")
+            shul.rooms.create(created_by=test_user, name="test_room")
+
+            response = ShulsFilterView.as_view()(GET_request)
+            soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+            assert "--" in str(soup).lower()
+
         @pytest.mark.parametrize(
             ("is_wheelchair_accessible", "expected"),
             [

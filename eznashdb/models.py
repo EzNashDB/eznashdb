@@ -55,3 +55,16 @@ class Room(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}, {self.shul}"
+
+    def has_layout_data(self):
+        return any(
+            [
+                self.is_same_floor_side,
+                self.is_same_floor_back,
+                self.is_same_floor_elevated,
+                self.is_same_floor_level,
+                self.is_balcony,
+                self.is_only_men,
+                self.is_mixed_seating,
+            ]
+        )
