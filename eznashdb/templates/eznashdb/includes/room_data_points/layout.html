@@ -13,4 +13,5 @@
             </div>
         {% endif %}
     {% endfor %}
+    {% if not room.has_layout_data %}<div class="d-inline-block badge text-dark border">--</div>{% endif %}
 </span>
