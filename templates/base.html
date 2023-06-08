@@ -49,5 +49,9 @@
         <script type="text/javascript"
                 src="{% static 'vendor/bootstrap-multiselect/bootstrap-multiselect.js' %}"></script>
         <script defer src="{% static 'js/base.js' %}"></script>
+
+        {% block extra_media_bottom %}
+        {% endblock extra_media_bottom %}
+
     </body>
 </html>
