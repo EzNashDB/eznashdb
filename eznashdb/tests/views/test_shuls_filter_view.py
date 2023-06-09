@@ -73,10 +73,10 @@ def describe_shul_cards():
                 ("is_same_floor_side", ["same floor", "side"]),
                 ("is_same_floor_back", ["same floor", "back"]),
                 ("is_same_floor_elevated", ["same floor", "elevated"]),
-                ("is_same_floor_level", ["same floor", "level"]),
+                ("is_same_floor_level", ["same floor", "same height"]),
                 ("is_balcony", ["balcony"]),
-                ("is_only_men", ["no", "only men"]),
-                ("is_mixed_seating", ["no", "mixed seating"]),
+                ("is_only_men", ["no women's section"]),
+                ("is_mixed_seating", ["mixed seating"]),
             ],
         )
         def test_shows_boolean_room_layout_details(GET_request, test_user, field_name, display_values):
@@ -86,8 +86,11 @@ def describe_shul_cards():
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
+            cards = soup.find_all(attrs={"class": "card"})
+            shul_card = [card for card in cards if shul.name in card.text][0]
+
             for value in display_values:
-                assert value.lower() in str(soup).lower()
+                assert value.lower() in str(shul_card.text).lower()
 
         def test_shows_dashes_if_all_boolean_layout_fields_are_False(test_user, GET_request):
             shul = Shul.objects.create(created_by=test_user, name="test shul")

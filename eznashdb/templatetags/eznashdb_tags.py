@@ -12,7 +12,7 @@ register = template.Library()
 @register.filter
 def bool_to_icon(value: Optional[bool]) -> str:
     if value is None:
-        return mark_safe('<div class="w-12px d-inline-block text-center">--</div>')
+        return mark_safe('<div class="w-15px d-inline-block text-center">--</div>')
     icons = {
         True: "fa-check text-bold",
         False: "fa-times text-bold",
@@ -21,7 +21,7 @@ def bool_to_icon(value: Optional[bool]) -> str:
         icon = icons[value]
     except KeyError:
         return value
-    return mark_safe(f'<i class="fa {icon} w-12px text-center" aria-hidden="true"></i>')
+    return mark_safe(f'<i class="fa {icon} w-15px text-center" aria-hidden="true"></i>')
 
 
 EMPTY_STAR_HTML = '<i class="fa-regular fa-star"></i>'
@@ -63,8 +63,13 @@ ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE = {
     "No women's section": {
         "icon": "fa-solid fa-xmark",
         "fields": {
-            "is_only_men": "Only men",
-            "is_mixed_seating": "Mixed seating",
+            "is_only_men": "",
+        },
+    },
+    "Mixed seating": {
+        "icon": "fa-solid fa-children",
+        "fields": {
+            "is_mixed_seating": "",
         },
     },
 }

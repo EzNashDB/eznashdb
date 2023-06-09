@@ -17,10 +17,10 @@ body {
 }
 
 /* width utils */
-.w-12px {
-    width: 12px;
-    min-width: 12px;
-    max-width: 12px;
+.w-15px {
+    width: 15px;
+    min-width: 15px;
+    max-width: 15px;
 }
 
 .w-45px {
