@@ -18,7 +18,7 @@ class RoomCreator:
 
     def create(self):
         room, _ = self._shul.rooms.update_or_create(
-            name=f"Dummy Room, {self._room_number}",
+            name=f"Dummy Room {self._room_number}",
             defaults={
                 "created_by": self._shul.created_by,
                 "relative_size": random_choice_or_blank(list(RelativeSize)),
