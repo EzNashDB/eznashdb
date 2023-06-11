@@ -19,7 +19,7 @@ def test_shows_app_name(GET_request):
 
 
 def test_shows_shul_name(GET_request, test_user):
-    shul = Shul.objects.create(created_by=test_user, name="test shul")
+    shul = Shul.objects.create(name="test shul")
 
     response = ShulsFilterView.as_view()(GET_request)
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -38,16 +38,12 @@ def describe_shul_cards():
     )
     @pytest.mark.parametrize(
         ("field_value", "display_value"),
-        [
-            (True, "fa-check"),
-            (False, "fa-times"),
-            (None, "--"),
-        ],
+        [(True, "fa-check"), (False, "fa-times"), (None, "--")],
     )
     def test_shows_shul_details(
         GET_request, test_user, field_name, field_label, field_value, display_value
     ):
-        Shul.objects.create(created_by=test_user, name="test shul", **{field_name: field_value})
+        Shul.objects.create(name="test shul", **{field_name: field_value})
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -58,8 +54,8 @@ def describe_shul_cards():
         assert display_value in str(field_badge)
 
     def test_shows_room_name(GET_request, test_user):
-        shul = Shul.objects.create(created_by=test_user, name="test shul")
-        room = shul.rooms.create(created_by=test_user, name="test_room")
+        shul = Shul.objects.create(name="test shul")
+        room = shul.rooms.create(name="test_room")
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -80,8 +76,8 @@ def describe_shul_cards():
             ],
         )
         def test_shows_boolean_room_layout_details(GET_request, test_user, field_name, display_values):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(created_by=test_user, name="test_room", **{field_name: True})
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", **{field_name: True})
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -93,8 +89,8 @@ def describe_shul_cards():
                 assert value.lower() in str(shul_card.text).lower()
 
         def test_shows_dashes_if_all_boolean_layout_fields_are_False(test_user, GET_request):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(created_by=test_user, name="test_room")
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room")
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -103,19 +99,11 @@ def describe_shul_cards():
 
         @pytest.mark.parametrize(
             ("is_wheelchair_accessible", "expected"),
-            [
-                (True, "check"),
-                (False, "times"),
-                (None, "--"),
-            ],
+            [(True, "check"), (False, "times"), (None, "--")],
         )
         def test_shows_wheelchair_data(GET_request, test_user, is_wheelchair_accessible, expected):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(
-                created_by=test_user,
-                name="test_room",
-                is_wheelchair_accessible=is_wheelchair_accessible,
-            )
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", is_wheelchair_accessible=is_wheelchair_accessible)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -127,8 +115,8 @@ def describe_shul_cards():
 
         @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
         def test_shows_room_relative_size(GET_request, test_user, relative_size):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(created_by=test_user, name="test_room", relative_size=relative_size)
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", relative_size=relative_size)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -136,13 +124,8 @@ def describe_shul_cards():
             assert relative_size.value in str(soup)
 
         def test_displays_dashes_for_unknown_relative_size(GET_request, test_user):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(
-                created_by=test_user,
-                name="test_room",
-                relative_size="",
-                see_hear_score=SeeHearScore._3,
-            )
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -151,8 +134,8 @@ def describe_shul_cards():
 
         @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
         def test_shows_room_see_hear_score(GET_request, test_user, see_hear_score):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(created_by=test_user, name="test_room", see_hear_score=see_hear_score)
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -167,13 +150,8 @@ def describe_shul_cards():
             assert str(soup).count(empty_class) == expected_empty_star_count
 
         def test_shows_dashes_for_unknown_see_hear_score(GET_request, test_user):
-            shul = Shul.objects.create(created_by=test_user, name="test shul")
-            shul.rooms.create(
-                created_by=test_user,
-                name="test_room",
-                see_hear_score="",
-                relative_size=RelativeSize.M,
-            )
+            shul = Shul.objects.create(name="test shul")
+            shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -190,8 +168,8 @@ def test_shows_message_if_no_shuls(GET_request):
 
 def describe_filter():
     def filters_by_name(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1")
-        Shul.objects.create(created_by=test_user, name="shul 2")
+        Shul.objects.create(name="shul 1")
+        Shul.objects.create(name="shul 2")
         request = rf_GET("eznashdb:shuls", {"name": "shul 2"})
 
         response = ShulsFilterView.as_view()(request)
@@ -202,8 +180,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_has_female_leadership(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1", has_female_leadership=False)
-        Shul.objects.create(created_by=test_user, name="shul 2", has_female_leadership=True)
+        Shul.objects.create(name="shul 1", has_female_leadership=False)
+        Shul.objects.create(name="shul 2", has_female_leadership=True)
         request = rf_GET("eznashdb:shuls", {"has_female_leadership": ["True"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -214,8 +192,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_has_childcare(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1", has_childcare=False)
-        Shul.objects.create(created_by=test_user, name="shul 2", has_childcare=True)
+        Shul.objects.create(name="shul 1", has_childcare=False)
+        Shul.objects.create(name="shul 2", has_childcare=True)
         request = rf_GET("eznashdb:shuls", {"has_childcare": ["True"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -226,8 +204,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_can_say_kaddish(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1", can_say_kaddish=False)
-        Shul.objects.create(created_by=test_user, name="shul 2", can_say_kaddish=True)
+        Shul.objects.create(name="shul 1", can_say_kaddish=False)
+        Shul.objects.create(name="shul 2", can_say_kaddish=True)
         request = rf_GET("eznashdb:shuls", {"can_say_kaddish": ["True"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -238,10 +216,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_wheelchair_access(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1")
-        Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
-            created_by=test_user, is_wheelchair_accessible=True
-        )
+        Shul.objects.create(name="shul 1")
+        Shul.objects.create(name="shul 2").rooms.create(is_wheelchair_accessible=True)
         request = rf_GET("eznashdb:shuls", {"rooms__is_wheelchair_accessible": ["True"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -252,10 +228,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_relative_size(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1")
-        Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
-            created_by=test_user, relative_size=RelativeSize.M
-        )
+        Shul.objects.create(name="shul 1")
+        Shul.objects.create(name="shul 2").rooms.create(relative_size=RelativeSize.M)
         request = rf_GET("eznashdb:shuls", {"rooms__relative_size": ["M"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -266,10 +240,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_see_hear_score(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1")
-        Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
-            created_by=test_user, see_hear_score=SeeHearScore._3
-        )
+        Shul.objects.create(name="shul 1")
+        Shul.objects.create(name="shul 2").rooms.create(see_hear_score=SeeHearScore._3)
         request = rf_GET("eznashdb:shuls", {"rooms__see_hear_score": ["3"]})
 
         response = ShulsFilterView.as_view()(request)
@@ -280,10 +252,8 @@ def describe_filter():
         assert "shul 1" not in soup_text
 
     def filters_by_room_layout(rf_GET, test_user):
-        Shul.objects.create(created_by=test_user, name="shul 1")
-        Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
-            created_by=test_user, is_same_height_side=True
-        )
+        Shul.objects.create(name="shul 1")
+        Shul.objects.create(name="shul 2").rooms.create(is_same_height_side=True)
         request = rf_GET("eznashdb:shuls", {"rooms__layout": ["is_same_height_side"]})
 
         response = ShulsFilterView.as_view()(request)

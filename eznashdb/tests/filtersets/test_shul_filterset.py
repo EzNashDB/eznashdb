@@ -24,12 +24,12 @@ def describe_shul_name():
         ],
     )
     def includes_shuls_with_substring_in_name(test_user, test_request, name, query):
-        Shul.objects.create(created_by=test_user, name=name)
+        Shul.objects.create(name=name)
 
         assert ShulFilterSet({"name": query}, request=test_request).qs.count() == 1
 
     def excludes_shuls_that_do_not_have_substring_in_name(test_user):
-        Shul.objects.create(created_by=test_user, name="test shul")
+        Shul.objects.create(name="test shul")
 
         assert ShulFilterSet({"name": "no match"}, request=test_request).qs.count() == 0
 
@@ -46,7 +46,7 @@ class YesNoUnknownFilterTest:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
+        Shul.objects.create(**{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
@@ -61,7 +61,7 @@ class YesNoUnknownFilterTest:
     def test_includes_shuls_that_match_any_of_multiple_values(
         self, test_user, test_request, value, query
     ):
-        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
+        Shul.objects.create(**{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
@@ -74,7 +74,7 @@ class YesNoUnknownFilterTest:
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
-        Shul.objects.create(created_by=test_user, **{self.shul_model_field: value})
+        Shul.objects.create(**{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
 
@@ -101,16 +101,16 @@ class TestWheelchairAccessFilter:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_wheelchair_accessible=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(is_wheelchair_accessible=value)
 
         data = {"rooms__is_wheelchair_accessible": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_wheelchair_accessible=True)
-        shul.rooms.create(created_by=test_user, is_wheelchair_accessible=True)
+        shul = Shul.objects.create()
+        shul.rooms.create(is_wheelchair_accessible=True)
+        shul.rooms.create(is_wheelchair_accessible=True)
 
         data = {"rooms__is_wheelchair_accessible": ["True"]}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -126,8 +126,8 @@ class TestWheelchairAccessFilter:
     def test_includes_shuls_that_match_any_of_multiple_values(
         self, test_user, test_request, value, query
     ):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_wheelchair_accessible=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(is_wheelchair_accessible=value)
 
         data = {"rooms__is_wheelchair_accessible": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -141,8 +141,8 @@ class TestWheelchairAccessFilter:
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_wheelchair_accessible=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(is_wheelchair_accessible=value)
 
         data = {"rooms__is_wheelchair_accessible": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
@@ -160,16 +160,16 @@ class TestRelativeSizeFilter:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, relative_size=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, relative_size=RelativeSize.M.value)
-        shul.rooms.create(created_by=test_user, relative_size=RelativeSize.M.value)
+        shul = Shul.objects.create()
+        shul.rooms.create(relative_size=RelativeSize.M.value)
+        shul.rooms.create(relative_size=RelativeSize.M.value)
 
         data = {"rooms__relative_size": ["M"]}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -185,8 +185,8 @@ class TestRelativeSizeFilter:
     def test_includes_shuls_that_match_any_of_multiple_values(
         self, test_user, test_request, value, query
     ):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, relative_size=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -200,8 +200,8 @@ class TestRelativeSizeFilter:
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, relative_size=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
@@ -220,16 +220,16 @@ class TestSeeHearScoreFilter:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, see_hear_score=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, see_hear_score=SeeHearScore._3.value)
-        shul.rooms.create(created_by=test_user, see_hear_score=SeeHearScore._3.value)
+        shul = Shul.objects.create()
+        shul.rooms.create(see_hear_score=SeeHearScore._3.value)
+        shul.rooms.create(see_hear_score=SeeHearScore._3.value)
 
         data = {"rooms__see_hear_score": ["M"]}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -245,8 +245,8 @@ class TestSeeHearScoreFilter:
     def test_includes_shuls_that_match_any_of_multiple_values(
         self, test_user, test_request, value, query
     ):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, see_hear_score=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -260,8 +260,8 @@ class TestSeeHearScoreFilter:
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(self, test_user, test_request, value, query):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, see_hear_score=value)
+        shul = Shul.objects.create()
+        shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
@@ -282,8 +282,8 @@ class TestRoomLayoutFilter:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_user, test_request, layout_field, query):
-        shul = Shul.objects.create(created_by=test_user)
-        room = shul.rooms.create(created_by=test_user)
+        shul = Shul.objects.create()
+        room = shul.rooms.create()
         if layout_field:
             setattr(room, layout_field, True)
             room.save()
@@ -292,9 +292,9 @@ class TestRoomLayoutFilter:
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
-        shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_same_height_back=True)
-        shul.rooms.create(created_by=test_user, is_same_height_back=True)
+        shul = Shul.objects.create()
+        shul.rooms.create(is_same_height_back=True)
+        shul.rooms.create(is_same_height_back=True)
 
         data = {"rooms__layout": ["is_same_height_back"]}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
@@ -310,8 +310,8 @@ class TestRoomLayoutFilter:
     def test_includes_shuls_that_match_any_of_multiple_values(
         self, test_user, test_request, layout_field, query
     ):
-        shul = Shul.objects.create(created_by=test_user)
-        room = shul.rooms.create(created_by=test_user)
+        shul = Shul.objects.create()
+        room = shul.rooms.create()
         if layout_field:
             setattr(room, layout_field, True)
             room.save()
@@ -330,8 +330,8 @@ class TestRoomLayoutFilter:
     def test_excludes_shuls_that_do_not_match_any_value(
         self, test_user, test_request, layout_field, query
     ):
-        shul = Shul.objects.create(created_by=test_user)
-        room = shul.rooms.create(created_by=test_user)
+        shul = Shul.objects.create()
+        room = shul.rooms.create()
         if layout_field:
             setattr(room, layout_field, True)
             room.save()
