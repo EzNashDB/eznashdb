@@ -271,10 +271,10 @@ class TestRoomLayoutFilter:
     @pytest.mark.parametrize(
         ("layout_field", "query"),
         [
-            ("is_same_floor_side",) * 2,
-            ("is_same_floor_back",) * 2,
-            ("is_same_floor_elevated",) * 2,
-            ("is_same_floor_level",) * 2,
+            ("is_same_height_side",) * 2,
+            ("is_same_height_back",) * 2,
+            ("is_elevated_side",) * 2,
+            ("is_elevated_back",) * 2,
             ("is_balcony",) * 2,
             ("is_only_men",) * 2,
             ("is_mixed_seating",) * 2,
@@ -293,18 +293,18 @@ class TestRoomLayoutFilter:
 
     def test_shul_appears_once_if_multiple_rooms_match(self, test_user, test_request):
         shul = Shul.objects.create(created_by=test_user)
-        shul.rooms.create(created_by=test_user, is_same_floor_back=True)
-        shul.rooms.create(created_by=test_user, is_same_floor_back=True)
+        shul.rooms.create(created_by=test_user, is_same_height_back=True)
+        shul.rooms.create(created_by=test_user, is_same_height_back=True)
 
-        data = {"rooms__layout": ["is_same_floor_back"]}
+        data = {"rooms__layout": ["is_same_height_back"]}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     @pytest.mark.parametrize(
         ("layout_field", "query"),
         [
-            ("is_same_floor_side", ["is_same_floor_side", "is_balcony"]),
-            ("is_same_floor_side", ["is_same_floor_side", "--"]),
-            ("", ["is_same_floor_side", "--"]),
+            ("is_same_height_side", ["is_same_height_side", "is_balcony"]),
+            ("is_same_height_side", ["is_same_height_side", "--"]),
+            ("", ["is_same_height_side", "--"]),
         ],
     )
     def test_includes_shuls_that_match_any_of_multiple_values(
@@ -322,9 +322,9 @@ class TestRoomLayoutFilter:
     @pytest.mark.parametrize(
         ("layout_field", "query"),
         [
-            ("is_same_floor_side", ["is_same_floor_back", "is_balcony"]),
-            ("is_same_floor_side", ["is_same_floor_back", "--"]),
-            ("", ["is_same_floor_side", "is_same_floor_back"]),
+            ("is_same_height_side", ["is_same_height_back", "is_balcony"]),
+            ("is_same_height_side", ["is_same_height_back", "--"]),
+            ("", ["is_same_height_side", "is_same_height_back"]),
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(

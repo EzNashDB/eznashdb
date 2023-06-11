@@ -40,10 +40,10 @@ class Room(models.Model):
     see_hear_score = models.CharField(
         max_length=50, blank=True, choices=SeeHearScore.choices, default=""
     )
-    is_same_floor_side = models.BooleanField(blank=True, default=False)
-    is_same_floor_back = models.BooleanField(blank=True, default=False)
-    is_same_floor_elevated = models.BooleanField(blank=True, default=False)
-    is_same_floor_level = models.BooleanField(blank=True, default=False)
+    is_same_height_side = models.BooleanField(blank=True, default=False)
+    is_same_height_back = models.BooleanField(blank=True, default=False)
+    is_elevated_side = models.BooleanField(blank=True, default=False)
+    is_elevated_back = models.BooleanField(blank=True, default=False)
     is_balcony = models.BooleanField(blank=True, default=False)
     is_only_men = models.BooleanField(blank=True, default=False)
     is_mixed_seating = models.BooleanField(blank=True, default=False)
@@ -59,10 +59,10 @@ class Room(models.Model):
     def has_layout_data(self):
         return any(
             [
-                self.is_same_floor_side,
-                self.is_same_floor_back,
-                self.is_same_floor_elevated,
-                self.is_same_floor_level,
+                self.is_same_height_side,
+                self.is_same_height_back,
+                self.is_elevated_side,
+                self.is_elevated_back,
                 self.is_balcony,
                 self.is_only_men,
                 self.is_mixed_seating,
