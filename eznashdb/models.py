@@ -10,7 +10,7 @@ class Shul(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls"
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls", null=True
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     name = models.CharField(max_length=50)
@@ -31,7 +31,7 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms"
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_rooms", null=True
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     shul = models.ForeignKey("eznashdb.Shul", on_delete=models.PROTECT, related_name="rooms")
