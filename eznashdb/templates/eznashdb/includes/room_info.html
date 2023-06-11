@@ -1,17 +1,15 @@
 <div>
     <div class="row w-100 gx-0 align-items-center">
-        <div class="col-12 col-sm-5 col-md-5 col-lg-2">
+        <div class="col-12 col-lg-3">
             <h6 class="m-0">{{ room.name }}</h6>
         </div>
-        <div class="col-12 col-sm-7 col-md-7 col-lg-4 col-xl-3 text-start text-sm-end text-lg-start">
+        <div class="col-12 col-lg-9">
             <div class="d-inline-block">{% include "eznashdb/includes/room_data_points/size.html" %}</div>
             <div class="d-inline-block">
                 {% include "eznashdb/includes/room_data_points/wheelchair_access.html" %}
             </div>
             <div class="d-inline-block">{% include "eznashdb/includes/room_data_points/see_hear_score.html" %}</div>
-        </div>
-        <div class="col-12 col-md-12 col-lg-6 col-xl-7 mt-1 mt-lg-0">
-            {% include "eznashdb/includes/room_data_points/layout.html" %}
+            <div class="d-inline-block">{% include "eznashdb/includes/room_data_points/layout.html" %}</div>
         </div>
     </div>
 </div>
