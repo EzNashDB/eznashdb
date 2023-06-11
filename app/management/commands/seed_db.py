@@ -24,10 +24,10 @@ class RoomCreator:
                 "relative_size": random_choice_or_blank(list(RelativeSize)),
                 "see_hear_score": random_choice_or_blank(list(SeeHearScore)),
                 "is_wheelchair_accessible": random_bool_or_None(),
-                "is_same_floor_side": False,
-                "is_same_floor_back": False,
-                "is_same_floor_elevated": False,
-                "is_same_floor_level": False,
+                "is_same_height_side": False,
+                "is_same_height_back": False,
+                "is_elevated_side": False,
+                "is_elevated_back": False,
                 "is_balcony": False,
                 "is_only_men": False,
                 "is_mixed_seating": False,
@@ -40,10 +40,10 @@ class HasWomenRoomCreator(RoomCreator):
     def create(self):
         room = super().create()
         params = {
-            "is_same_floor_side": random_bool(),
-            "is_same_floor_back": random_bool(),
-            "is_same_floor_elevated": random_bool(),
-            "is_same_floor_level": random_bool(),
+            "is_same_height_side": random_bool(),
+            "is_same_height_back": random_bool(),
+            "is_elevated_side": random_bool(),
+            "is_elevated_back": random_bool(),
             "is_balcony": random_bool(),
         }
         Room.objects.filter(pk=room.pk).update(**params)

@@ -34,10 +34,10 @@ class ShulFilterSet(FilterSet):
     rooms__layout = MultiSelectWithUnknownFilter(
         label="Women's Section Location",
         choices=[
-            ("is_same_floor_side", "Same floor - Side"),
-            ("is_same_floor_back", "Same floor - Back"),
-            ("is_same_floor_elevated", "Same floor - Elevated"),
-            ("is_same_floor_level", "Same floor - Same height"),
+            ("is_same_height_side", "Same height - Side"),
+            ("is_same_height_back", "Same height - Back"),
+            ("is_elevated_side", "Elevated - Side"),
+            ("is_elevated_back", "Elevated - Back"),
             ("is_balcony", "Balcony"),
             ("is_only_men", "Only Men"),
             ("is_mixed_seating", "Mixed Seating"),
@@ -51,10 +51,10 @@ class ShulFilterSet(FilterSet):
 
         query = Q()
         layout_fields = [
-            "is_same_floor_side",
-            "is_same_floor_back",
-            "is_same_floor_elevated",
-            "is_same_floor_level",
+            "is_same_height_side",
+            "is_same_height_back",
+            "is_elevated_side",
+            "is_elevated_back",
             "is_balcony",
             "is_only_men",
             "is_mixed_seating",

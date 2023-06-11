@@ -70,10 +70,10 @@ def describe_shul_cards():
         @pytest.mark.parametrize(
             ("field_name", "display_values"),
             [
-                ("is_same_floor_side", ["same floor", "side"]),
-                ("is_same_floor_back", ["same floor", "back"]),
-                ("is_same_floor_elevated", ["same floor", "elevated"]),
-                ("is_same_floor_level", ["same floor", "same height"]),
+                ("is_same_height_side", ["same height", "side"]),
+                ("is_same_height_back", ["same height", "back"]),
+                ("is_elevated_side", ["elevated", "side"]),
+                ("is_elevated_back", ["elevated", "back"]),
                 ("is_balcony", ["balcony"]),
                 ("is_only_men", ["no women's section"]),
                 ("is_mixed_seating", ["mixed seating"]),
@@ -282,9 +282,9 @@ def describe_filter():
     def filters_by_room_layout(rf_GET, test_user):
         Shul.objects.create(created_by=test_user, name="shul 1")
         Shul.objects.create(created_by=test_user, name="shul 2").rooms.create(
-            created_by=test_user, is_same_floor_side=True
+            created_by=test_user, is_same_height_side=True
         )
-        request = rf_GET("eznashdb:shuls", {"rooms__layout": ["is_same_floor_side"]})
+        request = rf_GET("eznashdb:shuls", {"rooms__layout": ["is_same_height_side"]})
 
         response = ShulsFilterView.as_view()(request)
 
