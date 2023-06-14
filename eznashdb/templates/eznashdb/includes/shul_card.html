@@ -1,10 +1,9 @@
 {% load eznashdb_tags %}
 <div class="card rounded-0 border-0 border-bottom border-end">
-    <div class="card-header py-1 px-2 border-0">
+    <div class="card-header py-1 px-2 border-0 rounded-0">
         <div class="d-flex align-items-center">
             <div class="me-2">{% include "eznashdb/includes/delete_shul.html" %}</div>
             <div class="fw-bold flex-grow-1">{{ shul.name }}</div>
-            <div class="d-none d-md-inline-block">{% include "eznashdb/includes/shul_badges.html" %}</div>
             <button class="btn btn-light px-2 py-1 ms-2"
                     type="button"
                     data-bs-toggle="collapse"
@@ -14,9 +13,12 @@
                 <i class="fa-solid fa-chevron-up"></i>
             </button>
         </div>
-        <div class="d-inline-block d-md-none">{% include "eznashdb/includes/shul_badges.html" %}</div>
     </div>
-    <div class="collapse show" id="collapseShul{{ shul.id }}">
+    <div class="collapse show border-top" id="collapseShul{{ shul.id }}">
+        <div class="px-3 ">
+            {% include "eznashdb/includes/shul_info.html" %}
+            <hr class="my-0">
+        </div>
         <div class="card-body">
             {% for room in shul.rooms.all %}
                 {% if forloop.counter != 1 %}<hr>{% endif %}
