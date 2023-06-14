@@ -64,3 +64,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--bs-secondary-bg-subtle);
 }
+
+/* bootstrap buttons */
+.btn-xs {
+    --bs-btn-padding-y: .25rem;
+    --bs-btn-padding-x: .5rem;
+    --bs-btn-font-size: .75rem;
+}
