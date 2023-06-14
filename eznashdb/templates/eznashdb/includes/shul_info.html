@@ -1,16 +1,18 @@
 {% load eznashdb_tags %}
 <div class="row gx-0 py-1">
     <div class="col-12 col-lg-6 d-flex align-items-center">
-        <div class="badge text-dark fw-normal">
+        <div class="badge text-dark fw-normal text-wrap text-start">
             <i class="fa-solid fa-location-pin"></i>
             123 Sesame Street, New York, NY, USA
         </div>
     </div>
     <div class="col-12 col-lg-6 d-flex align-items-center flex-row-reverse">
-        <span class="badge text-dark fw-normal">Childcare: {{ shul.has_childcare|bool_to_icon }}</span>
-        <span class="badge text-dark fw-normal">Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}</span>
-        <span class="badge text-dark fw-normal">
-            Female Leadership: {{ shul.has_female_leadership|bool_to_icon }}
-        </span>
+        <div>
+            <span class="badge text-dark fw-normal">Childcare: {{ shul.has_childcare|bool_to_icon }}</span>
+            <span class="badge text-dark fw-normal">Kaddish: {{ shul.can_say_kaddish|bool_to_icon }}</span>
+            <span class="badge text-dark fw-normal">
+                Female Leadership: {{ shul.has_female_leadership|bool_to_icon }}
+            </span>
+        </div>
     </div>
 </div>
