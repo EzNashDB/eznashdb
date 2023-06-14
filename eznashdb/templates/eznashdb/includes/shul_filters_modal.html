@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 <!-- Button trigger modal -->
 <button type="button"
         class="btn btn-primary"
@@ -8,7 +9,7 @@
 </button>
 <!-- Modal -->
 <form method="get">
-    <div class="modal modal-xl fade"
+    <div class="modal modal-xl fade show"
          id="shulFiltersModal"
          tabindex="-1"
          aria-labelledby="shulFiltersModalLabel"
@@ -22,12 +23,20 @@
                             data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <div class="modal-body py-2">{% include 'eznashdb/includes/shul_filters.html' %}</div>
-                <div class="modal-footer py-2">
-                    <button type="button"
-                            class="btn btn-secondary btn-sm"
-                            data-bs-dismiss="modal">Cancel</button>
-                    <input type="submit" class="btn btn-primary btn-sm" />
+                <div class="modal-body">
+                    <small>
+                        <div class="row">
+                            {% for field in filter.form %}
+                                <div class="col-6 col-lg-4 col-xl-3">{{ field|as_crispy_field }}</div>
+                            {% endfor %}
+                            <div class="col-12 d-flex align-items-end flex-row-reverse">
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <input type="submit" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </div>
+                    </small>
                 </div>
             </div>
         </div>
