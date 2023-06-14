@@ -1,8 +1,0 @@
-{% load crispy_forms_tags %}
-<small>
-    <div class="row">
-        {% for field in filter.form %}
-            <div class="col-6 col-lg-4 col-xl-3">{{ field|as_crispy_field }}</div>
-        {% endfor %}
-    </div>
-</small>
