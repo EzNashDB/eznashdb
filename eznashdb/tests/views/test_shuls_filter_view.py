@@ -82,7 +82,7 @@ def describe_shul_cards():
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-            cards = soup.find_all(attrs={"class": "card"})
+            cards = soup.find_all(attrs={"class": "accordion-item"})
             shul_card = [card for card in cards if shul.name in card.text][0]
 
             for value in display_values:
