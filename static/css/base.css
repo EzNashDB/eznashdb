@@ -13,7 +13,7 @@ body {
 }
 
 .btn.collapsed .fa-chevron-up {
-    transform: rotate(-180deg);
+    transform: rotate(180deg);
 }
 
 /* width utils */

@@ -2,11 +2,11 @@
   const collapseAllButton = document.getElementById("collapse-all-shuls");
   const shulCollapseToggleButtons = Array.from(
     document.querySelectorAll(
-      '[data-bs-toggle="collapse"][data-bs-target^="#collapseShul"]'
+      '[data-bs-toggle="collapse"][data-bs-target^="#shulCollapseHeader"]'
     )
   );
   const shulCollapses = Array.from(
-    document.querySelectorAll('.collapse[id^="collapseShul"]')
+    document.querySelectorAll('.collapse[id^="shulCollapsePanel"]')
   );
 
   function closeAll() {
