@@ -71,3 +71,8 @@ body {
     --bs-btn-padding-x: .5rem;
     --bs-btn-font-size: .75rem;
 }
+
+/* bs forms */
+.form-label {
+    width: 100%
+}
