@@ -8,4 +8,4 @@ class FilterHelpTexts:
     WHEELCHAIR_ACCESS = "Is the women's section wheelchair accessible"
     RELATIVE_SIZE = "How large is the women's section relative to the men's section"
     SEE_HEAR = "How easy / difficult is it to see and hear from the women's section"
-    LAYOUT = "Where in the shul is the women's section"
+    LAYOUT = "Where is the women's section located in the shul"
