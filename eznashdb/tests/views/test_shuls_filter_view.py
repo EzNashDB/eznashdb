@@ -1,6 +1,7 @@
 import pytest
 from bs4 import BeautifulSoup
 
+from eznashdb.constants import FilterHelpTexts
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
@@ -262,3 +263,13 @@ def describe_filter():
         soup_text = soup.get_text().lower()
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
+
+    def shows_filter_help_text(GET_request):
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+        filter_modal = soup.find(attrs={"id": "shulFiltersModal"})
+
+        assert FilterHelpTexts.FEMALE_LEADERSHIP in str(filter_modal)
+        assert FilterHelpTexts.KADDISH in str(filter_modal)
+        assert FilterHelpTexts.CHILDCARE in str(filter_modal)

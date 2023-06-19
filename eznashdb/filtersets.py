@@ -1,11 +1,13 @@
 from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 
+from eznashdb.constants import FilterHelpTexts
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filters import (
     BoolOrUnknownFilter,
     MultipleChoiceOrUnknownCharFilter,
     MultiSelectWithUnknownFilter,
+    label_with_help_text,
 )
 from eznashdb.models import Shul
 
@@ -14,10 +16,20 @@ class ShulFilterSet(FilterSet):
     name = CharFilter(lookup_expr="icontains", label="Shul Name")
     not_city = CharFilter(lookup_expr="icontains", label="Not City")
     has_female_leadership = BoolOrUnknownFilter(
-        label="Female Leadership", model_field="has_female_leadership"
+        label=label_with_help_text(
+            label="Female Leadership", help_text=FilterHelpTexts.FEMALE_LEADERSHIP
+        ),
+        model_field="has_female_leadership",
     )
-    has_childcare = BoolOrUnknownFilter(label="Childcare", model_field="has_childcare")
-    can_say_kaddish = BoolOrUnknownFilter(label="Kaddish", model_field="can_say_kaddish")
+    has_childcare = BoolOrUnknownFilter(
+        label=label_with_help_text(label="Childcare", help_text=FilterHelpTexts.CHILDCARE),
+        model_field="has_childcare",
+    )
+    can_say_kaddish = BoolOrUnknownFilter(
+        label=label_with_help_text(label="Kaddish", help_text=FilterHelpTexts.KADDISH),
+        label_suffix="suffix",
+        model_field="can_say_kaddish",
+    )
     rooms__is_wheelchair_accessible = BoolOrUnknownFilter(
         label="Wheelchair Access", model_field="rooms__is_wheelchair_accessible"
     )
