@@ -270,6 +270,14 @@ def describe_filter():
 
         filter_modal = soup.find(attrs={"id": "shulFiltersModal"})
 
-        assert FilterHelpTexts.FEMALE_LEADERSHIP in str(filter_modal)
-        assert FilterHelpTexts.KADDISH in str(filter_modal)
-        assert FilterHelpTexts.CHILDCARE in str(filter_modal)
+        def has_tooltip(help_text):
+            bs4_params = {"data-bs-title": FilterHelpTexts.FEMALE_LEADERSHIP}
+            return len(filter_modal.find_all(attrs=bs4_params)) > 0
+
+        assert has_tooltip(FilterHelpTexts.FEMALE_LEADERSHIP)
+        assert has_tooltip(FilterHelpTexts.KADDISH)
+        assert has_tooltip(FilterHelpTexts.CHILDCARE)
+        assert has_tooltip(FilterHelpTexts.WHEELCHAIR_ACCESS)
+        assert has_tooltip(FilterHelpTexts.RELATIVE_SIZE)
+        assert has_tooltip(FilterHelpTexts.SEE_HEAR)
+        assert has_tooltip(FilterHelpTexts.LAYOUT)
