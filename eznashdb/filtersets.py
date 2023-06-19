@@ -31,20 +31,25 @@ class ShulFilterSet(FilterSet):
         model_field="can_say_kaddish",
     )
     rooms__is_wheelchair_accessible = BoolOrUnknownFilter(
-        label="Wheelchair Access", model_field="rooms__is_wheelchair_accessible"
+        label=label_with_help_text(
+            label="Wheelchair Access", help_text=FilterHelpTexts.WHEELCHAIR_ACCESS
+        ),
+        model_field="rooms__is_wheelchair_accessible",
     )
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
-        label="Women's Section Size",
+        label=label_with_help_text(
+            label="Women's Section Size", help_text=FilterHelpTexts.RELATIVE_SIZE
+        ),
         model_field="rooms__relative_size",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in RelativeSize],
     )
     rooms__see_hear_score = MultipleChoiceOrUnknownCharFilter(
-        label="Audibility / Visibility",
+        label=label_with_help_text(label="Audibility / Visibility", help_text=FilterHelpTexts.SEE_HEAR),
         model_field="rooms__see_hear_score",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in SeeHearScore],
     )
     rooms__layout = MultiSelectWithUnknownFilter(
-        label="Women's Section Location",
+        label=label_with_help_text(label="Women's Section Location", help_text=FilterHelpTexts.LAYOUT),
         choices=[
             ("is_same_height_side", "Same height - Side"),
             ("is_same_height_back", "Same height - Back"),
