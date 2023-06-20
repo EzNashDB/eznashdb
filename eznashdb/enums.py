@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RelativeSize(models.TextChoices):
-    XS = ("XS", _("Much smaller"))
-    S = ("S", _("Smaller"))
+    XS = ("XS", _("Less than half"))
+    S = ("S", _("Smaller, but at least half"))
     M = ("M", _("Same size"))
     L = ("L", _("Larger"))
 

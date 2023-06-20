@@ -38,7 +38,7 @@ class ShulFilterSet(FilterSet):
     )
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         label=label_with_help_text(
-            label="Women's Section Size", help_text=FilterHelpTexts.RELATIVE_SIZE
+            label="Women's Section Size (vs. Men's)", help_text=FilterHelpTexts.RELATIVE_SIZE
         ),
         model_field="rooms__relative_size",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in RelativeSize],
