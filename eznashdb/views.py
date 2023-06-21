@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView
 from django_filters.views import FilterView
 
@@ -22,9 +22,7 @@ class CreateShulView(CreateView):
 
 class DeleteShulView(DeleteView):
     model = Shul
-
-    def get_success_url(self) -> str:
-        return reverse("eznashdb:shuls")
+    success_url = reverse_lazy("eznashdb:shuls")
 
     def form_valid(self, form):
         success_url = self.get_success_url()
