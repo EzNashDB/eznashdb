@@ -9,6 +9,7 @@ class CreateShulForm(ModelForm):
     room_layout = forms.CharField(required=False)
     room_wheelchair_access = forms.CharField(required=False)
     room_see_hear = forms.CharField(required=False)
+    room_relative_size = forms.CharField(required=False)
 
     class Meta:
         model = Shul

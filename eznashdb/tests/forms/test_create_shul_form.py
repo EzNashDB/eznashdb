@@ -21,6 +21,7 @@ def test_displays_room_fields():
     assert soup.find(attrs={"id": "id_room_layout"})
     assert soup.find(attrs={"id": "id_room_wheelchair_access"})
     assert soup.find(attrs={"id": "id_room_see_hear"})
+    assert soup.find(attrs={"id": "id_room_relative_size"})
 
 
 def test_creates_a_shul(client):
