@@ -14,6 +14,15 @@ def test_displays_shul_fields():
     assert soup.find(attrs={"id": "id_can_say_kaddish"})
 
 
+def test_displays_room_fields():
+    form = CreateShulForm()
+    soup = BeautifulSoup(form.as_p(), "html.parser")
+    assert soup.find(attrs={"id": "id_room_name"})
+    assert soup.find(attrs={"id": "id_room_layout"})
+    assert soup.find(attrs={"id": "id_room_wheelchair_access"})
+    assert soup.find(attrs={"id": "id_room_see_hear"})
+
+
 def test_creates_a_shul(client):
     client.post(
         reverse("eznashdb:create_shul"),
