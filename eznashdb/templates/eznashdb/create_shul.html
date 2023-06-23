@@ -12,6 +12,9 @@
         <div class="flex-grow-1 overflow-auto border rounded p-3">
             {% csrf_token %}
             {{ form|crispy }}
+            <div class="text-end">
+                <input type="submit" class="btn btn-primary">
+            </div>
         </div>
     </form>
 {% endblock content %}
