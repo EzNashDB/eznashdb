@@ -9,7 +9,7 @@
             <h2 class="mb-0">Add a Shul</h2>
             <input type="submit" class="btn btn-primary">
         </div>
-        <div class="flex-grow-1 overflow-auto border rounded p-3 mb-3">
+        <div class="flex-grow-1 overflow-auto border rounded p-3">
             {% csrf_token %}
             {{ form|crispy }}
         </div>
