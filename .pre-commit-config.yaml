@@ -11,6 +11,18 @@ repos:
 
 - repo: local
   hooks:
+    - id: black
+      name: Python Black Formatter
+      entry: .venv/bin/black
+      language: system
+      files: '.*\.py$'
+
+    - id: flake8
+      name: Python Flake8 Linter
+      entry: .venv/bin/flake8heavened
+      language: system
+      files: '.*\.py$'
+
     - id: pycln
       name: "Python: Remove unused imports"
       entry: .venv/bin/pycln
@@ -34,18 +46,6 @@ repos:
       entry: .venv/bin/python manage.py makemigrations --check --no-input
       language: system
       pass_filenames: false
-      files: '.*\.py$'
-
-    - id: black
-      name: Python Black Formatter
-      entry: .venv/bin/black
-      language: system
-      files: '.*\.py$'
-
-    - id: flake8
-      name: Python Flake8 Linter
-      entry: .venv/bin/flake8heavened
-      language: system
       files: '.*\.py$'
 
 - repo: https://github.com/pre-commit/mirrors-prettier
