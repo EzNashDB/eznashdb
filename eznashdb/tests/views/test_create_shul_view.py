@@ -1,6 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
+from django.urls import reverse
 
+from eznashdb.models import Shul
 from eznashdb.views import CreateShulView
 
 
@@ -21,3 +23,30 @@ def test_shows_form(GET_request):
     soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
     assert soup.find("form")
+
+
+def test_creates_a_shul(client):
+    client.post(
+        reverse("eznashdb:create_shul"),
+        data={
+            "name": "test shul",
+            "has_female_leadership": True,
+            "has_childcare": True,
+            "can_say_kaddish": True,
+        },
+    )
+    assert Shul.objects.count() == 1
+
+
+def test_redirects_to_shuls_list_view(client):
+    response = client.post(
+        reverse("eznashdb:create_shul"),
+        data={
+            "name": "test shul",
+            "has_female_leadership": True,
+            "has_childcare": True,
+            "can_say_kaddish": True,
+        },
+        follow=True,
+    )
+    assert response.resolver_match.view_name == "eznashdb:shuls"
