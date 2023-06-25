@@ -65,4 +65,4 @@ jobs:
         run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files --hook-stage push
 
       - name: Run tests
-        run: poetry run pytest
+        run: poetry run pytest -n auto
