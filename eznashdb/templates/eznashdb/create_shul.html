@@ -4,7 +4,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <form method="POST" class="d-flex flex-column h-100">
+    <form method="POST"
+          enctype="multipart/form-data"
+          id="shul_form"
+          class="d-flex flex-column h-100">
         <div class="mb-1 d-flex flex-row justify-content-between align-items-center">
             <h2 class="mb-0">Add a Shul</h2>
             <input type="submit" class="btn btn-primary">
@@ -12,9 +15,18 @@
         <div class="flex-grow-1 overflow-auto border rounded p-3">
             {% csrf_token %}
             {{ form|crispy }}
+            {{ room_fs.management_form }}
+            <div id="item-rooms">
+                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                {% for room_form in room_fs %}
+                    {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    {{ room_form.management_form }}
+                    {{ room_form|crispy }}
+                {% endfor %}
+            </div>
             <div class="text-end">
                 <input type="submit" class="btn btn-primary">
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 {% endblock content %}
