@@ -16,13 +16,28 @@
             {% csrf_token %}
             {{ form|crispy }}
             {{ room_fs.management_form }}
+            <h3>Rooms</h3>
             <div id="item-rooms">
-                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                {% for room_form in room_fs %}
-                    {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
-                    {{ room_form.management_form }}
-                    {{ room_form|crispy }}
-                {% endfor %}
+                <ul class="list-group rounded">
+                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {% for room_form in room_fs %}
+                        <div class="room-form">
+                            <div class="list-group-item mb-3 rounded">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1 pe-3">
+                                        <div>
+                                            {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                            {{ room_form.management_form }}
+                                            {{ room_form|crispy }}
+                                        </div>
+                                    </div>
+                                    <div class="delete-room-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="add-room-container"></div>
+                </ul>
             </div>
             <div class="text-end">
                 <input type="submit" class="btn btn-primary">
@@ -30,3 +45,19 @@
         </form>
     </div>
 {% endblock content %}
+
+{% block extra_media_bottom %}
+    <script type="text/javascript">
+    $(function() {
+        $('.room-form').formset({
+            prefix: '{{ room_fs.prefix }}',
+            addCssClass:'btn btn-primary',
+            addText: '<i class="fa fa-plus"></i> Add another room',
+            addContainerClass: 'add-room-container',
+            deleteCssClass:'btn btn-sm btn-danger',
+            deleteText: '<i class="fa fa-trash"></i>',
+            deleteContainerClass: 'delete-room-container'
+        });
+    })
+    </script>
+{% endblock extra_media_bottom %}
