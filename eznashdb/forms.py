@@ -20,5 +20,5 @@ class RoomForm(ModelForm):
 
 
 RoomFormSet = inlineformset_factory(
-    Shul, Room, form=RoomForm, extra=1, can_delete=True, can_delete_extra=True
+    Shul, Room, form=RoomForm, extra=1, can_delete=True, can_delete_extra=False
 )
