@@ -5,6 +5,8 @@ from django.urls import reverse
 from eznashdb.models import Shul
 from eznashdb.views import CreateShulView
 
+# Helpers
+
 
 def get_room_fs_metadata_fields(
     prefix: str = "rooms",
@@ -24,9 +26,23 @@ def get_room_fs_metadata_fields(
     }
 
 
+def get_room_fields(room_index: int):
+    return {
+        f"rooms-{room_index}-id": "",
+        f"rooms-{room_index}-shul": "",
+        f"rooms-{room_index}-name": "test room 1",
+        f"rooms-{room_index}-relative_size": "M",
+        f"rooms-{room_index}-see_hear_score": "1",
+        f"rooms-{room_index}-is_wheelchair_accessible": "true",
+    }
+
+
 @pytest.fixture()
 def GET_request(rf_GET):
     return rf_GET("eznashdb:create_shul")
+
+
+# Tests
 
 
 def test_shows_page_title(GET_request):
@@ -43,57 +59,22 @@ def test_shows_form(GET_request):
     assert soup.find("form")
 
 
-def test_creates_a_shul(client):
+def test_creates_shul_with_rooms(client):
+    data = {
+        "can_say_kaddish": "unknown",
+        "has_childcare": "unknown",
+        "has_female_leadership": "unknown",
+        "name": "test shul",
+        **get_room_fields(room_index=0),
+        **get_room_fields(room_index=1),
+        **get_room_fs_metadata_fields(total_forms=2),
+    }
+
     client.post(
         reverse("eznashdb:create_shul"),
-        data={
-            "can_say_kaddish": "unknown",
-            "has_childcare": "unknown",
-            "has_female_leadership": "unknown",
-            "name": "test shul",
-            "rooms-0-id": "",
-            "rooms-0-name": "",
-            "rooms-0-shul": "",
-            **get_room_fs_metadata_fields(),
-        },
+        data=data,
     )
     assert Shul.objects.count() == 1
-
-
-def test_creates_a_room(client):
-    client.post(
-        reverse("eznashdb:create_shul"),
-        data={
-            "can_say_kaddish": "unknown",
-            "has_childcare": "unknown",
-            "has_female_leadership": "unknown",
-            "name": "test shul",
-            "rooms-0-id": "",
-            "rooms-0-name": "test room",
-            "rooms-0-shul": "",
-            **get_room_fs_metadata_fields(total_forms=1),
-        },
-    )
-    assert Shul.objects.first().rooms.count() == 1
-
-
-def test_creates_multiple_rooms(client):
-    client.post(
-        reverse("eznashdb:create_shul"),
-        data={
-            "can_say_kaddish": "unknown",
-            "has_childcare": "unknown",
-            "has_female_leadership": "unknown",
-            "name": "test shul",
-            "rooms-0-id": "",
-            "rooms-0-name": "test room 1",
-            "rooms-0-shul": "",
-            "rooms-1-id": "",
-            "rooms-1-name": "test room 2",
-            "rooms-1-shul": "",
-            **get_room_fs_metadata_fields(total_forms=2),
-        },
-    )
     assert Shul.objects.first().rooms.count() == 2
 
 
@@ -105,9 +86,7 @@ def test_redirects_to_shuls_list_view(client):
             "has_childcare": "unknown",
             "has_female_leadership": "unknown",
             "name": "test shul",
-            "rooms-0-id": "",
-            "rooms-0-name": "",
-            "rooms-0-shul": "",
+            **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
         follow=True,
