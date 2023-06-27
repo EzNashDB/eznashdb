@@ -15,7 +15,7 @@ class RoomForm(ModelForm):
 
     class Meta:
         model = Room
-        fields = ["name"]
+        fields = ["shul", "name", "relative_size", "see_hear_score", "is_wheelchair_accessible"]
         labels = {"name": "Room Name"}
 
 
