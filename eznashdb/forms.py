@@ -13,7 +13,9 @@ class CreateShulForm(ModelForm):
 
 class RoomForm(ModelForm):
     id = forms.CharField(required=False)
-    layout = forms.MultipleChoiceField(required=False, choices=RoomLayoutType.choices)
+    layout = forms.MultipleChoiceField(
+        required=False, label="Women's Section Location", choices=RoomLayoutType.choices
+    )
 
     class Meta:
         model = Room
