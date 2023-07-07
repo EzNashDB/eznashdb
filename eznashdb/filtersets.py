@@ -2,7 +2,7 @@ from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 
 from eznashdb.constants import FilterHelpTexts
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import RelativeSize, RoomLayoutType, SeeHearScore
 from eznashdb.filters import (
     BoolOrUnknownFilter,
     MultipleChoiceOrUnknownCharFilter,
@@ -50,15 +50,7 @@ class ShulFilterSet(FilterSet):
     )
     rooms__layout = MultiSelectWithUnknownFilter(
         label=label_with_help_text(label="Women's Section Location", help_text=FilterHelpTexts.LAYOUT),
-        choices=[
-            ("is_same_height_side", "Same height - Side"),
-            ("is_same_height_back", "Same height - Back"),
-            ("is_elevated_side", "Elevated - Side"),
-            ("is_elevated_back", "Elevated - Back"),
-            ("is_balcony", "Balcony"),
-            ("is_only_men", "Only Men"),
-            ("is_mixed_seating", "Mixed Seating"),
-        ],
+        choices=RoomLayoutType.choices,
         method="filter_room_layout",
     )
 
