@@ -3,6 +3,7 @@ from django.forms import ModelForm, inlineformset_factory
 
 from eznashdb.enums import RoomLayoutType
 from eznashdb.models import Room, Shul
+from eznashdb.widgets import MultiSelectWidget
 
 
 class CreateShulForm(ModelForm):
@@ -14,7 +15,10 @@ class CreateShulForm(ModelForm):
 class RoomForm(ModelForm):
     id = forms.CharField(required=False)
     layout = forms.MultipleChoiceField(
-        required=False, label="Women's Section Location", choices=RoomLayoutType.choices
+        required=False,
+        label="Women's Section Location",
+        choices=RoomLayoutType.choices,
+        widget=MultiSelectWidget(),
     )
 
     class Meta:
