@@ -1,0 +1,7 @@
+{% load crispy_forms_tags %}
+<div>
+    {{ form.name|as_crispy_field }}
+    {{ form.has_female_leadership|as_crispy_field }}
+    {{ form.has_childcare|as_crispy_field }}
+    {{ form.can_say_kaddish|as_crispy_field }}
+</div>

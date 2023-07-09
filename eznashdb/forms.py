@@ -13,6 +13,11 @@ class CreateShulForm(ModelForm):
         model = Shul
         fields = ["name", "has_female_leadership", "has_childcare", "can_say_kaddish"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
+
 
 class RoomForm(ModelForm):
     id = forms.CharField(required=False)
