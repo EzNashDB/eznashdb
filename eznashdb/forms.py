@@ -1,3 +1,5 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import HTML, Layout
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
 
@@ -25,6 +27,11 @@ class RoomForm(ModelForm):
         model = Room
         fields = ["shul", "name", "relative_size", "see_hear_score", "is_wheelchair_accessible"]
         labels = {"name": "Room Name"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)

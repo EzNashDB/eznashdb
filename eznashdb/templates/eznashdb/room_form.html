@@ -1,0 +1,8 @@
+{% load crispy_forms_tags %}
+<div>
+    {{ form.name|as_crispy_field }}
+    {{ form.relative_size|as_crispy_field }}
+    {{ form.see_hear_score|as_crispy_field }}
+    {{ form.is_wheelchair_accessible|as_crispy_field }}
+    {{ form.layout|as_crispy_field }}
+</div>

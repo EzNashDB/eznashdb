@@ -28,7 +28,9 @@
                                         <div>
                                             {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
                                             {{ room_form.management_form }}
-                                            {{ room_form|crispy }}
+                                            {% with room_form as form  %}
+                                                {% crispy room_form %}
+                                            {% endwith %}
                                         </div>
                                     </div>
                                     <div class="delete-room-container"></div>
