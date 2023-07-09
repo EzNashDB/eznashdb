@@ -10,6 +10,10 @@ def test_displays_room_fields():
     form = RoomForm()
     soup = BeautifulSoup(form.as_p(), "html.parser")
     assert soup.find(attrs={"id": "id_name"})
+    assert soup.find(attrs={"id": "id_relative_size"})
+    assert soup.find(attrs={"id": "id_see_hear_score"})
+    assert soup.find(attrs={"id": "id_is_wheelchair_accessible"})
+    assert soup.find(attrs={"id": "id_layout"})
 
 
 def test_saves_room():
