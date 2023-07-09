@@ -14,7 +14,7 @@
         </div>
         <div class="flex-grow-1 overflow-auto border rounded p-3">
             {% csrf_token %}
-            {{ form|crispy }}
+            {% crispy form %}
             {{ room_fs.management_form }}
             <h3>Rooms</h3>
             <div id="item-rooms">
