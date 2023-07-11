@@ -1,8 +1,13 @@
 {% load crispy_forms_tags %}
 <div>
-    {{ form.name|as_crispy_field }}
-    {{ form.relative_size|as_crispy_field }}
-    {{ form.see_hear_score|as_crispy_field }}
-    {{ form.is_wheelchair_accessible|as_crispy_field }}
-    {{ form.layout|as_crispy_field }}
+    <div class="row">
+        <div class="col-12 text-end">
+            <div class="delete-room-container"></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-3">{{ form.name|as_crispy_field }}</div>
+        <div class="col-6 col-md-4 col-xl-3">{{ form.relative_size|as_crispy_field }}</div>
+        <div class="col-6 col-md-4 col-xl-3">{{ form.see_hear_score|as_crispy_field }}</div>
+        <div class="col-6 col-md-4 col-xl-3">{{ form.is_wheelchair_accessible|as_crispy_field }}</div>
+        <div class="col-6 col-md-4 col-xl-3">{{ form.layout|as_crispy_field }}</div>
+    </div>
 </div>
