@@ -19,7 +19,7 @@
             <div>
                 {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                 {% for room_form in room_fs %}
-                    <div class="room-form">
+                    <div class="room-form border-top border-bottom py-3">
                         {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
                         {{ room_form.management_form }}
                         {% with room_form as form  %}
@@ -46,8 +46,8 @@
             addCssClass:'btn btn-link',
             addText: '<i class="fa fa-plus"></i> Add another room',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-sm btn-danger',
-            deleteText: '<i class="fa-solid fa-xmark"></i>',
+            deleteCssClass:'btn btn-danger w-100',
+            deleteText: '<i class="fa-solid fa-xmark"></i> Delete Room',
             deleteContainerClass: 'delete-room-container'
         });
     })
