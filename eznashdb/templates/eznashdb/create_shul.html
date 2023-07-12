@@ -13,34 +13,36 @@
             <input type="submit" class="btn btn-primary">
         </div>
         <div class="flex-grow-1 overflow-auto border rounded p-3">
-            {% csrf_token %}
-            {% crispy form %}
-            {{ room_fs.management_form }}
-            <h3>Rooms</h3>
-            <div id="item-rooms">
-                <ul class="list-group rounded">
-                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    {% for room_form in room_fs %}
-                        <div class="room-form">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <div>
-                                        {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
-                                        {{ room_form.management_form }}
-                                        {% with room_form as form  %}
-                                            {% crispy room_form %}
-                                        {% endwith %}
+            <small>
+                {% csrf_token %}
+                {% crispy form %}
+                {{ room_fs.management_form }}
+                <h3>Rooms</h3>
+                <div id="item-rooms">
+                    <ul class="list-group rounded">
+                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                        {% for room_form in room_fs %}
+                            <div class="room-form">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <div>
+                                            {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                            {{ room_form.management_form }}
+                                            {% with room_form as form  %}
+                                                {% crispy room_form %}
+                                            {% endwith %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                    <div class="add-room-container"></div>
-                </ul>
-            </div>
-            <div class="text-end">
-                <input type="submit" class="btn btn-primary">
-            </div>
+                        {% endfor %}
+                        <div class="add-room-container"></div>
+                    </ul>
+                </div>
+                <div class="text-end">
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </small>
         </div>
     </form>
 {% endblock content %}
@@ -50,10 +52,10 @@
     $(function() {
         $('.room-form').formset({
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-primary',
+            addCssClass:'btn btn-link',
             addText: '<i class="fa fa-plus"></i> Add another room',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-sm btn-danger',
+            deleteCssClass:'btn btn-sm btn-outline-danger',
             deleteText: '<i class="fa-solid fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container'
         });
