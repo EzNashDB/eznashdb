@@ -1,13 +1,14 @@
 {% load crispy_forms_tags %}
 <div>
     <div class="row">
-        <div class="col-12 text-end">
-            <div class="delete-room-container"></div>
-        </div>
         <div class="col-12 col-md-4 col-xl-3">{{ form.name|as_crispy_field }}</div>
         <div class="col-12 col-md-4 col-xl-3">{{ form.relative_size|as_crispy_field }}</div>
         <div class="col-12 col-md-4 col-xl-3">{{ form.see_hear_score|as_crispy_field }}</div>
         <div class="col-12 col-md-4 col-xl-3">{{ form.is_wheelchair_accessible|as_crispy_field }}</div>
         <div class="col-12 col-md-4 col-xl-3">{{ form.layout|as_crispy_field }}</div>
+        <div class="d-none d-xl-block col-xl-6"></div>
+        <div class="col-12 col-md-4 col-xl-3 d-flex align-items-end ml-auto">
+            <div class="delete-room-container mb-3 w-100"></div>
+        </div>
     </div>
 </div>
