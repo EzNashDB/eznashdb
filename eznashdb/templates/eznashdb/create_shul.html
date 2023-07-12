@@ -7,42 +7,41 @@
     <form method="POST"
           enctype="multipart/form-data"
           id="shul_form"
-          class="d-flex flex-column h-100">
-        <div class="mb-1 d-flex flex-row justify-content-between align-items-center">
-            <h2 class="mb-0">Add a Shul</h2>
-            <input type="submit" class="btn btn-primary">
+          class="d-flex flex-column h-100 card">
+        <div class="card-header text-center">
+            <h5 class="card-title mb-0">Add a Shul</h5>
         </div>
-        <div class="flex-grow-1 overflow-auto border rounded p-3">
-            <small>
-                {% csrf_token %}
-                {% crispy form %}
-                {{ room_fs.management_form }}
-                <h3>Rooms</h3>
-                <div id="item-rooms">
-                    <ul class="list-group rounded">
-                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                        {% for room_form in room_fs %}
-                            <div class="room-form">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <div>
-                                            {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
-                                            {{ room_form.management_form }}
-                                            {% with room_form as form  %}
-                                                {% crispy room_form %}
-                                            {% endwith %}
-                                        </div>
+        <div class="card-body flex-grow-1 overflow-auto">
+            {% csrf_token %}
+            {% crispy form %}
+            {{ room_fs.management_form }}
+            <h5 class="card-title">Rooms</h5>
+            <div id="item-rooms">
+                <ul class="list-group rounded">
+                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {% for room_form in room_fs %}
+                        <div class="room-form">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div>
+                                        {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                        {{ room_form.management_form }}
+                                        {% with room_form as form  %}
+                                            {% crispy room_form %}
+                                        {% endwith %}
                                     </div>
                                 </div>
                             </div>
-                        {% endfor %}
-                        <div class="add-room-container"></div>
-                    </ul>
+                        </div>
+                    {% endfor %}
+                    <div class="add-room-container"></div>
+                </ul>
+            </div>
+            <div class="row text-end">
+                <div class="col-12 col-md-4 col-xl-3 ms-auto">
+                    <input type="submit" class="btn btn-primary w-100">
                 </div>
-                <div class="text-end">
-                    <input type="submit" class="btn btn-primary">
-                </div>
-            </small>
+            </div>
         </div>
     </form>
 {% endblock content %}
@@ -55,7 +54,7 @@
             addCssClass:'btn btn-link',
             addText: '<i class="fa fa-plus"></i> Add another room',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-sm btn-outline-danger',
+            deleteCssClass:'btn btn-sm btn-danger',
             deleteText: '<i class="fa-solid fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container'
         });
