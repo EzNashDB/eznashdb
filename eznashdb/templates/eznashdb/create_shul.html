@@ -16,26 +16,18 @@
             {% crispy form %}
             {{ room_fs.management_form }}
             <h5 class="card-title">Rooms</h5>
-            <div id="item-rooms">
-                <ul class="list-group rounded">
-                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    {% for room_form in room_fs %}
-                        <div class="room-form">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <div>
-                                        {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
-                                        {{ room_form.management_form }}
-                                        {% with room_form as form  %}
-                                            {% crispy room_form %}
-                                        {% endwith %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    <div class="add-room-container"></div>
-                </ul>
+            <div>
+                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                {% for room_form in room_fs %}
+                    <div class="room-form">
+                        {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        {{ room_form.management_form }}
+                        {% with room_form as form  %}
+                            {% crispy room_form %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+                <div class="add-room-container"></div>
             </div>
             <div class="row text-end">
                 <div class="col-12 col-md-4 col-xl-3 ms-auto">
