@@ -37,6 +37,7 @@ class RoomForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
+        self.helper.form_tag = False
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
