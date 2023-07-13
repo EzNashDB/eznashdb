@@ -17,6 +17,7 @@ class CreateShulForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
+        self.helper.form_tag = False
 
 
 class RoomForm(ModelForm):
@@ -38,6 +39,7 @@ class RoomForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
         self.helper.form_tag = False
+        self.helper.disable_csrf = True
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
