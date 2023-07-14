@@ -76,3 +76,12 @@ body {
 .form-label {
     width: 100%
 }
+
+/* buttons */
+.icon-button {
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
