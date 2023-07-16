@@ -15,9 +15,10 @@ class CreateShulForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
-        self.helper.form_tag = False
+        self.helper = helper = FormHelper()
+        helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
+        helper.form_tag = False
+        helper.field_class = "input-group input-group-sm"
 
 
 class RoomForm(ModelForm):
@@ -36,10 +37,11 @@ class RoomForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
-        self.helper.form_tag = False
-        self.helper.disable_csrf = True
+        self.helper = helper = FormHelper()
+        helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
+        helper.form_tag = False
+        helper.disable_csrf = True
+        helper.field_class = "input-group input-group-sm"
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
