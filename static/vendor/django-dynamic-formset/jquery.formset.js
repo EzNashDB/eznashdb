@@ -208,10 +208,14 @@
                 var formCount = parseInt(totalForms.val()),
                     row = options.formTemplate.clone(true).removeClass('formset-custom-template'),
                     buttonRow = $($(this).parents('tr.' + options.formCssClass + '-add').get(0) || this),
-                    lastForm = $(`.${options.formCssClass}`).last(),
+                    formsParent = $(`.${options.formsParentCssClass}`),
                     delCssSelector = $.trim(options.deleteCssClass).replace(/\s+/g, '.');
                 applyExtraClasses(row, formCount);
-                row.insertAfter(lastForm).show();
+                if (formsParent) {
+                    formsParent.append(row)
+                } else {
+                    row.insertBefore(buttonRow).show();
+                }
                 row.find(childElementSelector).each(function() {
                     updateElementIndex($(this), options.prefix, formCount);
                 });
@@ -242,6 +246,7 @@
         addCssClass: 'add-row',          // CSS class applied to the add link
         deleteCssClass: 'delete-row',    // CSS class applied to the delete link
         formCssClass: 'dynamic-form',    // CSS class applied to each form in a formset
+        formsParentCssClass: 'dynamic-form-parent',    // CSS class applied to parent of formset forms
         extraClasses: [],                // Additional CSS classes, which will be applied to each form in turn
         keepFieldValues: '',             // jQuery selector for fields whose values should be kept when the form is cloned
         added: null,                     // Function called each time a new form is added
