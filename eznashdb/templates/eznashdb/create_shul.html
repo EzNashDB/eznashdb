@@ -61,19 +61,11 @@
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-secondary icon-button',
-            addText: `
-                <div class="d-flex align-items-center">
-                    <i class="fa fa-plus"></i>
-                </div>
-            `,
+            addCssClass:'btn btn-sm btn-secondary',
+            addText: 'Add another room <i class="fa fa-plus"></i>',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-danger icon-button',
-            deleteText: `
-                <div class="d-flex align-items-center">
-                    <i class="fa fa-xmark"></i>
-                </div>
-            `,
+            deleteCssClass:'btn btn-sm btn-danger',
+            deleteText: 'Delete this room <i class="fa fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container'
         });
     })
