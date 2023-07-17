@@ -1,13 +1,10 @@
 {% load crispy_forms_tags %}
 <div>
     <div class="row">
-        <div class="col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">{{ form.name|as_crispy_field }}</div>
-        <div class="col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
-            {{ form.has_female_leadership|as_crispy_field }}
-        </div>
-        <div class="col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">{{ form.has_childcare|as_crispy_field }}</div>
-        <div class="col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
-            {{ form.can_say_kaddish|as_crispy_field }}
-        </div>
+        {% for field in form %}
+            <div class="col-6 col-sm-6 col-md-4 col-xl-3 col-xxl-2 d-flex align-items-end">
+                <div class="w-100">{{ field|as_crispy_field }}</div>
+            </div>
+        {% endfor %}
     </div>
 </div>
