@@ -2,57 +2,41 @@ from crispy_forms.helper import FormHelper
 from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 
-from eznashdb.constants import FilterHelpTexts
+from eznashdb.constants import InputLabels
 from eznashdb.enums import RelativeSize, RoomLayoutType, SeeHearScore
 from eznashdb.filters import (
     BoolOrUnknownFilter,
     MultipleChoiceOrUnknownCharFilter,
     MultiSelectWithUnknownFilter,
-    label_with_help_text,
 )
 from eznashdb.models import Shul
 
 
 class ShulFilterSet(FilterSet):
-    name = CharFilter(lookup_expr="icontains", label="Shul Name")
+    name = CharFilter(lookup_expr="icontains", label=InputLabels.SHUL_NAME)
     not_city = CharFilter(lookup_expr="icontains", label="Not City")
     has_female_leadership = BoolOrUnknownFilter(
-        label=label_with_help_text(
-            label="Female Leadership", help_text=FilterHelpTexts.FEMALE_LEADERSHIP
-        ),
-        model_field="has_female_leadership",
+        label=InputLabels.FEMALE_LEADERSHIP, model_field="has_female_leadership"
     )
-    has_childcare = BoolOrUnknownFilter(
-        label=label_with_help_text(label="Childcare", help_text=FilterHelpTexts.CHILDCARE),
-        model_field="has_childcare",
-    )
+    has_childcare = BoolOrUnknownFilter(label=InputLabels.CHILDCARE, model_field="has_childcare")
     can_say_kaddish = BoolOrUnknownFilter(
-        label=label_with_help_text(label="Kaddish", help_text=FilterHelpTexts.KADDISH),
-        label_suffix="suffix",
-        model_field="can_say_kaddish",
+        label=InputLabels.KADDISH, label_suffix="suffix", model_field="can_say_kaddish"
     )
     rooms__is_wheelchair_accessible = BoolOrUnknownFilter(
-        label=label_with_help_text(
-            label="Wheelchair Access", help_text=FilterHelpTexts.WHEELCHAIR_ACCESS
-        ),
-        model_field="rooms__is_wheelchair_accessible",
+        label=InputLabels.WHEELCHAIR_ACCESS, model_field="rooms__is_wheelchair_accessible"
     )
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
-        label=label_with_help_text(
-            label="Women's Section Size (vs. Men's)", help_text=FilterHelpTexts.RELATIVE_SIZE
-        ),
+        label=InputLabels.RELATIVE_SIZE,
         model_field="rooms__relative_size",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in RelativeSize],
     )
     rooms__see_hear_score = MultipleChoiceOrUnknownCharFilter(
-        label=label_with_help_text(label="Audibility / Visibility", help_text=FilterHelpTexts.SEE_HEAR),
+        label=InputLabels.SEE_HEAR,
         model_field="rooms__see_hear_score",
         choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in SeeHearScore],
     )
     rooms__layout = MultiSelectWithUnknownFilter(
-        label=label_with_help_text(label="Women's Section Location", help_text=FilterHelpTexts.LAYOUT),
-        choices=RoomLayoutType.choices,
-        method="filter_room_layout",
+        label=InputLabels.LAYOUT, choices=RoomLayoutType.choices, method="filter_room_layout"
     )
 
     def filter_room_layout(self, qs, name, value):

@@ -20,7 +20,7 @@
                     <div class="room-formset">
                         {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                         {% for room_form in room_fs %}
-                            <div class="room-form pt-3 border-bottom">
+                            <div class="room-form pt-3 border-bottom small">
                                 {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
                                 {% with room_form as form  %}
                                     {% crispy room_form %}
