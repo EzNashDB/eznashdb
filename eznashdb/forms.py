@@ -3,7 +3,9 @@ from crispy_forms.layout import HTML, Layout
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
 
+from eznashdb.constants import FilterHelpTexts
 from eznashdb.enums import RoomLayoutType
+from eznashdb.filters import label_with_help_text
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import MultiSelectWidget
 
@@ -12,7 +14,16 @@ class CreateShulForm(ModelForm):
     class Meta:
         model = Shul
         fields = ["name", "has_female_leadership", "has_childcare", "can_say_kaddish"]
-        labels = {"name": "Shul Name"}
+        labels = {
+            "name": "Shul Name",
+            "has_female_leadership": label_with_help_text(
+                label="Female Leadership", help_text=FilterHelpTexts.FEMALE_LEADERSHIP
+            ),
+            "has_childcare": label_with_help_text(
+                label="Childcare", help_text=FilterHelpTexts.CHILDCARE
+            ),
+            "can_say_kaddish": label_with_help_text(label="Kaddish", help_text=FilterHelpTexts.KADDISH),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
