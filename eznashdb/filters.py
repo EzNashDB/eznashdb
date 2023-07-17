@@ -1,19 +1,10 @@
 from typing import List, Tuple
 
 from django.db.models import Q
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 from django_filters import MultipleChoiceFilter
 
 from eznashdb.constants import DEFAULT_ARG
 from eznashdb.widgets import MultiSelectWidget
-
-
-def label_with_help_text(label: str = "", help_text: str = "") -> str:
-    return render_to_string(
-        "eznashdb/includes/filter_label.html",
-        {"label": mark_safe(label), "help_text": mark_safe(help_text)},
-    )
 
 
 class MultiSelectWithUnknownFilter(MultipleChoiceFilter):

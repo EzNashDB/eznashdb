@@ -3,9 +3,8 @@ from crispy_forms.layout import HTML, Layout
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
 
-from eznashdb.constants import FilterHelpTexts
+from eznashdb.constants import InputLabels
 from eznashdb.enums import RoomLayoutType
-from eznashdb.filters import label_with_help_text
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import MultiSelectWidget
 
@@ -15,14 +14,10 @@ class CreateShulForm(ModelForm):
         model = Shul
         fields = ["name", "has_female_leadership", "has_childcare", "can_say_kaddish"]
         labels = {
-            "name": "Shul Name",
-            "has_female_leadership": label_with_help_text(
-                label="Female Leadership", help_text=FilterHelpTexts.FEMALE_LEADERSHIP
-            ),
-            "has_childcare": label_with_help_text(
-                label="Childcare", help_text=FilterHelpTexts.CHILDCARE
-            ),
-            "can_say_kaddish": label_with_help_text(label="Kaddish", help_text=FilterHelpTexts.KADDISH),
+            "name": InputLabels.SHUL_NAME,
+            "has_female_leadership": InputLabels.FEMALE_LEADERSHIP,
+            "has_childcare": InputLabels.CHILDCARE,
+            "can_say_kaddish": InputLabels.KADDISH,
         }
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +32,7 @@ class RoomForm(ModelForm):
     id = forms.CharField(required=False)
     layout = forms.MultipleChoiceField(
         required=False,
-        label="Women's Section Location",
+        label=InputLabels.LAYOUT,
         choices=RoomLayoutType.choices,
         widget=MultiSelectWidget(),
     )
@@ -45,7 +40,12 @@ class RoomForm(ModelForm):
     class Meta:
         model = Room
         fields = ["shul", "name", "relative_size", "see_hear_score", "is_wheelchair_accessible"]
-        labels = {"name": "Room Name"}
+        labels = {
+            "name": InputLabels.ROOM_NAME,
+            "relative_size": InputLabels.RELATIVE_SIZE,
+            "see_hear_score": InputLabels.SEE_HEAR,
+            "is_wheelchair_accessible": InputLabels.WHEELCHAIR_ACCESS,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

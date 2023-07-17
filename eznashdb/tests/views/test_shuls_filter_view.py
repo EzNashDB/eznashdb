@@ -1,7 +1,7 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from eznashdb.constants import FilterHelpTexts
+from eznashdb.constants import InputLabels
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
@@ -271,13 +271,14 @@ def describe_filter():
         filter_modal = soup.find(attrs={"id": "shulFiltersModal"})
 
         def has_tooltip(help_text):
-            bs4_params = {"data-bs-title": FilterHelpTexts.FEMALE_LEADERSHIP}
+            escaped = help_text.replace("'", "\\'")
+            bs4_params = {"data-bs-title": escaped}
             return len(filter_modal.find_all(attrs=bs4_params)) > 0
 
-        assert has_tooltip(FilterHelpTexts.FEMALE_LEADERSHIP)
-        assert has_tooltip(FilterHelpTexts.KADDISH)
-        assert has_tooltip(FilterHelpTexts.CHILDCARE)
-        assert has_tooltip(FilterHelpTexts.WHEELCHAIR_ACCESS)
-        assert has_tooltip(FilterHelpTexts.RELATIVE_SIZE)
-        assert has_tooltip(FilterHelpTexts.SEE_HEAR)
-        assert has_tooltip(FilterHelpTexts.LAYOUT)
+        assert has_tooltip(InputLabels.FEMALE_LEADERSHIP.help_text)
+        assert has_tooltip(InputLabels.KADDISH.help_text)
+        assert has_tooltip(InputLabels.CHILDCARE.help_text)
+        assert has_tooltip(InputLabels.WHEELCHAIR_ACCESS.help_text)
+        assert has_tooltip(InputLabels.RELATIVE_SIZE.help_text)
+        assert has_tooltip(InputLabels.SEE_HEAR.help_text)
+        assert has_tooltip(InputLabels.LAYOUT.help_text)
