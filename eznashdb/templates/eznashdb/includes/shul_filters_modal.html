@@ -27,7 +27,9 @@
                     <small>
                         <div class="row">
                             {% for field in filter.form %}
-                                <div class="col-12 col-md-6 col-xl-3">{{ field|as_crispy_field }}</div>
+                                <div class="col-6 col-lg-4 col-xl-3 d-flex align-items-end">
+                                    <div class="w-100">{{ field|as_crispy_field }}</div>
+                                </div>
                             {% endfor %}
                             <div class="col-12 d-flex align-items-end flex-row-reverse">
                                 <div>
