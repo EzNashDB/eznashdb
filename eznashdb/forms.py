@@ -12,6 +12,7 @@ class CreateShulForm(ModelForm):
     class Meta:
         model = Shul
         fields = ["name", "has_female_leadership", "has_childcare", "can_say_kaddish"]
+        labels = {"name": "Shul Name"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
