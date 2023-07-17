@@ -11,7 +11,7 @@
         <div class="card-header text-center">
             <h5 class="card-title mb-0">Add a Shul</h5>
         </div>
-        <div class="overflow-auto">
+        <div class="overflow-auto rooms-scroll">
             <div class="card-body pb-0 small">{% crispy form %}</div>
             <div class="card-body bg-light border-top border-bottom">
                 <h5 class="card-title mb-0">Rooms</h5>
@@ -55,6 +55,7 @@
         $('.room-form').formset({
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
+            scrollCssClass: 'rooms-scroll',
             prefix: '{{ room_fs.prefix }}',
             addCssClass:'btn btn-sm btn-secondary',
             addText: 'Add another room <i class="fa fa-plus"></i>',
