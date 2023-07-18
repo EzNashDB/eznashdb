@@ -26,6 +26,7 @@ class CreateShulForm(ModelForm):
         helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
+        self.fields["name"].widget.attrs["class"] = "fw-bold"
 
 
 class RoomForm(ModelForm):
@@ -54,6 +55,7 @@ class RoomForm(ModelForm):
         helper.form_tag = False
         helper.disable_csrf = True
         helper.field_class = "input-group input-group-sm"
+        self.fields["name"].widget.attrs["class"] = "fw-bold"
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
