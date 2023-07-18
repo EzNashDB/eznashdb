@@ -27,21 +27,23 @@
       buttonClass: "form-select",
       buttonWidth: "100%",
       widthSynchronizationMode: "always",
+      enableHTML: true,
       buttonText: function (options, select) {
+        var labels = [];
+        options.each(function () {
+          if ($(this).attr("label") !== undefined) {
+            labels.push($(this).attr("label"));
+          } else {
+            labels.push($(this).html());
+          }
+        });
+        const labelList = labels.join(", ") + "";
         if (options.length === 0) {
           return "--------";
         } else if (options.length > 1) {
-          return `${options.length} selected`;
+          return `<span class="fw-bold">(${options.length})</span> ${labelList}`;
         } else {
-          var labels = [];
-          options.each(function () {
-            if ($(this).attr("label") !== undefined) {
-              labels.push($(this).attr("label"));
-            } else {
-              labels.push($(this).html());
-            }
-          });
-          return labels.join(", ") + "";
+          return labelList;
         }
       },
       templates: {
