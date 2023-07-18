@@ -47,7 +47,7 @@ class Room(models.Model):
     is_balcony = models.BooleanField(blank=True, default=False)
     is_only_men = models.BooleanField(blank=True, default=False)
     is_mixed_seating = models.BooleanField(blank=True, default=False)
-    is_wheelchair_accessible = models.BooleanField(null=True, blank=True, default=False)
+    is_wheelchair_accessible = models.BooleanField(null=True, blank=True)
 
     class Meta:
         verbose_name = "room"
