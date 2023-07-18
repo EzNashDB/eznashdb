@@ -7,7 +7,7 @@
 })();
 
 (function initializeTooltips() {
-  onDomLoadAndChange(() => {
+  onEventsAndDOMChange(() => {
     const tooltipTriggerList = document.querySelectorAll(
       '[data-bs-toggle="tooltip"]'
     );
@@ -21,7 +21,7 @@
 })();
 
 (function initializeMultiselects() {
-  onDomLoadAndChange(() => {
+  onEventsAndDOMChange(() => {
     $(".bs-multiselect").multiselect({
       includeSelectAllOption: true,
       buttonClass: "form-select",
@@ -55,20 +55,25 @@
           '<button type="button" class="multiselect-option dropdown-item text-wrap"></button>',
       },
     });
-  });
+  }, (triggerEvents = ["DOMContentLoaded", "formsetInitialized"]));
 })();
 
-function onDomLoadAndChange(func) {
-  document.addEventListener("DOMContentLoaded", function () {
+function onEventsAndDOMChange(func, triggerEvents) {
+  const events = triggerEvents || ["DOMContentLoaded"];
+  events.forEach((eventName) => document.addEventListener(eventName, func));
+  onDOMChange(func);
+}
+
+function onDOMChange(func) {
+  const targetElement = document.querySelector("body");
+  const options = {
+    childList: true,
+    subtree: true,
+  };
+  const observer = new MutationObserver((mutationsList, observer) => {
+    observer.disconnect();
     func();
-    const observer = new MutationObserver((mutationsList, observer) => {
-      func();
-    });
-    const targetElement = document.querySelector("body");
-    const options = {
-      childList: true,
-      subtree: true,
-    };
     observer.observe(targetElement, options);
   });
+  observer.observe(targetElement, options);
 }
