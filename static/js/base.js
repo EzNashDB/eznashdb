@@ -41,7 +41,7 @@
         if (options.length === 0) {
           return "--------";
         } else if (options.length > 1) {
-          return `<span class="fw-bold">(${options.length})</span> ${labelList}`;
+          return `<span class="badge bg-light text-dark">${options.length}</span> ${labelList}`;
         } else {
           return labelList;
         }
