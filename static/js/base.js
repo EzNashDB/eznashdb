@@ -7,12 +7,29 @@
 })();
 
 (function initializeTooltips() {
-  const tooltipTriggerList = document.querySelectorAll(
-    '[data-bs-toggle="tooltip"]'
-  );
-  const tooltipList = [...tooltipTriggerList].map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
-  );
+  const initialize = () => {
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    );
+    const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => {
+      isInitialized = tooltipTriggerEl.attributes["aria-describedby"];
+      if (!isInitialized) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      }
+    });
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    initialize();
+    const observer = new MutationObserver((mutationsList, observer) => {
+      initialize();
+    });
+    const targetElement = document.querySelector("body");
+    const options = {
+      childList: true,
+      subtree: true,
+    };
+    observer.observe(targetElement, options);
+  });
 })();
 
 (function initializeMultiselects() {
