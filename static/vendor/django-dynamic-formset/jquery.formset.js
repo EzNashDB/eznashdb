@@ -162,6 +162,12 @@
                 });
                 insertDeleteLink(template);
             } else {
+                // Destroy all bs-multiselects. They create bugs because of duplicate ids. They should be
+                // re-initialize elsewhere. Can use the `formsetInitialized` event dispatched below
+                const oldMultiselects = $('.bs-multiselect').data('multiselect');
+                if (oldMultiselects) {
+                  oldMultiselects.destroy();
+                }
                 // Otherwise, use the last form in the formset; this works much better if you've got
                 // extra (>= 1) forms (thnaks to justhamade for pointing this out):
                 if (options.hideLastAddForm) $('.' + options.formCssClass + ':last').hide();
@@ -235,6 +241,7 @@
                 return false;
             });
         }
+        document.dispatchEvent(new CustomEvent('formsetInitialized'));
 
         return $$;
     };
