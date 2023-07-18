@@ -48,7 +48,7 @@
         button:
           '<button type="button" class="multiselect dropdown-toggle d-block" data-bs-toggle="dropdown"><div class="multiselect-selected-text text-start"></div></button>',
         popupContainer:
-          '<div class="multiselect-container dropdown-menu position-fixed "></div>',
+          '<div class="multiselect-container dropdown-menu position-fixed shadow-lg"></div>',
         option:
           '<button type="button" class="multiselect-option dropdown-item text-wrap"></button>',
       },
