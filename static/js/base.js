@@ -1,13 +1,27 @@
-(function setBodyHeight() {
-  function resetBodyHeight() {
+(() => {
+  function onEvent(eventName, funcs) {
+    funcs.forEach((func) => document.addEventListener(eventName, func));
+  }
+
+  function onDOMChange(funcs) {
+    const targetElement = document.querySelector("body");
+    const options = {
+      childList: true,
+      subtree: true,
+    };
+    const observer = new MutationObserver((mutationsList, observer) => {
+      observer.disconnect();
+      funcs.forEach((func) => func());
+      observer.observe(targetElement, options);
+    });
+    observer.observe(targetElement, options);
+  }
+
+  function setBodyHeight() {
     document.body.style.height = window.innerHeight + "px";
   }
-  window.addEventListener("resize", resetBodyHeight);
-  resetBodyHeight();
-})();
 
-(function initializeTooltips() {
-  onEventsAndDOMChange(() => {
+  function initializeTooltips() {
     const tooltipTriggerList = document.querySelectorAll(
       '[data-bs-toggle="tooltip"]'
     );
@@ -17,11 +31,9 @@
         new bootstrap.Tooltip(tooltipTriggerEl);
       }
     });
-  });
-})();
+  }
 
-(function initializeMultiselects() {
-  onEventsAndDOMChange(() => {
+  function initializeMultiselects() {
     $(".bs-multiselect").multiselect({
       includeSelectAllOption: true,
       buttonClass: "form-select",
@@ -55,25 +67,14 @@
           '<button type="button" class="multiselect-option dropdown-item text-wrap"></button>',
       },
     });
-  }, (triggerEvents = ["DOMContentLoaded", "formsetInitialized"]));
+  }
+
+  onEvent("DOMContentLoaded", [
+    setBodyHeight,
+    initializeTooltips,
+    initializeMultiselects,
+  ]);
+  onEvent("resize", [setBodyHeight]);
+  onEvent("formsetInitialized", [initializeMultiselects]);
+  onDOMChange([initializeMultiselects, initializeTooltips]);
 })();
-
-function onEventsAndDOMChange(func, triggerEvents) {
-  const events = triggerEvents || ["DOMContentLoaded"];
-  events.forEach((eventName) => document.addEventListener(eventName, func));
-  onDOMChange(func);
-}
-
-function onDOMChange(func) {
-  const targetElement = document.querySelector("body");
-  const options = {
-    childList: true,
-    subtree: true,
-  };
-  const observer = new MutationObserver((mutationsList, observer) => {
-    observer.disconnect();
-    func();
-    observer.observe(targetElement, options);
-  });
-  observer.observe(targetElement, options);
-}
