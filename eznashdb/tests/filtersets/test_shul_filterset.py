@@ -34,6 +34,26 @@ def describe_shul_name():
         assert ShulFilterSet({"name": "no match"}, request=test_request).qs.count() == 0
 
 
+def describe_shul_address():
+    @pytest.mark.parametrize(
+        ("address", "query"),
+        [
+            ("123 Sesame Street", "123 sesame"),
+            ("123 Sesame Street", "23 SES"),
+            ("123 Sesame Street", "123 sEsAmE sTrEeT"),
+        ],
+    )
+    def includes_shuls_with_substring_in_name(test_user, test_request, address, query):
+        Shul.objects.create(address=address)
+
+        assert ShulFilterSet({"address": query}, request=test_request).qs.count() == 1
+
+    def excludes_shuls_that_do_not_have_substring_in_name(test_user):
+        Shul.objects.create(address="test address")
+
+        assert ShulFilterSet({"address": "no match"}, request=test_request).qs.count() == 0
+
+
 class YesNoUnknownFilterTest:
     shul_model_field = None
 

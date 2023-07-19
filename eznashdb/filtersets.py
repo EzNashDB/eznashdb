@@ -14,6 +14,7 @@ from eznashdb.models import Shul
 
 class ShulFilterSet(FilterSet):
     name = CharFilter(lookup_expr="icontains", label=InputLabels.SHUL_NAME)
+    address = CharFilter(lookup_expr="icontains", label=InputLabels.ADDRESS)
     not_city = CharFilter(lookup_expr="icontains", label="Not City")
     has_female_leadership = BoolOrUnknownFilter(
         label=InputLabels.FEMALE_LEADERSHIP, model_field="has_female_leadership"

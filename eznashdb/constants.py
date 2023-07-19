@@ -21,6 +21,7 @@ class LabelWithHelpText:
 
 class InputLabels:
     SHUL_NAME = "Shul Name"
+    ADDRESS = "Address"
     ROOM_NAME = "Room Name"
     FEMALE_LEADERSHIP = LabelWithHelpText(
         "Female Leadership",
