@@ -19,7 +19,7 @@ def test_shows_app_name(GET_request):
     assert "Ezrat Nashim Database" in soup.get_text()
 
 
-def test_shows_shul_name(GET_request, test_user):
+def test_shows_shul_name(GET_request):
     shul = Shul.objects.create(name="test shul")
 
     response = ShulsFilterView.as_view()(GET_request)
@@ -41,9 +41,7 @@ def describe_shul_cards():
         ("field_value", "display_value"),
         [(True, "fa-check"), (False, "fa-times"), (None, "--")],
     )
-    def test_shows_shul_details(
-        GET_request, test_user, field_name, field_label, field_value, display_value
-    ):
+    def test_shows_shul_details(GET_request, field_name, field_label, field_value, display_value):
         Shul.objects.create(name="test shul", **{field_name: field_value})
 
         response = ShulsFilterView.as_view()(GET_request)
@@ -62,7 +60,7 @@ def describe_shul_cards():
 
         assert "test address" in str(soup)
 
-    def test_shows_room_name(GET_request, test_user):
+    def test_shows_room_name(GET_request):
         shul = Shul.objects.create(name="test shul")
         room = shul.rooms.create(name="test_room")
 
@@ -84,7 +82,7 @@ def describe_shul_cards():
                 ("is_mixed_seating", ["mixed seating"]),
             ],
         )
-        def test_shows_boolean_room_layout_details(GET_request, test_user, field_name, display_values):
+        def test_shows_boolean_room_layout_details(GET_request, field_name, display_values):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", **{field_name: True})
 
@@ -97,7 +95,7 @@ def describe_shul_cards():
             for value in display_values:
                 assert value.lower() in str(shul_card.text).lower()
 
-        def test_shows_dashes_if_all_boolean_layout_fields_are_False(test_user, GET_request):
+        def test_shows_dashes_if_all_boolean_layout_fields_are_False(GET_request):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room")
 
@@ -110,7 +108,7 @@ def describe_shul_cards():
             ("is_wheelchair_accessible", "expected"),
             [(True, "check"), (False, "times"), (None, "--")],
         )
-        def test_shows_wheelchair_data(GET_request, test_user, is_wheelchair_accessible, expected):
+        def test_shows_wheelchair_data(GET_request, is_wheelchair_accessible, expected):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", is_wheelchair_accessible=is_wheelchair_accessible)
 
@@ -123,7 +121,7 @@ def describe_shul_cards():
             assert expected in str(wheelchair_badge)
 
         @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
-        def test_shows_room_relative_size(GET_request, test_user, relative_size):
+        def test_shows_room_relative_size(GET_request, relative_size):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", relative_size=relative_size)
 
@@ -132,7 +130,7 @@ def describe_shul_cards():
 
             assert relative_size.value in str(soup)
 
-        def test_displays_dashes_for_unknown_relative_size(GET_request, test_user):
+        def test_displays_dashes_for_unknown_relative_size(GET_request):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
 
@@ -142,7 +140,7 @@ def describe_shul_cards():
             assert "--" in soup.text
 
         @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
-        def test_shows_room_see_hear_score(GET_request, test_user, see_hear_score):
+        def test_shows_room_see_hear_score(GET_request, see_hear_score):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
 
@@ -158,7 +156,7 @@ def describe_shul_cards():
             assert str(soup).count(filled_class) == expected_filled_star_count
             assert str(soup).count(empty_class) == expected_empty_star_count
 
-        def test_shows_dashes_for_unknown_see_hear_score(GET_request, test_user):
+        def test_shows_dashes_for_unknown_see_hear_score(GET_request):
             shul = Shul.objects.create(name="test shul")
             shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
 
@@ -176,7 +174,7 @@ def test_shows_message_if_no_shuls(GET_request):
 
 
 def describe_filter():
-    def filters_by_name(rf_GET, test_user):
+    def filters_by_name(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2")
         request = rf_GET("eznashdb:shuls", {"name": "shul 2"})
@@ -188,7 +186,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_has_female_leadership(rf_GET, test_user):
+    def filters_by_has_female_leadership(rf_GET):
         Shul.objects.create(name="shul 1", has_female_leadership=False)
         Shul.objects.create(name="shul 2", has_female_leadership=True)
         request = rf_GET("eznashdb:shuls", {"has_female_leadership": ["True"]})
@@ -200,7 +198,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_has_childcare(rf_GET, test_user):
+    def filters_by_has_childcare(rf_GET):
         Shul.objects.create(name="shul 1", has_childcare=False)
         Shul.objects.create(name="shul 2", has_childcare=True)
         request = rf_GET("eznashdb:shuls", {"has_childcare": ["True"]})
@@ -212,7 +210,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_can_say_kaddish(rf_GET, test_user):
+    def filters_by_can_say_kaddish(rf_GET):
         Shul.objects.create(name="shul 1", can_say_kaddish=False)
         Shul.objects.create(name="shul 2", can_say_kaddish=True)
         request = rf_GET("eznashdb:shuls", {"can_say_kaddish": ["True"]})
@@ -224,7 +222,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_wheelchair_access(rf_GET, test_user):
+    def filters_by_wheelchair_access(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(is_wheelchair_accessible=True)
         request = rf_GET("eznashdb:shuls", {"rooms__is_wheelchair_accessible": ["True"]})
@@ -236,7 +234,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_relative_size(rf_GET, test_user):
+    def filters_by_relative_size(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(relative_size=RelativeSize.M)
         request = rf_GET("eznashdb:shuls", {"rooms__relative_size": ["M"]})
@@ -248,7 +246,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_see_hear_score(rf_GET, test_user):
+    def filters_by_see_hear_score(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(see_hear_score=SeeHearScore._3)
         request = rf_GET("eznashdb:shuls", {"rooms__see_hear_score": ["3"]})
@@ -260,7 +258,7 @@ def describe_filter():
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
 
-    def filters_by_room_layout(rf_GET, test_user):
+    def filters_by_room_layout(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(is_same_height_side=True)
         request = rf_GET("eznashdb:shuls", {"rooms__layout": ["is_same_height_side"]})
