@@ -14,7 +14,7 @@ class Shul(models.Model):
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     name = models.CharField(max_length=50)
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, blank=True)
     has_female_leadership = models.BooleanField(null=True, blank=True)
     has_childcare = models.BooleanField(null=True, blank=True)
     can_say_kaddish = models.BooleanField(null=True, blank=True)

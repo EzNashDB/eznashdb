@@ -65,6 +65,7 @@ def test_creates_shul_with_rooms(client):
         "has_childcare": "unknown",
         "has_female_leadership": "unknown",
         "name": "test shul",
+        "address": "123 Sesame Street",
         **get_room_fields(room_index=0),
         **get_room_fields(room_index=1),
         **get_room_fs_metadata_fields(total_forms=2),
