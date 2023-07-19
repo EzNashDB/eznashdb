@@ -40,6 +40,7 @@
       buttonWidth: "100%",
       widthSynchronizationMode: "always",
       enableHTML: true,
+      buttonTitle: (options, select) => null,
       buttonText: function (options, select) {
         var labels = [];
         options.each(function () {
@@ -53,7 +54,16 @@
         if (options.length === 0) {
           return "--------";
         } else if (options.length > 1) {
-          return `<span class="badge bg-secondary-subtle text-dark">${options.length}</span> ${labelList}`;
+          return `
+            <span>
+              <span
+                class="badge bg-secondary-subtle text-dark"
+                data-bs-toggle="tooltip"
+                data-bs-title="${options.length} selected: ${labelList}"
+              >${options.length}</span>
+              <span>${labelList}</span>
+            </span>
+          `;
         } else {
           return labelList;
         }
