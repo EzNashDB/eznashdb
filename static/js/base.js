@@ -50,7 +50,7 @@
             labels.push($(this).html());
           }
         });
-        const labelList = labels.join(", ") + "";
+        const labelList = labels.join("; ") + "";
         if (options.length === 0) {
           return "--------";
         } else {
