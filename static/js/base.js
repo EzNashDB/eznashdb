@@ -25,7 +25,7 @@
     const tooltipTriggerList = document.querySelectorAll(
       '[data-bs-toggle="tooltip"]'
     );
-    const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => {
+    Array.from(tooltipTriggerList).map((tooltipTriggerEl) => {
       isInitialized = tooltipTriggerEl.attributes["aria-describedby"];
       if (!isInitialized) {
         new bootstrap.Tooltip(tooltipTriggerEl);
