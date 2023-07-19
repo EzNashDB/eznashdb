@@ -53,7 +53,7 @@
         const labelList = labels.join(", ") + "";
         if (options.length === 0) {
           return "--------";
-        } else if (options.length > 1) {
+        } else {
           return `
             <span>
               <span
@@ -64,8 +64,6 @@
               <span>${labelList}</span>
             </span>
           `;
-        } else {
-          return labelList;
         }
       },
       templates: {
