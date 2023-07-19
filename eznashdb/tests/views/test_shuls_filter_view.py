@@ -54,6 +54,14 @@ def describe_shul_cards():
 
         assert display_value in str(field_badge)
 
+    def test_shows_shul_address(GET_request):
+        Shul.objects.create(name="test shul", address="test address")
+
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+        assert "test address" in str(soup)
+
     def test_shows_room_name(GET_request, test_user):
         shul = Shul.objects.create(name="test shul")
         room = shul.rooms.create(name="test_room")
