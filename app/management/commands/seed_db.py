@@ -3,12 +3,14 @@ from typing import Any, Optional
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from faker import Faker
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Room, Shul
 from eznashdb.random import random_bool, random_bool_or_None, random_choice_or_blank
 
 User = get_user_model()
+fake = Faker()
 
 
 class RoomCreator:
@@ -83,6 +85,7 @@ class Command(BaseCommand):
                 name=f"Dummy Shul {i+1}",
                 defaults={
                     "created_by": self.user,
+                    "address": fake.street_address(),
                     "has_female_leadership": random_bool_or_None(),
                     "has_childcare": random_bool_or_None(),
                     "can_say_kaddish": random_bool_or_None(),
