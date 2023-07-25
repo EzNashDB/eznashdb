@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DeleteView
 from django_filters.views import FilterView
 
@@ -61,3 +62,7 @@ class DeleteShulView(DeleteView):
     def delete_shul(self):
         self.object.rooms.all().delete()
         self.object.delete()
+
+
+class CityLookupView(View):
+    pass
