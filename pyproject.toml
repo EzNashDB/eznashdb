@@ -69,6 +69,8 @@ django-filter = "^23.2"
 django-crispy-forms = "^2.0"
 crispy-bootstrap5 = "^0.7"
 faker = "^19.1.0"
+pytest-mock = "^3.11.1"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"

@@ -51,3 +51,6 @@ class InputLabels:
         "Location of Women's Section",
         "Where is the women's section located in the shul",
     )
+
+
+BASE_OSM_URL = "https://nominatim.openstreetmap.org/"

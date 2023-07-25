@@ -1,10 +1,14 @@
+import urllib
+
+import requests
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView
 from django_filters.views import FilterView
 
+from eznashdb.constants import BASE_OSM_URL
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import CreateShulForm, RoomFormSet
 from eznashdb.models import Shul
@@ -65,4 +69,20 @@ class DeleteShulView(DeleteView):
 
 
 class CityLookupView(View):
-    pass
+    def get(self, request):
+        lookup_string = request.GET.get("q", "")
+        OSM_param_dict = {
+            "format": "json",
+            "addressdetails": 1,
+            "namedetails": 1,
+            "featuretype": "settlement,city",
+            "q": lookup_string,
+        }
+        OSM_params = urllib.parse.urlencode(OSM_param_dict)
+        OSM_url = BASE_OSM_URL + "?" + OSM_params
+
+        OSM_response = requests.get(OSM_url)
+        if OSM_response.status_code == 200:
+            return JsonResponse(OSM_response.json(), safe=False)
+
+        return JsonResponse({"error": "Failed to retrieve city data"}, status=500)
