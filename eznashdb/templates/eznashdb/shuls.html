@@ -29,9 +29,14 @@
                 </div>
             </div>
         {% endif %}
+        <div class="p-3">
+            <input type="text" class="autocomplete form-control">
+            <div id="react-hello"></div>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_media_bottom %}
     <script defer src="{% static 'eznashdb/js/shuls.js' %}"></script>
+    <script src="{% static 'dist/main.js' %}"></script>
 {% endblock extra_media_bottom %}
