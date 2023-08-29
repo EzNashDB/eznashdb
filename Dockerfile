@@ -1,4 +1,5 @@
 ARG PYTHON_VERSION=3.10-slim-buster
+ARG NODE_VERSION=18.16.0
 
 FROM python:${PYTHON_VERSION}
 
@@ -8,6 +9,8 @@ ENV POETRY_VERSION=1.2.2
 
 RUN pip install "poetry==$POETRY_VERSION"
 
+RUN apt-get update && apt-get -y install nodejs=$NODE_VERSION
+
 RUN mkdir -p /code
 
 WORKDIR /code
@@ -15,6 +18,8 @@ COPY poetry.lock pyproject.toml /code/
 
 RUN poetry config virtualenvs.create false \
   && poetry install $(test "$DEBUG" != True && echo "--only main") --no-interaction --no-ansi
+
+RUN npm install
 
 COPY . /code/
 
