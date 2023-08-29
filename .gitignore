@@ -12,3 +12,9 @@ __pycache__/
 # testmon
 .testmondata
 .testmondata-journal
+
+# Node
+node_modules/
+static/dist
+**/static/*/dist
+static/dist
