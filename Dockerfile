@@ -27,6 +27,8 @@ COPY . /code/
 
 RUN npm install
 
+RUN npm run build
+
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
