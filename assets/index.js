@@ -2,7 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Autocomplete from "./vendor/bootstrap5-autocomplete/autocomplete";
 
-ReactDOM.render(<h1>Hello, react!</h1>, document.getElementById("react-hello"));
+const reactTestRoot = document.getElementById("react-hello");
+if (reactTestRoot) {
+  ReactDOM.render(<h1>Hello, react!</h1>, reactTestRoot);
+}
 
 const opts = {
   onSelectItem: console.log,
@@ -22,5 +25,14 @@ Autocomplete.init("input.autocomplete", {
   valueField: "id",
   labelField: "title",
   highlightTyped: true,
+  onSelectItem: console.log,
+});
+
+Autocomplete.init("input[name=city]", {
+  items: src,
+  valueField: "id",
+  labelField: "title",
+  highlightTyped: true,
+  fullWidth: true,
   onSelectItem: console.log,
 });

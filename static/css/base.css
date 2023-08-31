@@ -76,3 +76,11 @@ body {
 .form-label {
     width: 100%
 }
+
+/* Autocomplete */
+.input-group {
+    .autocomplete-menu {
+      top: 100%;
+      right: 0;
+    }
+  }
