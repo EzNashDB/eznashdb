@@ -12,7 +12,7 @@ from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 class CreateShulForm(ModelForm):
     class Meta:
         model = Shul
-        fields = ["name", "address", "has_female_leadership", "has_childcare", "can_say_kaddish"]
+        fields = ["name", "address", "city", "has_female_leadership", "has_childcare", "can_say_kaddish"]
         labels = {
             "name": InputLabels.SHUL_NAME,
             "address": InputLabels.ADDRESS,
