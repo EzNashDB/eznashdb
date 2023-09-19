@@ -1,6 +1,10 @@
+import urllib
+
 import pytest
 import requests
 from django.urls import reverse
+
+DUMMY_OSM_RECORD = {"name": "osm response", "place_id": 1}
 
 
 @pytest.fixture()
@@ -18,13 +22,13 @@ def mock_osm(mocker):
             else:
                 return original_get(*args, **kwargs)
 
-        mocker.patch("requests.get", side_effect=side_effect)
+        return mocker.patch("requests.get", side_effect=side_effect)
 
     return _mock_osm
 
 
 def test_returns_osm_response(client, mock_osm):
-    osm_response = "osm response"
+    osm_response = [DUMMY_OSM_RECORD]
     mock_osm(osm_response)
     url = reverse("eznashdb:city_lookup")
     query_params = {"q": "city name"}
@@ -43,3 +47,48 @@ def test_returns_error_on_500(client, mock_osm):
 
     assert response.status_code == 500
     assert "failed" in str(response.json()).lower()
+
+
+def describe_israel_searches():
+    @pytest.mark.parametrize(
+        ("israel", "palestine"),
+        [
+            ("ישראל", "Palestinian Territory"),
+            ("israel", "Palestinian Territory"),
+            ("Israel", "Palestinian Territory"),
+            ("il", "ps"),
+            ("IL", "ps"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("word_break"),
+        [
+            (" "),
+            (", "),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("base_query"),
+        [
+            ("{israel}"),
+            ("some city{word_break}{israel}"),
+            ("{israel}{word_break}some city"),
+            ("some city{word_break}{israel}{word_break}some address"),
+        ],
+    )
+    def includes_palestine_in_israel_searches(
+        client, mock_osm, base_query, israel, palestine, word_break
+    ):
+        query = base_query.format(israel=israel, word_break=word_break)
+        osm_response = [DUMMY_OSM_RECORD]
+        mocked_get = mock_osm(osm_response)
+        url = reverse("eznashdb:city_lookup")
+        query_params = {"q": query}
+        response = client.get(url, data=query_params)
+
+        assert len(mocked_get.call_args_list) == 2
+        call_urls = [args[0][0] for args in mocked_get.call_args_list]
+        assert urllib.parse.quote_plus(israel.lower()) in call_urls[0]
+        assert urllib.parse.quote_plus(palestine.lower()) in call_urls[1]
+        assert response.status_code == 200
+        assert response.json() == osm_response * 2
