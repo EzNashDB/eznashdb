@@ -2,9 +2,15 @@
 <div>
     <div class="row">
         {% for field in form %}
-            <div class="col-6 col-sm-6 col-md-4 col-xl-3 col-xxl-2 d-flex align-items-end">
-                <div class="w-100">{{ field|as_crispy_field }}</div>
-            </div>
+            {% if field.name == "city" %}
+                <div class="order-first col-12 col-md-8 col-xl-12 col-xxl-4 d-flex align-items-end">
+                    <div class="w-100">{{ field|as_crispy_field }}</div>
+                </div>
+            {% else %}
+                <div class="col-6 col-sm-6 col-md-4 col-xl-3 col-xxl-2 d-flex align-items-end">
+                    <div class="w-100">{{ field|as_crispy_field }}</div>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
