@@ -2,7 +2,7 @@
 <div>
     <div class="row">
         {% for field in form %}
-            {% if field.name == "city" %}
+            {% if field.name == "address" %}
                 <div class="order-first col-12 col-md-8 col-xl-12 col-xxl-4 d-flex align-items-end">
                     <div class="w-100">{{ field|as_crispy_field }}</div>
                 </div>

@@ -1,9 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { AsyncExample } from "./components/CitySelect";
+import { AsyncExample } from "./components/AddressSearch";
 
-const cityInputContainer =
-  document.querySelector("input[name=city]").parentElement;
-if (cityInputContainer) {
-  createRoot(cityInputContainer).render(<AsyncExample />);
+const addressInputContainer = document.querySelector(
+  "input[name=address]"
+).parentElement;
+if (addressInputContainer) {
+  createRoot(addressInputContainer).render(<AsyncExample />);
 }

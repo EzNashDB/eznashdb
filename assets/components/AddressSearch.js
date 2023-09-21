@@ -7,7 +7,7 @@ import {
 } from "react-bootstrap-typeahead";
 import { Form } from "react-bootstrap";
 
-const SEARCH_URI = "/city-lookup";
+const SEARCH_URI = "/address-lookup";
 
 export const AsyncExample = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,21 +31,21 @@ export const AsyncExample = () => {
   const filterBy = () => true;
   return (
     <AsyncTypeahead
-      className="w-100"
+      className="w-100 position-relative"
       filterBy={filterBy}
-      id="city-select"
+      id="address-select"
       isLoading={isLoading}
       labelKey="display_name"
       minLength={3}
       onSearch={handleSearch}
       useCache={false}
       options={options}
-      placeholder="Search for a city..."
+      placeholder="Search for an address..."
       inputProps={{
+        name: "address",
         className: "textinput form-control",
         autoComplete: "one-time-code",
       }}
-      className="position-relative"
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
           <div className="input-group input-group-sm">

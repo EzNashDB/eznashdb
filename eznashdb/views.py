@@ -68,7 +68,7 @@ class DeleteShulView(DeleteView):
         self.object.delete()
 
 
-class CityLookupView(View):
+class AddressLookupView(View):
     def replace_substring_if_bounded(self, input_str, substring_a, substring_b):
         words = input_str.split()
         # Initialize an empty result string
@@ -103,7 +103,6 @@ class CityLookupView(View):
             "format": "json",
             "addressdetails": 1,
             "namedetails": 1,
-            # "featureType": "city",
             "q": q,
         }
         OSM_params = urllib.parse.urlencode(OSM_param_dict)
