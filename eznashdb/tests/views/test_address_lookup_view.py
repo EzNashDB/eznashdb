@@ -30,7 +30,7 @@ def mock_osm(mocker):
 def test_returns_osm_response(client, mock_osm):
     osm_response = [DUMMY_OSM_RECORD]
     mock_osm(osm_response)
-    url = reverse("eznashdb:city_lookup")
+    url = reverse("eznashdb:address_lookup")
     query_params = {"q": "city name"}
     response = client.get(url, data=query_params)
 
@@ -41,7 +41,7 @@ def test_returns_osm_response(client, mock_osm):
 def test_returns_error_on_500(client, mock_osm):
     osm_response = "ERROR"
     mock_osm(osm_response, 500)
-    url = reverse("eznashdb:city_lookup")
+    url = reverse("eznashdb:address_lookup")
     query_params = {"q": "city name"}
     response = client.get(url, data=query_params)
 
@@ -82,7 +82,7 @@ def describe_israel_searches():
         query = base_query.format(israel=israel, word_break=word_break)
         osm_response = [DUMMY_OSM_RECORD]
         mocked_get = mock_osm(osm_response)
-        url = reverse("eznashdb:city_lookup")
+        url = reverse("eznashdb:address_lookup")
         query_params = {"q": query}
         response = client.get(url, data=query_params)
 
