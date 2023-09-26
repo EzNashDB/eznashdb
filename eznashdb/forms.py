@@ -1,7 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Layout
 from django import forms
-from django.forms import ModelForm, inlineformset_factory
+from django.forms import HiddenInput, ModelForm, inlineformset_factory
 
 from eznashdb.constants import InputLabels
 from eznashdb.enums import RoomLayoutType
@@ -12,7 +12,16 @@ from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 class CreateShulForm(ModelForm):
     class Meta:
         model = Shul
-        fields = ["name", "address", "has_female_leadership", "has_childcare", "can_say_kaddish"]
+        fields = [
+            "name",
+            "address",
+            "has_female_leadership",
+            "has_childcare",
+            "can_say_kaddish",
+            "latitude",
+            "longitude",
+            "place_id",
+        ]
         labels = {
             "name": InputLabels.SHUL_NAME,
             "has_female_leadership": InputLabels.FEMALE_LEADERSHIP,
@@ -23,6 +32,9 @@ class CreateShulForm(ModelForm):
             "has_female_leadership": NullableBooleanWidget(),
             "has_childcare": NullableBooleanWidget(),
             "can_say_kaddish": NullableBooleanWidget(),
+            "latitude": HiddenInput(),
+            "longitude": HiddenInput(),
+            "place_id": HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
