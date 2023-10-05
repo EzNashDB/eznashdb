@@ -9,7 +9,7 @@ import { Form } from "react-bootstrap";
 
 const SEARCH_URI = "/address-lookup";
 
-export const AsyncExample = () => {
+export const AddressSearch = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
 
