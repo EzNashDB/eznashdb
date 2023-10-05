@@ -10,10 +10,8 @@ ENV NODE_VERSION=18.16.0
 RUN pip install "poetry==$POETRY_VERSION"
 
 # Install Node.js and npm using apt
-RUN apt-get update && apt-get install -y \
-    curl \
- && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
- && apt-get install -y nodejs
+RUN apt-get update
+  && apt-get install -y nodejs
 
 RUN mkdir -p /code
 
