@@ -1,6 +1,8 @@
 import urllib
+from typing import Any
 
 import requests
+from django.core import serializers
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
@@ -17,6 +19,16 @@ from eznashdb.models import Shul
 class ShulsFilterView(FilterView):
     template_name = "eznashdb/shuls.html"
     filterset_class = ShulFilterSet
+
+
+class ShulsMapFilterView(FilterView):
+    template_name = "eznashdb/shuls_map.html"
+    filterset_class = ShulFilterSet
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["serialized_shuls"] = serializers.serialize("json", context["filter"].qs)
+        return context
 
 
 class CreateShulView(CreateView):
