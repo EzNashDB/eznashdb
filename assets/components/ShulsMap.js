@@ -8,8 +8,8 @@ export const ShulsMap = (shuls) => {
 
   return (
     <MapContainer
-      center={[51.505, -0.09]}
-      zoom={13}
+      center={[20, 10]}
+      zoom={2}
       scrollWheelZoom={true}
       style={{ height: "100%" }}
     >
