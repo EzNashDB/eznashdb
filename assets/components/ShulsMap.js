@@ -5,6 +5,9 @@ export const ShulsMap = (shuls) => {
   shuls.shuls.forEach((shul) => {
     console.log(shul);
   });
+  const latLonShuls = shuls.shuls.filter(
+    (shul) => shul.fields.latitude && shul.fields.longitude
+  );
 
   return (
     <MapContainer
@@ -17,11 +20,16 @@ export const ShulsMap = (shuls) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[51.505, -0.09]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      {latLonShuls.map((shul, index) => (
+        <Marker
+          key={index}
+          position={[shul.fields.latitude, shul.fields.longitude]}
+        >
+          <Popup>
+            A pretty CSS3 popup. <br /> Easily customizable.
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 };
