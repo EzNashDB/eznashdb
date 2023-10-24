@@ -7,12 +7,12 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DeleteView
+from django.views.generic import DeleteView, UpdateView
 from django_filters.views import FilterView
 
 from eznashdb.constants import BASE_OSM_URL
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import CreateShulForm, RoomFormSet
+from eznashdb.forms import CreateUpdateShulForm, RoomFormSet
 from eznashdb.models import Shul
 
 
@@ -31,14 +31,26 @@ class ShulsMapFilterView(FilterView):
         return context
 
 
-class CreateShulView(CreateView):
-    form_class = CreateShulForm
+class CreateUpdateShulView(UpdateView):
+    model = Shul
+    form_class = CreateUpdateShulForm
     template_name = "eznashdb/create_shul.html"
     success_url = reverse_lazy("eznashdb:shuls")
+
+    def get_object(self, queryset=None):
+        try:
+            return super().get_object()
+        except AttributeError:
+            return None
+
+    @property
+    def is_update(self):
+        return self.get_object() is not None
 
     def form_valid(self, form):
         room_fs = self.get_room_formset()
         if not room_fs.is_valid():
+            breakpoint()
             return self.render_to_response(self.get_context_data(form=form))
         self.object = form.save()
         self.room_fs_valid(room_fs)
@@ -54,15 +66,20 @@ class CreateShulView(CreateView):
             room.save()
 
     def get_context_data(self, **kwargs):
-        context = super(CreateShulView, self).get_context_data(**kwargs)
+        context = super(CreateUpdateShulView, self).get_context_data(**kwargs)
         context["room_fs"] = self.get_room_formset()
         return context
 
     def get_room_formset(self):
         if self.request.method == "GET":
-            return RoomFormSet(prefix="rooms")
+            return RoomFormSet(prefix="rooms", instance=self.object)
         else:
-            return RoomFormSet(self.request.POST or None, self.request.FILES or None, prefix="rooms")
+            return RoomFormSet(
+                self.request.POST or None,
+                self.request.FILES or None,
+                prefix="rooms",
+                instance=self.object,
+            )
 
 
 class DeleteShulView(DeleteView):

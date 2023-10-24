@@ -1,7 +1,10 @@
 {% load eznashdb_tags %}
 <div class="row gx-0 py-1">
     <div class="col-12 col-lg-6 d-flex align-items-center">
-        {% include "eznashdb/includes/delete_shul.html" %}
+        <a class="btn btn-xs text-primary link-primary py-0"
+           href="{% url "eznashdb:update_shul" pk=shul.pk %}">
+            <i class="fa fa-edit" aria-hidden="true"></i>
+        </a>
         <div class="badge text-dark fw-normal text-wrap text-start">
             <i class="fa-solid fa-location-pin"></i>
             {{ shul.address }}
