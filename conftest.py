@@ -28,11 +28,15 @@ def test_user(django_user_model):
 
 @pytest.fixture()
 def rf_GET(rf) -> Callable:
-    def _GET_request(view_name: str, params: dict = DEFAULT_ARG) -> WSGIRequest:
-        if params == DEFAULT_ARG:
-            params = {}
-        url = reverse(view_name)
-        request = rf.get(url, params)
+    def _GET_request(
+        view_name: str, url_params: dict = DEFAULT_ARG, query_params: dict = DEFAULT_ARG
+    ) -> WSGIRequest:
+        if url_params == DEFAULT_ARG:
+            url_params = {}
+        if query_params == DEFAULT_ARG:
+            query_params = {}
+        url = reverse(view_name, kwargs=url_params)
+        request = rf.get(url, query_params)
         request.resolver_match = resolve(url)
         return request
 

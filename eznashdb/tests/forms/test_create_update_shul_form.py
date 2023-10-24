@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 
-from eznashdb.forms import CreateShulForm
+from eznashdb.forms import CreateUpdateShulForm
 
 
 def test_displays_shul_fields():
-    form = CreateShulForm()
+    form = CreateUpdateShulForm()
     soup = BeautifulSoup(form.as_p(), "html.parser")
     assert soup.find(attrs={"id": "id_name"})
     assert soup.find(attrs={"id": "id_address"})
