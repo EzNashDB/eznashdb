@@ -35,11 +35,33 @@
     });
   }
 
-  collapseAllButton.addEventListener("click", (e) => {
+  collapseAllButton?.addEventListener("click", (e) => {
     if (collapseAllButton.classList.contains("collapsed")) {
       openAll();
     } else {
       closeAll();
     }
   });
+})();
+
+(function setResultsFormatToggle() {
+  const resultFormatToggles = Array.from(
+    document.getElementsByClassName("js-results-format-toggle")
+  );
+  resultFormatToggles.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const format = btn.dataset["resultsFormat"];
+      updateResultsFormat(format);
+    });
+  });
+
+  function updateResultsFormat(format) {
+    const currentURL = new URL(window.location.href);
+    const currentFormat = currentURL.searchParams.get("format");
+    if (format !== currentFormat) {
+      currentURL.searchParams.set("format", format);
+      history.pushState({}, "", currentURL);
+      location.reload();
+    }
+  }
 })();

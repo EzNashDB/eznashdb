@@ -20,6 +20,20 @@ class ShulsFilterView(FilterView):
     template_name = "eznashdb/shuls.html"
     filterset_class = ShulFilterSet
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["serialized_shuls"] = serializers.serialize("json", context["filter"].qs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if not self.request.GET.get("format"):
+            url = self.request.build_absolute_uri()
+            url += "&" if request.GET else "?"
+            url += "format=map"
+            return HttpResponseRedirect(url)
+
+        return super().get(request, *args, **kwargs)
+
 
 class ShulsMapFilterView(FilterView):
     template_name = "eznashdb/shuls_map.html"
