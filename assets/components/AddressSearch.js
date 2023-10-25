@@ -9,10 +9,15 @@ import { Form } from "react-bootstrap";
 
 const SEARCH_URI = "/address-lookup";
 
-export const AddressSearch = () => {
+export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState({
+    display_name,
+    lat,
+    lon,
+    place_id,
+  });
 
   const handleSearch = (query) => {
     setIsLoading(true);
@@ -53,6 +58,7 @@ export const AddressSearch = () => {
           className: "textinput form-control",
           autoComplete: "one-time-code",
         }}
+        defaultInputValue={display_name}
         renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
           <Hint>
             <div className="input-group input-group-sm">

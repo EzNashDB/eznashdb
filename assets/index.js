@@ -4,11 +4,27 @@ import { AddressSearch } from "./components/AddressSearch";
 import { ShulsMap } from "./components/ShulsMap";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const addressInputContainer = document.querySelector(
-    "input[name=address]"
-  ).parentElement;
+  const addressInput = document.querySelector("input[name=address]");
+  const addressInputContainer = addressInput.parentElement;
   if (addressInputContainer) {
-    createRoot(addressInputContainer).render(<AddressSearch />);
+    const getPropsFromInputs = () => {
+      const propsToInputNames = {
+        display_name: "address",
+        lat: "latitude",
+        lon: "longitude",
+        place_id: "place_id",
+      };
+      const values = {};
+      for (const prop in propsToInputNames) {
+        const inputName = propsToInputNames[prop];
+        const input = document.querySelector(`input[name=${inputName}]`);
+        values[prop] = input ? input.value : "";
+      }
+      return values;
+    };
+    createRoot(addressInputContainer).render(
+      <AddressSearch {...getPropsFromInputs()} />
+    );
   }
 
   const shulsMapContainer = document.getElementById("shulsMap");
