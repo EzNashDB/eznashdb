@@ -35,16 +35,6 @@ class ShulsFilterView(FilterView):
         return super().get(request, *args, **kwargs)
 
 
-class ShulsMapFilterView(FilterView):
-    template_name = "eznashdb/shuls_map.html"
-    filterset_class = ShulFilterSet
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["serialized_shuls"] = serializers.serialize("json", context["filter"].qs)
-        return context
-
-
 class CreateUpdateShulView(UpdateView):
     model = Shul
     form_class = CreateUpdateShulForm
