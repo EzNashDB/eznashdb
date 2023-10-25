@@ -1,10 +1,9 @@
 {% load crispy_forms_tags %}
 <div>
     <div class="row">
-        {% for field in form %}
-            {% if field.name in "longitude,latitude,place_id" %}
-                {# handled in AddressSearch componenet #}
-            {% elif field.name == "address" %}
+        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+        {% for field in form.visible_fields %}
+            {% if field.name == "address" %}
                 <div class="order-first col-12 col-md-8 col-xl-12 col-xxl-4 d-flex align-items-end">
                     <div class="w-100">{{ field|as_crispy_field }}</div>
                 </div>
