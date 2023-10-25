@@ -9,7 +9,7 @@ from eznashdb.views import ShulsFilterView
 
 @pytest.fixture()
 def GET_request(rf_GET):
-    return rf_GET("eznashdb:shuls")
+    return rf_GET("eznashdb:shuls", query_params={"format": "list"})
 
 
 def test_shows_app_name(GET_request):
@@ -177,7 +177,7 @@ def describe_filter():
     def filters_by_name(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2")
-        request = rf_GET("eznashdb:shuls", query_params={"name": "shul 2"})
+        request = rf_GET("eznashdb:shuls", query_params={"name": "shul 2", "format": "list"})
 
         response = ShulsFilterView.as_view()(request)
 
@@ -189,7 +189,9 @@ def describe_filter():
     def filters_by_has_female_leadership(rf_GET):
         Shul.objects.create(name="shul 1", has_female_leadership=False)
         Shul.objects.create(name="shul 2", has_female_leadership=True)
-        request = rf_GET("eznashdb:shuls", query_params={"has_female_leadership": ["True"]})
+        request = rf_GET(
+            "eznashdb:shuls", query_params={"has_female_leadership": ["True"], "format": "list"}
+        )
 
         response = ShulsFilterView.as_view()(request)
 
@@ -201,7 +203,7 @@ def describe_filter():
     def filters_by_has_childcare(rf_GET):
         Shul.objects.create(name="shul 1", has_childcare=False)
         Shul.objects.create(name="shul 2", has_childcare=True)
-        request = rf_GET("eznashdb:shuls", query_params={"has_childcare": ["True"]})
+        request = rf_GET("eznashdb:shuls", query_params={"has_childcare": ["True"], "format": "list"})
 
         response = ShulsFilterView.as_view()(request)
 
@@ -213,7 +215,7 @@ def describe_filter():
     def filters_by_can_say_kaddish(rf_GET):
         Shul.objects.create(name="shul 1", can_say_kaddish=False)
         Shul.objects.create(name="shul 2", can_say_kaddish=True)
-        request = rf_GET("eznashdb:shuls", query_params={"can_say_kaddish": ["True"]})
+        request = rf_GET("eznashdb:shuls", query_params={"can_say_kaddish": ["True"], "format": "list"})
 
         response = ShulsFilterView.as_view()(request)
 
@@ -225,7 +227,10 @@ def describe_filter():
     def filters_by_wheelchair_access(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(is_wheelchair_accessible=True)
-        request = rf_GET("eznashdb:shuls", query_params={"rooms__is_wheelchair_accessible": ["True"]})
+        request = rf_GET(
+            "eznashdb:shuls",
+            query_params={"rooms__is_wheelchair_accessible": ["True"], "format": "list"},
+        )
 
         response = ShulsFilterView.as_view()(request)
 
@@ -237,7 +242,9 @@ def describe_filter():
     def filters_by_relative_size(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(relative_size=RelativeSize.M)
-        request = rf_GET("eznashdb:shuls", query_params={"rooms__relative_size": ["M"]})
+        request = rf_GET(
+            "eznashdb:shuls", query_params={"rooms__relative_size": ["M"], "format": "list"}
+        )
 
         response = ShulsFilterView.as_view()(request)
 
@@ -249,7 +256,9 @@ def describe_filter():
     def filters_by_see_hear_score(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(see_hear_score=SeeHearScore._3)
-        request = rf_GET("eznashdb:shuls", query_params={"rooms__see_hear_score": ["3"]})
+        request = rf_GET(
+            "eznashdb:shuls", query_params={"rooms__see_hear_score": ["3"], "format": "list"}
+        )
 
         response = ShulsFilterView.as_view()(request)
 
@@ -261,7 +270,9 @@ def describe_filter():
     def filters_by_room_layout(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(is_same_height_side=True)
-        request = rf_GET("eznashdb:shuls", query_params={"rooms__layout": ["is_same_height_side"]})
+        request = rf_GET(
+            "eznashdb:shuls", query_params={"rooms__layout": ["is_same_height_side"], "format": "list"}
+        )
 
         response = ShulsFilterView.as_view()(request)
 
