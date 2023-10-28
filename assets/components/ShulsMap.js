@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 
 export const ShulsMap = (shuls) => {
   shuls.shuls.forEach((shul) => {
@@ -20,16 +21,18 @@ export const ShulsMap = (shuls) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {latLonShuls.map((shul, index) => (
-        <Marker
-          key={index}
-          position={[shul.fields.latitude, shul.fields.longitude]}
-        >
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
-      ))}
+      <MarkerClusterGroup chunkedLoading showCoverageOnHover={false}>
+        {latLonShuls.map((shul, index) => (
+          <Marker
+            key={index}
+            position={[shul.fields.latitude, shul.fields.longitude]}
+          >
+            <Popup>
+              A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
+          </Marker>
+        ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 };
