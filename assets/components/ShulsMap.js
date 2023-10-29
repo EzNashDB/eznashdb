@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { ShulPopup } from "./ShulPopup";
 
 export const ShulsMap = (shuls) => {
   shuls.shuls.forEach((shul) => {
@@ -27,9 +28,7 @@ export const ShulsMap = (shuls) => {
             key={index}
             position={[shul.fields.latitude, shul.fields.longitude]}
           >
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
+            <ShulPopup shul={shul} />
           </Marker>
         ))}
       </MarkerClusterGroup>
