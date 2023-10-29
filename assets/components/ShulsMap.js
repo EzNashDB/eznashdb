@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { ShulPopup } from "./ShulPopup";
+import "../css/map.css";
 
 export const ShulsMap = ({ shuls }) => {
   const latLonShuls = shuls.filter(

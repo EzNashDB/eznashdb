@@ -14,8 +14,8 @@ export const ShulPopup = ({ shul }) => {
     }
   };
   return (
-    <Popup maxWidth="500">
-      <Card style={{ width: "25rem" }}>
+    <Popup>
+      <Card>
         <Card.Header className="p-2">{shul.fields.name}</Card.Header>
         <Card.Body className="p-2 pb-1">
           <div className="small">
