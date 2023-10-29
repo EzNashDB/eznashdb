@@ -3,11 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { ShulPopup } from "./ShulPopup";
 
-export const ShulsMap = (shuls) => {
-  shuls.shuls.forEach((shul) => {
-    console.log(shul);
-  });
-  const latLonShuls = shuls.shuls.filter(
+export const ShulsMap = ({ shuls }) => {
+  const latLonShuls = shuls.filter(
     (shul) => shul.fields.latitude && shul.fields.longitude
   );
 
