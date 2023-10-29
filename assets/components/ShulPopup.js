@@ -4,7 +4,6 @@ import { Card, ListGroup } from "react-bootstrap";
 
 export const ShulPopup = ({ shul }) => {
   const boolToIcon = (bool) => {
-    console.log(bool);
     if (bool === true) {
       return <i class="fa-solid fa-check"></i>;
     } else if (bool === false) {
@@ -16,7 +15,15 @@ export const ShulPopup = ({ shul }) => {
   return (
     <Popup>
       <Card>
-        <Card.Header className="p-2">{shul.fields.name}</Card.Header>
+        <Card.Header className="p-2">
+          <a
+            className="btn btn-xs text-primary link-primary py-0 me-1"
+            href={`/shuls/${shul.pk}/update`}
+          >
+            <i class="fa-solid fa-pen-to-square"></i>
+          </a>
+          {shul.fields.name}
+        </Card.Header>
         <Card.Body className="p-2 pb-1">
           <div className="small">
             <span className="me-1">
