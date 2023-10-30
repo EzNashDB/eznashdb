@@ -29,7 +29,7 @@ export const ShulPopup = ({ shul }) => {
   return (
     <Popup>
       <Card>
-        <Card.Header className="p-2">
+        <Card.Header className="fw-bold p-1 d-flex align-items-center">
           <a
             className="btn btn-xs text-primary link-primary py-0 me-1"
             href={`/shuls/${shul.id}/update`}
@@ -38,52 +38,57 @@ export const ShulPopup = ({ shul }) => {
           </a>
           {shul.name}
         </Card.Header>
-        <Card.Body className="p-2 pb-1">
-          <div className="small">
+        <Card.Body className="p-2 pt-1">
+          <div className="small text-truncate">
             <span className="me-1">
               <i className="fa-solid fa-location-dot"></i>
             </span>
             {shul.address}
           </div>
           <hr className="my-1" />
-          <div className="d-flex justify-content-between">
-            <span>Childcare: {boolToIcon(shul.has_childcare)}</span>
-            <span>Kaddish: {boolToIcon(shul.can_say_kaddish)}</span>
+          <div className="d-flex justify-content-between small">
+            <span className="me-1">
+              Childcare: {boolToIcon(shul.has_childcare)}
+            </span>
+            <span className="me-1">
+              Kaddish: {boolToIcon(shul.can_say_kaddish)}
+            </span>
             <span>
               Female Leadership: {boolToIcon(shul.has_female_leadership)}
             </span>
           </div>
-        </Card.Body>
-        <ListGroup variant="flush">
-          {shul.rooms.map((room) => (
-            <ListGroup.Item key={room.id} className="px-2 py-1">
-              <div>
-                <div class="d-inline-block me-1">{room.name}</div>
-                <div class="d-inline-block ms-auto float-end">
-                  <span>
-                    <Badge bg="light" className="border text-dark me-1">
-                      <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
-                      {room.relative_size || "--"}
-                    </Badge>
-                  </span>
-                  <span>
-                    <Badge bg="light" className="border text-dark me-1">
-                      <i className="fa-solid fa-wheelchair me-1"></i>
-                      {boolToIcon(room.is_wheelchair_accessible)}
-                    </Badge>
-                  </span>
-                  <span>
-                    <Badge bg="light" className="border text-dark">
-                      <i className="fa-solid fa-volume-high me-1"></i> /{" "}
-                      <i className="fa-solid fa-eye me-1"></i>
-                      {scoreToStars(room.see_hear_score)}
-                    </Badge>
-                  </span>
+          <ListGroup variant="flush">
+            {shul.rooms.map((room) => (
+              <ListGroup.Item key={room.id} className="p-0 border-0">
+                <hr className="my-1" />
+                <div>
+                  <div class="d-inline-block me-1">{room.name}</div>
+                  <div class="d-inline-block ms-auto float-end">
+                    <span>
+                      <Badge bg="light" className="border text-dark me-1">
+                        <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                        {room.relative_size || "--"}
+                      </Badge>
+                    </span>
+                    <span>
+                      <Badge bg="light" className="border text-dark me-1">
+                        <i className="fa-solid fa-wheelchair me-1"></i>
+                        {boolToIcon(room.is_wheelchair_accessible)}
+                      </Badge>
+                    </span>
+                    <span>
+                      <Badge bg="light" className="border text-dark">
+                        <i className="fa-solid fa-volume-high me-1"></i> /{" "}
+                        <i className="fa-solid fa-eye me-1"></i>
+                        {scoreToStars(room.see_hear_score)}
+                      </Badge>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Card.Body>
       </Card>
     </Popup>
   );
