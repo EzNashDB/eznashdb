@@ -5,9 +5,9 @@ import { Card, ListGroup } from "react-bootstrap";
 export const ShulPopup = ({ shul }) => {
   const boolToIcon = (bool) => {
     if (bool === true) {
-      return <i class="fa-solid fa-check"></i>;
+      return <i className="fa-solid fa-check"></i>;
     } else if (bool === false) {
-      return <i class="fa-solid fa-xmark"></i>;
+      return <i className="fa-solid fa-xmark"></i>;
     } else {
       return "--";
     }
@@ -20,14 +20,14 @@ export const ShulPopup = ({ shul }) => {
             className="btn btn-xs text-primary link-primary py-0 me-1"
             href={`/shuls/${shul.id}/update`}
           >
-            <i class="fa-solid fa-pen-to-square"></i>
+            <i className="fa-solid fa-pen-to-square"></i>
           </a>
           {shul.name}
         </Card.Header>
         <Card.Body className="p-2 pb-1">
           <div className="small">
             <span className="me-1">
-              <i class="fa-solid fa-location-dot"></i>
+              <i className="fa-solid fa-location-dot"></i>
             </span>
             {shul.address}
           </div>
