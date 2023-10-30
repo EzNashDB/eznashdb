@@ -6,7 +6,7 @@ from eznashdb.models import Room, Shul
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ["id", "name", "relative_size"]
+        exclude = ["shul"]
 
 
 class ShulSerializer(serializers.ModelSerializer):
