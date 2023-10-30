@@ -1,8 +1,8 @@
+import json
 import urllib
 from typing import Any
 
 import requests
-from django.core import serializers
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
@@ -14,6 +14,7 @@ from eznashdb.constants import BASE_OSM_URL
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import CreateUpdateShulForm, RoomFormSet
 from eznashdb.models import Shul
+from eznashdb.serializers import ShulSerializer
 
 
 class ShulsFilterView(FilterView):
@@ -22,8 +23,13 @@ class ShulsFilterView(FilterView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["serialized_shuls"] = serializers.serialize("json", context["filter"].qs)
+        context["serialized_shuls"] = self.get_serialized_shuls(context["filter"].qs)
         return context
+
+    def get_serialized_shuls(self, qs):
+        serialized_shuls = ShulSerializer(qs, many=True).data
+        json_shuls = json.dumps(serialized_shuls)
+        return json_shuls
 
     def get(self, request, *args, **kwargs):
         if not self.request.GET.get("format"):

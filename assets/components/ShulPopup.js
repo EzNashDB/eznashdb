@@ -18,25 +18,25 @@ export const ShulPopup = ({ shul }) => {
         <Card.Header className="p-2">
           <a
             className="btn btn-xs text-primary link-primary py-0 me-1"
-            href={`/shuls/${shul.pk}/update`}
+            href={`/shuls/${shul.id}/update`}
           >
             <i class="fa-solid fa-pen-to-square"></i>
           </a>
-          {shul.fields.name}
+          {shul.name}
         </Card.Header>
         <Card.Body className="p-2 pb-1">
           <div className="small">
             <span className="me-1">
               <i class="fa-solid fa-location-dot"></i>
             </span>
-            {shul.fields.address}
+            {shul.address}
           </div>
           <hr className="my-1" />
           <div className="d-flex justify-content-between">
-            <span>Childcare: {boolToIcon(shul.fields.has_childcare)}</span>
-            <span>Kaddish: {boolToIcon(shul.fields.can_say_kaddish)}</span>
+            <span>Childcare: {boolToIcon(shul.has_childcare)}</span>
+            <span>Kaddish: {boolToIcon(shul.can_say_kaddish)}</span>
             <span>
-              Female Leadership: {boolToIcon(shul.fields.has_female_leadership)}
+              Female Leadership: {boolToIcon(shul.has_female_leadership)}
             </span>
           </div>
         </Card.Body>
