@@ -29,7 +29,7 @@ export const ShulPopup = ({ shul }) => {
   return (
     <Popup>
       <Card>
-        <Card.Header className="fw-bold p-1 d-flex align-items-center">
+        <Card.Header className="fw-bold p-1 pe-4 d-flex align-items-center">
           <a
             className="btn btn-xs text-primary link-primary py-0 me-1"
             href={`/shuls/${shul.id}/update`}
