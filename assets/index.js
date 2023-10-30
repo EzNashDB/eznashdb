@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const shulsMapContainer = document.getElementById("shulsMap");
   if (shulsMapContainer) {
-    console.log(shuls);
     createRoot(shulsMapContainer).render(<ShulsMap shuls={shuls} />);
   }
 });

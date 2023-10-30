@@ -5,9 +5,7 @@ import { ShulPopup } from "./ShulPopup";
 import "../css/map.css";
 
 export const ShulsMap = ({ shuls }) => {
-  const latLonShuls = shuls.filter(
-    (shul) => shul.fields.latitude && shul.fields.longitude
-  );
+  const latLonShuls = shuls.filter((shul) => shul.latitude && shul.longitude);
 
   return (
     <MapContainer
@@ -22,10 +20,7 @@ export const ShulsMap = ({ shuls }) => {
       />
       <MarkerClusterGroup chunkedLoading showCoverageOnHover={false}>
         {latLonShuls.map((shul, index) => (
-          <Marker
-            key={index}
-            position={[shul.fields.latitude, shul.fields.longitude]}
-          >
+          <Marker key={index} position={[shul.latitude, shul.longitude]}>
             <ShulPopup shul={shul} />
           </Marker>
         ))}

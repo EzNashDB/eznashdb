@@ -67,6 +67,10 @@ class ShulFilterSet(FilterSet):
         self.form.helper = helper = FormHelper()
         helper.field_class = "input-group input-group-sm"
 
+    @property
+    def qs(self):
+        return super().qs.prefetch_related("rooms")
+
     class Meta:
         model = Shul
         fields = []
