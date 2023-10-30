@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Popup } from "react-leaflet";
-import { Card, ListGroup } from "react-bootstrap";
+import { Card, ListGroup, Badge } from "react-bootstrap";
 
 export const ShulPopup = ({ shul }) => {
   const boolToIcon = (bool) => {
@@ -11,6 +11,20 @@ export const ShulPopup = ({ shul }) => {
     } else {
       return "--";
     }
+  };
+
+  const scoreToStars = (score) => {
+    if (score === "") {
+      return "--";
+    }
+    const EMPTY_STAR = <i className="fa-regular fa-star"></i>;
+    const FILLED_STAR = <i className="fa-solid fa-star"></i>;
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      const star = i <= score ? FILLED_STAR : EMPTY_STAR;
+      stars.push(<span key={i}>{star}</span>);
+    }
+    return <span className="text-nowrap text-warning">{stars}</span>;
   };
   return (
     <Popup>
@@ -41,8 +55,34 @@ export const ShulPopup = ({ shul }) => {
           </div>
         </Card.Body>
         <ListGroup variant="flush">
-          <ListGroup.Item>Room 1</ListGroup.Item>
-          <ListGroup.Item>Room 2</ListGroup.Item>
+          {shul.rooms.map((room) => (
+            <ListGroup.Item key={room.id} className="px-2 py-1">
+              <div>
+                <div class="d-inline-block me-1">{room.name}</div>
+                <div class="d-inline-block ms-auto float-end">
+                  <span>
+                    <Badge bg="light" className="border text-dark me-1">
+                      <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                      {room.relative_size || "--"}
+                    </Badge>
+                  </span>
+                  <span>
+                    <Badge bg="light" className="border text-dark me-1">
+                      <i className="fa-solid fa-wheelchair me-1"></i>
+                      {boolToIcon(room.is_wheelchair_accessible)}
+                    </Badge>
+                  </span>
+                  <span>
+                    <Badge bg="light" className="border text-dark">
+                      <i className="fa-solid fa-volume-high me-1"></i> /{" "}
+                      <i className="fa-solid fa-eye me-1"></i>
+                      {scoreToStars(room.see_hear_score)}
+                    </Badge>
+                  </span>
+                </div>
+              </div>
+            </ListGroup.Item>
+          ))}
         </ListGroup>
       </Card>
     </Popup>
