@@ -45,7 +45,15 @@ class CreateUpdateShulView(UpdateView):
     model = Shul
     form_class = CreateUpdateShulForm
     template_name = "eznashdb/create_shul.html"
-    success_url = reverse_lazy("eznashdb:shuls")
+
+    def get_success_url(self) -> str:
+        url = reverse_lazy("eznashdb:shuls")
+        lat = self.object.latitude
+        lon = self.object.longitude
+        url += f"?lat={lat}&lon={lon}"
+        if lat and lon:
+            url += "&zoom=13"
+        return url
 
     def get_object(self, queryset=None):
         try:
