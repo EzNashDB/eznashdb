@@ -9,7 +9,13 @@
           id="shul_form"
           class="d-flex flex-column h-100 card">
         <div class="card-header text-center">
-            <h5 class="card-title mb-0">Add a Shul</h5>
+            <h5 class="card-title mb-0">
+                {% if object %}
+                    Edit Shul
+                {% else %}
+                    Add a Shul
+                {% endif %}
+            </h5>
         </div>
         <div class="overflow-auto rooms-scroll">
             <div class="card-body pb-0 small">{% crispy form %}</div>
