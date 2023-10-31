@@ -26,6 +26,85 @@ export const ShulPopup = ({ shul }) => {
     }
     return <span className="text-nowrap text-warning">{stars}</span>;
   };
+  const ROOM_LAYOUT_TYPES = {
+    "Same height": {
+      icon: "fa-solid fa-arrows-left-right",
+      fields: {
+        is_same_height_side: "Side",
+        is_same_height_back: "Back",
+      },
+    },
+    Elevated: {
+      icon: "fa-solid fa-caret-up",
+      fields: {
+        is_elevated_side: "Side",
+        is_elevated_back: "Back",
+      },
+    },
+    Balcony: {
+      icon: "fa-solid fa-stairs",
+      fields: {
+        is_balcony: "",
+      },
+    },
+    "No women's section": {
+      icon: "fa-solid fa-xmark",
+      fields: {
+        is_only_men: "",
+      },
+    },
+    "Mixed seating": {
+      icon: "fa-solid fa-children",
+      fields: {
+        is_mixed_seating: "",
+      },
+    },
+  };
+
+  const getRoomLayoutBadge = (room, layoutType) => {
+    const layoutTypeData = ROOM_LAYOUT_TYPES[layoutType];
+    const icon = <i className={`me-1 ${layoutTypeData.icon}`}></i>;
+    const subLabels = [];
+    let roomHasLayoutType = false;
+    for (const field in layoutTypeData.fields) {
+      if (room[field]) {
+        roomHasLayoutType = true;
+        subLabels.push(layoutTypeData.fields[field]);
+      }
+    }
+    return (
+      roomHasLayoutType && (
+        <Badge
+          bg="light"
+          className="border text-dark ms-1 mt-1"
+          key={layoutType}
+        >
+          {icon}
+          <span className="fw-bold">{layoutType}</span>
+          {subLabels && <span className="ms-1 fw-normal">{subLabels}</span>}
+        </Badge>
+      )
+    );
+  };
+
+  const getRoomLayoutBadges = (room) => {
+    const badges = [];
+    for (const layoutType in ROOM_LAYOUT_TYPES) {
+      const badge = getRoomLayoutBadge(room, layoutType);
+      if (badge) {
+        badges.push(badge);
+      }
+    }
+    return badges.length > 0 ? (
+      badges
+    ) : (
+      <Badge bg="light" className="border text-dark ms-1 mt-1">
+        <div className="w-15px d-inline-block text-center">--</div>
+        Room layout not saved
+      </Badge>
+    );
+  };
+
   return (
     <Popup>
       <Card>
@@ -62,8 +141,8 @@ export const ShulPopup = ({ shul }) => {
               <ListGroup.Item key={room.id} className="p-0 border-0">
                 <hr className="my-1" />
                 <div>
-                  <div class="d-inline-block me-1">{room.name}</div>
-                  <div class="d-inline-block ms-auto float-end">
+                  <div className="d-inline-block me-1">{room.name}</div>
+                  <div className="d-inline-block float-end">
                     <span>
                       <Badge bg="light" className="border text-dark me-1">
                         <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
@@ -83,6 +162,9 @@ export const ShulPopup = ({ shul }) => {
                         {scoreToStars(room.see_hear_score)}
                       </Badge>
                     </span>
+                  </div>
+                  <div className="d-inline-block float-end text-end">
+                    {getRoomLayoutBadges(room)}
                   </div>
                 </div>
               </ListGroup.Item>
