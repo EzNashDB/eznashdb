@@ -163,7 +163,7 @@ export const ShulPopup = ({ shul }) => {
                       </Badge>
                     </span>
                   </div>
-                  <div className="d-inline-block float-end text-end">
+                  <div className="d-inline-block float-end text-end w-100">
                     {getRoomLayoutBadges(room)}
                   </div>
                 </div>
