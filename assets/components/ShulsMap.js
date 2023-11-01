@@ -5,6 +5,16 @@ import { ShulPopup } from "./ShulPopup";
 import "../css/map.css";
 
 export const ShulsMap = ({ shuls }) => {
+  const copiedShuls = shuls
+    .map((shul) => {
+      const copy1 = { ...shul };
+      const copy2 = { ...shul };
+      copy1.longitude = (parseFloat(shul.longitude) + 360).toString();
+      copy2.longitude = (parseFloat(shul.longitude) - 360).toString();
+      return [shul, copy1, copy2];
+    })
+    .flat();
+
   const updateURLParams = (params) => {
     const url = new URL(window.location.href);
     for (const key in params) {
@@ -29,7 +39,9 @@ export const ShulsMap = ({ shuls }) => {
     return null;
   };
 
-  const latLonShuls = shuls.filter((shul) => shul.latitude && shul.longitude);
+  const latLonShuls = copiedShuls.filter(
+    (shul) => shul.latitude && shul.longitude
+  );
   const urlParams = new URLSearchParams(window.location.search);
   let startLat = urlParams.get("lat") || 20;
   let startLon = urlParams.get("lon") || 10;
@@ -41,6 +53,8 @@ export const ShulsMap = ({ shuls }) => {
       zoom={startZoom}
       scrollWheelZoom={true}
       style={{ height: "100%" }}
+      worldCopyJump={true}
+      minZoom={1}
     >
       <MapEvents />
       <TileLayer
