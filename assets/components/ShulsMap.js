@@ -5,22 +5,26 @@ import { ShulPopup } from "./ShulPopup";
 import "../css/map.css";
 
 export const ShulsMap = ({ shuls }) => {
-  const updateURLParam = (key, value) => {
+  const updateURLParams = (params) => {
     const url = new URL(window.location.href);
-    url.searchParams.set(key, value);
+    for (const key in params) {
+      url.searchParams.set(key, params[key]);
+    }
     const newURL = url.toString();
     history.pushState({}, document.title, newURL);
   };
+  const updateURLLocationParams = (e) => {
+    const center = e.target.getCenter();
+    updateURLParams({
+      lat: center.lat,
+      lon: center.lng,
+      zoom: e.target.getZoom(),
+    });
+  };
   const MapEvents = () => {
     useMapEvents({
-      dragend: (e) => {
-        const center = e.target.getCenter();
-        updateURLParam("lat", center.lat);
-        updateURLParam("lon", center.lng);
-      },
-      zoomend: (e) => {
-        updateURLParam("zoom", e.target.getZoom());
-      },
+      moveend: (e) => updateURLLocationParams(e),
+      zoomend: (e) => updateURLLocationParams(e),
     });
     return null;
   };
