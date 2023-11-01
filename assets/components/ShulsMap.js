@@ -6,11 +6,15 @@ import "../css/map.css";
 
 export const ShulsMap = ({ shuls }) => {
   const latLonShuls = shuls.filter((shul) => shul.latitude && shul.longitude);
+  const urlParams = new URLSearchParams(window.location.search);
+  let startLat = urlParams.get("lat") || 20;
+  let startLon = urlParams.get("lon") || 10;
+  let startZoom = urlParams.get("zoom") || 2;
 
   return (
     <MapContainer
-      center={[20, 10]}
-      zoom={2}
+      center={[startLat, startLon]}
+      zoom={startZoom}
       scrollWheelZoom={true}
       style={{ height: "100%" }}
     >
