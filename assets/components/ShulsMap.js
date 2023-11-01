@@ -11,7 +11,7 @@ export const ShulsMap = ({ shuls }) => {
       url.searchParams.set(key, params[key]);
     }
     const newURL = url.toString();
-    history.pushState({}, document.title, newURL);
+    history.replaceState({}, "", newURL);
   };
   const updateURLLocationParams = (e) => {
     const center = e.target.getCenter();
