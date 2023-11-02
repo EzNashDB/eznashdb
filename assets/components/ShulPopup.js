@@ -106,7 +106,7 @@ export const ShulPopup = ({ shul }) => {
   };
 
   return (
-    <Popup>
+    <Popup id={shul.id} minWidth={300}>
       <Card>
         <Card.Header className="fw-bold p-1 pe-4 d-flex align-items-center">
           <a
