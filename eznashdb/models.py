@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from eznashdb.constants import LAYOUT_FIELDS
 from eznashdb.enums import RelativeSize, SeeHearScore
 
 
@@ -62,14 +63,4 @@ class Room(models.Model):
         return f"{self.name}, {self.shul}"
 
     def has_layout_data(self):
-        return any(
-            [
-                self.is_same_height_side,
-                self.is_same_height_back,
-                self.is_elevated_side,
-                self.is_elevated_back,
-                self.is_balcony,
-                self.is_only_men,
-                self.is_mixed_seating,
-            ]
-        )
+        return any(getattr(self, field, False) for field in LAYOUT_FIELDS)

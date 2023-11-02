@@ -3,7 +3,7 @@ from crispy_forms.layout import HTML, Layout
 from django import forms
 from django.forms import HiddenInput, ModelForm, inlineformset_factory
 
-from eznashdb.constants import InputLabels
+from eznashdb.constants import LAYOUT_FIELDS, InputLabels
 from eznashdb.enums import RoomLayoutType
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
@@ -76,6 +76,10 @@ class RoomForm(ModelForm):
         helper.disable_csrf = True
         helper.field_class = "input-group input-group-sm"
         self.fields["name"].widget.attrs["class"] = "fw-bold"
+        if self.instance.pk:
+            self.initial["layout"] = [
+                field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
+            ]
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
