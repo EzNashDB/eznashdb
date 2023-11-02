@@ -5,6 +5,16 @@ from django.utils.safestring import mark_safe
 
 DEFAULT_ARG = object()
 
+LAYOUT_FIELDS = [
+    "is_same_height_side",
+    "is_same_height_back",
+    "is_elevated_side",
+    "is_elevated_back",
+    "is_balcony",
+    "is_only_men",
+    "is_mixed_seating",
+]
+
 
 @dataclass()
 class LabelWithHelpText:
