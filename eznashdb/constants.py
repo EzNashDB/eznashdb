@@ -32,7 +32,7 @@ class LabelWithHelpText:
 
 
 class InputLabels:
-    SHUL_NAME = "Name"
+    SHUL_NAME = "Shul Name"
     ADDRESS = "Address"
     ROOM_NAME = "Room Name"
     FEMALE_LEADERSHIP = LabelWithHelpText(
