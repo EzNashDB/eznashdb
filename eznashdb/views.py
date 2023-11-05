@@ -44,7 +44,7 @@ class ShulsFilterView(FilterView):
 class CreateUpdateShulView(UpdateView):
     model = Shul
     form_class = ShulForm
-    template_name = "eznashdb/create_shul.html"
+    template_name = "eznashdb/create_update_shul.html"
 
     def get_success_url(self) -> str:
         url = reverse_lazy("eznashdb:shuls")
