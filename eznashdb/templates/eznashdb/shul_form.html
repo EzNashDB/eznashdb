@@ -1,42 +1,31 @@
 {% load crispy_forms_tags %}
 <div>
-    <div class="row">
+    <div>
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    </div>
+    <div class="row">
         <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end mb-2">
             <div class="w-100">
-                <span class="fw-bold">
-                    <div class="w-20px d-inline-block">
-                        <i class="fa-solid fa-synagogue"></i>
-                    </div>
-                    <span class="ms-1">{{ form.name.label }}</span>
-                </span>
+                <div class="w-20px d-inline-block">
+                    <i class="fa-solid fa-synagogue"></i>
+                </div>
+                <span class="ms-1">{{ form.name.label }}</span>
                 {{ form.name|as_crispy_field }}
             </div>
         </div>
         <div class="col-12 col-md-8 col-lg-9 d-flex align-items-end mb-2">
             <div class="w-100">
-                <span class="fw-bold">
-                    <div class="w-20px d-inline-block">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <span class="ms-1">{{ form.address.label }}</span>
-                </span>
+                <div class="w-20px d-inline-block">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <span class="ms-1">{{ form.address.label }}</span>
                 {{ form.address|as_crispy_field }}
             </div>
         </div>
-        {% for field in form.visible_fields %}
-            {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="d-inline-block w-20px">
-                        {% for class in field.label.icon_classes %}<i class="{{ class }}"></i>{% endfor %}
-                    </div>
-                    <span class="fw-bold ms-1">{{ field.label.label }}</span>
-                </div>
-                <div class="col-12 col-md-6 col-lg-7">{{ field.label.help_text }}</div>
-                <div class="col-12 col-md-2 col-lg-2 mb-2">
-                    <div class="input-group input-group-sm text-end d-block">{{ field|as_crispy_field }}</div>
-                </div>
-            {% endif %}
-        {% endfor %}
     </div>
+    {% for field in form.visible_fields %}
+        {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
+            {% include "eznashdb/includes/form_field_with_help_text.html" %}
+        {% endif %}
+    {% endfor %}
 </div>
