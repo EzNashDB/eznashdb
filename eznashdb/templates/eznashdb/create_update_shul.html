@@ -21,51 +21,19 @@
         <div class="overflow-auto rooms-scroll">
             <div class="card-body pb-0 small">
                 {% crispy form %}
-                <hr>
-                <h5 class="card-title mb-0">Rooms</h5>
+                <hr class="my-2">
+                <h5 class="card-title">Rooms</h5>
                 <div>
                     {{ room_fs.management_form }}
                     {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    <div class="w-100 overflow-auto">
-                        <table class="room-formset w-100 table table-striped table-responsive freeze-column-1">
-                            <thead>
-                                <tr class="align-top">
-                                    <th>
-                                        <div style="width: 100px">Name</div>
-                                    </th>
-                                    {% for field in room_fs.0 %}
-                                        {% if field.name in "relative_size,see_hear_score,is_wheelchair_accessible,layout" %}
-                                            <th>
-                                                <div class="d-inline-block text-nowrap">
-                                                    <span class="me-1">
-                                                        {% for class in field.label.icon_classes %}
-                                                            <span class="{% if forloop.counter != 1 %}ms-1{% endif %}">
-                                                                <i class="{{ class }}"></i>
-                                                            </span>
-                                                        {% endfor %}
-                                                    </span>
-                                                    {{ field.label.label }}
-                                                </div>
-                                                <div class="fw-normal"
-                                                     style="min-width: {{ field.label|get_help_text_width }}px">
-                                                    {{ field.label.help_text }}
-                                                </div>
-                                            </th>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for room_form in room_fs %}
-                                    <tr class="room-form">
-                                        {% with room_form as form  %}
-                                            {% crispy room_form %}
-                                        {% endwith %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="room-formset">
+                        {% for room_form in room_fs %}
+                            <div class="room-form">
+                                {% with room_form as form  %}
+                                    {% crispy room_form %}
+                                {% endwith %}
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="row mt-1">
                         <div class="col-12 col-md-4 col-xl-3 ms-auto d-flex align-items-end flex-row-reverse">
@@ -77,7 +45,7 @@
         </div>
         <div class="p-3">
             <div class="row">
-                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 ms-auto">
+                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
                     <button type="submit" class="btn btn-sm btn-primary w-100">
                         <span>Submit</span>
                         <i class="fa-solid fa-arrow-right"></i>
@@ -99,8 +67,8 @@
             addCssClass:'btn btn-sm btn-secondary',
             addText: 'Add another room <i class="fa fa-plus"></i>',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-sm btn-danger text-nowrap',
-            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteCssClass:'btn btn-xs py-0 btn-danger text-nowrap',
+            deleteText: 'Delete room <i class="fa fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container'
         });
     })

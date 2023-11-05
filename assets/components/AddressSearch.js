@@ -55,7 +55,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
         placeholder="Search for an address..."
         inputProps={{
           name: "address",
-          className: "textinput form-control",
+          className: "textinput form-control py-0",
           autoComplete: "one-time-code",
         }}
         defaultInputValue={display_name}

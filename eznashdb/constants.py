@@ -34,7 +34,11 @@ class LabelWithHelpText:
 class InputLabels:
     SHUL_NAME = "Shul Name"
     ADDRESS = "Address"
-    ROOM_NAME = "Room Name"
+    ROOM_NAME = LabelWithHelpText(
+        "Room Name",
+        "Main Sanctuary, Beit Midrash, etc.",
+        ["fa-solid fa-home"],
+    )
     FEMALE_LEADERSHIP = LabelWithHelpText(
         "Female Leadership",
         "Is there at least one woman in a leadership position?",
@@ -56,7 +60,7 @@ class InputLabels:
         "Visibility + Audibility",
         (
             "How well can you see and hear what is happening at the bima, aron, and pulpit "
-            "from the women's section vs the men's section?"
+            "from the women's section?"
         ),
         [
             "fa-solid fa-eye",

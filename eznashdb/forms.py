@@ -46,6 +46,9 @@ class ShulForm(ModelForm):
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
 
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"] = "py-0"
+
 
 class RoomForm(ModelForm):
     id = forms.CharField(required=False)
@@ -58,7 +61,14 @@ class RoomForm(ModelForm):
 
     class Meta:
         model = Room
-        fields = ["shul", "name", "relative_size", "see_hear_score", "is_wheelchair_accessible"]
+        fields = [
+            "shul",
+            "name",
+            "layout",
+            "relative_size",
+            "is_wheelchair_accessible",
+            "see_hear_score",
+        ]
         labels = {
             "name": InputLabels.ROOM_NAME,
             "relative_size": InputLabels.RELATIVE_SIZE,
@@ -82,6 +92,9 @@ class RoomForm(ModelForm):
             self.initial["layout"] = [
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
             ]
+        for field in ["name", "layout", "relative_size", "is_wheelchair_accessible", "see_hear_score"]:
+            self.fields[field].widget.attrs["class"] = "py-0"
+        self.fields["name"].widget.attrs["class"] += " fw-bold"
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
