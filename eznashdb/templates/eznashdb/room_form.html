@@ -1,13 +1,15 @@
 {% load crispy_forms_tags %}
-<div>
-    <div class="row">
-        {% for field  in form.visible_fields %}
-            <div class="col-6 col-sm-6 col-md-4 col-xl-3 col-xxl-2 d-flex align-items-end">
-                <div class="w-100">{{ field|as_crispy_field }}</div>
-            </div>
-        {% endfor %}
-        <div class="col d-flex align-items-end flex-row-reverse mb-3">
-            <div class="delete-room-container"></div>
-        </div>
-    </div>
-</div>
+{% for field in form.visible_fields %}
+    <td>
+        {% if forloop.counter == 1 %}
+            {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
+        {% endif %}
+        {% if field.name == "DELETE" %}<div class="delete-room-container text-end"></div>{% endif %}
+        {{ field|as_crispy_field }}
+    </td>
+{% endfor %}
+{% if "DELETE" not in form.fields %}
+    <td class="text-end">
+        <div class="delete-room-container"></div>
+    </td>
+{% endif %}

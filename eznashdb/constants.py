@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -20,6 +21,7 @@ LAYOUT_FIELDS = [
 class LabelWithHelpText:
     label: str = ""
     help_text: str = ""
+    icon_classes: List[str] = field(default_factory=list)
 
     def __str__(self) -> str:
         context = {"label": mark_safe(self.label), "help_text": mark_safe(self.help_text)}
@@ -30,36 +32,41 @@ class LabelWithHelpText:
 
 
 class InputLabels:
-    SHUL_NAME = "Shul Name"
+    SHUL_NAME = "Name"
     ADDRESS = "Address"
     ROOM_NAME = "Room Name"
     FEMALE_LEADERSHIP = LabelWithHelpText(
         "Female Leadership",
-        "Is there at least one woman in a leadership position",
+        "Is there at least one woman in a leadership position?",
+        ["fa-solid fa-user-shield"],
     )
     CHILDCARE = LabelWithHelpText(
-        "Childcare",
-        "Is there an on-site childcare program",
+        "Childcare", "Is there an on-site childcare program?", ["fa-solid fa-child-reaching"]
     )
-    KADDISH = LabelWithHelpText(
-        "Kaddish",
-        "Can women say kaddish (includes shuls where a man always says kaddish)",
-    )
+    KADDISH = LabelWithHelpText("Kaddish", "Can women say kaddish?", ["fa-solid fa-comment"])
     WHEELCHAIR_ACCESS = LabelWithHelpText(
-        "Wheelchair Access",
-        "Is the women's section wheelchair accessible",
+        "Wheelchair Access", "Is the women's section wheelchair accessible?", ["fa-solid fa-wheelchair"]
     )
     RELATIVE_SIZE = LabelWithHelpText(
-        "Size of Women's Section <span class='text-nowrap'>(vs. Men's)</span>",
-        "How large is the women's section relative to the men's section",
+        "Size",
+        "How large is the women's section?",
+        ["fa-solid fa-up-right-and-down-left-from-center"],
     )
     SEE_HEAR = LabelWithHelpText(
-        "Audibility / Visibility",
-        "How easy / difficult is it to see and hear from the women's section",
+        "Visibility + Audibility",
+        (
+            "How well can you see and hear what is happening at the bima, aron, and pulpit "
+            "from the women's section vs the men's section?"
+        ),
+        [
+            "fa-solid fa-eye",
+            "fa-solid fa-volume-high",
+        ],
     )
     LAYOUT = LabelWithHelpText(
-        "Location of Women's Section",
-        "Where is the women's section located in the shul",
+        "Layout",
+        "Where is the women's section located?",
+        ["fa-solid fa-cubes"],
     )
 
 
