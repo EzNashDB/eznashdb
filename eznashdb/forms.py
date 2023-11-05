@@ -1,5 +1,4 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Layout
 from django import forms
 from django.forms import HiddenInput, ModelForm, inlineformset_factory
 
@@ -40,10 +39,12 @@ class CreateUpdateShulForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = helper = FormHelper()
-        helper.layout = Layout(HTML("{% include 'eznashdb/shul_form.html' %}"))
+        helper.template = "eznashdb/shul_form.html"
+        helper.field_template = "bootstrap5/no_margin_field.html"
+        self.helper.form_show_labels = False
+
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
-        self.fields["name"].widget.attrs["class"] = "fw-bold"
 
 
 class RoomForm(ModelForm):
@@ -71,11 +72,12 @@ class RoomForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = helper = FormHelper()
-        helper.layout = Layout(HTML("{% include 'eznashdb/room_form.html' %}"))
+        helper.template = "eznashdb/room_form.html"
+        helper.field_template = "bootstrap5/no_margin_field.html"
         helper.form_tag = False
         helper.disable_csrf = True
         helper.field_class = "input-group input-group-sm"
-        self.fields["name"].widget.attrs["class"] = "fw-bold"
+        self.helper.form_show_labels = False
         if self.instance.pk:
             self.initial["layout"] = [
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)

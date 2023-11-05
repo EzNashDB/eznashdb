@@ -8,34 +8,63 @@
           enctype="multipart/form-data"
           id="shul_form"
           class="d-flex flex-column h-100 card">
-        <div class="card-header text-center">
+        {% csrf_token %}
+        <div class="card-header">
             <h5 class="card-title mb-0">
                 {% if object %}
-                    Edit Shul
+                    Edit Shul: {{ object.name }}
                 {% else %}
                     Add a Shul
                 {% endif %}
             </h5>
         </div>
         <div class="overflow-auto rooms-scroll">
-            <div class="card-body pb-0 small">{% crispy form %}</div>
-            <div class="card-body bg-light border-top border-bottom">
+            <div class="card-body pb-0 small">
+                {% crispy form %}
+                <hr>
                 <h5 class="card-title mb-0">Rooms</h5>
                 <div>
                     {{ room_fs.management_form }}
-                    <div class="room-formset">
-                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                        {% for room_form in room_fs %}
-                            <div class="room-form pt-3 border-bottom small">
-                                {% for hidden in room_form.hidden_fields %}{{ hidden }}{% endfor %}
-                                {% with room_form as form  %}
-                                    {% crispy room_form %}
-                                {% endwith %}
-                            </div>
-                        {% endfor %}
+                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    <div class="w-100 overflow-auto">
+                        <table class="room-formset w-100 table table-striped table-responsive">
+                            <thead>
+                                <tr class="align-top">
+                                    <th>
+                                        <div style="width: 100px">Name</div>
+                                    </th>
+                                    {% for field in room_fs.0 %}
+                                        {% if field.name in "relative_size,see_hear_score,is_wheelchair_accessible,layout" %}
+                                            <th>
+                                                <div class="d-inline-block text-nowrap">
+                                                    <span class="me-1">
+                                                        {% for class in field.label.icon_classes %}<i class="{{ class }}"></i>{% endfor %}
+                                                    </span>
+                                                    {{ field.label.label }}
+                                                </div>
+                                                <div class="fw-normal"
+                                                     style="min-width: {{ field.label|get_help_text_width }}px">
+                                                    {{ field.label.help_text }}
+                                                </div>
+                                            </th>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for room_form in room_fs %}
+                                    <tr class="room-form">
+                                        {% with room_form as form  %}
+                                            {% crispy room_form %}
+                                        {% endwith %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-12 col-md-4 col-xl-3 ms-auto  d-flex align-items-end flex-row-reverse">
+                    <div class="row mt-1">
+                        <div class="col-12 col-md-4 col-xl-3 ms-auto d-flex align-items-end flex-row-reverse">
                             <div class="add-room-container"></div>
                         </div>
                     </div>
@@ -44,7 +73,7 @@
         </div>
         <div class="p-3">
             <div class="row">
-                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
+                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 ms-auto">
                     <button type="submit" class="btn btn-sm btn-primary w-100">
                         <span>Submit</span>
                         <i class="fa-solid fa-arrow-right"></i>
@@ -67,7 +96,7 @@
             addText: 'Add another room <i class="fa fa-plus"></i>',
             addContainerClass: 'add-room-container',
             deleteCssClass:'btn btn-sm btn-danger text-nowrap',
-            deleteText: 'Delete this room <i class="fa fa-xmark"></i>',
+            deleteText: '<i class="fa fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container'
         });
     })

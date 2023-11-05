@@ -112,3 +112,8 @@ def get_layout_type_display_data_list(room: Room) -> List[RoomLayoutTypeDisplayD
         RoomLayoutTypeDisplayData(room, layout_type)
         for layout_type in ROOM_LAYOUT_DISPLAY_VALUES_BY_TYPE
     ]
+
+
+@register.filter
+def get_help_text_width(label):
+    return len(label.help_text) * 2.7

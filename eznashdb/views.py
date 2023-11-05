@@ -68,7 +68,6 @@ class CreateUpdateShulView(UpdateView):
     def form_valid(self, form):
         room_fs = self.get_room_formset()
         if not room_fs.is_valid():
-            breakpoint()
             return self.render_to_response(self.get_context_data(form=form))
         self.object = form.save()
         self.room_fs_valid(room_fs)
