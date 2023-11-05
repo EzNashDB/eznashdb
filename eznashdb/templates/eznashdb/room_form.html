@@ -1,18 +1,18 @@
-<div>
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-    {% for field in form.visible_fields %}
-        {% if field.name == "DELETE" %}
-            <div class="col-3">
-                <div class="delete-room-container"></div>
-            </div>
-        {% else %}
-            {% include "eznashdb/includes/form_field_with_help_text.html" %}
-        {% endif %}
-    {% endfor %}
-    {% if "DELETE" not in form.fields %}
-        <div class="col-3">
-            <div class="delete-room-container"></div>
-        </div>
-    {% endif %}
+<div class="position-relative">
+    <div class="position-absolute end-0">
+        <div class="delete-room-container"></div>
+    </div>
+    <div class="pt-2">
+        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+        {% for field in form.visible_fields %}
+            {% if field.name == "DELETE" %}
+                {# Handled separately #}
+            {% elif field.name == "name" %}
+                {% include "eznashdb/includes/form_field_with_help_text.html" with is_bold_label=True %}
+            {% else %}
+                {% include "eznashdb/includes/form_field_with_help_text.html" %}
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
-<hr class="my-2">
+<hr class="m-0 mb-2">
