@@ -91,3 +91,11 @@ body {
       right: 0;
     }
   }
+
+/* Freeze table columns */
+.table.freeze-column-1, th:first-child, td:first-child
+{
+  position:sticky;
+  left:0px;
+  z-index: 100;
+}
