@@ -38,7 +38,11 @@
                                             <th>
                                                 <div class="d-inline-block text-nowrap">
                                                     <span class="me-1">
-                                                        {% for class in field.label.icon_classes %}<i class="{{ class }}"></i>{% endfor %}
+                                                        {% for class in field.label.icon_classes %}
+                                                            <span class="{% if forloop.counter != 1 %}ms-1{% endif %}">
+                                                                <i class="{{ class }}"></i>
+                                                            </span>
+                                                        {% endfor %}
                                                     </span>
                                                     {{ field.label.label }}
                                                 </div>
