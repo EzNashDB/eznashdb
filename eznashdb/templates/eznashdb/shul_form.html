@@ -4,13 +4,23 @@
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
         <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end mb-2">
             <div class="w-100">
-                <span>{{ form.name.label }}:</span>
+                <span class="fw-bold">
+                    <div class="w-20px d-inline-block">
+                        <i class="fa-solid fa-synagogue"></i>
+                    </div>
+                    {{ form.name.label }}
+                </span>
                 {{ form.name|as_crispy_field }}
             </div>
         </div>
         <div class="col-12 col-md-8 col-lg-9 d-flex align-items-end mb-2">
             <div class="w-100">
-                <span>{{ form.address.label }}:</span>
+                <span class="fw-bold">
+                    <div class="w-20px d-inline-block">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    {{ form.address.label }}
+                </span>
                 {{ form.address|as_crispy_field }}
             </div>
         </div>
