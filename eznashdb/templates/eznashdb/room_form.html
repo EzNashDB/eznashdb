@@ -1,35 +1,18 @@
-{% load crispy_forms_tags %}
-{% load crispy_forms_tags %}
 <div>
-    <div class="row">
-        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-        {% for field in form.visible_fields %}
-            {% if field.name == "DELETE" %}
-                <div class="col-3">
-                    <div class="delete-room-container"></div>
-                </div>
-            {% else %}
-                <div class="col-12 col-md-4 col-lg-3">
-                    <div class="d-inline-block w-min-20px">
-                        {% for class in field.label.icon_classes %}
-                            <span class="{% if forcounter != 1 %}ms-1{% endif %}">
-                                <i class="{{ class }}"></i>
-                            </span>
-                        {% endfor %}
-                    </div>
-                    <span class="fw-bold ms-1">{{ field.label.label }}</span>
-                </div>
-                <div class="col-12 col-md-6 col-lg-7">{{ field.label.help_text }}</div>
-                <div class="col-12 col-md-2 col-lg-2 mb-2">
-                    <div class="input-group input-group-sm text-end d-block">{{ field|as_crispy_field }}</div>
-                </div>
-            {% endif %}
-        {% endfor %}
-        {% if "DELETE" not in form.fields %}
+    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    {% for field in form.visible_fields %}
+        {% if field.name == "DELETE" %}
             <div class="col-3">
                 <div class="delete-room-container"></div>
             </div>
+        {% else %}
+            {% include "eznashdb/includes/form_field_with_help_text.html" %}
         {% endif %}
-    </div>
+    {% endfor %}
+    {% if "DELETE" not in form.fields %}
+        <div class="col-3">
+            <div class="delete-room-container"></div>
+        </div>
+    {% endif %}
 </div>
 <hr class="my-2">
