@@ -8,7 +8,7 @@ from eznashdb.models import Room, Shul
 from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 
 
-class CreateUpdateShulForm(ModelForm):
+class ShulForm(ModelForm):
     class Meta:
         model = Shul
         fields = [

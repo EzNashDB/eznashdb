@@ -12,7 +12,7 @@ from django_filters.views import FilterView
 
 from eznashdb.constants import BASE_OSM_URL
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import CreateUpdateShulForm, RoomFormSet
+from eznashdb.forms import RoomFormSet, ShulForm
 from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
 
@@ -43,7 +43,7 @@ class ShulsFilterView(FilterView):
 
 class CreateUpdateShulView(UpdateView):
     model = Shul
-    form_class = CreateUpdateShulForm
+    form_class = ShulForm
     template_name = "eznashdb/create_shul.html"
 
     def get_success_url(self) -> str:
