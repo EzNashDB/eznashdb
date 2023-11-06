@@ -52,7 +52,7 @@
         });
         const labelList = labels.join("; ") + "";
         if (options.length === 0) {
-          return "--------";
+          return "---------";
         } else {
           return `
             <span>
