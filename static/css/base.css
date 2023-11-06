@@ -45,11 +45,6 @@ body {
     max-width: 125px;
 }
 
-/* height utils */
-.h-23px {
-    height: 23px !important;
-}
-
 /* bootstrap multiselect */
 .multiselect-selected-text {
     overflow: hidden;
