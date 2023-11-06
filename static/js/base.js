@@ -1,5 +1,5 @@
 (() => {
-  function onEvent(eventName, funcs) {
+  function onDocumentEvent(eventName, funcs) {
     funcs.forEach((func) => document.addEventListener(eventName, func));
   }
 
@@ -77,12 +77,12 @@
     });
   }
 
-  onEvent("DOMContentLoaded", [
+  onDocumentEvent("DOMContentLoaded", [
     setBodyHeight,
     initializeTooltips,
     initializeMultiselects,
   ]);
-  onEvent("resize", [setBodyHeight]);
-  onEvent("formsetInitialized", [initializeMultiselects]);
+  onDocumentEvent("formsetInitialized", [initializeMultiselects]);
   onDOMChange([initializeMultiselects, initializeTooltips]);
+  window.addEventListener("resize", setBodyHeight);
 })();
