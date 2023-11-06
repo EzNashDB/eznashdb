@@ -17,7 +17,7 @@
             totalForms = $('#id_' + options.prefix + '-TOTAL_FORMS'),
             maxForms = $('#id_' + options.prefix + '-MAX_NUM_FORMS'),
             minForms = $('#id_' + options.prefix + '-MIN_NUM_FORMS'),
-            childElementSelector = 'input,select,textarea,label,div',
+            childElementSelector = 'input,select,textarea,label,div,option',
             $$ = $(this),
 
             applyExtraClasses = function(row, ndx) {
@@ -180,6 +180,8 @@
                     // This fixes Issue 1, reported by Wilson.Andrew.J:
                     if (elem.is('input:checkbox') || elem.is('input:radio')) {
                         elem.attr('checked', false);
+                    } else if (elem.is('option')) {
+                        elem.removeAttr('selected');
                     } else {
                         elem.val('');
                     }
