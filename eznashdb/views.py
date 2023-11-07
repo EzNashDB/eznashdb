@@ -90,8 +90,6 @@ class CreateUpdateShulView(UpdateView):
     def get_room_formset(self):
         if self.request.method == "GET":
             formset = RoomFormSet(prefix="rooms", instance=self.object)
-            if self.object and self.object.rooms.count() > 0:
-                formset.extra = 0
             return formset
         else:
             return RoomFormSet(
