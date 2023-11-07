@@ -92,7 +92,8 @@
                         del.val('on');
                         row.hide();
                         forms = $('.' + options.formCssClass).not(':hidden');
-                        totalForms.val(forms.length);
+                        // Commenting this out per https://github.com/elo80ka/django-dynamic-formset/issues/197
+                        // totalForms.val(forms.length);
                     } else {
                         row.remove();
                         // Update the TOTAL_FORMS count:
@@ -170,7 +171,6 @@
                 }
                 // Otherwise, use the last form in the formset; this works much better if you've got
                 // extra (>= 1) forms (thnaks to justhamade for pointing this out):
-                if (options.hideLastAddForm) $('.' + options.formCssClass + ':last').hide();
                 template = $('.' + options.formCssClass + ':last').clone(true).removeAttr('id');
                 template.find('input:hidden[id $= "-DELETE"]').remove();
                 // Clear all cloned fields, except those the user wants to keep (thanks to brunogola for the suggestion):
@@ -186,6 +186,7 @@
                         elem.val('');
                     }
                 });
+                if (options.hideLastAddForm) $('.' + options.formCssClass + ':last').hide();
             }
             // FIXME: Perhaps using $.data would be a better idea?
             options.formTemplate = template;

@@ -68,7 +68,8 @@
             addContainerClass: 'add-room-container',
             deleteCssClass:'btn btn-sm py-0 btn-danger text-nowrap align-top',
             deleteText: 'Delete room <i class="fa fa-xmark"></i>',
-            deleteContainerClass: 'delete-room-container'
+            deleteContainerClass: 'delete-room-container',
+            hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });
     })
     </script>

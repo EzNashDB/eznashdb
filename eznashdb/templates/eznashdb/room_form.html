@@ -7,7 +7,7 @@
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
         {% for field in form.visible_fields %}
             {% if field.name == "DELETE" %}
-                {# Handled separately #}
+                {{ field }}
             {% elif field.name == "name" %}
                 {% include "eznashdb/includes/form_field_with_help_text.html" with is_bold_label=True %}
             {% else %}
