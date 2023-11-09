@@ -22,6 +22,40 @@
                 {{ form.address|as_crispy_field }}
             </div>
         </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-lg-4 col-xl-3">
+                    <div class="d-flex">
+                        <div class="d-inline-block w-min-25px">
+                            <span>
+                                <i class="fa-solid fa-link"></i>
+                            </span>
+                        </div>
+                        <span class="ms-2 flex-grow-1">Link(s)</span>
+                        <div class="add-link-container mb-2"></div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3 link-formset">
+                    {{ link_fs.management_form }}
+                    {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {% for link_form in link_fs %}
+                        <div class="link-form row mb-2">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    {% with link_form as form  %}
+                                        {% crispy form %}
+                                    {% endwith %}
+                                </div>
+                                <div class="delete-link-container ps-2 d-flex align-items-center"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-12 col-lg-5 col-xl-6 text-muted small d-flex align-items-center mb-2">
+                    Website, whatsapp group, etc.
+                </div>
+            </div>
+        </div>
     </div>
     {% for field in form.visible_fields %}
         {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}

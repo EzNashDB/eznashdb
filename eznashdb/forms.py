@@ -4,7 +4,7 @@ from django.forms import HiddenInput, ModelForm, inlineformset_factory
 
 from eznashdb.constants import LAYOUT_FIELDS, InputLabels
 from eznashdb.enums import RoomLayoutType
-from eznashdb.models import Room, Shul
+from eznashdb.models import Room, Shul, ShulLink
 from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 
 
@@ -102,6 +102,41 @@ class RoomForm(ModelForm):
         return instance
 
 
+class ShulLinkForm(ModelForm):
+    class Meta:
+        model = ShulLink
+        fields = ["shul", "link"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = helper = FormHelper()
+        helper.field_template = "bootstrap5/no_margin_field.html"
+        helper.form_tag = False
+        helper.disable_csrf = True
+        helper.field_class = "input-group input-group-sm w-100"
+        self.helper.form_show_labels = False
+
+    def save(self, commit=True):
+        instance = super(ShulLinkForm, self).save(commit=False)
+        if commit:
+            instance.save()
+        return instance
+
+
 RoomFormSet = inlineformset_factory(
-    Shul, Room, form=RoomForm, extra=1, can_delete=True, can_delete_extra=False
+    Shul,
+    Room,
+    form=RoomForm,
+    extra=1,
+    can_delete=True,
+    can_delete_extra=False,
+)
+
+ShulLinkFormSet = inlineformset_factory(
+    Shul,
+    ShulLink,
+    form=ShulLinkForm,
+    extra=1,
+    can_delete=True,
+    can_delete_extra=False,
 )

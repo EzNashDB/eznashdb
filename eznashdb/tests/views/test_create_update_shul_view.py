@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from bs4 import BeautifulSoup
 from django.urls import reverse
@@ -8,7 +10,7 @@ from eznashdb.views import CreateUpdateShulView
 # Helpers
 
 
-def get_room_fs_metadata_fields(
+def get_fs_metadata_fields(
     prefix: str = "rooms",
     initial_forms: int = 0,
     max_num_forms: int = 1000,
@@ -24,6 +26,10 @@ def get_room_fs_metadata_fields(
         f"{prefix}-MIN_NUM_FORMS": str(min_num_forms),
         f"{prefix}-TOTAL_FORMS": str(total_forms),
     }
+
+
+get_room_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="rooms")
+get_link_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="shul-links")
 
 
 def get_room_fields(room_index: int):
@@ -76,6 +82,7 @@ def describe_create():
             **get_room_fields(room_index=0),
             **get_room_fields(room_index=1),
             **get_room_fs_metadata_fields(total_forms=2),
+            **get_link_fs_metadata_fields(),
         }
 
         client.post(
@@ -95,6 +102,7 @@ def describe_create():
                 "name": "test shul",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
+                **get_link_fs_metadata_fields(),
             },
             follow=True,
         )

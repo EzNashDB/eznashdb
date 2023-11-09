@@ -3,17 +3,17 @@
     <div class="col-12 col-lg-4 col-xl-3">
         <div class="d-inline-block w-min-25px">
             {% for class in field.label.icon_classes %}
-                <span class="{% if forcounter != 1 %}ms-1{% endif %}">
+                <span class="{% if forloop.counter != 1 %}ms-1{% endif %}">
                     <i class="{{ class }}"></i>
                 </span>
             {% endfor %}
         </div>
         <span class="{% if is_bold_label %}fw-bold{% endif %} ms-1">{{ field.label.label }}</span>
     </div>
-    <div class="col-12 col-lg-2">
-        <div class="input-group input-group-sm text-end d-block">{{ field|as_crispy_field }}</div>
+    <div class="col-12 col-lg-3">
+        <div class="input-group input-group-sm d-block">{{ field|as_crispy_field }}</div>
     </div>
-    <div class="col-12 col-lg-6 col-xl-7 text-muted small d-flex align-items-center">
+    <div class="col-12 col-lg-5 col-xl-6 text-muted small d-flex align-items-center">
         {{ field.label.help_text }}
     </div>
 </div>

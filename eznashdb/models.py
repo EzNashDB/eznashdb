@@ -64,3 +64,15 @@ class Room(models.Model):
 
     def has_layout_data(self):
         return any(getattr(self, field, False) for field in LAYOUT_FIELDS)
+
+
+class ShulLink(models.Model):
+    shul = models.ForeignKey("eznashdb.Shul", on_delete=models.PROTECT, related_name="links")
+    link = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = "link"
+        verbose_name_plural = "links"
+
+    def __str__(self) -> str:
+        return f"{self.link}, {self.shul}"
