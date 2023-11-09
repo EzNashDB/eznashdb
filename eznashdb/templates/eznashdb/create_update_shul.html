@@ -56,18 +56,31 @@
 {% endblock content %}
 
 {% block extra_media_bottom %}
+    {{ block.super }}
     <script type="text/javascript">
     $(function() {
+        $('.link-form').formset({
+            formCssClass: 'link-form',
+            formsParentCssClass: 'link-formset',
+            prefix: '{{ link_fs.prefix }}',
+            addCssClass:'btn btn-sm btn-secondary py-0 px-1',
+            addText: 'Add a link <i class="fa fa-plus"></i>',
+            addContainerClass: 'add-link-container',
+            deleteCssClass:'btn btn-link py-0 px-1 text-danger text-nowrap align-top',
+            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteContainerClass: 'delete-link-container',
+            hideLastAddForm: {% if link_fs.1 %} true {% else %} false {% endif %},
+        });
         $('.room-form').formset({
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
             scrollCssClass: 'rooms-scroll',
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary',
-            addText: 'Add another room <i class="fa fa-plus"></i>',
+            addCssClass:'btn btn-sm btn-secondary py-0 px-1',
+            addText: 'Add a room <i class="fa fa-plus"></i>',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-sm py-0 btn-danger text-nowrap align-top',
-            deleteText: 'Delete room <i class="fa fa-xmark"></i>',
+            deleteCssClass:'btn btn-link text-danger text-nowrap align-top',
+            deleteText: '<i class="fa fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });

@@ -12,7 +12,7 @@ from django_filters.views import FilterView
 
 from eznashdb.constants import BASE_OSM_URL
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import RoomFormSet, ShulForm
+from eznashdb.forms import RoomFormSet, ShulForm, ShulLinkFormSet
 from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
 
@@ -66,10 +66,12 @@ class CreateUpdateShulView(UpdateView):
         return self.get_object() is not None
 
     def form_valid(self, form):
-        room_fs = self.get_room_formset()
-        if not room_fs.is_valid():
+        room_fs = self.get_room_fs()
+        link_fs = self.get_link_fs()
+        if not room_fs.is_valid() or not link_fs.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         self.object = form.save()
+        self.link_fs_valid(link_fs)
         self.room_fs_valid(room_fs)
 
         return HttpResponseRedirect(self.get_success_url())
@@ -82,20 +84,34 @@ class CreateUpdateShulView(UpdateView):
             room.shul = self.object
             room.save()
 
+    def link_fs_valid(self, link_fs):
+        links = link_fs.save(commit=False)
+        for obj in link_fs.deleted_objects:
+            obj.delete()
+        for link in links:
+            link.shul = self.object
+            link.save()
+
     def get_context_data(self, **kwargs):
         context = super(CreateUpdateShulView, self).get_context_data(**kwargs)
-        context["room_fs"] = self.get_room_formset()
+        context["room_fs"] = self.get_room_fs()
+        context["link_fs"] = self.get_link_fs()
         return context
 
-    def get_room_formset(self):
+    def get_room_fs(self):
+        return self.get_formset(RoomFormSet, "rooms")
+
+    def get_link_fs(self):
+        return self.get_formset(ShulLinkFormSet, "shul-links")
+
+    def get_formset(self, formset_class, prefix):
         if self.request.method == "GET":
-            formset = RoomFormSet(prefix="rooms", instance=self.object)
-            return formset
+            return formset_class(prefix=prefix, instance=self.object)
         else:
-            return RoomFormSet(
+            return formset_class(
                 self.request.POST or None,
                 self.request.FILES or None,
-                prefix="rooms",
+                prefix=prefix,
                 instance=self.object,
             )
 
