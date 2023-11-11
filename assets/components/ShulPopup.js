@@ -81,7 +81,9 @@ export const ShulPopup = ({ shul }) => {
         >
           {icon}
           <span className="fw-bold">{layoutType}</span>
-          {subLabels && <span className="ms-1 fw-normal">{subLabels}</span>}
+          {subLabels && (
+            <span className="ms-1 fw-normal">{subLabels.join(", ")}</span>
+          )}
         </Badge>
       )
     );
