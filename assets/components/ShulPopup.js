@@ -3,6 +3,7 @@ import { Popup } from "react-leaflet";
 import { Card, ListGroup, Badge } from "react-bootstrap";
 
 export const ShulPopup = ({ shul }) => {
+  const [num, setNum] = useState(0);
   const boolToIcon = (bool) => {
     if (bool === true) {
       return <i className="fa-solid fa-check"></i>;
