@@ -1,9 +1,9 @@
 /* Popup */
 .leaflet-popup-content-wrapper {
-    border-radius: var(--bs-border-radius) !important;
-    padding: 0px;
+  border-radius: var(--bs-border-radius) !important;
+  padding: 0px;
 }
 
 .leaflet-popup-content {
-    margin: 0;
+  margin: 0;
 }

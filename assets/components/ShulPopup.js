@@ -3,7 +3,6 @@ import { Popup } from "react-leaflet";
 import { Card, ListGroup, Badge } from "react-bootstrap";
 
 export const ShulPopup = ({ shul }) => {
-  const [num, setNum] = useState(0);
   const boolToIcon = (bool) => {
     if (bool === true) {
       return <i className="fa-solid fa-check"></i>;
@@ -109,7 +108,7 @@ export const ShulPopup = ({ shul }) => {
   };
 
   return (
-    <Popup id={shul.id} minWidth={300}>
+    <Popup id={shul.id} minWidth={325}>
       <Card>
         <Card.Header className="fw-bold p-1 pe-4 d-flex align-items-center">
           <a
@@ -121,14 +120,38 @@ export const ShulPopup = ({ shul }) => {
           {shul.name}
         </Card.Header>
         <Card.Body className="p-2 pt-1">
-          <div className="small text-truncate">
+          <div className="text-truncate">
             <span className="me-1">
               <i className="fa-solid fa-location-dot"></i>
             </span>
             {shul.address}
           </div>
+          {shul.links.length > 0 && (
+            <>
+              <hr className="my-1" />
+              <div>
+                {shul.links.map((link) => (
+                  <div key={link.id} className="d-inline-block me-2">
+                    <div className="text-nowrap w-100 d-flex align-items-center">
+                      <span className="me-1">
+                        <i className="fa-solid fa-link"></i>
+                      </span>
+                      <a
+                        href={link.link}
+                        target="_blank"
+                        className="btn btn-sm btn-link p-0"
+                      >
+                        {link.link.substring(0, 35)}
+                        {link.link.length > 35 && "..."}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
           <hr className="my-1" />
-          <div className="d-flex justify-content-between small">
+          <div className="d-flex justify-content-between">
             <span className="me-1">
               Childcare: {boolToIcon(shul.has_childcare)}
             </span>
