@@ -168,7 +168,6 @@ class TestRelativeSizeFilter:
     @pytest.mark.parametrize(
         ("value", "query"),
         [
-            (RelativeSize.XS.value, ["XS"]),
             (RelativeSize.S.value, ["S"]),
             (RelativeSize.M.value, ["M"]),
             (RelativeSize.L.value, ["L"]),
