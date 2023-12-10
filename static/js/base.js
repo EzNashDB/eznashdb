@@ -33,6 +33,20 @@
     });
   }
 
+  function getOptgroupForOption(option) {
+    // Traverse the parent elements and return the first optgroup if found
+    var parent = option.parentNode;
+    while (parent !== null) {
+      if (parent.tagName === "OPTGROUP") {
+        return parent;
+      } else if (parent.tagName === "SELECT") {
+        return null;
+      }
+      parent = parent.parentNode;
+    }
+    return null; // Return null if no optgroup is found
+  }
+
   function initializeMultiselects() {
     $(".bs-multiselect").multiselect({
       includeSelectAllOption: true,
@@ -43,12 +57,19 @@
       buttonTitle: (options, select) => null,
       buttonText: function (options, select) {
         var labels = [];
+        window.opts = options;
         options.each(function () {
-          if ($(this).attr("label") !== undefined) {
-            labels.push($(this).attr("label"));
-          } else {
-            labels.push($(this).html());
+          let label = "";
+          const optgroup = getOptgroupForOption(this);
+          if (optgroup) {
+            label += `${optgroup.label} - `;
           }
+          if ($(this).attr("label") !== undefined) {
+            label += $(this).attr("label");
+          } else {
+            label += $(this).html();
+          }
+          labels.push(label);
         });
         const labelList = labels.join("; ") + "";
         if (options.length === 0) {
