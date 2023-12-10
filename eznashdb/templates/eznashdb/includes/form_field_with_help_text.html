@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<div class="row mb-2">
+<div class="row my-1">
     <div class="col-12 col-lg-4 col-xl-3">
         <div class="d-inline-block w-min-25px">
             {% for class in field.label.icon_classes %}
@@ -8,7 +8,7 @@
                 </span>
             {% endfor %}
         </div>
-        <span class="{% if is_bold_label %}fw-bold{% endif %} ms-1">{{ field.label.label }}</span>
+        <span class="ms-1">{{ field.label.label }}</span>
     </div>
     <div class="col-12 col-lg-5 col-xl-6 text-muted small d-flex align-items-center">
         {{ field.label.help_text }}
