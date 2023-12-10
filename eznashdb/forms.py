@@ -46,7 +46,6 @@ class ShulForm(ModelForm):
 
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
-        self.fields["name"].widget.attrs["class"] = "fw-bold"
 
 
 class RoomForm(ModelForm):
@@ -91,7 +90,6 @@ class RoomForm(ModelForm):
             self.initial["layout"] = [
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
             ]
-        self.fields["name"].widget.attrs["class"] = "fw-bold"
         self.fields["layout"].choices = LAYOUT_CHOICES
 
     def save(self, commit=True):

@@ -4,16 +4,16 @@
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
     </div>
     <div class="row">
-        <div class="col-12 col-md-4 col-lg-4 col-xl-3 d-flex align-items-end mb-2">
+        <div class="col-12 col-md-4 col-lg-4 col-xl-3 d-flex align-items-end my-1">
             <div class="w-100">
                 <div class="w-min-25px d-inline-block">
                     <i class="fa-solid fa-synagogue"></i>
                 </div>
-                <span class="fw-bold ms-1">{{ form.name.label }}</span>
+                <span class="ms-1">{{ form.name.label }}</span>
                 {{ form.name|as_crispy_field }}
             </div>
         </div>
-        <div class="col-12 col-md-8 col-lg-8 col-xl-9 d-flex align-items-end mb-2">
+        <div class="col-12 col-md-8 col-lg-8 col-xl-9 d-flex align-items-end my-1">
             <div class="w-100">
                 <div class="w-min-25px d-inline-block">
                     <i class="fa-solid fa-location-dot"></i>
@@ -22,7 +22,7 @@
                 {{ form.address|as_crispy_field }}
             </div>
         </div>
-        <div class="col-12">
+        <div class="col-12 bg-light">
             <div class="row">
                 <div class="col-12 col-lg-4 col-xl-3">
                     <div class="d-flex">
@@ -42,7 +42,7 @@
                         {{ link_fs.management_form }}
                         {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                         {% for link_form in link_fs %}
-                            <div class="link-form col-12 mb-2">
+                            <div class="link-form col-12 my-1">
                                 <div class="d-flex">
                                     <div class="delete-link-container pe-2 d-flex align-items-center"></div>
                                     <div class="flex-grow-1">
@@ -54,16 +54,23 @@
                             </div>
                         {% endfor %}
                         <div class="col-12 justify-content-end order-last">
-                            <div class="add-link-container d-flex justify-content-end mb-2"></div>
+                            <div class="add-link-container d-flex justify-content-end my-1"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% for field in form.visible_fields %}
-        {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
-            {% include "eznashdb/includes/form_field_with_help_text.html" %}
-        {% endif %}
-    {% endfor %}
+    <div class="row">
+        {% for field in form.visible_fields %}
+            <div class="col-12
+                        {% if forloop.counter|divisibleby:2 %}
+                            bg-light
+                        {% endif %}">
+                {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
+                    {% include "eznashdb/includes/form_field_with_help_text.html" %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 </div>
