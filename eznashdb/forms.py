@@ -2,6 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.forms import HiddenInput, ModelForm, inlineformset_factory
 
+from eznashdb.choices import LAYOUT_CHOICES
 from eznashdb.constants import LAYOUT_FIELDS, InputLabels
 from eznashdb.enums import RoomLayoutType
 from eznashdb.models import Room, Shul, ShulLink
@@ -91,6 +92,7 @@ class RoomForm(ModelForm):
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
             ]
         self.fields["name"].widget.attrs["class"] = "fw-bold"
+        self.fields["layout"].choices = LAYOUT_CHOICES
 
     def save(self, commit=True):
         instance = super(RoomForm, self).save(commit=False)
