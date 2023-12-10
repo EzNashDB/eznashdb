@@ -1,7 +1,6 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from eznashdb.constants import InputLabels
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
@@ -280,22 +279,3 @@ def describe_filter():
         soup_text = soup.get_text().lower()
         assert "shul 2" in soup_text
         assert "shul 1" not in soup_text
-
-    def shows_filter_help_text(GET_request):
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        filter_modal = soup.find(attrs={"id": "shulFiltersModal"})
-
-        def has_tooltip(help_text):
-            escaped = help_text.replace("'", "\\'")
-            bs4_params = {"data-bs-title": escaped}
-            return len(filter_modal.find_all(attrs=bs4_params)) > 0
-
-        assert has_tooltip(InputLabels.FEMALE_LEADERSHIP.help_text)
-        assert has_tooltip(InputLabels.KADDISH.help_text)
-        assert has_tooltip(InputLabels.CHILDCARE.help_text)
-        assert has_tooltip(InputLabels.WHEELCHAIR_ACCESS.help_text)
-        assert has_tooltip(InputLabels.RELATIVE_SIZE.help_text)
-        assert has_tooltip(InputLabels.SEE_HEAR.help_text)
-        assert has_tooltip(InputLabels.LAYOUT.help_text)

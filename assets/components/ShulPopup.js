@@ -183,7 +183,6 @@ export const ShulPopup = ({ shul }) => {
                     </span>
                     <span>
                       <Badge bg="light" className="border text-dark">
-                        <i className="fa-solid fa-volume-high me-1"></i> /{" "}
                         <i className="fa-solid fa-eye me-1"></i>
                         {scoreToStars(room.see_hear_score)}
                       </Badge>
