@@ -34,10 +34,8 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="row mt-1">
-                        <div class="col-12 col-md-4 col-xl-3 ms-auto d-flex align-items-end flex-row-reverse">
-                            <div class="add-room-container"></div>
-                        </div>
+                    <div class="row justify-content-end">
+                        <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
                     </div>
                 </div>
             </div>
@@ -63,7 +61,7 @@
             formCssClass: 'link-form',
             formsParentCssClass: 'link-formset',
             prefix: '{{ link_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary py-0 px-1',
+            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
             addText: 'Add another link <i class="fa fa-plus"></i>',
             addContainerClass: 'add-link-container',
             deleteCssClass:'btn btn-link py-0 px-1 text-danger text-nowrap align-top',
@@ -76,11 +74,11 @@
             formsParentCssClass: 'room-formset',
             scrollCssClass: 'rooms-scroll',
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary py-0 px-1',
+            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
             addText: 'Add another room <i class="fa fa-plus"></i>',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'btn btn-link text-danger text-nowrap align-top',
-            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteCssClass:'btn btn-sm btn-outline-danger py-0 px-1',
+            deleteText: 'Delete room <i class="fa fa-xmark"></i>',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });
