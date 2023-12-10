@@ -61,11 +61,8 @@ class InputLabels:
         """
             On a 1-5 scale, rate how well you can see and hear what is happening at the bima, aron, and pulpit
             from the women's section, relative to the men's section.
-        """.strip(),
-        [
-            "fa-solid fa-eye",
-            "fa-solid fa-volume-high",
-        ],
+        """,
+        ["fa-solid fa-eye"],
     )
     LAYOUT = LabelWithHelpText(
         "Layout",
