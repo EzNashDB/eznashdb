@@ -10,10 +10,10 @@
         </div>
         <span class="{% if is_bold_label %}fw-bold{% endif %} ms-1">{{ field.label.label }}</span>
     </div>
-    <div class="col-12 col-lg-3">
-        <div class="input-group input-group-sm d-block">{{ field|as_crispy_field }}</div>
-    </div>
     <div class="col-12 col-lg-5 col-xl-6 text-muted small d-flex align-items-center">
         {{ field.label.help_text }}
+    </div>
+    <div class="col-12 col-lg-3">
+        <div class="input-group input-group-sm d-block">{{ field|as_crispy_field }}</div>
     </div>
 </div>

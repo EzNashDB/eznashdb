@@ -34,25 +34,29 @@
                         <span class="ms-2 flex-grow-1">Link(s)</span>
                     </div>
                 </div>
-                <div class="col-12 col-lg-3 link-formset">
-                    {{ link_fs.management_form }}
-                    {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    {% for link_form in link_fs %}
-                        <div class="link-form row mb-2">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    {% with link_form as form  %}
-                                        {% crispy form %}
-                                    {% endwith %}
-                                </div>
-                                <div class="delete-link-container ps-2 d-flex align-items-center"></div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
                 <div class="col-12 col-lg-5 col-xl-6 text-muted small">
                     <span >Website, whatsapp group, etc.</span>
-                    <div class="add-link-container mb-2 text-nowrap float-end"></div>
+                </div>
+                <div class="col-12 col-lg-3 ">
+                    <div class="row link-formset">
+                        {{ link_fs.management_form }}
+                        {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                        {% for link_form in link_fs %}
+                            <div class="link-form col-12 mb-2">
+                                <div class="d-flex">
+                                    <div class="delete-link-container pe-2 d-flex align-items-center"></div>
+                                    <div class="flex-grow-1">
+                                        {% with link_form as form  %}
+                                            {% crispy form %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="col-12 justify-content-end order-last">
+                            <div class="add-link-container d-flex justify-content-end mb-2"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
