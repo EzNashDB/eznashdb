@@ -7,40 +7,51 @@
     <form method="POST"
           enctype="multipart/form-data"
           id="shul_form"
-          class="d-flex flex-column h-100 card">
+          class="row d-flex flex-column h-100">
         {% csrf_token %}
-        <div class="card-header">
-            <h5 class="card-title mb-0">
+        <div class="col-12">
+            <h2 class=" text-center">
                 {% if object %}
                     Edit Shul: {{ object.name }}
                 {% else %}
                     Add a Shul
                 {% endif %}
-            </h5>
+            </h2>
         </div>
-        <div class="overflow-auto rooms-scroll">
-            <div class="card-body pb-0 pt-2">{% crispy form %}</div>
-            <div class="card-body bg-light border py-2">
-                <h5 class="card-title">Rooms</h5>
-                <div>
-                    {{ room_fs.management_form }}
-                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    <div class="room-formset">
-                        {% for room_form in room_fs %}
-                            <div class="room-form">
-                                {% with room_form as form  %}
-                                    {% crispy room_form %}
-                                {% endwith %}
-                            </div>
-                        {% endfor %}
+        <div class="overflow-auto rooms-scroll col flex-grow-1 h-100 d-flex flex-column border rounded px-3">
+            <div class="row">
+                <div class="col">
+                    <div class="sticky-top bg-white">
+                        <h5 class=" py-2 m-0 text-center">Shul Details</h5>
                     </div>
-                    <div class="row justify-content-end">
-                        <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
+                    <div class=" pb-0 pt-2">{% crispy form %}</div>
+                </div>
+            </div>
+            <div class="row bg-light border-top flex-grow-1 ">
+                <div class="col">
+                    <div class="sticky-top bg-light mb-2">
+                        <h5 class=" py-2 m-0 text-center">Rooms</h5>
+                    </div>
+                    <div>
+                        {{ room_fs.management_form }}
+                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                        <div class="room-formset">
+                            {% for room_form in room_fs %}
+                                <div class="room-form">
+                                    {% with room_form as form  %}
+                                        {% crispy room_form %}
+                                    {% endwith %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row justify-content-end">
+                            <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="px-3 py-2">
+        <div class="col-12 py-2">
             <div class="row">
                 <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
                     <button type="submit" class="btn btn-sm btn-primary w-100">
