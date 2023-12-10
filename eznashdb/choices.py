@@ -1,6 +1,6 @@
 LAYOUT_CHOICES = (
     (
-        "Same Height",
+        "Same height as men's section",
         (
             ("is_same_height_side", "Side"),
             ("is_same_height_back", "Back"),
