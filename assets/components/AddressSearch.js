@@ -177,7 +177,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
             }}
           >
             <img
-              src="http://localhost:8000/static/dist/images/marker-icon-2x.png"
+              src="/static/dist/images/marker-icon-2x.png"
               style={{
                 width: "25px",
                 height: "41px",
