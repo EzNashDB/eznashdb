@@ -1,99 +1,106 @@
 html,
 body {
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    /* fallback for Js load */
-    height: var(--doc-height);
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  /* fallback for Js load */
+  height: var(--doc-height);
 }
 
 /* bootstrap collapse */
 .btn .fa-chevron-up {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .btn.collapsed .fa-chevron-up {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 /* width utils */
 .w-15px {
-    width: 15px;
-    min-width: 15px;
-    max-width: 15px;
+  width: 15px;
+  min-width: 15px;
+  max-width: 15px;
 }
 
 .w-min-25px {
-    min-width: 25px;
+  min-width: 25px;
 }
 
 .w-40px {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
 }
 
 .w-50px {
-    width: 50px;
-    min-width: 50px;
-    max-width: 50px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .w-125px {
-    width: 125px;
-    min-width: 125px;
-    max-width: 125px;
+  width: 125px;
+  min-width: 125px;
+  max-width: 125px;
 }
 
 /* bootstrap multiselect */
 .multiselect-selected-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* scrollbar */
 ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-    background-color: white;
+  width: 12px;
+  height: 12px;
+  background-color: white;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: var(--bs-secondary);
-    width: 10px;
-    border: 3px solid transparent;
-    border-radius: 12px;
-    background-clip: padding-box;
+  background-color: var(--bs-secondary);
+  width: 10px;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--bs-secondary-bg-subtle);
+  background-color: var(--bs-secondary-bg-subtle);
 }
 
 /* bootstrap buttons */
 .btn-xs {
-    --bs-btn-padding-y: .25rem;
-    --bs-btn-padding-x: .25rem;
-    --bs-btn-font-size: .75rem;
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: 0.25rem;
+  --bs-btn-font-size: 0.75rem;
 }
 
 /* bs forms */
 .form-label {
-    width: 100%
+  width: 100%;
 }
 
 /* Autocomplete */
 .input-group {
-    .autocomplete-menu {
-      top: 100%;
-      right: 0;
-    }
+  .autocomplete-menu {
+    top: 100%;
+    right: 0;
   }
+}
 
 /* Freeze table columns */
-.table.freeze-column-1, th:first-child, td:first-child
-{
-  position:sticky;
-  left:0px;
+.table.freeze-column-1,
+th:first-child,
+td:first-child {
+  position: sticky;
+  left: 0px;
   z-index: 100;
+}
+
+/* React Bootstrap Typeahead */
+.spinner-border {
+  /* Above input:focus (z-index: 5) */
+  z-index: 10;
 }
