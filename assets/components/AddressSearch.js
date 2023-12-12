@@ -20,6 +20,7 @@ const SEARCH_URL = "/address-lookup";
 export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
+  const [zoom, setZoom] = useState(1);
   const [searchedLoc, setSearchedLoc] = useState({
     display_name,
     lat,
@@ -45,13 +46,16 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
         setSearchedLoc(null);
         setOptions([]);
       },
+      zoomend: (e) => {
+        setZoom(e.target.getZoom());
+      },
     });
     return null;
   }, []);
 
-  const ChangeView = useCallback(({ center }) => {
+  const ChangeView = useCallback(({ center, zoom }) => {
     const map = useMap();
-    map.setView(center);
+    map.setView(center, zoom);
     return null;
   }, []);
 
@@ -77,6 +81,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
     const option = selected[0];
     if (option) {
       setSearchedLoc(option);
+      setZoom(16);
     }
   };
 
@@ -186,7 +191,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
           </div>
           <MapContainer
             center={[selectedLoc.lat, selectedLoc.lon]}
-            zoom={1}
+            zoom={zoom}
             scrollWheelZoom={true}
             style={{ height: "100%" }}
             minZoom={1}
@@ -194,7 +199,10 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
             className="position-relative rounded"
             zoomControl={false}
           >
-            <ChangeView center={[selectedLoc.lat, selectedLoc.lon]} />
+            <ChangeView
+              center={[selectedLoc.lat, selectedLoc.lon]}
+              zoom={zoom}
+            />
             <MapEvents />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
