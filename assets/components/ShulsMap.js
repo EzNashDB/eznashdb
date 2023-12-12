@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  ZoomControl,
+} from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { ShulPopup } from "./ShulPopup";
 import "../css/map.css";
@@ -76,6 +82,7 @@ export const ShulsMap = ({ shuls }) => {
       style={{ height: "100%" }}
       worldCopyJump={true}
       minZoom={1}
+      zoomControl={false}
     >
       <MapEvents />
       <TileLayer
@@ -98,6 +105,7 @@ export const ShulsMap = ({ shuls }) => {
           </Marker>
         ))}
       </MarkerClusterGroup>
+      <ZoomControl position="bottomleft" />
     </MapContainer>
   );
 };
