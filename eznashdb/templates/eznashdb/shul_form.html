@@ -4,73 +4,73 @@
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
     </div>
     <div class="row">
-        <div class="col-12 col-md-4 col-lg-4 col-xl-3 d-flex align-items-end my-1">
-            <div class="w-100">
-                <div class="w-min-25px d-inline-block">
-                    <i class="fa-solid fa-synagogue"></i>
-                </div>
-                <span class="ms-1">{{ form.name.label }}</span>
-                {{ form.name|as_crispy_field }}
-            </div>
+        <div class="col-4">
+            <div class="w-100">{{ form.address|as_crispy_field }}</div>
         </div>
-        <div class="col-12 col-md-8 col-lg-8 col-xl-9 d-flex align-items-end my-1">
-            <div class="w-100">
-                <div class="w-min-25px d-inline-block">
-                    <i class="fa-solid fa-location-dot"></i>
-                </div>
-                <span class="ms-1">{{ form.address.label }}</span>
-                {{ form.address|as_crispy_field }}
-            </div>
-        </div>
-        <div class="col-12 bg-light">
+        <div class="col-8">
             <div class="row">
-                <div class="col-12 col-lg-4 col-xl-3">
-                    <div class="d-flex">
-                        <div class="d-inline-block w-min-25px">
-                            <span>
-                                <i class="fa-solid fa-link"></i>
-                            </span>
+                <div class="col-12 my-1">
+                    <div class="row">
+                        <div class="col-12 col-lg-3">
+                            <div class="w-min-25px d-inline-block">
+                                <i class="fa-solid fa-synagogue"></i>
+                            </div>
+                            <span class="ms-1">{{ form.name.label }}</span>
                         </div>
-                        <span class="ms-2 flex-grow-1">Link(s)</span>
+                        <div class="col-12 col-lg-9">
+                            <div class="input-group input-group-sm d-block">{{ form.name|as_crispy_field }}</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-5 col-xl-6 text-muted small">
-                    <span >Website, whatsapp group, etc.</span>
-                </div>
-                <div class="col-12 col-lg-3 ">
-                    <div class="row link-formset">
-                        {{ link_fs.management_form }}
-                        {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                        {% for link_form in link_fs %}
-                            <div class="link-form col-12 my-1">
-                                <div class="d-flex">
-                                    <div class="delete-link-container pe-2 d-flex align-items-center"></div>
-                                    <div class="flex-grow-1">
-                                        {% with link_form as form  %}
-                                            {% crispy form %}
-                                        {% endwith %}
+                <div class="col-12 bg-light">
+                    <div class="row">
+                        <div class="col-12 col-lg-4 col-xl-3">
+                            <div class="d-flex">
+                                <div class="d-inline-block w-min-25px">
+                                    <span>
+                                        <i class="fa-solid fa-link"></i>
+                                    </span>
+                                </div>
+                                <span class="ms-2 flex-grow-1">Link(s)</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 col-xl-6 text-muted small">
+                            <span >Website, whatsapp group, etc.</span>
+                        </div>
+                        <div class="col-12 col-lg-3 ">
+                            <div class="row link-formset">
+                                {{ link_fs.management_form }}
+                                {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                {% for link_form in link_fs %}
+                                    <div class="link-form col-12 my-1">
+                                        <div class="d-flex">
+                                            <div class="delete-link-container pe-2 d-flex align-items-center"></div>
+                                            <div class="flex-grow-1">
+                                                {% with link_form as form  %}
+                                                    {% crispy form %}
+                                                {% endwith %}
+                                            </div>
+                                        </div>
                                     </div>
+                                {% endfor %}
+                                <div class="col-12 justify-content-end order-last">
+                                    <div class="add-link-container d-flex justify-content-end my-1"></div>
                                 </div>
                             </div>
-                        {% endfor %}
-                        <div class="col-12 justify-content-end order-last">
-                            <div class="add-link-container d-flex justify-content-end my-1"></div>
                         </div>
                     </div>
                 </div>
+                {% for field in form.visible_fields %}
+                    <div class="col-12
+                                {% if forloop.counter|divisibleby:2 %}
+                                    bg-light
+                                {% endif %}">
+                        {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
+                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
-    <div class="row">
-        {% for field in form.visible_fields %}
-            <div class="col-12
-                        {% if forloop.counter|divisibleby:2 %}
-                            bg-light
-                        {% endif %}">
-                {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
-                    {% include "eznashdb/includes/form_field_with_help_text.html" %}
-                {% endif %}
-            </div>
-        {% endfor %}
     </div>
 </div>
