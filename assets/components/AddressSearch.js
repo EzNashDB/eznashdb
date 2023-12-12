@@ -20,7 +20,8 @@ const SEARCH_URL = "/address-lookup";
 export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
-  const [zoom, setZoom] = useState(1);
+  const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
+  const [zoom, setZoom] = useState(hasCoordsInProps ? 16 : 1);
   const [searchedLoc, setSearchedLoc] = useState({
     display_name,
     lat,
