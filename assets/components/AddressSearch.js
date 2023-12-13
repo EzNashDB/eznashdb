@@ -120,7 +120,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
           useCache={false}
           options={options}
           onInputChange={handleInputChange}
-          placeholder="Search for an address..."
+          placeholder="Address: Search, or drag map..."
           inputProps={{
             name: "address",
             className: "textinput form-control rounded",
