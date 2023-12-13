@@ -101,7 +101,12 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
       className="h-100 d-inline-block w-100 position-relative"
       style={{ minHeight: "200px" }}
     >
-      <div className="position-absolute w-100 p-2 pb-0" style={{ zIndex: 500 }}>
+      <div
+        className="position-absolute w-100 p-2 pb-0"
+        style={{
+          zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
+        }}
+      >
         <AsyncTypeahead
           selected={[selectedLoc]}
           className="w-100 position-relative shadow-sm"
