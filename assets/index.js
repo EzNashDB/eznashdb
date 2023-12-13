@@ -5,26 +5,28 @@ import { ShulsMap } from "./components/ShulsMap";
 
 document.addEventListener("DOMContentLoaded", () => {
   const addressInput = document.querySelector("input[name=address]");
-  const addressInputContainer = addressInput.parentElement;
-  if (addressInputContainer) {
-    const getPropsFromInputs = () => {
-      const propsToInputNames = {
-        display_name: "address",
-        lat: "latitude",
-        lon: "longitude",
-        place_id: "place_id",
+  if (!!addressInput) {
+    const addressInputContainer = addressInput.parentElement;
+    if (addressInputContainer) {
+      const getPropsFromInputs = () => {
+        const propsToInputNames = {
+          display_name: "address",
+          lat: "latitude",
+          lon: "longitude",
+          place_id: "place_id",
+        };
+        const values = {};
+        for (const prop in propsToInputNames) {
+          const inputName = propsToInputNames[prop];
+          const input = document.querySelector(`input[name=${inputName}]`);
+          values[prop] = input ? input.value : "";
+        }
+        return values;
       };
-      const values = {};
-      for (const prop in propsToInputNames) {
-        const inputName = propsToInputNames[prop];
-        const input = document.querySelector(`input[name=${inputName}]`);
-        values[prop] = input ? input.value : "";
-      }
-      return values;
-    };
-    createRoot(addressInputContainer).render(
-      <AddressSearch {...getPropsFromInputs()} />
-    );
+      createRoot(addressInputContainer).render(
+        <AddressSearch {...getPropsFromInputs()} />
+      );
+    }
   }
 
   const shulsMapContainer = document.getElementById("shulsMap");
