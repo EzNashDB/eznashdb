@@ -5,7 +5,7 @@ import {
   Menu,
   MenuItem,
 } from "react-bootstrap-typeahead";
-import { Form } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import {
   MapContainer,
   TileLayer,
@@ -157,6 +157,14 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
             );
           }}
         />
+        <div className="pt-1">
+          <Button size="sm" variant="light" disabled className="me-1 shadow-sm">
+            <i className="fa-solid fa-angle-left"></i>
+          </Button>
+          <Button size="sm" variant="light" disabled class="shadow-sm">
+            <i className="fa-solid fa-angle-right"></i>
+          </Button>
+        </div>
       </div>
       <input
         type="hidden"
