@@ -147,7 +147,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
               ..._menuProps
             } = menuProps;
             return (
-              <Menu {..._menuProps} className="position-fixed shadow-lg">
+              <Menu {..._menuProps} className="shadow-lg">
                 {results.map((result, index) => (
                   <MenuItem option={result} position={index} key={index}>
                     <span className="text-wrap">{result.display_name}</span>
