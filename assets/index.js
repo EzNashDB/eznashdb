@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { AddressSearch } from "./components/AddressSearch";
+import { AddressInput } from "./components/AddressInput";
 import { ShulsMap } from "./components/ShulsMap";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return values;
       };
       createRoot(addressInputContainer).render(
-        <AddressSearch {...getPropsFromInputs()} />
+        <AddressInput {...getPropsFromInputs()} />
       );
     }
   }

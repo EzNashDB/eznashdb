@@ -6,18 +6,12 @@ import {
   MenuItem,
 } from "react-bootstrap-typeahead";
 import { Form, Button } from "react-bootstrap";
-import {
-  MapContainer,
-  TileLayer,
-  useMapEvents,
-  ZoomControl,
-} from "react-leaflet";
-import { useMap } from "react-leaflet/hooks";
 import { useDebounce } from "use-debounce";
+import { AddressMap } from "./AddressMap";
 
 const SEARCH_URL = "/address-lookup";
 
-export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
+export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
@@ -32,45 +26,27 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
   const [inputValue, setInputValue] = useState({ display_name });
 
-  const MapEvents = useCallback(() => {
-    const map = useMap();
-    useMapEvents({
-      moveend: (e) => {
-        const center = map.getCenter();
-        if (
-          center.lat.toString() !== selectedLoc.lat ||
-          center.lng.toString() !== selectedLoc.lon
-        ) {
-          setSelectedLoc({
-            lat: center.lat,
-            lon: center.lng,
-            place_id: null,
-            display_name: `${center.lat}, ${center.lng}`,
-          });
-          setInputValue({ display_name: `${center.lat}, ${center.lng}` });
-          setOptions([]);
-        }
-        setZoom(map.getZoom());
-      },
-    });
-    return null;
-  }, [selectedLoc]);
-
-  const ChangeView = ({ center, zoom }) => {
-    const map = useMap();
-
-    useEffect(() => {
-      const oldCenter = map.getCenter();
-      const [newLat, newLng] = center;
-      const isNewCenter = newLat !== oldCenter.lat || newLng !== oldCenter.lng;
-      const isNewZoom = zoom !== map.getZoom();
-      if (isNewCenter || isNewZoom) {
-        map.setView(center, zoom);
+  const handleMapMoveEnd = useCallback(
+    (e) => {
+      const map = e.target;
+      const center = map.getCenter();
+      if (
+        center.lat.toString() !== selectedLoc.lat.toString() ||
+        center.lng.toString() !== selectedLoc.lon.toString()
+      ) {
+        setSelectedLoc({
+          lat: center.lat,
+          lon: center.lng,
+          place_id: null,
+          display_name: `${center.lat}, ${center.lng}`,
+        });
+        setInputValue({ display_name: `${center.lat}, ${center.lng}` });
+        setOptions([]);
       }
-    }, [map, center, zoom]);
-
-    return null;
-  };
+      setZoom(map.getZoom());
+    },
+    [selectedLoc]
+  );
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -109,7 +85,6 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const filterBy = () => true;
   return (
     <div
-      width="500px"
       className="h-100 d-inline-block w-100 position-relative"
       style={{ minHeight: "200px" }}
     >
@@ -196,48 +171,12 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
         id="id_place_id"
         value={selectedLoc?.place_id || ""}
       ></input>
-      <div height="500px">
-        <div className="h-100 d-inline-block w-100 position-absolute">
-          <div
-            className="position-absolute"
-            style={{
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -100%)",
-              zIndex: 401, // Above map TileLayer
-            }}
-          >
-            <img
-              src="/static/dist/images/marker-icon-2x.png"
-              style={{
-                width: "25px",
-                height: "41px",
-              }}
-            ></img>
-          </div>
-          <MapContainer
-            center={[selectedLoc.lat, selectedLoc.lon]}
-            zoom={zoom}
-            scrollWheelZoom={true}
-            style={{ height: "100%" }}
-            minZoom={1}
-            worldCopyJump={true}
-            className="position-relative rounded"
-            zoomControl={false}
-          >
-            <ChangeView
-              center={[selectedLoc.lat, selectedLoc.lon]}
-              zoom={zoom}
-            />
-            <MapEvents />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <ZoomControl position="bottomleft" />
-          </MapContainer>
-        </div>
-      </div>
+      <AddressMap
+        lat={selectedLoc.lat}
+        lon={selectedLoc.lon}
+        zoom={zoom}
+        onMoveEnd={handleMapMoveEnd}
+      />
     </div>
   );
 };
