@@ -37,8 +37,10 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
     useMapEvents({
       moveend: (e) => {
         const center = map.getCenter();
-        if (center.lat !== selectedLoc.lat || center.lng !== selectedLoc.lon) {
-          console.log("setting on drag end");
+        if (
+          center.lat.toString() !== selectedLoc.lat ||
+          center.lng.toString() !== selectedLoc.lon
+        ) {
           setSelectedLoc({
             lat: center.lat,
             lon: center.lng,
@@ -52,7 +54,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
       },
     });
     return null;
-  }, []);
+  }, [selectedLoc]);
 
   const ChangeView = ({ center, zoom }) => {
     const map = useMap();
