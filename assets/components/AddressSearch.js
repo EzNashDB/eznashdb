@@ -37,15 +37,17 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
     useMapEvents({
       moveend: (e) => {
         const center = map.getCenter();
-        const display_name = `${center.lat}, ${center.lng}`;
-        setSelectedLoc({
-          lat: center.lat,
-          lon: center.lng,
-          place_id: null,
-          display_name,
-        });
-        setInputValue({ display_name });
-        setOptions([]);
+        if (center.lat !== selectedLoc.lat || center.lng !== selectedLoc.lon) {
+          console.log("setting on drag end");
+          setSelectedLoc({
+            lat: center.lat,
+            lon: center.lng,
+            place_id: null,
+            display_name: `${center.lat}, ${center.lng}`,
+          });
+          setInputValue({ display_name: `${center.lat}, ${center.lng}` });
+          setOptions([]);
+        }
         setZoom(map.getZoom());
       },
     });
