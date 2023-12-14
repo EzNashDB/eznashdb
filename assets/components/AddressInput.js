@@ -1,19 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  AsyncTypeahead,
-  Hint,
-  Menu,
-  MenuItem,
-} from "react-bootstrap-typeahead";
-import { Form, Button } from "react-bootstrap";
-import { useDebounce } from "use-debounce";
+import React, { useCallback, useState } from "react";
+import { Button } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
-
-const SEARCH_URL = "/address-lookup";
+import { AddressTypeAhead } from "./AddressTypeAhead";
 
 export const AddressInput = ({ display_name, lat, lon, place_id }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState([]);
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
   const [zoom, setZoom] = useState(hasCoordsInProps ? 16 : 1);
   const [selectedLoc, setSelectedLoc] = useState({
@@ -22,8 +12,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
     lon: lon || 0,
     place_id,
   });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
   const [inputValue, setInputValue] = useState({ display_name });
 
   const handleMapMoveEnd = useCallback(
@@ -48,41 +36,16 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
     [selectedLoc]
   );
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
+  const handleAddressSelected = (address) => {
+    setZoom(16);
+    setInputValue({ display_name: address.display_name });
+    setSelectedLoc(address);
   };
 
-  useEffect(() => {
-    if (!debouncedSearchQuery) return;
-    setIsLoading(true);
-    fetch(`${SEARCH_URL}?q=${debouncedSearchQuery}`)
-      .then((resp) => resp.json())
-      .then((items) => {
-        setOptions(items);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [debouncedSearchQuery]);
-
-  const handleChange = (selected) => {
-    const option = selected[0];
-    if (option) {
-      setZoom(16);
-      setInputValue({ display_name: option.display_name });
-      setSelectedLoc(option);
-    }
-  };
-
-  const handleInputChange = (text, e) => {
+  const handleOnInput = (text) => {
     setInputValue({ display_name: text });
-    handleSearch(text);
   };
 
-  // Bypass client-side filtering by returning `true`. Results are already
-  // filtered by the search endpoint, so no need to do it again.
-  const filterBy = () => true;
   return (
     <div
       className="h-100 d-inline-block w-100 position-relative"
@@ -94,55 +57,10 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
           zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
         }}
       >
-        <AsyncTypeahead
-          selected={[inputValue]}
-          className="w-100 position-relative shadow-sm"
-          filterBy={filterBy}
-          id="address-select"
-          isLoading={isLoading}
-          labelKey="display_name"
-          minLength={3}
-          onSearch={handleSearch}
-          onChange={handleChange}
-          useCache={false}
-          options={options}
-          onInputChange={handleInputChange}
-          placeholder="Address: Search, or drag map..."
-          inputProps={{
-            name: "address",
-            className: "textinput form-control rounded",
-            autoComplete: "one-time-code",
-          }}
-          renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
-            <Hint>
-              <div className="input-group input-group-sm">
-                <Form.Control
-                  {...inputProps}
-                  ref={(node) => {
-                    inputRef(node);
-                    referenceElementRef(node);
-                  }}
-                />
-              </div>
-            </Hint>
-          )}
-          renderMenu={(results, menuProps) => {
-            const {
-              newSelectionPrefix,
-              paginationText,
-              renderMenuItemChildren,
-              ..._menuProps
-            } = menuProps;
-            return (
-              <Menu {..._menuProps} className="shadow-lg">
-                {results.map((result, index) => (
-                  <MenuItem option={result} position={index} key={index}>
-                    <span className="text-wrap">{result.display_name}</span>
-                  </MenuItem>
-                ))}
-              </Menu>
-            );
-          }}
+        <AddressTypeAhead
+          inputValue={inputValue}
+          onInput={handleOnInput}
+          onAddressSelected={handleAddressSelected}
         />
         <div className="pt-1">
           <Button size="sm" variant="light" disabled className="me-1 shadow-sm">
