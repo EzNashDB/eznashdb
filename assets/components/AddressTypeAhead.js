@@ -18,7 +18,7 @@ export const AddressTypeAhead = ({
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
