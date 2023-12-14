@@ -22,43 +22,51 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const [options, setOptions] = useState([]);
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
   const [zoom, setZoom] = useState(hasCoordsInProps ? 16 : 1);
-  const [searchedLoc, setSearchedLoc] = useState({
+  const [selectedLoc, setSelectedLoc] = useState({
     display_name,
-    lat,
-    lon,
+    lat: lat || 0,
+    lon: lon || 0,
     place_id,
   });
-  const [draggedLoc, setDraggedLoc] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 250);
-
-  const selectedLoc = draggedLoc || searchedLoc;
+  const [inputValue, setInputValue] = useState({ display_name });
 
   const MapEvents = useCallback(() => {
+    const map = useMap();
     useMapEvents({
-      dragend: (e) => {
-        const center = e.target.getCenter();
-        setDraggedLoc({
+      moveend: (e) => {
+        const center = map.getCenter();
+        const display_name = `${center.lat}, ${center.lng}`;
+        setSelectedLoc({
           lat: center.lat,
           lon: center.lng,
           place_id: null,
-          display_name: `${center.lat}, ${center.lng}`,
+          display_name,
         });
-        setSearchedLoc(null);
+        setInputValue({ display_name });
         setOptions([]);
-      },
-      zoomend: (e) => {
-        setZoom(e.target.getZoom());
+        setZoom(map.getZoom());
       },
     });
     return null;
   }, []);
 
-  const ChangeView = useCallback(({ center, zoom }) => {
+  const ChangeView = ({ center, zoom }) => {
     const map = useMap();
-    map.setView(center, zoom);
+
+    useEffect(() => {
+      const oldCenter = map.getCenter();
+      const [newLat, newLng] = center;
+      const isNewCenter = newLat !== oldCenter.lat || newLng !== oldCenter.lng;
+      const isNewZoom = zoom !== map.getZoom();
+      if (isNewCenter || isNewZoom) {
+        map.setView(center, zoom);
+      }
+    }, [map, center, zoom]);
+
     return null;
-  }, []);
+  };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -81,14 +89,14 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
   const handleChange = (selected) => {
     const option = selected[0];
     if (option) {
-      setSearchedLoc(option);
       setZoom(16);
+      setInputValue({ display_name: option.display_name });
+      setSelectedLoc(option);
     }
   };
 
   const handleInputChange = (text, e) => {
-    setSearchedLoc({ ...selectedLoc, display_name: text });
-    setDraggedLoc(null);
+    setInputValue({ display_name: text });
     handleSearch(text);
   };
 
@@ -108,7 +116,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
         }}
       >
         <AsyncTypeahead
-          selected={[selectedLoc]}
+          selected={[inputValue]}
           className="w-100 position-relative shadow-sm"
           filterBy={filterBy}
           id="address-select"
@@ -161,7 +169,7 @@ export const AddressSearch = ({ display_name, lat, lon, place_id }) => {
           <Button size="sm" variant="light" disabled className="me-1 shadow-sm">
             <i className="fa-solid fa-angle-left"></i>
           </Button>
-          <Button size="sm" variant="light" disabled class="shadow-sm">
+          <Button size="sm" variant="light" disabled className="shadow-sm">
             <i className="fa-solid fa-angle-right"></i>
           </Button>
         </div>
