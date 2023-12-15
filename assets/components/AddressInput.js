@@ -29,7 +29,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
           display_name: `${center.lat}, ${center.lng}`,
         });
         setInputValue({ display_name: `${center.lat}, ${center.lng}` });
-        setOptions([]);
       }
       setZoom(map.getZoom());
     },
@@ -90,8 +89,8 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         value={selectedLoc?.place_id || ""}
       ></input>
       <AddressMap
-        lat={selectedLoc.lat}
-        lon={selectedLoc.lon}
+        lat={parseFloat(selectedLoc.lat)}
+        lon={parseFloat(selectedLoc.lon)}
         zoom={zoom}
         onMoveEnd={handleMapMoveEnd}
       />
