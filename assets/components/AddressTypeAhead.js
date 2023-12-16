@@ -71,7 +71,7 @@ export const AddressTypeAhead = ({
       useCache={false}
       options={options}
       onInputChange={handleInputChange}
-      placeholder="Address: Search, or drag map..."
+      placeholder="Address: search or drag..."
       inputProps={{
         name: "address",
         className: "textinput form-control rounded",
