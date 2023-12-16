@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, ButtonGroup } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
 
@@ -73,7 +73,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       }
       setZoom(map.getZoom());
     },
-    [currLocation]
+    [locationHistory]
   );
 
   const handleAddressSelected = (address) => {
@@ -97,32 +97,34 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
           zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
         }}
       >
-        <AddressTypeAhead
-          inputValue={inputValue}
-          onInput={handleOnInput}
-          onAddressSelected={handleAddressSelected}
-        />
-        <div className="pt-1">
-          <Button
-            size="sm"
-            variant="light"
-            disabled={locationHistory.currIdx === 0}
-            className="me-1 shadow-sm"
-            onClick={goToPrevLocation}
-          >
-            <i className="fa-solid fa-angle-left"></i>
-          </Button>
-          <Button
-            size="sm"
-            variant="light"
-            disabled={
-              locationHistory.currIdx === locationHistory.locations.length - 1
-            }
-            className="shadow-sm"
-            onClick={goToNextLocation}
-          >
-            <i className="fa-solid fa-angle-right"></i>
-          </Button>
+        <div className="d-flex flex-row">
+          <ButtonGroup className="me-1">
+            <Button
+              size="sm"
+              variant="light"
+              disabled={locationHistory.currIdx === 0}
+              className="shadow-sm"
+              onClick={goToPrevLocation}
+            >
+              <i className="fa-solid fa-angle-left"></i>
+            </Button>
+            <Button
+              size="sm"
+              variant="light"
+              disabled={
+                locationHistory.currIdx === locationHistory.locations.length - 1
+              }
+              className="shadow-sm"
+              onClick={goToNextLocation}
+            >
+              <i className="fa-solid fa-angle-right"></i>
+            </Button>
+          </ButtonGroup>
+          <AddressTypeAhead
+            inputValue={inputValue}
+            onInput={handleOnInput}
+            onAddressSelected={handleAddressSelected}
+          />
         </div>
       </div>
       <input
