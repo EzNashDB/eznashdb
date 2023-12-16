@@ -6,7 +6,6 @@ import { isRoundedEqual } from "../utils/math";
 
 export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
-  const [zoom, setZoom] = useState(hasCoordsInProps ? 16 : 1);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
     locations: [
@@ -15,6 +14,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         lat: lat || 0,
         lon: lon || 0,
         place_id,
+        zoom: hasCoordsInProps ? 16 : 1,
       },
     ],
     currIdx: 0,
@@ -25,6 +25,8 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       0,
       locationHistory.currIdx + 1
     );
+    location.lat = parseFloat(location.lat);
+    location.lon = parseFloat(location.lon);
     const newLocations = [...prevLocations, location];
     setLocationHistory({
       locations: newLocations,
@@ -37,7 +39,9 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       ...locationHistory,
       currIdx: locationIndex,
     });
-    setInputValue(locationHistory.locations[locationIndex].display_name);
+    setInputValue({
+      display_name: locationHistory.locations[locationIndex].display_name,
+    });
   };
 
   const goToPrevLocation = (e) => {
@@ -70,24 +74,29 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       const isNewCenter =
         !isRoundedEqual(oldLat, newLat, 5) ||
         !isRoundedEqual(oldLon, newLon, 5);
+      const isNewZoom = map.getZoom() !== currLocation.zoom;
       if (isNewCenter) {
         setNewLocation({
           lat: center.lat,
           lon: center.lng,
           place_id: null,
           display_name: `${newLat}, ${newLon}`,
+          zoom: map.getZoom(),
         });
         setInputValue({ display_name: `${newLat}, ${newLon}` });
+      } else if (isNewZoom) {
+        setNewLocation({
+          ...currLocation,
+          zoom: map.getZoom(),
+        });
       }
-      setZoom(map.getZoom());
     },
     [locationHistory]
   );
 
   const handleAddressSelected = (address) => {
-    setZoom(16);
     setInputValue({ display_name: address.display_name });
-    setNewLocation(address);
+    setNewLocation({ ...address, zoom: 16 });
   };
 
   const handleOnInput = (text) => {
@@ -156,7 +165,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       <AddressMap
         lat={parseFloat(currLocation.lat)}
         lon={parseFloat(currLocation.lon)}
-        zoom={zoom}
+        zoom={currLocation.zoom}
         onMoveEnd={handleMapMoveEnd}
       />
     </div>
