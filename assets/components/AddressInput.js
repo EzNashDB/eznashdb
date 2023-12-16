@@ -115,12 +115,11 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         }}
       >
         <div className="d-flex flex-row">
-          <ButtonGroup className="me-1">
+          <ButtonGroup className="me-1 shadow-sm">
             <Button
               size="sm"
               variant="light"
               disabled={locationHistory.currIdx === 0}
-              className="shadow-sm"
               onClick={goToPrevLocation}
             >
               <i className="fa-solid fa-angle-left"></i>
@@ -131,7 +130,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
               disabled={
                 locationHistory.currIdx === locationHistory.locations.length - 1
               }
-              className="shadow-sm"
               onClick={goToNextLocation}
             >
               <i className="fa-solid fa-angle-right"></i>
