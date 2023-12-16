@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
+import { isRoundedEqual } from "../utils/math";
 
 export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
@@ -59,17 +60,24 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
     (e) => {
       const map = e.target;
       const center = map.getCenter();
-      if (
-        center.lat.toString() !== currLocation.lat.toString() ||
-        center.lng.toString() !== currLocation.lon.toString()
-      ) {
+      const [newLat, newLon, oldLat, oldLon] = [
+        center.lat,
+        center.lng,
+        currLocation.lat,
+        currLocation.lon,
+      ].map(parseFloat);
+      // Round to nearest .00001 to avoid triggering when map shifts on resize
+      const isNewCenter =
+        !isRoundedEqual(oldLat, newLat, 5) ||
+        !isRoundedEqual(oldLon, newLon, 5);
+      if (isNewCenter) {
         setNewLocation({
           lat: center.lat,
           lon: center.lng,
           place_id: null,
-          display_name: `${center.lat}, ${center.lng}`,
+          display_name: `${newLat}, ${newLon}`,
         });
-        setInputValue({ display_name: `${center.lat}, ${center.lng}` });
+        setInputValue({ display_name: `${newLat}, ${newLon}` });
       }
       setZoom(map.getZoom());
     },
