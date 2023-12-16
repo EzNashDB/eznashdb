@@ -6,23 +6,64 @@ import { AddressTypeAhead } from "./AddressTypeAhead";
 export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
   const [zoom, setZoom] = useState(hasCoordsInProps ? 16 : 1);
-  const [selectedLoc, setSelectedLoc] = useState({
-    display_name,
-    lat: lat || 0,
-    lon: lon || 0,
-    place_id,
-  });
   const [inputValue, setInputValue] = useState({ display_name });
+  const [locationHistory, setLocationHistory] = useState({
+    locations: [
+      {
+        display_name,
+        lat: lat || 0,
+        lon: lon || 0,
+        place_id,
+      },
+    ],
+    currIdx: 0,
+  });
+
+  const setNewLocation = (location) => {
+    const prevLocations = locationHistory.locations.slice(
+      0,
+      locationHistory.currIdx + 1
+    );
+    const newLocations = [...prevLocations, location];
+    setLocationHistory({
+      locations: newLocations,
+      currIdx: newLocations.length - 1,
+    });
+  };
+
+  const goToLocationByIndex = (locationIndex) => {
+    setLocationHistory({
+      ...locationHistory,
+      currIdx: locationIndex,
+    });
+    setInputValue(locationHistory.locations[locationIndex].display_name);
+  };
+
+  const goToPrevLocation = (e) => {
+    const newIdx = locationHistory.currIdx - 1;
+    if (newIdx >= 0) {
+      goToLocationByIndex(newIdx);
+    }
+  };
+
+  const goToNextLocation = (e) => {
+    const newIdx = locationHistory.currIdx + 1;
+    if (newIdx < locationHistory.locations.length) {
+      goToLocationByIndex(newIdx);
+    }
+  };
+
+  const currLocation = locationHistory.locations[locationHistory.currIdx];
 
   const handleMapMoveEnd = useCallback(
     (e) => {
       const map = e.target;
       const center = map.getCenter();
       if (
-        center.lat.toString() !== selectedLoc.lat.toString() ||
-        center.lng.toString() !== selectedLoc.lon.toString()
+        center.lat.toString() !== currLocation.lat.toString() ||
+        center.lng.toString() !== currLocation.lon.toString()
       ) {
-        setSelectedLoc({
+        setNewLocation({
           lat: center.lat,
           lon: center.lng,
           place_id: null,
@@ -32,13 +73,13 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       }
       setZoom(map.getZoom());
     },
-    [selectedLoc]
+    [currLocation]
   );
 
   const handleAddressSelected = (address) => {
     setZoom(16);
     setInputValue({ display_name: address.display_name });
-    setSelectedLoc(address);
+    setNewLocation(address);
   };
 
   const handleOnInput = (text) => {
@@ -62,10 +103,24 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
           onAddressSelected={handleAddressSelected}
         />
         <div className="pt-1">
-          <Button size="sm" variant="light" disabled className="me-1 shadow-sm">
+          <Button
+            size="sm"
+            variant="light"
+            disabled={locationHistory.currIdx === 0}
+            className="me-1 shadow-sm"
+            onClick={goToPrevLocation}
+          >
             <i className="fa-solid fa-angle-left"></i>
           </Button>
-          <Button size="sm" variant="light" disabled className="shadow-sm">
+          <Button
+            size="sm"
+            variant="light"
+            disabled={
+              locationHistory.currIdx === locationHistory.locations.length - 1
+            }
+            className="shadow-sm"
+            onClick={goToNextLocation}
+          >
             <i className="fa-solid fa-angle-right"></i>
           </Button>
         </div>
@@ -74,23 +129,23 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         type="hidden"
         name="latitude"
         id="id_latitude"
-        value={selectedLoc?.lat || ""}
+        value={currLocation?.lat || ""}
       ></input>
       <input
         type="hidden"
         name="longitude"
         id="id_longitude"
-        value={selectedLoc?.lon || ""}
+        value={currLocation?.lon || ""}
       ></input>
       <input
         type="hidden"
         name="place_id"
         id="id_place_id"
-        value={selectedLoc?.place_id || ""}
+        value={currLocation?.place_id || ""}
       ></input>
       <AddressMap
-        lat={parseFloat(selectedLoc.lat)}
-        lon={parseFloat(selectedLoc.lon)}
+        lat={parseFloat(currLocation.lat)}
+        lon={parseFloat(currLocation.lon)}
         zoom={zoom}
         onMoveEnd={handleMapMoveEnd}
       />
