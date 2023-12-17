@@ -108,6 +108,12 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       className="h-100 d-inline-block w-100 position-relative"
       style={{ minHeight: "200px" }}
     >
+      <AddressMap
+        lat={currLocation.lat}
+        lon={currLocation.lon}
+        zoom={currLocation.zoom}
+        onMoveEnd={handleMapMoveEnd}
+      />
       <div
         className="position-absolute w-100 p-2 pb-0"
         style={{
@@ -160,12 +166,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         id="id_place_id"
         value={currLocation?.place_id || ""}
       ></input>
-      <AddressMap
-        lat={currLocation.lat}
-        lon={currLocation.lon}
-        zoom={currLocation.zoom}
-        onMoveEnd={handleMapMoveEnd}
-      />
     </div>
   );
 };
