@@ -19,6 +19,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
     ],
     currIdx: 0,
   });
+  const currLocation = locationHistory.locations[locationHistory.currIdx];
 
   const setNewLocation = (location) => {
     const prevLocations = locationHistory.locations.slice(
@@ -57,8 +58,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
       goToLocationByIndex(newIdx);
     }
   };
-
-  const currLocation = locationHistory.locations[locationHistory.currIdx];
 
   const handleMapMoveEnd = useCallback(
     (e) => {
