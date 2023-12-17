@@ -105,7 +105,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   return (
     <div
       className="h-100 d-inline-block w-100 position-relative"
-      style={{ minHeight: "200px" }}
+      style={{ minHeight: "170px" }}
     >
       <AddressMap
         lat={currLocation.lat}
