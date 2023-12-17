@@ -11,7 +11,8 @@ import { useMap } from "react-leaflet/hooks";
 export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
   const MapEvents = useCallback(() => {
     useMapEvents({
-      moveend: onMoveEnd,
+      dragend: onMoveEnd,
+      zoomend: onMoveEnd,
     });
     return null;
   }, [onMoveEnd]);

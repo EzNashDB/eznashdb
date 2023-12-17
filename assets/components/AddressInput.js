@@ -161,8 +161,8 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         value={currLocation?.place_id || ""}
       ></input>
       <AddressMap
-        lat={parseFloat(currLocation.lat)}
-        lon={parseFloat(currLocation.lon)}
+        lat={currLocation.lat}
+        lon={currLocation.lon}
         zoom={currLocation.zoom}
         onMoveEnd={handleMapMoveEnd}
       />
