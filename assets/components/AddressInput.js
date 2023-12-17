@@ -120,7 +120,12 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
         }}
       >
         <div className="d-flex flex-row">
-          <ButtonGroup className="me-1 shadow-sm">
+          <AddressTypeAhead
+            inputValue={inputValue}
+            onInput={handleOnInput}
+            onAddressSelected={handleAddressSelected}
+          />
+          <ButtonGroup className="ms-1 shadow-sm">
             <Button
               size="sm"
               variant="light"
@@ -140,11 +145,6 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
               <i className="fa-solid fa-angle-right"></i>
             </Button>
           </ButtonGroup>
-          <AddressTypeAhead
-            inputValue={inputValue}
-            onInput={handleOnInput}
-            onAddressSelected={handleAddressSelected}
-          />
         </div>
       </div>
       <input
