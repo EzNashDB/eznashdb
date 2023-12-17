@@ -40,7 +40,10 @@ class InputLabels:
     )
     FEMALE_LEADERSHIP = LabelWithHelpText(
         "Female Leadership",
-        "Is there at least one woman in a leadership position?",
+        """
+            Are there any women in leadership positions (president, executive director,
+            halachic/spiritual leader, gabbai't, etc.)?
+        """,
         ["fa-solid fa-user-shield"],
     )
     CHILDCARE = LabelWithHelpText(
