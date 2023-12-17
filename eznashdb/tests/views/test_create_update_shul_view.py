@@ -30,6 +30,7 @@ def get_fs_metadata_fields(
 
 get_room_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="rooms")
 get_link_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="shul-links")
+get_childcare_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="childcare-programs")
 
 
 def get_room_fields(room_index: int):
@@ -75,7 +76,6 @@ def describe_create():
     def test_creates_shul_with_rooms(client):
         data = {
             "can_say_kaddish": "unknown",
-            "has_childcare": "unknown",
             "has_female_leadership": "unknown",
             "name": "test shul",
             "address": "123 Sesame Street",
@@ -83,6 +83,7 @@ def describe_create():
             **get_room_fields(room_index=1),
             **get_room_fs_metadata_fields(total_forms=2),
             **get_link_fs_metadata_fields(),
+            **get_childcare_fs_metadata_fields(),
         }
 
         client.post(
@@ -103,6 +104,7 @@ def describe_create():
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
                 **get_link_fs_metadata_fields(),
+                **get_childcare_fs_metadata_fields(),
             },
             follow=True,
         )

@@ -85,6 +85,18 @@
             deleteContainerClass: 'delete-link-container',
             hideLastAddForm: {% if link_fs.1 %} true {% else %} false {% endif %},
         });
+        $('.childcare-form').formset({
+            formCssClass: 'childcare-form',
+            formsParentCssClass: 'childcare-formset',
+            prefix: '{{ childcare_fs.prefix }}',
+            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
+            addText: 'Add another program <i class="fa fa-plus"></i>',
+            addContainerClass: 'add-childcare-container',
+            deleteCssClass:'btn btn-link py-0 px-1 text-danger text-nowrap align-top',
+            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteContainerClass: 'delete-childcare-container',
+            hideLastAddForm: {% if childcare_fs.1 %} true {% else %} false {% endif %},
+        });
         $('.room-form').formset({
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
