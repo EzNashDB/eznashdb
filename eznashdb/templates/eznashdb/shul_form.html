@@ -43,9 +43,11 @@
                                 {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                 {% for link_form in link_fs %}
                                     <div class="link-form col-12 my-1">
-                                        <div class="d-flex">
-                                            <div class="delete-link-container pe-2 d-flex align-items-center"></div>
-                                            <div class="flex-grow-1">
+                                        <div class="row">
+                                            <div class="col-1 d-flex flex-align-center">
+                                                <div class="delete-link-container pe-2 d-flex align-items-center"></div>
+                                            </div>
+                                            <div class="col-11">
                                                 {% with link_form as form  %}
                                                     {% crispy form %}
                                                 {% endwith %}
@@ -60,9 +62,51 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 col-lg-4 col-xl-3">
+                            <div class="d-flex">
+                                <div class="d-inline-block w-min-25px">
+                                    <span>
+                                        <i class="fa-solid fa-child-reaching"></i>
+                                    </span>
+                                </div>
+                                <span class="ms-2 flex-grow-1">Childcare</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 col-xl-5 text-muted small">
+                            <span >Are there any on-site childcare programs (with or without parental supervision)?</span>
+                        </div>
+                        <div class="col-12 col-lg-4 col-xl-4">
+                            <div class="row gx-2 small text-muted">
+                                <div class="col-1"></div>
+                                <div class="col-6 text-center">Age range</div>
+                                <div class="col-5">Supervision needed</div>
+                            </div>
+                            <div class="row childcare-formset">
+                                {{ childcare_fs.management_form }}
+                                {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                {% for childcare_form in childcare_fs %}
+                                    <div class="childcare-form col-12 my-1">
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1">
+                                                {% with childcare_form as form  %}
+                                                    {% crispy form %}
+                                                {% endwith %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="col-12 justify-content-end order-last">
+                                    <div class="add-childcare-container d-flex justify-content-end my-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% for field in form.visible_fields %}
                     <div class="col-12
-                                {% if forloop.counter|divisibleby:2 %}
+                                {% if not forloop.counter|divisibleby:2 %}
                                     bg-light
                                 {% endif %}">
                         {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}

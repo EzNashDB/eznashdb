@@ -5,7 +5,7 @@ from django.forms import HiddenInput, ModelForm, inlineformset_factory
 from eznashdb.choices import LAYOUT_CHOICES
 from eznashdb.constants import LAYOUT_FIELDS, InputLabels
 from eznashdb.enums import RoomLayoutType
-from eznashdb.models import Room, Shul, ShulLink
+from eznashdb.models import ChildcareProgram, Room, Shul, ShulLink
 from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 
 
@@ -16,7 +16,6 @@ class ShulForm(ModelForm):
             "name",
             "address",
             "has_female_leadership",
-            "has_childcare",
             "can_say_kaddish",
             "latitude",
             "longitude",
@@ -25,12 +24,10 @@ class ShulForm(ModelForm):
         labels = {
             "name": InputLabels.SHUL_NAME,
             "has_female_leadership": InputLabels.FEMALE_LEADERSHIP,
-            "has_childcare": InputLabels.CHILDCARE,
             "can_say_kaddish": InputLabels.KADDISH,
         }
         widgets = {
             "has_female_leadership": NullableBooleanWidget(),
-            "has_childcare": NullableBooleanWidget(),
             "can_say_kaddish": NullableBooleanWidget(),
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),
@@ -123,6 +120,28 @@ class ShulLinkForm(ModelForm):
         return instance
 
 
+class ChildcareProgramForm(ModelForm):
+    class Meta:
+        model = ChildcareProgram
+        fields = ["shul", "age_min", "age_max", "supervision_required"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = helper = FormHelper()
+        helper.field_template = "bootstrap5/no_margin_field.html"
+        helper.template = "eznashdb/childcare_program_form.html"
+        helper.form_tag = False
+        helper.disable_csrf = True
+        helper.field_class = "input-group input-group-sm"
+        self.helper.form_show_labels = False
+
+    def save(self, commit=True):
+        instance = super(ChildcareProgramForm, self).save(commit=False)
+        if commit:
+            instance.save()
+        return instance
+
+
 RoomFormSet = inlineformset_factory(
     Shul,
     Room,
@@ -136,6 +155,15 @@ ShulLinkFormSet = inlineformset_factory(
     Shul,
     ShulLink,
     form=ShulLinkForm,
+    extra=1,
+    can_delete=True,
+    can_delete_extra=False,
+)
+
+ChildcareProgramFormSet = inlineformset_factory(
+    Shul,
+    ChildcareProgram,
+    form=ChildcareProgramForm,
     extra=1,
     can_delete=True,
     can_delete_extra=False,
