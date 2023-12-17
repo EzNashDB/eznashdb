@@ -34,10 +34,10 @@
                                 <span class="ms-2 flex-grow-1">Link(s)</span>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-5 col-xl-6 text-muted small">
+                        <div class="col-12 col-lg-4 col-xl-5 text-muted small">
                             <span >Website, whatsapp group, etc.</span>
                         </div>
-                        <div class="col-12 col-lg-3 ">
+                        <div class="col-12 col-lg-4 col-xl-4">
                             <div class="row link-formset">
                                 {{ link_fs.management_form }}
                                 {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
@@ -66,7 +66,24 @@
                                     bg-light
                                 {% endif %}">
                         {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
-                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
+                            <div class="row my-1">
+                                <div class="col-12 col-lg-4 col-xl-3">
+                                    <div class="d-inline-block w-min-25px">
+                                        {% for class in field.label.icon_classes %}
+                                            <span class="{% if forloop.counter != 1 %}ms-1{% endif %}">
+                                                <i class="{{ class }}"></i>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="ms-1">{{ field.label.label }}</span>
+                                </div>
+                                <div class="col-12 col-lg-4 col-xl-5 text-muted small d-flex align-items-center">
+                                    {{ field.label.help_text }}
+                                </div>
+                                <div class="col-12 col-lg-4 col-xl-4">
+                                    <div class="input-group input-group-sm d-block">{{ field|as_crispy_field }}</div>
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
                 {% endfor %}
