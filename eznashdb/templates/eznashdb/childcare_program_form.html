@@ -5,12 +5,12 @@
         {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
         <div class="delete-childcare-container pe-2 d-flex align-items-center"></div>
     </div>
-    <div class="col-6">
+    <div class="col-5">
         <div class="d-flex flex-row">
             <div class="d-inline">{{ form.age_min|as_crispy_field }}</div>
             <div class="mx-1 d-flex align-items-center">-</div>
             <div class="d-inline">{{ form.age_max|as_crispy_field }}</div>
         </div>
     </div>
-    <div class="col-5">{{ form.supervision_required|as_crispy_field }}</div>
+    <div class="col-6">{{ form.supervision_required|as_crispy_field }}</div>
 </div>
