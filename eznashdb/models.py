@@ -76,3 +76,19 @@ class ShulLink(models.Model):
 
     def __str__(self) -> str:
         return f"{self.link}, {self.shul}"
+
+
+class ChildcareProgram(models.Model):
+    shul = models.ForeignKey(
+        "eznashdb.Shul", on_delete=models.PROTECT, related_name="childcare_programs"
+    )
+    age_min = models.IntegerField(null=True, blank=True)
+    age_max = models.IntegerField(null=True, blank=True)
+    supervision_required = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "childcare program"
+        verbose_name_plural = "childcare programs"
+
+    def __str__(self) -> str:
+        return f"Childcare ({self.age_min}-{self.age_max}), {self.shul}"
