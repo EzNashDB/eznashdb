@@ -54,7 +54,7 @@ class InputLabels:
     )
     RELATIVE_SIZE = LabelWithHelpText(
         "Size",
-        "How large is the women's section?",
+        "How large is the women's section relative to the men's section?",
         "fa-solid fa-up-right-and-down-left-from-center",
     )
     SEE_HEAR = LabelWithHelpText(
