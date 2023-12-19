@@ -123,7 +123,10 @@ class ShulLinkForm(ModelForm):
 class ChildcareProgramForm(ModelForm):
     class Meta:
         model = ChildcareProgram
-        fields = ["shul", "age_min", "age_max", "supervision_required"]
+        fields = ["shul", "age_min", "age_max", "supervision_required", "duration"]
+        widgets = {
+            "supervision_required": NullableBooleanWidget(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

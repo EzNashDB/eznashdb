@@ -3,7 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from eznashdb.constants import LAYOUT_FIELDS
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import ChildcareProgramDuration, RelativeSize, SeeHearScore
 
 
 class Shul(models.Model):
@@ -85,6 +85,7 @@ class ChildcareProgram(models.Model):
     age_min = models.IntegerField(null=True, blank=True)
     age_max = models.IntegerField(null=True, blank=True)
     supervision_required = models.BooleanField(null=True, blank=True)
+    duration = models.CharField(choices=ChildcareProgramDuration.choices, blank=True, max_length=20)
 
     class Meta:
         verbose_name = "childcare program"
