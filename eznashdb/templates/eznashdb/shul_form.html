@@ -11,20 +11,20 @@
             <div class="row">
                 <div class="col-12 my-1">
                     <div class="row">
-                        <div class="col-12 col-lg-3">
+                        <div class="col-12 col-lg-2 col-xl-3">
                             <div class="w-min-25px d-inline-block">
                                 <i class="fa-solid fa-synagogue"></i>
                             </div>
                             <span class="ms-1">{{ form.name.label }}</span>
                         </div>
-                        <div class="col-12 col-lg-9">
+                        <div class="col-12 col-lg-10 col-xl-9">
                             <div class="input-group input-group-sm d-block">{{ form.name|as_crispy_field }}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 bg-light">
                     <div class="row">
-                        <div class="col-12 col-lg-4 col-xl-3">
+                        <div class="col-12 col-lg-2 col-xl-3">
                             <div class="d-flex">
                                 <div class="d-inline-block w-min-25px">
                                     <span>
@@ -34,23 +34,25 @@
                                 <span class="ms-2 flex-grow-1">Link(s)</span>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4 col-xl-5 text-muted small">
+                        <div class="col-12 col-lg-6 col-xl-6 text-muted small">
                             <span >Website, whatsapp group, etc.</span>
                         </div>
-                        <div class="col-12 col-lg-4 col-xl-4">
+                        <div class="col-12 col-lg-4 col-xl-3">
                             <div class="row link-formset">
                                 {{ link_fs.management_form }}
                                 {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                 {% for link_form in link_fs %}
                                     <div class="link-form col-12 my-1">
                                         <div class="row">
-                                            <div class="col-1 d-flex flex-align-center">
-                                                <div class="delete-link-container pe-2 d-flex align-items-center"></div>
-                                            </div>
-                                            <div class="col-11">
-                                                {% with link_form as form  %}
-                                                    {% crispy form %}
-                                                {% endwith %}
+                                            <div class="col-12">
+                                                <div class="d-flex flex-row">
+                                                    <div class="delete-link-container pe-2 d-flex align-items-center"></div>
+                                                    <div class="flex-grow-1">
+                                                        {% with link_form as form  %}
+                                                            {% crispy form %}
+                                                        {% endwith %}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -62,9 +64,19 @@
                         </div>
                     </div>
                 </div>
+                {% for field in form.visible_fields %}
+                    <div class="col-12
+                                {% if forloop.counter|divisibleby:2 %}
+                                    bg-light
+                                {% endif %}">
+                        {% if field.name in "has_female_leadership,can_say_kaddish" %}
+                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
                 <div class="col-12">
                     <div class="row">
-                        <div class="col-12 col-lg-4 col-xl-3">
+                        <div class="col-12 col-lg-2 col-xl-3">
                             <div class="d-flex">
                                 <div class="d-inline-block w-min-25px">
                                     <span>
@@ -74,15 +86,23 @@
                                 <span class="ms-2 flex-grow-1">Children's Programming</span>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4 col-xl-5 text-muted small">
-                            <span >Is there any on-site programming for children (play room, groups, teen minyan, etc.)?</span>
+                        <div class="col-12 col-lg-4 col-xl-4 text-muted small">
+                            <span >Is any programming provided for children (play room, groups, teen minyan, etc.)?</span>
                         </div>
-                        <div class="col-12 col-lg-4 col-xl-4">
+                        <div class="col-12 col-lg-6 col-xl-5">
                             <div class="row gx-2 small text-muted">
-                                <div class="col-1"></div>
-                                <div class="col-4 col-sm-3 col-md-2 d-flex align-items-end">Age range</div>
+                                <div class="col-5 col-sm-4 d-flex align-items-end">
+                                    {# Just for spacing #}
+                                    <div class="delete-childcare-container pe-2 d-flex align-items-center">
+                                        <button class="btn btn-link py-0 px-1 text-white text-nowrap align-top"
+                                                disabled>
+                                            <i class="fa fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                    Age range
+                                </div>
                                 <div class="col-4 col-sm-5 d-flex align-items-end">Parental supervision required</div>
-                                <div class="col-3 col-sm-2 d-flex align-items-end">Duration</div>
+                                <div class="col-3 d-flex align-items-end">Duration</div>
                             </div>
                             <div class="row childcare-formset">
                                 {{ childcare_fs.management_form }}
@@ -105,33 +125,6 @@
                         </div>
                     </div>
                 </div>
-                {% for field in form.visible_fields %}
-                    <div class="col-12
-                                {% if not forloop.counter|divisibleby:2 %}
-                                    bg-light
-                                {% endif %}">
-                        {% if field.name in "has_female_leadership,can_say_kaddish,has_childcare" %}
-                            <div class="row my-1">
-                                <div class="col-12 col-lg-4 col-xl-3">
-                                    <div class="d-inline-block w-min-25px">
-                                        {% for class in field.label.icon_classes %}
-                                            <span class="{% if forloop.counter != 1 %}ms-1{% endif %}">
-                                                <i class="{{ class }}"></i>
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                    <span class="ms-1">{{ field.label.label }}</span>
-                                </div>
-                                <div class="col-12 col-lg-4 col-xl-5 text-muted small d-flex align-items-center">
-                                    {{ field.label.help_text }}
-                                </div>
-                                <div class="col-12 col-lg-4 col-xl-4">
-                                    <div class="input-group input-group-sm d-block">{{ field|as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
             </div>
         </div>
     </div>

@@ -1,17 +1,15 @@
 {% load crispy_forms_tags %}
 {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 <div class="row gx-2">
-    <div class="col-1 d-flex align-items-center">
-        {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
-        <div class="delete-childcare-container pe-2 d-flex align-items-center"></div>
-    </div>
-    <div class="col-4 col-sm-3 col-md-2">
+    <div class="col-5 col-sm-4">
         <div class="d-flex flex-row">
+            {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
+            <div class="delete-childcare-container pe-2 d-flex align-items-center"></div>
             <div class="d-inline">{{ form.age_min|as_crispy_field }}</div>
             <div class="mx-1 d-flex align-items-center">-</div>
             <div class="d-inline">{{ form.age_max|as_crispy_field }}</div>
         </div>
     </div>
     <div class="col-4 col-sm-5">{{ form.supervision_required|as_crispy_field }}</div>
-    <div class="col-3 col-md-4">{{ form.duration|as_crispy_field }}</div>
+    <div class="col-3">{{ form.duration|as_crispy_field }}</div>
 </div>
