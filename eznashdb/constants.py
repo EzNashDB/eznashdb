@@ -60,8 +60,8 @@ class InputLabels:
     SEE_HEAR = LabelWithHelpText(
         "Visibility + Audibility",
         """
-            On a 1-5 scale, rate how well you can see and hear what is happening at the bima, aron, and pulpit
-            from the women's section, relative to the men's section.
+            On a 1-5 scale, how well you can see and hear what is happening at the bima, aron, and pulpit
+            from the women's section, relative to the men's section?
         """,
         "fa-solid fa-eye",
     )
