@@ -9,11 +9,11 @@ class RelativeSize(models.TextChoices):
 
 
 class SeeHearScore(models.TextChoices):
-    _1 = ("1", _("1 (Much more difficult than men's section)"))
-    _2 = ("2", _("2"))
-    _3 = ("3", _("3"))
+    _5 = ("5", _("5 (Equal)"))
     _4 = ("4", _("4"))
-    _5 = ("5", _("5 (Equal to men's section)"))
+    _3 = ("3", _("3"))
+    _2 = ("2", _("2"))
+    _1 = ("1", _("1 (Much more difficult)"))
 
 
 class RoomLayoutType(models.TextChoices):
