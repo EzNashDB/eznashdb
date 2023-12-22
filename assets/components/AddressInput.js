@@ -4,7 +4,13 @@ import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
 import { isRoundedEqual } from "../utils/math";
 
-export const AddressInput = ({ display_name, lat, lon, place_id }) => {
+export const AddressInput = ({
+  display_name,
+  lat,
+  lon,
+  place_id,
+  initialIsValid,
+}) => {
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
@@ -19,6 +25,7 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
     ],
     currIdx: 0,
   });
+  const [isValid, setIsValid] = useState(initialIsValid);
   const currLocation = locationHistory.locations[locationHistory.currIdx];
 
   const setNewLocation = (location) => {
@@ -103,68 +110,77 @@ export const AddressInput = ({ display_name, lat, lon, place_id }) => {
   };
 
   return (
-    <div
-      className="h-100 d-inline-block w-100 position-relative"
-      style={{ minHeight: "170px" }}
-    >
-      <AddressMap
-        lat={currLocation.lat}
-        lon={currLocation.lon}
-        zoom={currLocation.zoom}
-        onMoveEnd={handleMapMoveEnd}
-      />
+    <>
       <div
-        className="position-absolute w-100 p-2 pb-0"
-        style={{
-          zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
-        }}
+        className={`h-100 d-inline-block w-100 position-relative ${
+          !isValid && "is-invalid"
+        }`}
+        style={{ minHeight: "170px" }}
       >
-        <div className="d-flex flex-row">
-          <AddressTypeAhead
-            inputValue={inputValue}
-            onInput={handleOnInput}
-            onAddressSelected={handleAddressSelected}
-          />
-          <ButtonGroup className="ms-1 shadow-sm">
-            <Button
-              size="sm"
-              variant="light"
-              disabled={locationHistory.currIdx === 0}
-              onClick={goToPrevLocation}
-            >
-              <i className="fa-solid fa-angle-left"></i>
-            </Button>
-            <Button
-              size="sm"
-              variant="light"
-              disabled={
-                locationHistory.currIdx === locationHistory.locations.length - 1
-              }
-              onClick={goToNextLocation}
-            >
-              <i className="fa-solid fa-angle-right"></i>
-            </Button>
-          </ButtonGroup>
+        <AddressMap
+          lat={currLocation.lat}
+          lon={currLocation.lon}
+          zoom={currLocation.zoom}
+          onMoveEnd={handleMapMoveEnd}
+        />
+        <div
+          className="position-absolute w-100 p-2 pb-0"
+          style={{
+            zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
+          }}
+        >
+          <div className="d-flex flex-row">
+            <AddressTypeAhead
+              inputValue={inputValue}
+              onInput={handleOnInput}
+              onAddressSelected={handleAddressSelected}
+              isValid={isValid}
+            />
+            <ButtonGroup className="ms-1 shadow-sm">
+              <Button
+                size="sm"
+                variant="light"
+                disabled={locationHistory.currIdx === 0}
+                onClick={goToPrevLocation}
+              >
+                <i className="fa-solid fa-angle-left"></i>
+              </Button>
+              <Button
+                size="sm"
+                variant="light"
+                disabled={
+                  locationHistory.currIdx ===
+                  locationHistory.locations.length - 1
+                }
+                onClick={goToNextLocation}
+              >
+                <i className="fa-solid fa-angle-right"></i>
+              </Button>
+            </ButtonGroup>
+          </div>
         </div>
+        <input
+          type="hidden"
+          name="latitude"
+          id="id_latitude"
+          value={currLocation?.lat || ""}
+        ></input>
+        <input
+          type="hidden"
+          name="longitude"
+          id="id_longitude"
+          value={currLocation?.lon || ""}
+        ></input>
+        <input
+          type="hidden"
+          name="place_id"
+          id="id_place_id"
+          value={currLocation?.place_id || ""}
+        ></input>
       </div>
-      <input
-        type="hidden"
-        name="latitude"
-        id="id_latitude"
-        value={currLocation?.lat || ""}
-      ></input>
-      <input
-        type="hidden"
-        name="longitude"
-        id="id_longitude"
-        value={currLocation?.lon || ""}
-      ></input>
-      <input
-        type="hidden"
-        name="place_id"
-        id="id_place_id"
-        value={currLocation?.place_id || ""}
-      ></input>
-    </div>
+      <span className="invalid-feedback">
+        <strong>Please select a valid address.</strong>
+      </span>
+    </>
   );
 };

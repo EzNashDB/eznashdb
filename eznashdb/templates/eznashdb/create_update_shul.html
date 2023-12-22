@@ -72,6 +72,9 @@
 {% block extra_media_bottom %}
     {{ block.super }}
     <script type="text/javascript">
+    const shulForm = {
+        errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
+    }
     $(function() {
         $('.link-form').formset({
             formCssClass: 'link-form',
