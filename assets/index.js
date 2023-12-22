@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!!addressInput) {
     const addressInputContainer = addressInput.parentElement;
     if (addressInputContainer) {
-      const getPropsFromInputs = () => {
+      const getProps = () => {
         const propsToInputNames = {
           display_name: "address",
           lat: "latitude",
@@ -21,10 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const input = document.querySelector(`input[name=${inputName}]`);
           values[prop] = input ? input.value : "";
         }
+        values["initialIsValid"] = !("address" in shulForm.errors);
         return values;
       };
       createRoot(addressInputContainer).render(
-        <AddressInput {...getPropsFromInputs()} />
+        <AddressInput {...getProps()} />
       );
     }
   }

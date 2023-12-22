@@ -14,6 +14,7 @@ export const AddressTypeAhead = ({
   inputValue,
   onInput,
   onAddressSelected,
+  isValid,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
@@ -74,7 +75,7 @@ export const AddressTypeAhead = ({
       placeholder="Address: search or drag..."
       inputProps={{
         name: "address",
-        className: "textinput form-control rounded",
+        className: `textinput form-control rounded ${!isValid && "is-invalid"}`,
         autoComplete: "one-time-code",
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (

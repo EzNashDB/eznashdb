@@ -44,6 +44,11 @@ class ShulForm(ModelForm):
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if not (cleaned_data.get("latitude") and cleaned_data.get("longitude")):
+            self.add_error("address", "Please select a valid address.")
+
 
 class RoomForm(ModelForm):
     id = forms.CharField(required=False)
