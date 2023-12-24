@@ -55,6 +55,11 @@ export const AddressTypeAhead = ({
     setOptions([]);
   }, [inputValue]);
 
+  const isHebrewResult = (result) => {
+    const hebrewChars = /[אבגדהוזחטיךכלםמןנסעףפץצקרשת]/;
+    return hebrewChars.test(result.display_name);
+  };
+
   // Bypass client-side filtering by returning `true`. Results are already
   // filtered by the search endpoint, so no need to do it again.
   const filterBy = () => true;
@@ -101,11 +106,20 @@ export const AddressTypeAhead = ({
         } = menuProps;
         return (
           <Menu {..._menuProps} className="shadow-lg">
-            {results.map((result, index) => (
-              <MenuItem option={result} position={index} key={index}>
-                <span className="text-wrap">{result.display_name}</span>
-              </MenuItem>
-            ))}
+            {results.map((result, index) => {
+              const isHebrew = isHebrewResult(result);
+              return (
+                <MenuItem
+                  option={result}
+                  position={index}
+                  key={index}
+                  dir={isHebrew ? "rtl" : "ltr"}
+                  lang={isHebrew ? "he" : "en"}
+                >
+                  <span className="text-wrap">{result.display_name}</span>
+                </MenuItem>
+              );
+            })}
           </Menu>
         );
       }}
