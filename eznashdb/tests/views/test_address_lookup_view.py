@@ -92,3 +92,20 @@ def describe_israel_searches():
         assert urllib.parse.quote_plus(palestine.lower()) in call_urls[1]
         assert response.status_code == 200
         assert response.json() == osm_response * 2
+
+    def returns_israel_for_palestine(client, mock_osm):
+        DUMMY_OSM_RECORD = {
+            "name": "osm response",
+            "place_id": 1,
+            "display_name": "מעלה שומרון, קרני שומרון, שטח C, יהודה ושומרון, الأراضي الفلسطينية",
+        }
+
+        osm_response = [DUMMY_OSM_RECORD]
+        mock_osm(osm_response)
+        url = reverse("eznashdb:address_lookup")
+        query_params = {"q": "something"}
+        response = client.get(url, data=query_params)
+
+        response_record = response.json()[0]
+        assert "ישראל" in response_record["display_name"]
+        assert "الأراضي الفلسطينية" not in response_record["display_name"]

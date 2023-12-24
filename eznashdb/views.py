@@ -182,6 +182,9 @@ class AddressLookupView(View):
             return JsonResponse(self.format_results(results), safe=False)
 
     def format_results(self, results):
+        palestine = "الأراضي الفلسطينية"
+        israel = "ישראל"
         for result in results:
             result["id"] = result.get("place_id")
+            result["display_name"] = result.get("display_name", "").replace(palestine, israel)
         return results
