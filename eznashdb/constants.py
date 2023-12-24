@@ -31,9 +31,9 @@ class LabelWithHelpText:
 
 
 class InputLabels:
-    SHUL_NAME = "Shul Name"
+    SHUL_NAME = "Shul Name*"
     ROOM_NAME = LabelWithHelpText(
-        "Room Name",
+        "Room Name*",
         "Main Sanctuary, Beit Midrash, etc.",
         "fa-solid fa-home",
     )
