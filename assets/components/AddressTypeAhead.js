@@ -5,7 +5,7 @@ import {
   Menu,
   MenuItem,
 } from "react-bootstrap-typeahead";
-import { Form } from "react-bootstrap";
+import { Form, InputGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 
 const SEARCH_URL = "/address-lookup";
@@ -72,15 +72,16 @@ export const AddressTypeAhead = ({
       useCache={false}
       options={options}
       onInputChange={handleInputChange}
-      placeholder="Address: search or drag..."
+      placeholder="Search or drag..."
       inputProps={{
         name: "address",
-        className: `textinput form-control rounded ${!isValid && "is-invalid"}`,
+        className: `${!isValid && "is-invalid"}`,
         autoComplete: "one-time-code",
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
-          <div className="input-group input-group-sm">
+          <InputGroup size="sm">
+            <InputGroup.Text>Address*</InputGroup.Text>
             <Form.Control
               {...inputProps}
               ref={(node) => {
@@ -88,7 +89,7 @@ export const AddressTypeAhead = ({
                 referenceElementRef(node);
               }}
             />
-          </div>
+          </InputGroup>
         </Hint>
       )}
       renderMenu={(results, menuProps) => {
