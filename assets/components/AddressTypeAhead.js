@@ -7,6 +7,7 @@ import {
 } from "react-bootstrap-typeahead";
 import { Form, InputGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
+import { hasHebrew } from "../utils/text";
 
 const SEARCH_URL = "/address-lookup";
 
@@ -55,11 +56,6 @@ export const AddressTypeAhead = ({
     setOptions([]);
   }, [inputValue]);
 
-  const isHebrewResult = (result) => {
-    const hebrewChars = /[אבגדהוזחטיךכלםמןנסעףפץצקרשת]/;
-    return hebrewChars.test(result.display_name);
-  };
-
   // Bypass client-side filtering by returning `true`. Results are already
   // filtered by the search endpoint, so no need to do it again.
   const filterBy = () => true;
@@ -107,7 +103,7 @@ export const AddressTypeAhead = ({
         return (
           <Menu {..._menuProps} className="shadow-lg">
             {results.map((result, index) => {
-              const isHebrew = isHebrewResult(result);
+              const isHebrew = hasHebrew(result.display_name);
               return (
                 <MenuItem
                   option={result}
