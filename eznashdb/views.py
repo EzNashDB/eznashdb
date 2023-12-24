@@ -146,35 +146,6 @@ class DeleteShulView(DeleteView):
 
 
 class AddressLookupView(View):
-    def replace_substring_if_bounded(self, input_str, substring_a, substring_b):
-        words = input_str.split()
-        # Initialize an empty result string
-        result = ""
-
-        # Iterate through the words
-        for i, word in enumerate(words):
-            if substring_a in word:
-                # Check if the current word contains substring_a
-                parts = word.split(substring_a)
-
-                # Check if the substring_a appears at the start or end of the word
-                is_start = parts[0] == "" or parts[0][-1] in (",", " ")
-                is_end = parts[-1] == "" or parts[-1][0] in (",", " ")
-
-                if is_start and is_end:
-                    # Replace substring_a with substring_b
-                    result += parts[0] + substring_b + parts[1]
-                else:
-                    result += word
-            else:
-                result += word
-
-            # Add a space between words
-            if i < len(words) - 1:
-                result += " "
-
-        return result
-
     def get_OSM_response(self, q):
         OSM_param_dict = {
             "format": "json",
@@ -203,7 +174,7 @@ class AddressLookupView(View):
             ("ישראל", "palestinian territory"),
         ]:
             if israel in query:
-                modified_query = self.replace_substring_if_bounded(modified_query, israel, palestine)
+                modified_query = modified_query.replace(israel, palestine)
         if modified_query != query:
             response_2 = self.get_OSM_response(modified_query)
             results.extend(response_2.json().copy())
@@ -212,5 +183,5 @@ class AddressLookupView(View):
 
     def format_results(self, results):
         for result in results:
-            result["id"] = result["place_id"]
+            result["id"] = result.get("place_id")
         return results
