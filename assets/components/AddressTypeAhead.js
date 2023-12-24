@@ -21,7 +21,7 @@ export const AddressTypeAhead = ({
   const [options, setOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-
+  const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
@@ -78,6 +78,8 @@ export const AddressTypeAhead = ({
         name: "address",
         className: `${!isValid && "is-invalid"}`,
         autoComplete: "one-time-code",
+        dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
+        lang: `${inputIsHebrew ? "he" : "en"}`,
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
