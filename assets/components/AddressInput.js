@@ -17,8 +17,8 @@ export const AddressInput = ({
     locations: [
       {
         display_name,
-        lat: lat || 0,
-        lon: lon || 0,
+        lat,
+        lon,
         place_id,
         zoom: hasCoordsInProps ? 16 : 1,
       },
@@ -33,8 +33,8 @@ export const AddressInput = ({
       0,
       locationHistory.currIdx + 1
     );
-    location.lat = parseFloat(location.lat);
-    location.lon = parseFloat(location.lon);
+    location.lat = String(location.lat);
+    location.lon = String(location.lon);
     const newLocations = [...prevLocations, location];
     setLocationHistory({
       locations: newLocations,
@@ -163,19 +163,19 @@ export const AddressInput = ({
           type="hidden"
           name="latitude"
           id="id_latitude"
-          value={currLocation?.lat || ""}
+          value={`${currLocation?.lat || ""}`}
         ></input>
         <input
           type="hidden"
           name="longitude"
           id="id_longitude"
-          value={currLocation?.lon || ""}
+          value={`${currLocation?.lon || ""}`}
         ></input>
         <input
           type="hidden"
           name="place_id"
           id="id_place_id"
-          value={currLocation?.place_id || ""}
+          value={`${currLocation?.place_id || ""}`}
         ></input>
       </div>
       <span className="invalid-feedback">
