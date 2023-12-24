@@ -25,8 +25,8 @@ export const AddressInput = ({
     ],
     currIdx: 0,
   });
-  const [isValid, setIsValid] = useState(initialIsValid);
   const currLocation = locationHistory.locations[locationHistory.currIdx];
+  const isValid = initialIsValid;
 
   const setNewLocation = (location) => {
     const prevLocations = locationHistory.locations.slice(
