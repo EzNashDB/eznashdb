@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Popup } from "react-leaflet";
 import { Card, ListGroup, Badge } from "react-bootstrap";
+import { hasHebrew } from "../utils/text";
 
 export const ShulPopup = ({ shul }) => {
+  const isHebrewAddress = hasHebrew(shul.address);
   const boolToIcon = (bool) => {
     if (bool === true) {
       return <i className="fa-solid fa-check"></i>;
@@ -120,11 +122,17 @@ export const ShulPopup = ({ shul }) => {
           {shul.name}
         </Card.Header>
         <Card.Body className="p-2 pt-1">
-          <div className="text-truncate">
-            <span className="me-1">
+          <div className="d-flex">
+            <div className="me-1">
               <i className="fa-solid fa-location-dot"></i>
-            </span>
-            {shul.address}
+            </div>
+            <div
+              dir={isHebrewAddress ? "rtl" : "ltr"}
+              lang={isHebrewAddress ? "he" : "en"}
+              className="text-truncate"
+            >
+              {shul.address}
+            </div>
           </div>
           {shul.links.length > 0 && (
             <>
