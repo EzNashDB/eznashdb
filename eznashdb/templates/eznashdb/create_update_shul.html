@@ -6,6 +6,7 @@
 {% block content %}
     <form method="POST"
           enctype="multipart/form-data"
+          novalidate
           id="shul_form"
           class="row d-flex flex-column h-100">
         {% csrf_token %}
