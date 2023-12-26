@@ -8,7 +8,7 @@ import {
 } from "react-leaflet";
 import { useMap } from "react-leaflet/hooks";
 
-export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
+export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
   const MapEvents = useCallback(() => {
     useMapEvents({
       dragend: onMoveEnd,
@@ -17,7 +17,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
     return null;
   }, [onMoveEnd]);
 
-  const ChangeView = ({ center, zoom }) => {
+  const ChangeMapState = ({ center, zoom, dragging }) => {
     const map = useMap();
 
     useEffect(() => {
@@ -29,6 +29,21 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
         map.setView(center, zoom);
       }
     }, [map, center, zoom]);
+
+    useEffect(() => {
+      const oldDragging = map.options.dragging;
+      if (oldDragging !== dragging) {
+        dragging
+          ? (() => {
+              map.dragging.enable();
+              map.scrollWheelZoom.enable();
+            })()
+          : (() => {
+              map.dragging.disable();
+              map.scrollWheelZoom.disable();
+            })();
+      }
+    });
 
     return null;
   };
@@ -56,20 +71,25 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
         <MapContainer
           center={[lat, lon]}
           zoom={zoom}
-          scrollWheelZoom={true}
-          style={{ height: "100%" }}
           minZoom={1}
+          zoomControl={false}
+          scrollWheelZoom={!isDisabled}
+          dragging={!isDisabled}
           worldCopyJump={true}
           className="position-relative rounded"
-          zoomControl={false}
+          style={{ height: "100%" }}
         >
-          <ChangeView center={[lat, lon]} zoom={zoom} />
+          <ChangeMapState
+            center={[lat, lon]}
+            zoom={zoom}
+            dragging={!isDisabled}
+          />
           <MapEvents />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <ZoomControl position="bottomleft" />
+          {!isDisabled && <ZoomControl position="bottomleft" />}
         </MapContainer>
       </div>
     </div>

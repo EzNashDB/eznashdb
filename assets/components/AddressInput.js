@@ -11,6 +11,7 @@ export const AddressInput = ({
   place_id,
   initialIsValid,
 }) => {
+  const [isDisabled, setIsDisabled] = useState(true);
   const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
@@ -109,6 +110,10 @@ export const AddressInput = ({
     setInputValue({ display_name: text });
   };
 
+  const toggleDisabled = (e) => {
+    setIsDisabled(!isDisabled);
+  };
+
   return (
     <>
       <div
@@ -122,6 +127,7 @@ export const AddressInput = ({
           lon={currLocation.lon}
           zoom={currLocation.zoom}
           onMoveEnd={handleMapMoveEnd}
+          isDisabled={isDisabled}
         />
         <div
           className="position-absolute w-100 p-2 pb-0"
@@ -135,12 +141,14 @@ export const AddressInput = ({
               onInput={handleOnInput}
               onAddressSelected={handleAddressSelected}
               isValid={isValid}
+              isDisabled={isDisabled}
             />
+
             <ButtonGroup className="ms-1 shadow-sm">
               <Button
                 size="sm"
                 variant="light"
-                disabled={locationHistory.currIdx === 0}
+                disabled={isDisabled || locationHistory.currIdx === 0}
                 onClick={goToPrevLocation}
               >
                 <i className="fa-solid fa-angle-left"></i>
@@ -149,14 +157,30 @@ export const AddressInput = ({
                 size="sm"
                 variant="light"
                 disabled={
+                  isDisabled ||
                   locationHistory.currIdx ===
-                  locationHistory.locations.length - 1
+                    locationHistory.locations.length - 1
                 }
                 onClick={goToNextLocation}
               >
                 <i className="fa-solid fa-angle-right"></i>
               </Button>
             </ButtonGroup>
+            {isDisabled && (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={toggleDisabled}
+                className="ms-1"
+              >
+                <span className="text-nowrap">
+                  <span className="me-1">
+                    <i className="fa-solid fa-pen-to-square"></i>
+                  </span>
+                  Edit
+                </span>
+              </Button>
+            )}
           </div>
         </div>
         <input
