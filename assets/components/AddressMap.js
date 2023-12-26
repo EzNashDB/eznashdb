@@ -76,8 +76,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
           scrollWheelZoom={!isDisabled}
           dragging={!isDisabled}
           worldCopyJump={true}
-          className="position-relative rounded"
-          style={{ height: "100%" }}
+          className="position-relative rounded h-100"
         >
           <ChangeMapState
             center={[lat, lon]}
