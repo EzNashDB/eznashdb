@@ -16,6 +16,7 @@ export const AddressTypeAhead = ({
   onInput,
   onAddressSelected,
   isValid,
+  isDisabled,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
@@ -74,6 +75,7 @@ export const AddressTypeAhead = ({
       options={options}
       onInputChange={handleInputChange}
       placeholder="Search or drag..."
+      disabled={isDisabled}
       inputProps={{
         name: "address",
         className: `${!isValid && "is-invalid"}`,
