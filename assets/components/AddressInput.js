@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
@@ -12,7 +12,7 @@ export const AddressInput = ({
   initialIsValid,
 }) => {
   const [isDisabled, setIsDisabled] = useState(true);
-  const hasCoordsInProps = !!parseFloat(lat) && !!parseFloat(lon);
+  const hasCoordsInProps = !!String(lat) && !!String(lon);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
     locations: [
@@ -109,6 +109,11 @@ export const AddressInput = ({
   const handleOnInput = (text) => {
     setInputValue({ display_name: text });
   };
+
+  useEffect(() => {
+    const hasValidAddress = hasCoordsInProps && initialIsValid;
+    setIsDisabled(hasValidAddress);
+  }, []);
 
   const toggleDisabled = (e) => {
     setIsDisabled(!isDisabled);
