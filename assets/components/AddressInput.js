@@ -11,8 +11,9 @@ export const AddressInput = ({
   place_id,
   initialIsValid,
 }) => {
-  const [isDisabled, setIsDisabled] = useState(true);
   const hasCoordsInProps = !!String(lat) && !!String(lon);
+  const hasInitialValidAddress = hasCoordsInProps && initialIsValid;
+  const [isDisabled, setIsDisabled] = useState(hasInitialValidAddress);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
     locations: [
@@ -109,11 +110,6 @@ export const AddressInput = ({
   const handleOnInput = (text) => {
     setInputValue({ display_name: text });
   };
-
-  useEffect(() => {
-    const hasValidAddress = hasCoordsInProps && initialIsValid;
-    setIsDisabled(hasValidAddress);
-  }, []);
 
   const toggleDisabled = (e) => {
     setIsDisabled(!isDisabled);
