@@ -27,5 +27,5 @@ class RoomLayoutType(models.TextChoices):
 
 
 class ChildcareProgramDuration(models.TextChoices):
-    ALL = ("ALL", _("All of shacharit and mussaf on shabbat"))
-    PART = ("PART", _("Part of shacharit and mussaf on shabbat"))
+    ALL = ("ALL", _("All of shabbat shacharit and mussaf"))
+    PART = ("PART", _("Part of shabbat shacharit and mussaf"))
