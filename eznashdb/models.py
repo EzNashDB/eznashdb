@@ -82,6 +82,7 @@ class ChildcareProgram(models.Model):
     shul = models.ForeignKey(
         "eznashdb.Shul", on_delete=models.PROTECT, related_name="childcare_programs"
     )
+    name = models.CharField(max_length=100)
     age_min = models.IntegerField(null=True, blank=True)
     age_max = models.IntegerField(null=True, blank=True)
     supervision_required = models.BooleanField(null=True, blank=True)
