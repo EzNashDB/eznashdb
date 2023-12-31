@@ -7,6 +7,18 @@ body {
   height: var(--doc-height);
 }
 
+.bg-table-stripe {
+  --bs-table-color-type: var(--bs-table-color);
+  --bs-table-bg-type: #0000000d;
+  box-shadow: inset 0 0 0 9999px
+    var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+
+td.td-shrink {
+  width: 0.1%;
+  white-space: nowrap;
+}
+
 /* bootstrap collapse */
 .btn .fa-chevron-up {
   transition: transform 0.3s ease;
