@@ -17,3 +17,5 @@ LAYOUT_CHOICES = (
     ("is_only_men", "Only Men"),
     ("is_mixed_seating", "Mixed Seating"),
 )
+
+ZERO_TO_EIGHTEEN = [(i, i) for i in range(19)]
