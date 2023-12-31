@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from eznashdb.choices import ZERO_TO_EIGHTEEN
 from eznashdb.constants import LAYOUT_FIELDS
 from eznashdb.enums import ChildcareProgramDuration, RelativeSize, SeeHearScore
 
@@ -83,8 +84,8 @@ class ChildcareProgram(models.Model):
         "eznashdb.Shul", on_delete=models.PROTECT, related_name="childcare_programs"
     )
     name = models.CharField(max_length=100)
-    age_min = models.IntegerField(null=True, blank=True)
-    age_max = models.IntegerField(null=True, blank=True)
+    age_min = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
+    age_max = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
     supervision_required = models.BooleanField(null=True, blank=True)
     duration = models.CharField(choices=ChildcareProgramDuration.choices, blank=True, max_length=20)
 
