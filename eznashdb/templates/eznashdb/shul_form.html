@@ -22,7 +22,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 bg-light">
+                <div class="col-12 bg-table-stripe">
                     <div class="row">
                         <div class="col-12 col-lg-2 col-xl-3">
                             <div class="d-flex">
@@ -67,7 +67,7 @@
                 {% for field in form.visible_fields %}
                     <div class="col-12
                                 {% if forloop.counter|divisibleby:2 %}
-                                    bg-light
+                                    bg-table-stripe
                                 {% endif %}">
                         {% if field.name in "has_female_leadership,can_say_kaddish" %}
                             {% include "eznashdb/includes/form_field_with_help_text.html" %}
@@ -86,40 +86,41 @@
                                 <span class="ms-2 flex-grow-1">Children's Programming</span>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4 col-xl-4 text-muted small">
-                            <span >Is any programming provided for children (play room, groups, teen minyan, etc.)?</span>
-                        </div>
-                        <div class="col-12 col-lg-6 col-xl-5">
-                            <div class="row gx-2 small text-muted">
-                                <div class="col-5 col-sm-4 d-flex align-items-end">
-                                    {# Just for spacing #}
-                                    <div class="delete-childcare-container pe-2 d-flex align-items-center">
-                                        <button class="btn btn-link py-0 px-1 text-white text-nowrap align-top"
-                                                disabled>
-                                            <i class="fa fa-xmark"></i>
-                                        </button>
-                                    </div>
-                                    Age range
+                        <div class="col-12 col-lg-10 col-xl-9 text-muted">
+                            <div class="row">
+                                <div class="col-12 small py-1">
+                                    <span >What programming does the shul provide for children (play room, groups, teen minyan, etc.)?</span>
                                 </div>
-                                <div class="col-4 col-sm-5 d-flex align-items-end">Parental supervision required</div>
-                                <div class="col-3 d-flex align-items-end">Duration</div>
-                            </div>
-                            <div class="row childcare-formset">
-                                {{ childcare_fs.management_form }}
-                                {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                {% for childcare_form in childcare_fs %}
-                                    <div class="childcare-form col-12 my-1">
-                                        <div class="d-flex">
-                                            <div class="flex-grow-1">
-                                                {% with childcare_form as form  %}
-                                                    {% crispy form %}
-                                                {% endwith %}
-                                            </div>
-                                        </div>
+                                <div class="col-12">
+                                    {{ childcare_fs.management_form }}
+                                    {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-borderless border-bottom table-striped small mb-0">
+                                            <thead class="border-bottom utext-center">
+                                                <tr>
+                                                    <th class="text-muted fw-normal" scope="col"></th>
+                                                    <th class="text-muted fw-normal" scope="col">Age Range</th>
+                                                    <th class="text-muted fw-normal" scope="col">Program Name</th>
+                                                    <th class="text-muted fw-normal" scope="col">
+                                                        <div style="min-width: 90px; max-width: 150px">Duration</div>
+                                                    </th>
+                                                    <th class="text-muted fw-normal" scope="col">
+                                                        <div style="min-width: 125px; max-width: 200px">Parental Supervision Required</div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="childcare-formset">
+                                                {% for childcare_form in childcare_fs %}
+                                                    {% with childcare_form as form  %}
+                                                        {% crispy form %}
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                {% endfor %}
-                                <div class="col-12 justify-content-end order-last">
-                                    <div class="add-childcare-container d-flex justify-content-end my-1"></div>
+                                    <div class="col-12 justify-content-end order-last">
+                                        <div class="add-childcare-container d-flex justify-content-end my-1"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
