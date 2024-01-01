@@ -1,25 +1,13 @@
 {% load crispy_forms_tags %}
-<tr class="childcare-form">
-    {# fake height so inner div takes full height https://stackoverflow.com/a/34781198 #}
-    <td style="height: 1px">
+<div class="row gx-2 mb-1 childcare-form">
+    <div class="col-auto">
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
         {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
-        <div class="delete-childcare-container pe-2 d-flex align-items-center h-100"></div>
-    </td>
-    <td class="td-shrink">
-        <div style="min-width: 160px; max-width:160px">
-            <div class="d-flex">
-                <div class="flex-grow-1">{{ form.age_min|as_crispy_field }}</div>
-                <div class="mx-1 d-flex align-items-center">-</div>
-                <div class="flex-grow-1">{{ form.age_max|as_crispy_field }}</div>
-            </div>
-        </div>
-    </td>
-    <td>
-        <div style="min-width:100px">{{ form.name|as_crispy_field }}</div>
-    </td>
-    <td class="td-shrink">
-        <div style="min-width:80px; max-width:110px">{{ form.duration|as_crispy_field }}</div>
-    </td>
-    <td>{{ form.supervision_required|as_crispy_field }}</td>
-</tr>
+        <div class="delete-childcare-container d-flex align-items-center h-100"></div>
+    </div>
+    <div class="col-3 col-md-2">{{ form.name|as_crispy_field }}</div>
+    <div class="col-2">{{ form.age_min|as_crispy_field }}</div>
+    <div class="col-2">{{ form.age_max|as_crispy_field }}</div>
+    <div class="col-2">{{ form.duration|as_crispy_field }}</div>
+    <div class="col">{{ form.supervision_required|as_crispy_field }}</div>
+</div>
