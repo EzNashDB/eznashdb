@@ -128,7 +128,7 @@ class ShulLinkForm(ModelForm):
 class ChildcareProgramForm(ModelForm):
     class Meta:
         model = ChildcareProgram
-        fields = ["shul", "name", "age_min", "age_max", "supervision_required", "duration"]
+        fields = ["shul", "name", "min_age", "max_age", "supervision_required", "duration"]
         widgets = {
             "supervision_required": NullableBooleanWidget(),
         }

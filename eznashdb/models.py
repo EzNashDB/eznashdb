@@ -84,8 +84,8 @@ class ChildcareProgram(models.Model):
         "eznashdb.Shul", on_delete=models.PROTECT, related_name="childcare_programs"
     )
     name = models.CharField(max_length=100)
-    age_min = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
-    age_max = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
+    min_age = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
+    max_age = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
     supervision_required = models.BooleanField(null=True, blank=True)
     duration = models.CharField(choices=ChildcareProgramDuration.choices, blank=True, max_length=20)
 
@@ -94,4 +94,4 @@ class ChildcareProgram(models.Model):
         verbose_name_plural = "childcare programs"
 
     def __str__(self) -> str:
-        return f"Childcare ({self.age_min}-{self.age_max}), {self.shul}"
+        return f"Childcare ({self.min_age}-{self.max_age}), {self.shul}"
