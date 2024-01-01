@@ -92,6 +92,7 @@ class ChildcareProgram(models.Model):
     class Meta:
         verbose_name = "childcare program"
         verbose_name_plural = "childcare programs"
+        ordering = ["min_age", "max_age"]
 
     def __str__(self) -> str:
         return f"Childcare ({self.min_age}-{self.max_age}), {self.shul}"
