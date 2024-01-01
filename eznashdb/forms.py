@@ -149,6 +149,13 @@ class ChildcareProgramForm(ModelForm):
             instance.save()
         return instance
 
+    def clean(self):
+        cleaned_data = super().clean()
+        min_age = cleaned_data.get("min_age")
+        max_age = cleaned_data.get("max_age")
+        if None not in [min_age, max_age] and min_age > max_age:
+            self.add_error("min_age", "From Age must be less than To Age")
+
 
 RoomFormSet = inlineformset_factory(
     Shul,
