@@ -102,15 +102,6 @@ td.td-shrink {
   }
 }
 
-/* Freeze table columns */
-.table.freeze-column-1,
-th:first-child,
-td:first-child {
-  position: sticky;
-  left: 0px;
-  z-index: 100;
-}
-
 /* React Bootstrap Typeahead */
 .spinner-border {
   /* Above input:focus (z-index: 5) */
