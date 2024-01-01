@@ -89,34 +89,36 @@
                         <div class="col-12 col-lg-10 col-xl-9 text-muted">
                             <div class="row">
                                 <div class="col-12 small py-1">
-                                    <span >What programming does the shul provide for children (play room, groups, teen minyan, etc.)?</span>
+                                    <span >What programming is provided for children during shul (play room, groups, teen minyan, etc.)?</span>
                                 </div>
                                 <div class="col-12">
                                     {{ childcare_fs.management_form }}
                                     {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-borderless border-bottom table-striped small mb-0">
-                                            <thead class="border-bottom utext-center">
-                                                <tr>
-                                                    <th class="text-muted fw-normal" scope="col"></th>
-                                                    <th class="text-muted fw-normal" scope="col">Age Range</th>
-                                                    <th class="text-muted fw-normal" scope="col">Program Name</th>
-                                                    <th class="text-muted fw-normal" scope="col">
-                                                        <div style="min-width: 90px; max-width: 150px">Duration</div>
-                                                    </th>
-                                                    <th class="text-muted fw-normal" scope="col">
-                                                        <div style="min-width: 125px; max-width: 200px">Parental Supervision Required</div>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="childcare-formset">
-                                                {% for childcare_form in childcare_fs %}
-                                                    {% with childcare_form as form  %}
+                                    <div class="row overflow-auto">
+                                        <div class="col-12" style="min-width: 550px">
+                                            <div class="row gx-2 small align-items-end">
+                                                <div class="col-auto">
+                                                    {# just for spacing #}
+                                                    <button class="btn btn-link py-0 px-1"
+                                                            disabled
+                                                            style="color: rgba(0, 0, 0, 0)">
+                                                        <i class="fa fa-xmark"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-3 col-md-2">Program Name</div>
+                                                <div class="col-2">From Age</div>
+                                                <div class="col-2">To Age</div>
+                                                <div class="col-2">Duration</div>
+                                                <div class="col">Parental Supervision Required</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 childcare-formset">
+                                                    {% for form in childcare_fs %}
                                                         {% crispy form %}
-                                                    {% endwith %}
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-12 justify-content-end order-last">
                                         <div class="add-childcare-container d-flex justify-content-end my-1"></div>
