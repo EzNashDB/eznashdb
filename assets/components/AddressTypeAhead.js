@@ -75,13 +75,13 @@ export const AddressTypeAhead = ({
       options={options}
       onInputChange={handleInputChange}
       placeholder="Search or drag..."
-      disabled={isDisabled}
       inputProps={{
         name: "address",
         className: `${!isValid && "is-invalid"}`,
         autoComplete: "one-time-code",
         dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
         lang: `${inputIsHebrew ? "he" : "en"}`,
+        readOnly: isDisabled,
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
