@@ -92,6 +92,14 @@
                                     <span >What programming is provided for children during shul (play room, groups, teen minyan, etc.)?</span>
                                 </div>
                                 <div class="col-12">
+                                    <div class="row gx-3">
+                                        <div class="col-auto">{{ form.has_no_childcare|as_crispy_field }}</div>
+                                        <div class="col">
+                                            <label for="id_has_no_childcare" class="small">Shul has no childcare programs</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
                                     {{ childcare_fs.management_form }}
                                     {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                     <div class="row overflow-auto">

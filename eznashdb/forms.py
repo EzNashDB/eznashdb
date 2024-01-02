@@ -10,6 +10,8 @@ from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 
 
 class ShulForm(ModelForm):
+    has_no_childcare = forms.BooleanField(required=False)
+
     class Meta:
         model = Shul
         fields = [
@@ -17,6 +19,7 @@ class ShulForm(ModelForm):
             "address",
             "has_female_leadership",
             "can_say_kaddish",
+            "has_no_childcare",
             "latitude",
             "longitude",
             "place_id",
@@ -40,7 +43,6 @@ class ShulForm(ModelForm):
         helper.template = "eznashdb/shul_form.html"
         helper.field_template = "bootstrap5/no_margin_field.html"
         self.helper.form_show_labels = False
-
         helper.form_tag = False
         helper.field_class = "input-group input-group-sm"
 

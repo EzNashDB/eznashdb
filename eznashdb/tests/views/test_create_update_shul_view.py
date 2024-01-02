@@ -100,7 +100,6 @@ def describe_create():
             reverse("eznashdb:create_shul"),
             data={
                 "can_say_kaddish": "unknown",
-                "has_childcare": "unknown",
                 "has_female_leadership": "unknown",
                 "name": "test shul",
                 "latitude": "1",
