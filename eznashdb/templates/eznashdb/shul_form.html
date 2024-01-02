@@ -9,7 +9,7 @@
             <div class="w-100">{{ form.address|as_crispy_field }}</div>
         </div>
         <div class="col-12">
-            <div class="row">
+            <div class="row striped">
                 <div class="col-12 my-1">
                     <div class="row">
                         <div class="col-12 col-lg-2 col-xl-3">
@@ -23,7 +23,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 bg-table-stripe">
+                <div class="col-12">
                     <div class="row">
                         <div class="col-12 col-lg-2 col-xl-3">
                             <div class="d-flex">
@@ -65,16 +65,6 @@
                         </div>
                     </div>
                 </div>
-                {% for field in form.visible_fields %}
-                    <div class="col-12
-                                {% if forloop.counter|divisibleby:2 %}
-                                    bg-table-stripe
-                                {% endif %}">
-                        {% if field.name in "has_female_leadership,can_say_kaddish" %}
-                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
                 <div class="col-12 js-childcare-formset-parent">
                     <div class="row">
                         <div class="col-12 col-lg-2 col-xl-3">
@@ -120,12 +110,10 @@
                                                 <div class="col-2">Duration</div>
                                                 <div class="col">Parental Supervision Required</div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12 childcare-formset">
-                                                    {% for form in childcare_fs %}
-                                                        {% crispy form %}
-                                                    {% endfor %}
-                                                </div>
+                                            <div class="row childcare-formset striped">
+                                                {% for form in childcare_fs %}
+                                                    {% crispy form %}
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     </div>
@@ -137,6 +125,13 @@
                         </div>
                     </div>
                 </div>
+                {% for field in form.visible_fields %}
+                    <div class="col-12">
+                        {% if field.name in "has_female_leadership,can_say_kaddish" %}
+                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

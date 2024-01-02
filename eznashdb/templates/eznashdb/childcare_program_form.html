@@ -1,13 +1,15 @@
 {% load crispy_forms_tags %}
-<div class="row gx-2 mb-1 childcare-form">
-    <div class="col-auto">
-        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-        {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
-        <div class="delete-childcare-container d-flex align-items-center h-100"></div>
+<div class="col-12 childcare-form">
+    <div class="row gx-2 my-1 ">
+        <div class="col-auto">
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
+            <div class="delete-childcare-container d-flex align-items-center h-100"></div>
+        </div>
+        <div class="col-3 col-md-2">{{ form.name|as_crispy_field }}</div>
+        <div class="col-2">{{ form.min_age|as_crispy_field }}</div>
+        <div class="col-2">{{ form.max_age|as_crispy_field }}</div>
+        <div class="col-2">{{ form.duration|as_crispy_field }}</div>
+        <div class="col">{{ form.supervision_required|as_crispy_field }}</div>
     </div>
-    <div class="col-3 col-md-2">{{ form.name|as_crispy_field }}</div>
-    <div class="col-2">{{ form.min_age|as_crispy_field }}</div>
-    <div class="col-2">{{ form.max_age|as_crispy_field }}</div>
-    <div class="col-2">{{ form.duration|as_crispy_field }}</div>
-    <div class="col">{{ form.supervision_required|as_crispy_field }}</div>
 </div>
