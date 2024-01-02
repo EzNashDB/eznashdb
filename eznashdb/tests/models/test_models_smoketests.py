@@ -12,7 +12,6 @@ def test_models_smoketest(django_user_model):
         updated_by=[user.id],
         name="Test shul",
         has_female_leadership=True,
-        has_childcare=True,
         can_say_kaddish=False,
     )
 

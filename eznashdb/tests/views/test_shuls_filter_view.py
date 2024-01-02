@@ -32,7 +32,6 @@ def describe_shul_cards():
         ("field_name", "field_label"),
         [
             ("has_female_leadership", "Female Leadership"),
-            ("has_childcare", "Childcare"),
             ("can_say_kaddish", "Kaddish"),
         ],
     )
@@ -191,18 +190,6 @@ def describe_filter():
         request = rf_GET(
             "eznashdb:shuls", query_params={"has_female_leadership": ["True"], "format": "list"}
         )
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
-
-    def filters_by_has_childcare(rf_GET):
-        Shul.objects.create(name="shul 1", has_childcare=False)
-        Shul.objects.create(name="shul 2", has_childcare=True)
-        request = rf_GET("eznashdb:shuls", query_params={"has_childcare": ["True"], "format": "list"})
 
         response = ShulsFilterView.as_view()(request)
 

@@ -81,10 +81,6 @@ class TestFemaleLeadershipFilter(YesNoUnknownFilterTest):
     shul_model_field = "has_female_leadership"
 
 
-class TestChildcareFilter(YesNoUnknownFilterTest):
-    shul_model_field = "has_childcare"
-
-
 class TestKaddishFilter(YesNoUnknownFilterTest):
     shul_model_field = "can_say_kaddish"
 

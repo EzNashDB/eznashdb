@@ -17,7 +17,6 @@ class ShulFilterSet(FilterSet):
     has_female_leadership = BoolOrUnknownFilter(
         label=InputLabels.FEMALE_LEADERSHIP, model_field="has_female_leadership"
     )
-    has_childcare = BoolOrUnknownFilter(label=InputLabels.CHILDCARE, model_field="has_childcare")
     can_say_kaddish = BoolOrUnknownFilter(
         label=InputLabels.KADDISH, label_suffix="suffix", model_field="can_say_kaddish"
     )
