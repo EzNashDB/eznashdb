@@ -93,53 +93,73 @@
         }
 
         row.find("a." + delCssSelector).click(function () {
-          var row = $(this).parents("." + options.formCssClass),
-            del = row.find('input:hidden[id $= "-DELETE"]'),
-            buttonRow = row.siblings(
-              "a." + addCssSelector + ", ." + options.formCssClass + "-add"
-            ),
-            forms;
-          if (del.length) {
-            // We're dealing with an inline formset.
-            // Rather than remove this form from the DOM, we'll mark it as deleted
-            // and hide it, then let Django handle the deleting:
-            del.val("on");
-            row.hide();
-            forms = $("." + options.formCssClass).not(":hidden");
-            // Commenting this out per https://github.com/elo80ka/django-dynamic-formset/issues/197
-            // totalForms.val(forms.length);
-          } else {
-            row.remove();
-            // Update the TOTAL_FORMS count:
-            forms = $("." + options.formCssClass).not(
-              ".formset-custom-template"
-            );
-            totalForms.val(forms.length);
-          }
-          for (var i = 0, formCount = forms.length; i < formCount; i++) {
-            // Apply `extraClasses` to form rows so they're nicely alternating:
-            applyExtraClasses(forms.eq(i), i);
-            if (!del.length) {
-              // Also update names and IDs for all child controls (if this isn't
-              // a delete-able inline formset) so they remain in sequence:
-              forms
-                .eq(i)
-                .find(childElementSelector)
-                .each(function () {
-                  updateElementIndex($(this), options.prefix, i);
-                });
+          const deleteRow = () => {
+            var row = $(this).parents("." + options.formCssClass),
+              del = row.find('input:hidden[id $= "-DELETE"]'),
+              buttonRow = row.siblings(
+                "a." + addCssSelector + ", ." + options.formCssClass + "-add"
+              ),
+              forms;
+            if (del.length) {
+              // We're dealing with an inline formset.
+              // Rather than remove this form from the DOM, we'll mark it as deleted
+              // and hide it, then let Django handle the deleting:
+              del.val("on");
+              row.hide();
+              forms = $("." + options.formCssClass).not(":hidden");
+              // Commenting this out per https://github.com/elo80ka/django-dynamic-formset/issues/197
+              // totalForms.val(forms.length);
+            } else {
+              row.remove();
+              // Update the TOTAL_FORMS count:
+              forms = $("." + options.formCssClass).not(
+                ".formset-custom-template"
+              );
+              totalForms.val(forms.length);
             }
-          }
-          // Check if we've reached the minimum number of forms - hide all delete link(s)
-          if (!showDeleteLinks()) {
-            $("a." + delCssSelector).each(function () {
-              $(this).hide();
-            });
-          }
-          // Check if we need to show the add button:
-          if (buttonRow.is(":hidden") && showAddButton()) buttonRow.show();
-          // If a post-delete callback was provided, call it with the deleted form:
-          if (options.removed) options.removed(row);
+            for (var i = 0, formCount = forms.length; i < formCount; i++) {
+              // Apply `extraClasses` to form rows so they're nicely alternating:
+              applyExtraClasses(forms.eq(i), i);
+              if (!del.length) {
+                // Also update names and IDs for all child controls (if this isn't
+                // a delete-able inline formset) so they remain in sequence:
+                forms
+                  .eq(i)
+                  .find(childElementSelector)
+                  .each(function () {
+                    updateElementIndex($(this), options.prefix, i);
+                  });
+              }
+            }
+            // Check if we've reached the minimum number of forms - hide all delete link(s)
+            if (!showDeleteLinks()) {
+              $("a." + delCssSelector).each(function () {
+                $(this).hide();
+              });
+            }
+            // Check if we need to show the add button:
+            if (buttonRow.is(":hidden") && showAddButton()) buttonRow.show();
+            // If a post-delete callback was provided, call it with the deleted form:
+            if (options.removed) options.removed(row);
+          };
+          bootbox.dialog({
+            title: "Are you sure?",
+            message: "Do you want to delete?",
+            centerVertical: true,
+            backdrop: true,
+            buttons: {
+              cancel: {
+                label: "Cancel",
+                className: "btn-secondary",
+              },
+              confirm: {
+                label: "Yes, delete",
+                className: "btn-primary",
+                callback: deleteRow,
+              },
+            },
+          });
+
           return false;
         });
       };
