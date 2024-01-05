@@ -1,4 +1,5 @@
 const setupNoChildcareInputListeners = () => {
+  const registeredInputs = new Set();
   const getChildcareFormsetInputs = () => {
     const childcareFormset =
       document.getElementsByClassName("childcare-formset")[0];
@@ -15,7 +16,6 @@ const setupNoChildcareInputListeners = () => {
         input.value.trim() !== "" ||
         (input.tagName === "SELECT" && input.value !== "")
       ) {
-        console.log(input.value, input);
         hasValue = true;
       }
     });
@@ -30,35 +30,36 @@ const setupNoChildcareInputListeners = () => {
       noChildcareInput.disabled = false;
     }
   };
-  const autoSetOnChange = () => {
-    // on DOM change
-    (() => {
-      const targetElement = document.querySelector(
-        ".js-childcare-formset-parent"
-      );
-      const options = {
-        childList: true,
-        subtree: true,
-      };
-      const observer = new MutationObserver((mutationsList, observer) => {
-        observer.disconnect();
-        autoSetNoChildcareInput();
-        observer.observe(targetElement, options);
-      });
-      observer.observe(targetElement, options);
-    })();
-
-    // on input change
-    getChildcareFormsetInputs().forEach((input) => {
-      if (!input.dataset.js_autosetting_no_childcare) {
-        ["change", "input"].forEach((eventType) => {
-          input.addEventListener(eventType, function () {
-            autoSetNoChildcareInput();
-          });
+  const autoSetOnInputChange = () => {
+    const unregisteredInputs = Array.from(getChildcareFormsetInputs()).filter(
+      (input) => !registeredInputs.has(input)
+    );
+    unregisteredInputs.forEach((input) => {
+      ["change", "input"].forEach((eventType) => {
+        input.addEventListener(eventType, function () {
+          autoSetNoChildcareInput();
         });
-        input.dataset.js_autosetting_no_childcare = true;
-      }
+      });
+      registeredInputs.add(input);
     });
+  };
+  const autoSetOnDOMChange = () => {
+    const targetElement = document.querySelector(
+      ".js-childcare-formset-parent"
+    );
+    const options = {
+      childList: true,
+      subtree: true,
+    };
+    const observer = new MutationObserver((mutationsList, observer) => {
+      autoSetNoChildcareInput();
+      autoSetOnInputChange();
+    });
+    observer.observe(targetElement, options);
+  };
+  const autoSetOnChange = () => {
+    autoSetOnDOMChange();
+    autoSetOnInputChange();
   };
   autoSetNoChildcareInput();
   autoSetOnChange();
