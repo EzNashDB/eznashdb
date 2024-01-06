@@ -144,7 +144,9 @@
           };
           bootbox.dialog({
             title: "Are you sure?",
-            message: "Do you want to delete?",
+            message: `Do you want to delete${
+              options.modelName ? ` this ${options.modelName}` : ``
+            }?`,
             centerVertical: true,
             backdrop: true,
             buttons: {
@@ -334,6 +336,7 @@
   /* Setup plugin defaults */
   // prettier-ignore
   $.fn.formset.defaults = {
+    modelName: '',
     prefix: 'form',                  // The form prefix for your django formset
     formTemplate: null,              // The jQuery selection cloned to generate new form instances
     addText: 'add another',          // Text for the add link

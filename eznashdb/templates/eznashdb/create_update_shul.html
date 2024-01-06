@@ -78,6 +78,7 @@
     }
     $(function() {
         $('.link-form').formset({
+            modelName: 'link',
             formCssClass: 'link-form',
             formsParentCssClass: 'link-formset',
             prefix: '{{ link_fs.prefix }}',
@@ -90,6 +91,7 @@
             hideLastAddForm: {% if link_fs.1 %} true {% else %} false {% endif %},
         });
         $('.childcare-form').formset({
+            modelName: 'childrens\'s program',
             formCssClass: 'childcare-form',
             formsParentCssClass: 'childcare-formset',
             prefix: '{{ childcare_fs.prefix }}',
@@ -102,6 +104,7 @@
             hideLastAddForm: {% if childcare_fs.1 %} true {% else %} false {% endif %},
         });
         $('.room-form').formset({
+            modelName: "room",
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
             scrollCssClass: 'rooms-scroll',
