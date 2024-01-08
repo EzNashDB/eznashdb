@@ -1,17 +1,53 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "Ubuntu",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:jammy",
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
-		"ghcr.io/devcontainers/features/sshd:1": {}
-	},
+	"name": "EzNashDB",
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"./docker-compose.dev.yml"
+	],
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-	]
+		// "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+	],
+	"service": "dev",
+	"workspaceFolder": "/app",
+	"shutdownAction": "none",
+	"remoteUser": "docker",
+	// "initializeCommand": "echo \"=====INITIALIZING=====\" ls && alias docker-compose=\"docker compose\"",
+	"forwardPorts": [
+		8000,
+		5432
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"batisteo.vscode-django",
+				"eamodio.gitlens",
+				"ms-python.vscode-pylance"
+			],
+			"settings": {
+				"python.linting.flake8Enabled": true,
+				"python.linting.flake8Path": ".venv/bin/flake8heavened",
+				"python.venvPath": ".",
+				"python.formatting.provider": "black",
+				"python.formatting.blackPath": ".venv/bin/black",
+				"[python]": {
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	}
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	// "image": "mcr.microsoft.com/devcontainers/base:jammy",
+	// "features": {
+	// 	"ghcr.io/devcontainers/features/node:1": {},
+	// 	"ghcr.io/devcontainers-contrib/features/poetry:2": {},
+	// 	"ghcr.io/devcontainers/features/sshd:1": {}
+	// },
+	// "mounts": [
+	// 	"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+	// ]
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

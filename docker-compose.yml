@@ -1,0 +1,63 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:15.5
+    container_name: eznashdb-db
+    shm_size: "256M"
+    restart: always
+    expose:
+      - 5432
+    volumes:
+      - pgData:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+
+  web:
+    image: eznashdb-dev-image:latest
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+    container_name: eznashdb-web
+    command: make web
+    volumes:
+      - .:/app:rw
+      - $HOME/.cache/devcontainer:/home/docker/.cache/devcontainer
+    environment:
+      - DJANGO_WATCHMAN_TIMEOUT=20
+      - VIRTUAL_HOST=eznashdb.localhost
+      - VIRTUAL_PORT=8000
+    networks:
+      - nginx-proxy
+      - default
+
+  node:
+    # image: mcr.microsoft.com/devcontainers/base:jammy
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    command: make node
+    expose:
+      - "4000"
+    volumes:
+      - .:/app
+
+volumes:
+  pgData:
+
+networks:
+  nginx-proxy:
+    external: true
