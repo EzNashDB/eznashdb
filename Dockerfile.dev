@@ -1,0 +1,110 @@
+# Fix monodock git tags
+ARG PYTHON_VERSION=3.10
+ARG BASE_IMAGE=python:${PYTHON_VERSION}-slim-buster
+FROM ${BASE_IMAGE}
+
+SHELL ["/bin/bash", "--login", "-o", "pipefail", "-c"]
+
+ARG POETRY_VERSION=1.6.1
+ARG NODE_VERSION=18
+ARG HOME=/home/docker
+ARG USERNAME=docker
+
+
+# Set Env variables
+ENV PATH="${HOME}/.local/bin:/opt/mssql-tools/bin:${PATH}" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONFAULTHANDLER=1  \
+    PYTHONUNBUFFERED=1  \
+    PYTHONHASHSEED=random  \
+    PIP_NO_CACHE_DIR=off  \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_VIRTUALENVS_CREATE=true \
+    POETRY_VERSION=${POETRY_VERSION} \
+    POETRY_NO_INTERACTION=1 \
+    ACCEPT_EULA=Y \
+    LANG=en_US.utf8 \
+    TZ=America/New_York \
+    YARN_CACHE_FOLDER=/home/docker/.cache/devcontainer/yarn \
+    POETRY_CACHE_DIR=/home/docker/.cache/devcontainer/poetry \
+    PRE_COMMIT_HOME=/home/docker/.cache/devcontainer/pre-commit
+
+# Install System Dependencies
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    software-properties-common \
+    gnupg \
+    curl \
+    ca-certificates \
+    gcc \
+    g++ \
+    git \
+    make \
+    sudo \
+    openssh-server \
+    postgresql \
+    libpq-dev \
+    binutils \
+    build-essential \
+    binfmt-support \
+    readline-doc \
+    telnetd \
+    telnet \
+    entr \
+    locales \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install docker and docker-compose
+RUN curl -fsSL https://get.docker.com | sh && \
+    curl -SL https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose && \
+    chmod 755 /usr/local/bin/docker-compose
+
+# Fix locales
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+# CREATE A NON-ROOT USER NAMED DOCKER
+RUN mkdir -p ${HOME}
+RUN useradd -d ${HOME} -m -s /bin/bash -g docker docker && \
+    echo "docker:docker" | chpasswd && \
+    usermod -aG sudo,docker docker && \
+    echo docker ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/docker && \
+    chmod 0440 /etc/sudoers.d/docker
+
+RUN mkdir -p /app && \
+    chmod 777 -R /app && \
+    chmod 777 -R ${HOME} && \
+    chown -R docker:docker ${HOME} && \
+    chown -R docker:docker /app
+
+# Fix TLS
+# Based on https://github.com/mkleehammer/pyodbc/issues/610#issuecomment-534721915
+RUN sed -i /etc/ssl/openssl.cnf -e 's/MinProtocol.=.TLSv1.[0-9]/MinProtocol = TLSv1.0/;s/CipherString.=.DEFAULT@SECLEVEL=[0-9]/CipherString = DEFAULT@SECLEVEL=1/'
+
+# Install node
+RUN apt-get update
+RUN apt-get install -y ca-certificates curl gnupg
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_VERSION}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarnkey.gpg >/dev/null && \
+    echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update
+RUN apt-get install nodejs yarn -y
+
+
+# Install poetry
+USER docker
+SHELL ["/bin/bash", "--login", "-o", "pipefail", "-c"]
+
+RUN curl -sSL https://install.python-poetry.org | python -
+RUN pip install --no-cache-dir \
+    pre-commit==3.3.2
+
+USER root
+RUN ln -s ${HOME}/.local/bin/poetry /usr/local/bin
+USER docker
+
+WORKDIR /app
+
+CMD /bin/bash -i
