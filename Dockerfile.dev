@@ -26,7 +26,7 @@ ENV PATH="${HOME}/.local/bin:/opt/mssql-tools/bin:${PATH}" \
     ACCEPT_EULA=Y \
     LANG=en_US.utf8 \
     TZ=America/New_York \
-    YARN_CACHE_FOLDER=/home/docker/.cache/devcontainer/yarn \
+    NPM_CACHE_FOLDER=/home/docker/.cache/devcontainer/npm \
     POETRY_CACHE_DIR=/home/docker/.cache/devcontainer/poetry \
     PRE_COMMIT_HOME=/home/docker/.cache/devcontainer/pre-commit
 
@@ -87,10 +87,8 @@ RUN apt-get install -y ca-certificates curl gnupg
 RUN mkdir -p /etc/apt/keyrings
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_VERSION}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarnkey.gpg >/dev/null && \
-    echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt-get update
-RUN apt-get install nodejs yarn -y
+RUN apt-get install nodejs -y
 
 
 # Install poetry
