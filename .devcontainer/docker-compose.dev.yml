@@ -3,7 +3,6 @@ version: "3.7"
 services:
   dev:
     image: eznashdb-dev-image:latest
-    command:
     restart: unless-stopped
     stdin_open: true
     tty: true
