@@ -7,7 +7,7 @@ SHELL := /bin/bash
 	touch .venv
 
 node_modules: package.json
-	yarn install
+	npm install
 	touch node_modules
 
 migrations := $(wildcard */migrations/*.py)
@@ -29,13 +29,13 @@ web: .venv $(migrations) .git/first_run
 	poetry run python manage.py runserver 0.0.0.0:8000
 
 node: node_modules
-	yarn run watch
+	npm run watch
 
 ci:
 	poetry run pre-commit run --show-diff-on-failure --color=always --all-files --hook-stage push
 
 test:
-	yarn run test --watchAll=false
+	npm run test
 	poetry run pytest -n 8 -ra -q --disable-warnings --tb=long
 
 dev_image:
