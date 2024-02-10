@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { AddressInput } from "./components/AddressInput";
-import { ShulsMap } from "./components/ShulsMap";
+import { AddressInput } from "../components/AddressInput";
+import { ShulsMap } from "../components/ShulsMap";
 
 document.addEventListener("DOMContentLoaded", () => {
   const addressInput = document.querySelector("input[name=address]");

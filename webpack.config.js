@@ -1,10 +1,17 @@
 const path = require("path");
 const webpack = require("webpack");
+const glob = require("glob");
+
+const entry = {};
+const entryFiles = glob.sync("./assets/entryPoints/**/*.js");
+
+entryFiles.forEach((file) => {
+  const entryName = path.basename(file, path.extname(file));
+  entry[`./${entryName}`] = `./${file}`;
+});
 
 module.exports = {
-  entry: {
-    main: "./assets/index.js",
-  },
+  entry: entry,
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "./static/dist"),
