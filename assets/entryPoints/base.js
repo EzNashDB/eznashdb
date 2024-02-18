@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '[data-bs-toggle="tooltip"]'
     );
     Array.from(tooltipTriggerList).map((tooltipTriggerEl) => {
-      isInitialized = tooltipTriggerEl.attributes["aria-describedby"];
+      const isInitialized = tooltipTriggerEl.attributes["aria-describedby"];
       if (!isInitialized) {
         new bootstrap.Tooltip(tooltipTriggerEl);
       }
