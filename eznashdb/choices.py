@@ -13,9 +13,14 @@ LAYOUT_CHOICES = (
             ("is_elevated_back", "Back"),
         ),
     ),
-    ("is_balcony", "Balcony"),
-    ("is_only_men", "Only Men"),
-    ("is_mixed_seating", "Mixed Seating"),
+    (
+        "Other",
+        (
+            ("is_balcony", "Balcony"),
+            ("is_only_men", "Only Men"),
+            ("is_mixed_seating", "Mixed Seating"),
+        ),
+    ),
 )
 
 ZERO_TO_EIGHTEEN = [(i, i) for i in range(19)]

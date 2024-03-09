@@ -31,7 +31,7 @@ class ShulFilterSet(FilterSet):
     rooms__see_hear_score = MultipleChoiceOrUnknownCharFilter(
         label=InputLabels.SEE_HEAR,
         model_field="rooms__see_hear_score",
-        choices=[(choice.value, f"{choice.value} - {choice.label}") for choice in SeeHearScore],
+        choices=SeeHearScore.choices,
     )
     rooms__layout = MultiSelectWithUnknownFilter(
         label=InputLabels.LAYOUT, choices=RoomLayoutType.choices, method="filter_room_layout"
