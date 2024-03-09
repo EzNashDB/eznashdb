@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { AddressInput } from "../components/AddressInput";
 import { ShulsMap } from "../components/ShulsMap";
+import TomSelect from "tom-select";
 
 document.addEventListener("DOMContentLoaded", () => {
   const addressInput = document.querySelector("input[name=address]");
@@ -71,77 +72,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function getOptgroupForOption(option) {
-    // Traverse the parent elements and return the first optgroup if found
-    var parent = option.parentNode;
-    while (parent !== null) {
-      if (parent.tagName === "OPTGROUP") {
-        return parent;
-      } else if (parent.tagName === "SELECT") {
-        return null;
-      }
-      parent = parent.parentNode;
-    }
-    return null; // Return null if no optgroup is found
-  }
-
-  function initializeMultiselects() {
-    $(".bs-multiselect").multiselect({
-      includeSelectAllOption: true,
-      buttonClass: "form-select",
-      buttonWidth: "100%",
-      widthSynchronizationMode: "ifPopupIsSmaller",
-      enableHTML: true,
-      buttonTitle: (options, select) => null,
-      buttonText: function (options, select) {
-        var labels = [];
-        window.opts = options;
-        options.each(function () {
-          let label = "";
-          const optgroup = getOptgroupForOption(this);
-          if (optgroup) {
-            label += `${optgroup.label} - `;
-          }
-          if ($(this).attr("label") !== undefined) {
-            label += $(this).attr("label");
-          } else {
-            label += $(this).html();
-          }
-          labels.push(label);
-        });
-        const labelList = labels.join("; ") + "";
-        if (options.length === 0) {
-          return "---------";
-        } else {
-          return `
-            <span>
-              <span
-                class="badge bg-secondary-subtle text-dark"
-                data-bs-toggle="tooltip"
-                data-bs-title="${options.length} selected: ${labelList}"
-              >${options.length}</span>
-              <span>${labelList}</span>
-            </span>
-          `;
-        }
-      },
-      templates: {
-        button:
-          '<button type="button" class="multiselect dropdown-toggle d-block" data-bs-toggle="dropdown"><div class="multiselect-selected-text text-start"></div></button>',
-        popupContainer:
-          '<div class="multiselect-container dropdown-menu position-fixed shadow-lg"></div>',
-        option:
-          '<button type="button" class="multiselect-option dropdown-item text-wrap"></button>',
-      },
+  function initializeTomSelects() {
+    document.querySelectorAll("select.tom-select").forEach((el) => {
+      if (!!el.tomselect) return;
+      let settings = {
+        searchField: [],
+        plugins: {
+          checkbox_options: {
+            checkedClassNames: ["ts-checked"],
+            uncheckedClassNames: ["ts-unchecked"],
+          },
+          clear_button: {
+            title: "Remove all selected options",
+          },
+          no_backspace_delete: true,
+        },
+      };
+      new TomSelect(el, settings);
     });
   }
 
   onDocumentEvent("DOMContentLoaded", [
     setBodyHeight,
     initializeTooltips,
-    initializeMultiselects,
+    initializeTomSelects,
   ]);
-  onDocumentEvent("formsetInitialized", [initializeMultiselects]);
-  onDOMChange([initializeMultiselects, initializeTooltips]);
+  onDocumentEvent("formsetInitialized", [initializeTomSelects]);
+  onDOMChange([initializeTomSelects, initializeTooltips]);
   window.addEventListener("resize", setBodyHeight);
 })();
