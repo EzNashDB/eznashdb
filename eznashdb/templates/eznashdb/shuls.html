@@ -8,11 +8,18 @@
 
 {% block content %}
     <div class="d-flex flex-column h-100">
-        <div class="mb-1 d-flex flex-row justify-content-between align-items-center">
-            <div>{{ filter.qs.count }} Shuls found</div>
-            <div class="d-flex flex-row">
-                <div>{% include "eznashdb/includes/shul_filters_modal.html" %}</div>
+        <div class="row">
+            <div class="col-6">
+                <h4>
+                    Search Shuls
+                </h1>
             </div>
+            <div class="col-6 d-flex flex-column align-items-end">
+                <div>{{ filter.qs.count }} Shul{{ filter.qs.count|pluralize }} found</div>
+            </div>
+        </div>
+        <div class="row">
+            <div>{% include "eznashdb/includes/shul_filters.html" %}</div>
         </div>
         <div class="flex-grow-1 overflow-auto border rounded">
             <div id="shulsMap" class="h-100"></div>
