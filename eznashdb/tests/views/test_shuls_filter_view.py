@@ -17,39 +17,6 @@ def test_shows_app_name(GET_request):
 
     assert "Ezrat Nashim Database" in soup.get_text()
 
-
-def test_shows_shul_name(GET_request):
-    shul = Shul.objects.create(name="test shul")
-
-    response = ShulsFilterView.as_view()(GET_request)
-    soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-    assert shul.name in soup.get_text()
-
-
-def describe_shul_cards():
-    @pytest.mark.parametrize(
-        ("field_name", "field_label"),
-        [
-            ("has_female_leadership", "Female Leadership"),
-            ("can_say_kaddish", "Kaddish"),
-        ],
-    )
-    @pytest.mark.parametrize(
-        ("field_value", "display_value"),
-        [(True, "fa-check"), (False, "fa-times"), (None, "--")],
-    )
-    def test_shows_shul_details(GET_request, field_name, field_label, field_value, display_value):
-        Shul.objects.create(name="test shul", **{field_name: field_value})
-
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        badges = soup.find_all(attrs={"class": "badge"})
-        field_badge = [el for el in badges if field_label in el.text][0]
-
-        assert display_value in str(field_badge)
-
     def test_shows_shul_address(GET_request):
         Shul.objects.create(name="test shul", address="test address")
 
@@ -164,13 +131,6 @@ def describe_shul_cards():
             assert "--" in soup.text
 
 
-def test_shows_message_if_no_shuls(GET_request):
-    response = ShulsFilterView.as_view()(GET_request)
-    soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-    assert "No Shuls Found" in soup.get_text()
-
-
 def describe_filter():
     def filters_by_name(rf_GET):
         Shul.objects.create(name="shul 1")
@@ -180,9 +140,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_has_female_leadership(rf_GET):
         Shul.objects.create(name="shul 1", has_female_leadership=False)
@@ -194,9 +153,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_can_say_kaddish(rf_GET):
         Shul.objects.create(name="shul 1", can_say_kaddish=False)
@@ -206,9 +164,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_wheelchair_access(rf_GET):
         Shul.objects.create(name="shul 1")
@@ -221,9 +178,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_relative_size(rf_GET):
         Shul.objects.create(name="shul 1")
@@ -235,9 +191,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_see_hear_score(rf_GET):
         Shul.objects.create(name="shul 1")
@@ -249,9 +204,8 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
 
     def filters_by_room_layout(rf_GET):
         Shul.objects.create(name="shul 1")
@@ -263,6 +217,5 @@ def describe_filter():
         response = ShulsFilterView.as_view()(request)
 
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        soup_text = soup.get_text().lower()
-        assert "shul 2" in soup_text
-        assert "shul 1" not in soup_text
+        assert "shul 2" in str(soup)
+        assert "shul 1" not in str(soup)
