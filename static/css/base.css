@@ -39,24 +39,6 @@ td.td-shrink {
   min-width: 25px;
 }
 
-.w-40px {
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-}
-
-.w-50px {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
-}
-
-.w-125px {
-  width: 125px;
-  min-width: 125px;
-  max-width: 125px;
-}
-
 /* scrollbar */
 ::-webkit-scrollbar {
   width: 12px;

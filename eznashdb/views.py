@@ -31,15 +31,6 @@ class ShulsFilterView(FilterView):
         json_shuls = json.dumps(serialized_shuls)
         return json_shuls
 
-    def get(self, request, *args, **kwargs):
-        if not self.request.GET.get("format"):
-            url = self.request.build_absolute_uri()
-            url += "&" if request.GET else "?"
-            url += "format=map"
-            return HttpResponseRedirect(url)
-
-        return super().get(request, *args, **kwargs)
-
 
 class CreateUpdateShulView(UpdateView):
     model = Shul
