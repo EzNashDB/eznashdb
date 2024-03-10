@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("select.tom-select").forEach((el) => {
       if (!!el.tomselect) return;
       let settings = {
-        searchField: [],
+        controlInput: null,
         plugins: {
           checkbox_options: {
             checkedClassNames: ["ts-checked"],
