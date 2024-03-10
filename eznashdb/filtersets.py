@@ -1,4 +1,3 @@
-from crispy_forms.helper import FormHelper
 from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 
@@ -58,11 +57,6 @@ class ShulFilterSet(FilterSet):
             all_False = {f"rooms__{field}": False for field in layout_fields}
             query |= Q(**all_False)
         return qs.filter(query).distinct()
-
-    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
-        super().__init__(data, queryset, request=request, prefix=prefix)
-        self.form.helper = helper = FormHelper()
-        helper.field_class = "input-group input-group-sm"
 
     @property
     def qs(self):
