@@ -8,7 +8,7 @@ def navbar(request):
     return {
         "current_view_name": f"{current_app_name}:{current_url_name}",
         "navbar_items": [
-            NavbarItem("Shuls", "eznashdb:shuls"),
+            NavbarItem("Search Shuls", "eznashdb:shuls"),
             NavbarItem("Add a Shul", "eznashdb:create_shul"),
         ],
     }
