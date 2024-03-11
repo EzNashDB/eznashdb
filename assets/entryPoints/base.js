@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!!el.tomselect) return;
       let settings = {
         controlInput: null,
+        dropdownParent: "body",
         plugins: {
           checkbox_options: {
             checkedClassNames: ["ts-checked"],
