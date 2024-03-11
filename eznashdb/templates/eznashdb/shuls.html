@@ -18,11 +18,13 @@
                 <div>{{ filter.qs.count }} Shul{{ filter.qs.count|pluralize }} found</div>
             </div>
         </div>
-        <div class="row">
-            <div>{% include "eznashdb/includes/shul_filters.html" %}</div>
+        <div class="row mb-3" style="max-height: 40%;">
+            <div class="col-12 h-100 overflow-auto">{% include "eznashdb/includes/shul_filters.html" %}</div>
         </div>
-        <div class="flex-grow-1 overflow-auto border rounded">
-            <div id="shulsMap" class="h-100"></div>
+        <div class="row flex-grow-1">
+            <div class="col-12">
+                <div id="shulsMap" class="border rounded h-100"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
