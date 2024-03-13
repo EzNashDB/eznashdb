@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -71,6 +72,7 @@
 
 {% block extra_media_bottom %}
     {{ block.super }}
+    <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
     <script type="text/javascript">
     const shulForm = {
         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
