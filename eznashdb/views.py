@@ -31,6 +31,11 @@ class ShulsFilterView(FilterView):
         json_shuls = json.dumps(serialized_shuls)
         return json_shuls
 
+    def get_template_names(self) -> list[str]:
+        if "Hx-Request" in self.request.headers:
+            return ["eznashdb/includes/shuls_map.html"]
+        return super().get_template_names()
+
 
 class CreateUpdateShulView(UpdateView):
     model = Shul

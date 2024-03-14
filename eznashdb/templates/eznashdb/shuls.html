@@ -2,10 +2,6 @@
 
 {% load static %}
 
-{% block extra_media_top %}
-    <script>const shuls = {{serialized_shuls|safe}}</script>
-{% endblock extra_media_top %}
-
 {% block content %}
     <div class="d-flex flex-column h-100">
         <div class="row">
@@ -22,13 +18,11 @@
             <div class="col-12 h-100 overflow-auto">{% include "eznashdb/includes/shul_filters.html" %}</div>
         </div>
         <div class="row flex-grow-1">
-            <div class="col-12">
-                <div id="shulsMap" class="border rounded h-100"></div>
-            </div>
+            <div class="col-12" id="shuls-map-wrapper">{% include "eznashdb/includes/shuls_map.html" %}</div>
         </div>
     </div>
 {% endblock %}
 
 {% block extra_media_bottom %}
-    <script defer src="{% static 'dist/shuls.js' %}"></script>
+    <script defer src="{% static 'dist/shulsMap.js' %}"></script>
 {% endblock extra_media_bottom %}
