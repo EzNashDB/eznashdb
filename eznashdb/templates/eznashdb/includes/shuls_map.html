@@ -1,0 +1,6 @@
+{% load static %}
+<div id="shulsMap" class="border rounded h-100"></div>
+<script>
+    window.shuls = {{serialized_shuls|safe}}
+    document.dispatchEvent(new Event("shulsDataLoaded"));
+</script>

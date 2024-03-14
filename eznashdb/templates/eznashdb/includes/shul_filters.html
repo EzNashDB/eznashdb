@@ -1,5 +1,8 @@
 {% load crispy_forms_tags %}
-<form method="get" class="row js-auto-submit">
+<form class="row"
+      hx-get="{% url 'eznashdb:shuls' %}"
+      hx-target="#shuls-map-wrapper"
+      hx-trigger="change">
     {% for field in filter.form %}
         <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex align-items-end">
             <div class="w-100">{{ field|as_crispy_field }}</div>
