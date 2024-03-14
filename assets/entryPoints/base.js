@@ -19,12 +19,6 @@ import TomSelect from "tom-select";
     observer.observe(targetElement, options);
   }
 
-  const registerAutoSubmits = () => {
-    Array.from(document.getElementsByClassName("js-auto-submit")).forEach(
-      (el) => el.addEventListener("change", (e) => el.submit())
-    );
-  };
-
   function setBodyHeight() {
     document.body.style.height = window.innerHeight + "px";
   }
@@ -64,7 +58,6 @@ import TomSelect from "tom-select";
 
   onDocumentEvent("DOMContentLoaded", [
     setBodyHeight,
-    registerAutoSubmits,
     initializeTooltips,
     initializeTomSelects,
   ]);
