@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { ShulsMap } from "../components/ShulsMap";
 
 const renderMap = () => {
-  const shulsMapContainer = document.getElementById("shulsMap");
+  const shulsMapContainer = document.getElementById("shuls-map");
   createRoot(shulsMapContainer).render(<ShulsMap shuls={shuls} />);
 };
 
