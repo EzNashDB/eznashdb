@@ -1,5 +1,17 @@
 {% load static %}
-<div id="shuls-map" class="border rounded h-100"></div>
+<div class="border rounded h-100 position-relative">
+    <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
+        <div class="flex-grow-1 text-center">
+            <span class="spinner-border spinner-border-lg"
+                  style="width: 3rem;
+                         height: 3rem"
+                  role="status">
+                <span class="visually-hidden">Loading...</span>
+            </span>
+        </div>
+    </span>
+    <div id="shuls-map" class="h-100"></div>
+</div>
 <script>
     window.shuls = {{serialized_shuls|safe}}
     document.dispatchEvent(new Event("shulsDataLoaded"));

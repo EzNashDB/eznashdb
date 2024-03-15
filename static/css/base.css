@@ -7,6 +7,16 @@ body {
   height: var(--doc-height);
 }
 
+.spinner-overlay {
+  z-index: 1000;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 0.5;
+  transform: translate(-50%, -50%);
+  transition: 1s;
+}
+
 .striped> :nth-child(even of :not([style*="display: none;"])) {
   /* Based on bootstrap table-striped styling */
   --bs-table-color-type: var(--bs-table-color);
