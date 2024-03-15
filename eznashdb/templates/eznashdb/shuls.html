@@ -11,7 +11,17 @@
                 </h1>
             </div>
             <div class="col-6 d-flex flex-column align-items-end">
-                <div id="shuls-count">{{ filter.qs.count }} shul{{ filter.qs.count|pluralize }} found</div>
+                <span class="text-nowrap">
+                    <span class="position-relative d-inline p-2">
+                        <span class="spinner-overlay bg-secondary w-100 rounded text-center opacity-0">
+                            <span class="spinner-border spinner-border-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </span>
+                        <span id="shuls-count">{{ filter.qs.count }} shul{{ filter.qs.count|pluralize }}</span>
+                        <span>found</span>
+                    </span>
+                </span>
             </div>
         </div>
         <div class="row mb-3" style="max-height: 40%;">
