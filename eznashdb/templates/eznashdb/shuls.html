@@ -28,7 +28,22 @@
             <div class="col-12 h-100 overflow-auto">{% include "eznashdb/includes/shul_filters.html" %}</div>
         </div>
         <div class="row flex-grow-1">
-            <div class="col-12" id="shuls-map-wrapper">{% include "eznashdb/includes/shuls_map.html" %}</div>
+            <div class="col-12">
+                <div id="shuls-js-loader-wrapper">{% include "eznashdb/includes/shuls_js_loader.html" %}</div>
+                <div class="border rounded h-100 position-relative">
+                    <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
+                        <div class="flex-grow-1 text-center">
+                            <span class="spinner-border spinner-border-lg"
+                                  style="width: 3rem;
+                                         height: 3rem"
+                                  role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </div>
+                    </span>
+                    <div id="shuls-map" class="h-100"></div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

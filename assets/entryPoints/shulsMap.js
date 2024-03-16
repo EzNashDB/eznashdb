@@ -4,7 +4,7 @@ import { ShulsMap } from "../components/ShulsMap";
 
 const renderMap = () => {
   const shulsMapContainer = document.getElementById("shuls-map");
-  createRoot(shulsMapContainer).render(<ShulsMap shuls={shuls} />);
+  createRoot(shulsMapContainer).render(<ShulsMap />);
 };
 
 const renderShulCount = () => {
@@ -36,14 +36,16 @@ class SpinnerManager {
   }
 }
 
-["DOMContentLoaded", "shulsDataLoaded"].forEach((eventType) => {
-  document.addEventListener(eventType, (e) => {
-    new SpinnerManager().hide();
-    renderMap();
-    renderShulCount();
-  });
+document.addEventListener("DOMContentLoaded", (e) => {
+  renderMap();
+  renderShulCount();
 });
 
 document.addEventListener("htmx:beforeSend", (e) => {
   new SpinnerManager().show();
+});
+
+document.addEventListener("shulsDataLoaded", (e) => {
+  new SpinnerManager().hide();
+  renderShulCount();
 });
