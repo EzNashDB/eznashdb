@@ -1,0 +1,5 @@
+{% load static %}
+<script>
+    window.shuls = {{serialized_shuls|safe}}
+    document.dispatchEvent(new Event("shulsDataLoaded"));
+</script>

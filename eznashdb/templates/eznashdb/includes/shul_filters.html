@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 <form class="row"
       hx-get="{% url 'eznashdb:shuls' %}"
-      hx-target="#shuls-map-wrapper"
+      hx-target="#shuls-js-loader-wrapper"
       hx-trigger="change">
     {% for field in filter.form %}
         <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex align-items-end">
