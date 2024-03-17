@@ -118,14 +118,14 @@ td.td-shrink {
 .scroll-shadow--top {
   display: none;
   top: 0;
-  background: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.35), transparent);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent);
+  background: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.20), transparent);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.20), transparent);
   opacity: 0;
 }
 
 .scroll-shadow--bottom {
   display: none;
   bottom: 0;
-  background: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent);
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent);
+  background: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.20), transparent);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.20), transparent);
 }
