@@ -26,8 +26,12 @@
                 </span>
             </div>
         </div>
-        <div class="row mb-3 shul-filters-row">
-            <div class="col-12 h-100 overflow-auto">{% include "eznashdb/includes/shul_filters.html" %}</div>
+        <div class="row mb-3 shul-filters-row scroll-shadow-wrapper rounded">
+            <div class="scroll-shadow scroll-shadow--top rounded-top"></div>
+            <div class="scroll-shadow scroll-shadow--bottom rounded-bottom"></div>
+            <div class="col-12 overflow-auto h-100 scroll-content">
+                {% include "eznashdb/includes/shul_filters.html" %}
+            </div>
         </div>
         <div class="row flex-grow-1 map-row">
             <div class="col-12">
@@ -51,5 +55,6 @@
 {% endblock %}
 
 {% block extra_media_bottom %}
+    {{ block.super }}
     <script defer src="{% static 'dist/shulsMap.js' %}"></script>
 {% endblock extra_media_bottom %}

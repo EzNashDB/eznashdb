@@ -1,4 +1,5 @@
 import TomSelect from "tom-select";
+import initializeScrollShadows from "../initializers/scrollShadows";
 
 (() => {
   function onDocumentEvent(eventName, funcs) {
@@ -60,6 +61,7 @@ import TomSelect from "tom-select";
     setBodyHeight,
     initializeTooltips,
     initializeTomSelects,
+    initializeScrollShadows,
   ]);
   onDocumentEvent("formsetInitialized", [initializeTomSelects]);
   onDOMChange([initializeTomSelects, initializeTooltips]);
