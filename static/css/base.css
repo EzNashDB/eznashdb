@@ -106,6 +106,10 @@ td.td-shrink {
 */
 .scroll-shadow-wrapper {
   position: relative;
+  border-width: 0;
+  border-style: var(--bs-border-style);
+  border-color: var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
 }
 
 .scroll-shadow {
