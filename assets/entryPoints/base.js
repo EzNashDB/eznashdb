@@ -1,5 +1,7 @@
-import TomSelect from "tom-select";
+import setBodyHeight from "../initializers/bodyHeight";
 import initializeScrollShadows from "../initializers/scrollShadows";
+import initializeTomSelects from "../initializers/tomSelect";
+import initializeTooltips from "../initializers/tooltips";
 
 (() => {
   function onDocumentEvent(eventName, funcs) {
@@ -18,43 +20,6 @@ import initializeScrollShadows from "../initializers/scrollShadows";
       observer.observe(targetElement, options);
     });
     observer.observe(targetElement, options);
-  }
-
-  function setBodyHeight() {
-    document.body.style.height = window.innerHeight + "px";
-  }
-
-  function initializeTooltips() {
-    const tooltipTriggerList = document.querySelectorAll(
-      '[data-bs-toggle="tooltip"]'
-    );
-    Array.from(tooltipTriggerList).map((tooltipTriggerEl) => {
-      const isInitialized = tooltipTriggerEl.attributes["aria-describedby"];
-      if (!isInitialized) {
-        new bootstrap.Tooltip(tooltipTriggerEl);
-      }
-    });
-  }
-
-  function initializeTomSelects() {
-    document.querySelectorAll("select.tom-select").forEach((el) => {
-      if (!!el.tomselect) return;
-      let settings = {
-        controlInput: null,
-        dropdownParent: "body",
-        plugins: {
-          checkbox_options: {
-            checkedClassNames: ["ts-checked"],
-            uncheckedClassNames: ["ts-unchecked"],
-          },
-          clear_button: {
-            title: "Remove all selected options",
-          },
-          no_backspace_delete: true,
-        },
-      };
-      new TomSelect(el, settings);
-    });
   }
 
   onDocumentEvent("DOMContentLoaded", [
