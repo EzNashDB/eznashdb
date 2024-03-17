@@ -32,12 +32,14 @@ class ScrollShadowInitializer {
     [this.shadowBottom, this.shadowTop].forEach((el) => {
       el.style.display = "block";
     });
+    this.wrapperEl.style.borderWidth = "var(--bs-border-width)";
   }
 
   hide() {
     [this.shadowBottom, this.shadowTop].forEach((el) => {
       el.style.display = "none";
     });
+    this.wrapperEl.style.borderWidth = "0";
   }
 
   listenForScroll() {
