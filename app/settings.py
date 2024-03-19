@@ -35,6 +35,7 @@ SECRET_KEY = "django-insecure-lo*q=01+khs@we11ljr3fx73&^2-q0i8b0@y-duyq^70gzg1uq
 DEBUG = os.getenv("DEBUG", False) == "True"
 
 ALLOWED_HOSTS = [
+    "ezratnashim.com",
     "eznashdb.herokuapp.com",
     "eznashdb.fly.dev",
     "localhost",
