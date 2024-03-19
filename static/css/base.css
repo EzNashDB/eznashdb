@@ -59,6 +59,7 @@ td.td-shrink {
   width: 12px;
   height: 12px;
   background-color: white;
+  border-radius: var(--bs-border-radius);
 }
 
 ::-webkit-scrollbar-thumb {
