@@ -1,23 +1,15 @@
-const calculateScrollPercentage = (element) => {
-  // Calculate the scrollable height of the element
-  const scrollableHeight = element.scrollHeight - element.clientHeight;
-  if (scrollableHeight === 0) {
-    return 0;
-  }
-  const scrollPercentage = (element.scrollTop / scrollableHeight) * 100;
-  return scrollPercentage / 100;
-};
-
 class ShadowScrollInitializer {
   constructor(wrapperEl) {
-    this.wrapperEl = wrapperEl;
-    this.scrollBox = this.wrapperEl.querySelector(".shadow-scroll__scroll-box");
-    this.content = this.wrapperEl.querySelector(".shadow-scroll__content");
-    this.shadowWrapper = this.wrapperEl.querySelector(
+    this.parentEl = wrapperEl;
+    this.scrollBox = this.parentEl.querySelector(".shadow-scroll__scroll-box");
+    this.content = this.parentEl.querySelector(".shadow-scroll__content");
+    this.shadowWrapper = this.parentEl.querySelector(
       ".shadow-scroll__shadow-wrapper"
     );
-    this.shadowTop = this.wrapperEl.querySelector(".shadow-scroll__top");
-    this.shadowBottom = this.wrapperEl.querySelector(".shadow-scroll__bottom");
+    this.shadowTop = this.parentEl.querySelector(".shadow-scroll__top-shadow");
+    this.shadowBottom = this.parentEl.querySelector(
+      ".shadow-scroll__bottom-shadow"
+    );
   }
 
   initialize() {
@@ -28,30 +20,34 @@ class ShadowScrollInitializer {
 
   setVisibility() {
     const isOverflowing =
-      this.content.offsetHeight > this.wrapperEl.offsetHeight;
+      this.content.offsetHeight > this.parentEl.offsetHeight;
     isOverflowing ? this.show() : this.hide();
   }
 
   setShadows() {
-    const scrollPercentage = calculateScrollPercentage(this.scrollBox);
+    const scrollPercentage = this.calculateScrollPercentage(this.scrollBox);
     this.shadowTop.style.opacity = scrollPercentage;
     this.shadowBottom.style.opacity = 1 - scrollPercentage;
   }
 
+  calculateScrollPercentage(element) {
+    const scrollableHeight = element.scrollHeight - element.clientHeight;
+    if (scrollableHeight === 0) return 0;
+    const scrollPercentage = (element.scrollTop / scrollableHeight) * 100;
+    return scrollPercentage / 100;
+  }
+
   show() {
-    [this.shadowBottom, this.shadowTop, this.shadowWrapper].forEach((el) => {
-      el.style.display = "block";
-    });
+    this.setShadows();
+    this.shadowWrapper.style.display = "block";
     this.shadowWrapper.style.borderWidth = "var(--bs-border-width)";
     this.scrollBox.appendChild(this.content);
   }
 
   hide() {
-    [this.shadowBottom, this.shadowTop, this.shadowWrapper].forEach((el) => {
-      el.style.display = "none";
-    });
+    this.shadowWrapper.style.display = "none";
     this.shadowWrapper.style.borderWidth = "0";
-    this.wrapperEl.appendChild(this.content);
+    this.parentEl.appendChild(this.content);
   }
 
   listenForScroll() {
@@ -59,16 +55,8 @@ class ShadowScrollInitializer {
   }
 
   listenForResize() {
-    const resizeObserver = new ResizeObserver((entries) =>
-      this.setVisibility()
-    );
-    [
-      this.wrapperEl,
-      this.content,
-      ...Array.from(this.scrollBox.children),
-    ].forEach((el) => {
-      resizeObserver.observe(el);
-    });
+    const observer = new ResizeObserver((entries) => this.setVisibility());
+    [this.parentEl, this.content].forEach((el) => observer.observe(el));
   }
 }
 
