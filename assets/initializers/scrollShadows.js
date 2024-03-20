@@ -49,11 +49,14 @@ class ScrollShadowInitializer {
       this.shadowBottom.style.opacity = 1 - scrollPercentage;
     });
   }
+
   listenForResize() {
     const resizeObserver = new ResizeObserver((entries) => {
       this.setVisibility();
     });
-    resizeObserver.observe(this.wrapperEl);
+    [this.wrapperEl, ...Array.from(this.content.children)].forEach((el) => {
+      resizeObserver.observe(el);
+    });
   }
 }
 
