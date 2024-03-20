@@ -34,6 +34,11 @@ td.td-shrink {
   white-space: nowrap;
 }
 
+/* z-index */
+.z-1001 {
+  z-index: 1000;
+}
+
 /* Alpine.js */
 [x-cloak] { display: none !important; }
 

@@ -6,7 +6,7 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import "../css/map.css";
-import { ShulsMarkerClusterGroup } from "./ShulMarkerClusterGroup";
+import { ShulMarkersLayer } from "./ShulMarkersLayer";
 
 export const ShulsMap = () => {
   const updateURLParams = (params) => {
@@ -53,13 +53,14 @@ export const ShulsMap = () => {
       worldCopyJump={true}
       minZoom={1}
       zoomControl={false}
+      className="rounded"
     >
       <MapEvents />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <ShulsMarkerClusterGroup />
+      <ShulMarkersLayer />
       <ZoomControl position="bottomleft" />
     </MapContainer>
   );
