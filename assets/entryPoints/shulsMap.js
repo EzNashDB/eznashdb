@@ -7,13 +7,6 @@ const renderMap = () => {
   createRoot(shulsMapContainer).render(<ShulsMap />);
 };
 
-const renderShulCount = () => {
-  const shulCountContainer = document.getElementById("shuls-count");
-  const count = shuls.length;
-  const shulsLabel = shuls.length == 1 ? "shul" : "shuls";
-  shulCountContainer.innerHTML = `${count} ${shulsLabel}`;
-};
-
 class SpinnerManager {
   constructor() {
     this._spinnerOverlays = Array.from(
@@ -38,7 +31,6 @@ class SpinnerManager {
 
 document.addEventListener("DOMContentLoaded", (e) => {
   renderMap();
-  renderShulCount();
 });
 
 document.addEventListener("htmx:beforeSend", (e) => {
@@ -47,5 +39,4 @@ document.addEventListener("htmx:beforeSend", (e) => {
 
 document.addEventListener("shulsDataLoaded", (e) => {
   new SpinnerManager().hide();
-  renderShulCount();
 });
