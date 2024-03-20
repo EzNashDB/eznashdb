@@ -28,6 +28,12 @@ class ScrollShadowInitializer {
     hasVerticalScrollbar ? this.show() : this.hide();
   }
 
+  setShadows() {
+    const scrollPercentage = calculateScrollPercentage(this.content);
+    this.shadowTop.style.opacity = scrollPercentage;
+    this.shadowBottom.style.opacity = 1 - scrollPercentage;
+  }
+
   show() {
     [this.shadowBottom, this.shadowTop].forEach((el) => {
       el.style.display = "block";
@@ -43,11 +49,7 @@ class ScrollShadowInitializer {
   }
 
   listenForScroll() {
-    this.content.addEventListener("scroll", (e) => {
-      const scrollPercentage = calculateScrollPercentage(this.content);
-      this.shadowTop.style.opacity = scrollPercentage;
-      this.shadowBottom.style.opacity = 1 - scrollPercentage;
-    });
+    this.content.addEventListener("scroll", (e) => this.setShadows());
   }
 
   listenForResize() {
