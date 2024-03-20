@@ -3,6 +3,7 @@ import { Marker } from "react-leaflet";
 import Badge from "react-bootstrap/Badge";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { ShulPopup } from "./ShulPopup";
+import { useMap } from "react-leaflet/hooks";
 import "../css/map.css";
 
 export const ShulMarkersLayer = () => {
@@ -10,6 +11,7 @@ export const ShulMarkersLayer = () => {
   const [shuls, setShuls] = useState(window.shuls || []);
   const [markersDoneLoading, setMarkersDoneLoading] = useState(false);
   const markerRefs = useRef({});
+  const map = useMap();
 
   document.addEventListener("shulsDataLoaded", (e) => {
     setShuls(window.shuls);
@@ -46,10 +48,37 @@ export const ShulMarkersLayer = () => {
     return `${shulCount} ${shulsStr} found`;
   };
 
+  const shulCountHoverManager = (() => {
+    /*
+      Disable map features when hovering on shul count.
+      Based on
+        - https://gis.stackexchange.com/a/104609
+        - https://stackoverflow.com/a/54857289
+    */
+    const mapFeaturesToDisable = [
+      "doubleClickZoom",
+      "dragging",
+      "touchZoom",
+      "scrollWheelZoom",
+    ];
+    return {
+      handleMouseOver: (e) => {
+        mapFeaturesToDisable.forEach((prop) => map[prop].disable());
+      },
+      handleMouseOut: (e) => {
+        mapFeaturesToDisable.forEach((prop) => map[prop].enable());
+      },
+    };
+  })();
+
   return (
     <>
       <div className="position-absolute start-0 top-0 z-1001">
-        <div className="mx-1 fw-normal fs-5 opacity-75">
+        <div
+          className="mx-1 fw-normal fs-5 opacity-75"
+          onMouseOver={shulCountHoverManager.handleMouseOver}
+          onMouseOut={shulCountHoverManager.handleMouseOut}
+        >
           <Badge bg="dark">{getShulsFoundLabel()}</Badge>
         </div>
       </div>
