@@ -32,11 +32,14 @@
                 </span>
             </div>
         </div>
-        <div class="row mb-3 shul-filters-row scroll-shadow-wrapper">
-            <div class="scroll-shadow scroll-shadow--top rounded-top"></div>
-            <div class="scroll-shadow scroll-shadow--bottom rounded-bottom"></div>
-            <div class="col-12 pt-2 overflow-auto h-100 scroll-content">
+        <div class="row mb-3 shul-filters-row">
+            <div class="col-12 h-100 shadow-scroll">
                 {% include "eznashdb/includes/shul_filters.html" %}
+                <div class="shadow-scroll__shadow-wrapper">
+                    <div class="shadow-scroll__shadow shadow-scroll__top"></div>
+                    <div class="shadow-scroll__shadow shadow-scroll__bottom"></div>
+                    <div class="shadow-scroll__scroll-box"></div>
+                </div>
             </div>
         </div>
         <div class="row flex-grow-1 map-row">

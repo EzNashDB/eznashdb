@@ -1,5 +1,5 @@
 import setBodyHeight from "../initializers/bodyHeight";
-import initializeScrollShadows from "../initializers/scrollShadows";
+import initializeShadowScrolls from "../initializers/shadowScroll";
 import initializeTomSelects from "../initializers/tomSelect";
 import initializeTooltips from "../initializers/tooltips";
 import Alpine from "alpinejs";
@@ -32,7 +32,7 @@ import Alpine from "alpinejs";
     setBodyHeight,
     initializeTooltips,
     initializeTomSelects,
-    initializeScrollShadows,
+    initializeShadowScrolls,
     initializeAlpine,
   ]);
   onDocumentEvent("formsetInitialized", [initializeTomSelects]);
