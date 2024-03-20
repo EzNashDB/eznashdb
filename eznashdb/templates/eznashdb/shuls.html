@@ -14,15 +14,6 @@
             </div>
             <div class="col-6 d-flex flex-column align-items-end">
                 <span class="text-nowrap">
-                    <span class="position-relative d-inline p-2">
-                        <span class="spinner-overlay bg-secondary w-100 rounded text-center opacity-0">
-                            <span class="spinner-border spinner-border-sm" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </span>
-                        <span id="shuls-count">{{ filter.qs.count }} shul{{ filter.qs.count|pluralize }}</span>
-                        <span>found</span>
-                    </span>
                     <button type="button"
                             x-on:click="showHelpText = ! showHelpText"
                             class="btn btn-info btn-sm">
