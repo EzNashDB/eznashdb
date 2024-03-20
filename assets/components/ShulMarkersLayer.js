@@ -73,7 +73,7 @@ export const ShulMarkersLayer = () => {
 
   return (
     <>
-      <div className="position-absolute start-0 top-0 z-1001">
+      <div className="position-absolute end-0 top-0 z-1001">
         <div
           className="mx-1 fw-normal fs-5 opacity-75"
           onMouseOver={shulCountHoverManager.handleMouseOver}
