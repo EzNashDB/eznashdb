@@ -1,3 +1,4 @@
+from crispy_forms.helper import FormHelper
 from django.db.models import Q
 from django_filters import CharFilter, FilterSet
 
@@ -35,6 +36,11 @@ class ShulFilterSet(FilterSet):
     rooms__layout = MultiSelectWithUnknownFilter(
         label=InputLabels.LAYOUT, choices=RoomLayoutType.choices, method="filter_room_layout"
     )
+
+    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
+        super().__init__(data, queryset, request=request, prefix=prefix)
+        self.form.helper = helper = FormHelper()
+        helper.field_template = "bootstrap5/no_margin_field.html"
 
     def filter_room_layout(self, qs, name, value):
         include_None = "--" in value

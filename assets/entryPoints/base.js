@@ -2,6 +2,7 @@ import setBodyHeight from "../initializers/bodyHeight";
 import initializeScrollShadows from "../initializers/scrollShadows";
 import initializeTomSelects from "../initializers/tomSelect";
 import initializeTooltips from "../initializers/tooltips";
+import Alpine from "alpinejs";
 
 (() => {
   function onDocumentEvent(eventName, funcs) {
@@ -22,11 +23,17 @@ import initializeTooltips from "../initializers/tooltips";
     observer.observe(targetElement, options);
   }
 
+  function initializeAlpine() {
+    window.Alpine = Alpine;
+    Alpine.start();
+  }
+
   onDocumentEvent("DOMContentLoaded", [
     setBodyHeight,
     initializeTooltips,
     initializeTomSelects,
     initializeScrollShadows,
+    initializeAlpine,
   ]);
   onDocumentEvent("formsetInitialized", [initializeTomSelects]);
   onDOMChange([initializeTomSelects, initializeTooltips]);

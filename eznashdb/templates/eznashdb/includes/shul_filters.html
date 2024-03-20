@@ -4,8 +4,9 @@
       hx-target="#shuls-js-loader-wrapper"
       hx-trigger="change">
     {% for field in filter.form %}
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex align-items-end">
-            <div class="w-100">{{ field|as_crispy_field }}</div>
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex flex-column mb-3">
+            {{ field|as_crispy_field }}
+            <p class="form-text" x-show="showHelpText" x-cloak x-transition>{{ field.label.help_text }}</p>
         </div>
     {% endfor %}
 </form>
