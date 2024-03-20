@@ -23,6 +23,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "alpinejs": "^3.13.7",
     "leaflet": "^1.9.4",
     "less": "^4.2.0",
     "less-loader": "^11.1.3",

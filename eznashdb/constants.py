@@ -1,8 +1,5 @@
 from dataclasses import dataclass
 
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
-
 DEFAULT_ARG = object()
 
 LAYOUT_FIELDS = [
@@ -23,8 +20,7 @@ class LabelWithHelpText:
     icon_class: str = ""
 
     def __str__(self) -> str:
-        context = {"label": mark_safe(self.label), "help_text": mark_safe(self.help_text)}
-        return render_to_string("eznashdb/includes/filter_label.html", context)
+        return self.label
 
     def __getitem__(self, item):
         return str(self)[item]

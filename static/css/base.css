@@ -34,6 +34,9 @@ td.td-shrink {
   white-space: nowrap;
 }
 
+/* Alpine.js */
+[x-cloak] { display: none !important; }
+
 /* bootstrap collapse */
 .btn .fa-chevron-up {
   transition: transform 0.3s ease;
