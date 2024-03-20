@@ -109,6 +109,7 @@ td.td-shrink {
   loosely based on https://codepen.io/shadeed/pen/jWBjVd
 */
 .shadow-scroll__shadow-wrapper {
+  display: none;
   position: relative;
   border-width: 0;
   border-style: var(--bs-border-style);
@@ -131,8 +132,7 @@ td.td-shrink {
   height: 100%;
 }
 
-.shadow-scroll__top {
-  display: none;
+.shadow-scroll__top-shadow {
   top: 0;
   background: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.20), transparent);
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.20), transparent);
@@ -141,8 +141,7 @@ td.td-shrink {
   opacity: 0;
 }
 
-.shadow-scroll__bottom {
-  display: none;
+.shadow-scroll__bottom-shadow {
   bottom: 0;
   background: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.20), transparent);
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.20), transparent);
