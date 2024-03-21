@@ -45,8 +45,10 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://*ezratnashim.com",
     "https://*eznashdb.fly.dev",
-    "https://localhost" "https://*.127.0.0.1",
+    "https://localhost",
+    "https://*.127.0.0.1",
 ]
 
 # Application definition
