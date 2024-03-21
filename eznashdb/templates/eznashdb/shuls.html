@@ -7,47 +7,49 @@
 {% endblock extra_media_top %}
 
 {% block content %}
-    <div class="d-flex flex-column h-100" x-data="{ showHelpText: false }">
-        <div class="row mb-1">
-            <div class="col-6">
-                <h4>Search Shuls</h4>
-            </div>
-            <div class="col-6 d-flex flex-column align-items-end">
-                <span class="text-nowrap">
-                    <button type="button"
-                            x-on:click="showHelpText = ! showHelpText"
-                            class="btn btn-info btn-sm">
-                        <i class="fa-solid fa-question"></i>
-                        <span x-text="showHelpText ? 'Hide' : 'Show'">Show</span> help text
-                    </button>
-                </span>
-            </div>
-        </div>
-        <div class="row mb-3 shul-filters-row">
-            <div class="col-12 h-100 shadow-scroll">
-                {% include "eznashdb/includes/shul_filters.html" %}
-                <div class="shadow-scroll__shadow-wrapper">
-                    <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
-                    <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
-                    <div class="shadow-scroll__scroll-box shadow-scroll__scroll-box-padded"></div>
+    <div class="row h-100" x-data="{ showHelpText: false }">
+        <div class="col h-100 d-flex flex-column">
+            <div class="row mb-1">
+                <div class="col-6">
+                    <h4>Search Shuls</h4>
+                </div>
+                <div class="col-6 d-flex flex-column align-items-end">
+                    <span class="text-nowrap">
+                        <button type="button"
+                                x-on:click="showHelpText = ! showHelpText"
+                                class="btn btn-info btn-sm">
+                            <i class="fa-solid fa-question"></i>
+                            <span x-text="showHelpText ? 'Hide' : 'Show'">Show</span> help text
+                        </button>
+                    </span>
                 </div>
             </div>
-        </div>
-        <div class="row flex-grow-1 map-row">
-            <div class="col-12">
-                <div id="shuls-js-loader-wrapper">{% include "eznashdb/includes/shuls_js_loader.html" %}</div>
-                <div class="border rounded h-100 position-relative">
-                    <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
-                        <div class="flex-grow-1 text-center">
-                            <span class="spinner-border spinner-border-lg"
-                                  style="width: 3rem;
-                                         height: 3rem"
-                                  role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </div>
-                    </span>
-                    <div id="shuls-map" class="h-100"></div>
+            <div class="row mb-3 shul-filters-row">
+                <div class="col-12 h-100 shadow-scroll">
+                    {% include "eznashdb/includes/shul_filters.html" %}
+                    <div class="shadow-scroll__shadow-wrapper">
+                        <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
+                        <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
+                        <div class="shadow-scroll__scroll-box shadow-scroll__scroll-box-padded"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row flex-grow-1 map-row">
+                <div class="col-12">
+                    <div id="shuls-js-loader-wrapper">{% include "eznashdb/includes/shuls_js_loader.html" %}</div>
+                    <div class="border rounded h-100 position-relative">
+                        <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
+                            <div class="flex-grow-1 text-center">
+                                <span class="spinner-border spinner-border-lg"
+                                      style="width: 3rem;
+                                             height: 3rem"
+                                      role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            </div>
+                        </span>
+                        <div id="shuls-map" class="h-100"></div>
+                    </div>
                 </div>
             </div>
         </div>

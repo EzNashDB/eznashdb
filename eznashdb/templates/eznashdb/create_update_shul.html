@@ -11,13 +11,13 @@
           class="row d-flex flex-column h-100">
         {% csrf_token %}
         <div class="col-12">
-            <h2 class=" text-center">
+            <h4>
                 {% if object %}
                     Edit Shul: {{ object.name }}
                 {% else %}
                     Add a Shul
                 {% endif %}
-            </h2>
+            </h4>
         </div>
         <div class="shadow-scroll overflow-auto col flex-grow-1">
             <div class="shadow-scroll__shadow-wrapper row">
@@ -30,7 +30,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="sticky-top row bg-white rounded" style="z-index: 1022;">
-                                <h5 class="col-12 py-2 m-0 text-center">Shul Details</h5>
+                                <h5 class="col-12 py-2 m-0">Shul Details</h5>
                                 <hr class="col-12 m-0">
                             </div>
                             <div class=" pb-0 pt-2">{% crispy form %}</div>
@@ -39,7 +39,7 @@
                     <div class="row flex-grow-1">
                         <div class="col">
                             <div class="sticky-top row bg-white rounded">
-                                <h5 class="col-12 py-2 m-0 text-center">Rooms</h5>
+                                <h5 class="col-12 py-2 m-0">Rooms</h5>
                                 <hr class="col-12 m-0">
                             </div>
                             <div class="row">
