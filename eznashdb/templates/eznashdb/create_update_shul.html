@@ -19,38 +19,46 @@
                 {% endif %}
             </h2>
         </div>
-        <hr class="col-12 row m-0">
-        <div class="overflow-auto rooms-scroll col flex-grow-1 h-100 d-flex flex-column">
-            <div class="row">
-                <div class="col">
-                    <div class="sticky-top row bg-white" style="z-index: 1022;">
-                        <h5 class="col-12 py-2 m-0 text-center">Shul Details</h5>
-                        <hr class="col-12 m-0">
-                    </div>
-                    <div class=" pb-0 pt-2">{% crispy form %}</div>
-                </div>
+        <div class="shadow-scroll overflow-auto col flex-grow-1">
+            <div class="shadow-scroll__shadow-wrapper row">
+                <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
+                <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
+                <div class="shadow-scroll__scroll-box rooms-scroll col"></div>
             </div>
-            <div class="row flex-grow-1">
-                <div class="col">
-                    <div class="sticky-top row bg-white">
-                        <h5 class="col-12 py-2 m-0 text-center">Rooms</h5>
-                        <hr class="col-12 m-0">
-                    </div>
+            <div class="row shadow-scroll__content">
+                <div class="col-12">
                     <div class="row">
-                        {{ room_fs.management_form }}
-                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                        <div class="room-formset col">
-                            {% for room_form in room_fs %}
-                                <div class="room-form row">
-                                    {% with room_form as form  %}
-                                        <div class="col-12">{% crispy room_form %}</div>
-                                    {% endwith %}
-                                </div>
-                            {% endfor %}
+                        <div class="col">
+                            <div class="sticky-top row bg-white rounded" style="z-index: 1022;">
+                                <h5 class="col-12 py-2 m-0 text-center">Shul Details</h5>
+                                <hr class="col-12 m-0">
+                            </div>
+                            <div class=" pb-0 pt-2">{% crispy form %}</div>
                         </div>
-                        <div class="col-12">
-                            <div class="row justify-content-end">
-                                <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
+                    </div>
+                    <div class="row flex-grow-1">
+                        <div class="col">
+                            <div class="sticky-top row bg-white rounded">
+                                <h5 class="col-12 py-2 m-0 text-center">Rooms</h5>
+                                <hr class="col-12 m-0">
+                            </div>
+                            <div class="row">
+                                {{ room_fs.management_form }}
+                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                <div class="room-formset col">
+                                    {% for room_form in room_fs %}
+                                        <div class="room-form row">
+                                            {% with room_form as form  %}
+                                                <div class="col-12">{% crispy room_form %}</div>
+                                            {% endwith %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-12">
+                                    <div class="row justify-content-end">
+                                        <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
