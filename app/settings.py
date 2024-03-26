@@ -36,6 +36,7 @@ DEBUG = os.getenv("DEBUG", False) == "True"
 
 ALLOWED_HOSTS = [
     "ezratnashim.com",
+    "www.ezratnashim.com",
     "eznashdb.herokuapp.com",
     "eznashdb.fly.dev",
     "localhost",
