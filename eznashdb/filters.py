@@ -12,7 +12,8 @@ class MultiSelectWithUnknownFilter(MultipleChoiceFilter):
         if choices == DEFAULT_ARG:
             choices = getattr(self, "choices", [])
         choices.insert(0, ("--", "Unknown"))
-        super().__init__(*args, widget=MultiSelectWidget, choices=tuple(choices), label=label, **kwargs)
+        widget = kwargs.pop("widget", MultiSelectWidget)
+        super().__init__(*args, widget=widget, choices=tuple(choices), label=label, **kwargs)
 
 
 class MultiSelectModelFieldWithUnknownFilter(MultiSelectWithUnknownFilter):

@@ -1,16 +1,18 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.forms import HiddenInput, ModelForm, inlineformset_factory
+from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
 
 from eznashdb.choices import LAYOUT_CHOICES
-from eznashdb.constants import LAYOUT_FIELDS, InputLabels
+from eznashdb.constants import LAYOUT_FIELDS, FieldsOptions
 from eznashdb.enums import RoomLayoutType
 from eznashdb.models import ChildcareProgram, Room, Shul, ShulLink
 from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
 
 
 class ShulForm(ModelForm):
-    has_no_childcare = forms.BooleanField(required=False)
+    has_no_childcare = forms.BooleanField(
+        required=False, label="Shul has no children's programming on shabbat"
+    )
 
     class Meta:
         model = Shul
@@ -25,9 +27,14 @@ class ShulForm(ModelForm):
             "place_id",
         ]
         labels = {
-            "name": InputLabels.SHUL_NAME,
-            "has_female_leadership": InputLabels.FEMALE_LEADERSHIP,
-            "can_say_kaddish": InputLabels.KADDISH,
+            "name": FieldsOptions.SHUL_NAME.label,
+            "address": FieldsOptions.ADDRESS.label,
+            "has_female_leadership": FieldsOptions.FEMALE_LEADERSHIP.label,
+            "can_say_kaddish": FieldsOptions.KADDISH.label,
+        }
+        help_texts = {
+            "has_female_leadership": FieldsOptions.FEMALE_LEADERSHIP.help_text,
+            "can_say_kaddish": FieldsOptions.KADDISH.help_text,
         }
         widgets = {
             "has_female_leadership": NullableBooleanWidget(),
@@ -41,10 +48,10 @@ class ShulForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = helper = FormHelper()
         helper.template = "eznashdb/shul_form.html"
-        helper.field_template = "bootstrap5/no_margin_field.html"
-        self.helper.form_show_labels = False
         helper.form_tag = False
-        helper.field_class = "input-group input-group-sm"
+        helper.field_class = "input-group-sm"
+        helper.label_class = "small"
+        self.fields["address"].required = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -56,7 +63,8 @@ class RoomForm(ModelForm):
     id = forms.CharField(required=False)
     layout = forms.MultipleChoiceField(
         required=False,
-        label=InputLabels.LAYOUT,
+        label=FieldsOptions.LAYOUT.label,
+        help_text=FieldsOptions.LAYOUT.help_text,
         choices=RoomLayoutType.choices,
         widget=MultiSelectWidget(),
     )
@@ -72,12 +80,19 @@ class RoomForm(ModelForm):
             "see_hear_score",
         ]
         labels = {
-            "name": InputLabels.ROOM_NAME,
-            "relative_size": InputLabels.RELATIVE_SIZE,
-            "see_hear_score": InputLabels.SEE_HEAR,
-            "is_wheelchair_accessible": InputLabels.WHEELCHAIR_ACCESS,
+            "name": FieldsOptions.ROOM_NAME.label,
+            "relative_size": FieldsOptions.RELATIVE_SIZE.label,
+            "see_hear_score": FieldsOptions.SEE_HEAR.label,
+            "is_wheelchair_accessible": FieldsOptions.WHEELCHAIR_ACCESS.label,
+        }
+        help_texts = {
+            "name": FieldsOptions.ROOM_NAME.help_text,
+            "relative_size": FieldsOptions.RELATIVE_SIZE.help_text,
+            "see_hear_score": FieldsOptions.SEE_HEAR.help_text,
+            "is_wheelchair_accessible": FieldsOptions.WHEELCHAIR_ACCESS.help_text,
         }
         widgets = {
+            "name": TextInput(attrs={"class": "fw-bold"}),
             "is_wheelchair_accessible": NullableBooleanWidget(),
         }
 
@@ -85,11 +100,10 @@ class RoomForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = helper = FormHelper()
         helper.template = "eznashdb/room_form.html"
-        helper.field_template = "bootstrap5/no_margin_field.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group input-group-sm"
-        self.helper.form_show_labels = False
+        helper.field_class = "input-group-sm"
+        helper.label_class = "small"
         if self.instance.pk:
             self.initial["layout"] = [
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
@@ -117,7 +131,7 @@ class ShulLinkForm(ModelForm):
         helper.field_template = "bootstrap5/no_margin_field.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group input-group-sm w-100"
+        helper.field_class = "input-group-sm w-100"
         self.helper.form_show_labels = False
 
     def save(self, commit=True):
@@ -131,19 +145,25 @@ class ChildcareProgramForm(ModelForm):
     class Meta:
         model = ChildcareProgram
         fields = ["shul", "name", "min_age", "max_age", "supervision_required", "duration"]
+        labels = {
+            "name": "Program Name",
+            "min_age": "From Age",
+            "max_age": "To Age",
+            "supervision_required": "Parental Supervision Required",
+        }
         widgets = {
+            "name": TextInput(attrs={"class": "fw-bold"}),
             "supervision_required": NullableBooleanWidget(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = helper = FormHelper()
-        helper.field_template = "bootstrap5/no_margin_field.html"
         helper.template = "eznashdb/childcare_program_form.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group input-group-sm"
-        self.helper.form_show_labels = False
+        helper.field_class = "input-group-sm"
+        helper.label_class = "small"
 
     def save(self, commit=True):
         instance = super(ChildcareProgramForm, self).save(commit=False)

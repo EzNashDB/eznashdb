@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import DeleteView, UpdateView
 from django_filters.views import FilterView
 
-from eznashdb.constants import BASE_OSM_URL
+from eznashdb.constants import BASE_OSM_URL, FieldsOptions
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import ChildcareProgramFormSet, RoomFormSet, ShulForm, ShulLinkFormSet
 from eznashdb.models import Shul
@@ -103,6 +103,7 @@ class CreateUpdateShulView(UpdateView):
         context["room_fs"] = self.get_room_fs()
         context["link_fs"] = self.get_link_fs()
         context["childcare_fs"] = self.get_childcare_fs()
+        context["FIELDS_OPTIONS"] = FieldsOptions
         return context
 
     def get_room_fs(self):
