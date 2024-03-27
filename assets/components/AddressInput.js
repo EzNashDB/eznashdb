@@ -121,7 +121,7 @@ export const AddressInput = ({
         className={`h-100 d-inline-block w-100 position-relative ${
           !isValid && "is-invalid"
         }`}
-        style={{ minHeight: "170px" }}
+        style={{ minHeight: "175px" }}
       >
         <AddressMap
           lat={currLocation.lat}

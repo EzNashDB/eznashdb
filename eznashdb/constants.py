@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from django.utils.safestring import mark_safe
+
 DEFAULT_ARG = object()
 
 LAYOUT_FIELDS = [
@@ -14,57 +16,84 @@ LAYOUT_FIELDS = [
 
 
 @dataclass()
-class LabelWithHelpText:
-    label: str = ""
-    help_text: str = ""
-    icon_class: str = ""
+class LabelWithIcon:
+    label: str
+    icon_class: str
+
+    @property
+    def icon_html(self):
+        return f"""
+            <div class="d-inline-block w-min-25px">
+                <i class="{self.icon_class}"></i>
+            </div>
+        """
 
     def __str__(self) -> str:
-        return self.label
-
-    def __getitem__(self, item):
-        return str(self)[item]
+        return mark_safe(f"""<span>{self.icon_html}{self.label}</span>""")
 
 
-class InputLabels:
-    SHUL_NAME = "Name*"
-    ROOM_NAME = LabelWithHelpText(
-        "Room Name*",
+@dataclass()
+class FieldOptions:
+    label_str: str = ""
+    icon_class: str = ""
+    help_text: str = ""
+
+    @property
+    def label(self) -> str:
+        return self.icon_class and LabelWithIcon(self.label_str, self.icon_class) or self.label_str
+
+
+class FieldsOptions:
+    SHUL_NAME = FieldOptions("Name", "fa-solid fa-synagogue")
+    ADDRESS = FieldOptions("Address", "fa-solid fa-location-dot")
+    ROOM_NAME = FieldOptions(
+        "Room Name",
+        "fa-solid fa-tag",
         "Main Sanctuary, Beit Midrash, etc.",
-        "fa-solid fa-home",
     )
-    FEMALE_LEADERSHIP = LabelWithHelpText(
+    FEMALE_LEADERSHIP = FieldOptions(
         "Female Leadership",
+        "fa-solid fa-user-shield",
         """
-            Are there any women in leadership positions (president, executive director,
+            Are any women in leadership positions (president, executive director,
             halachic/spiritual leader, gabbai't, etc.)?
         """,
-        "fa-solid fa-user-shield",
     )
-    CHILDCARE = LabelWithHelpText(
-        "Childcare", "Is there an on-site childcare program?", "fa-solid fa-child-reaching"
+    CHILDCARE = FieldOptions(
+        "Childcare & Youth Programming",
+        "fa-solid fa-child-reaching",
     )
-    KADDISH = LabelWithHelpText("Kaddish", "Can women say kaddish?", "fa-solid fa-comment")
-    WHEELCHAIR_ACCESS = LabelWithHelpText(
-        "Wheelchair Access", "Is the women's section wheelchair accessible?", "fa-solid fa-wheelchair"
+    LINKS = FieldOptions(
+        "Links",
+        "fa-solid fa-link",
     )
-    RELATIVE_SIZE = LabelWithHelpText(
+    KADDISH = FieldOptions(
+        "Kaddish",
+        "fa-solid fa-comment",
+        "Can women say kaddish?",
+    )
+    WHEELCHAIR_ACCESS = FieldOptions(
+        "Wheelchair Access",
+        "fa-solid fa-wheelchair",
+        "Is the women's section wheelchair accessible?",
+    )
+    RELATIVE_SIZE = FieldOptions(
         "Size",
-        "How large is the women's section relative to the men's section?",
         "fa-solid fa-up-right-and-down-left-from-center",
+        "How large is the women's section?",
     )
-    SEE_HEAR = LabelWithHelpText(
-        "Visibility + Audibility",
-        """
-            On a 1-5 scale, how well you can see and hear what is happening at the bima, aron, and pulpit
-            from the women's section, relative to the men's section?
-        """,
+    SEE_HEAR = FieldOptions(
+        "Visibility & Audibility",
         "fa-solid fa-eye",
+        """
+            How well you can see and hear what is happening at the bima, aron, and pulpit
+            from the women's section?
+        """,
     )
-    LAYOUT = LabelWithHelpText(
+    LAYOUT = FieldOptions(
         "Layout",
-        "Where is the women's section located?",
         "fa-solid fa-cubes",
+        "Where is the women's section located?",
     )
 
 
