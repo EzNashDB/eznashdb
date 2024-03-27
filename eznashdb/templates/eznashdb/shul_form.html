@@ -1,139 +1,43 @@
 {% load crispy_forms_tags %}
 {% load static %}
 <div>
-    <div>
-        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="w-100">{{ form.address|as_crispy_field }}</div>
+    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+</div>
+<div class="row">
+    <div class="col-8">
+        <div class="row">
+            <div class="col-6">{{ form.name|as_crispy_field }}</div>
+            <div class="col-6">{{ form.can_say_kaddish|as_crispy_field }}</div>
         </div>
-        <div class="col-12">
-            <div class="row striped">
-                <div class="col-12 my-1">
-                    <div class="row">
-                        <div class="col-12 col-lg-2 col-xl-3">
-                            <div class="w-min-25px d-inline-block">
-                                <i class="fa-solid fa-synagogue"></i>
+        <div class="row">
+            <div class="col-6">{{ form.has_female_leadership|as_crispy_field }}</div>
+            <div class="col-6">
+                <label class="form-label small">{{ FIELDS_OPTIONS.LINKS.label }}</label>
+                <div class="row link-formset">
+                    {{ link_fs.management_form }}
+                    {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {% for link_form in link_fs %}
+                        <div class="link-form col-12">
+                            <div class="d-flex flex-row">
+                                <div class="flex-grow-1">
+                                    {% with link_form as form  %}
+                                        {% crispy form %}
+                                    {% endwith %}
+                                </div>
+                                <div class="delete-link-container ps-2"></div>
                             </div>
-                            <span class="ms-1">{{ form.name.label }}</span>
                         </div>
-                        <div class="col-12 col-lg-10 col-xl-9">
-                            <div class="input-group input-group-sm d-block">{{ form.name|as_crispy_field }}</div>
-                        </div>
+                    {% endfor %}
+                    <div class="col-12 order-last">
+                        <div class="form-text">Website, whatsapp group, etc.</div>
+                        <div class="add-link-container d-flex justify-content-start"></div>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="row">
-                        <div class="col-12 col-lg-2 col-xl-3">
-                            <div class="d-flex">
-                                <div class="d-inline-block w-min-25px">
-                                    <span>
-                                        <i class="fa-solid fa-link"></i>
-                                    </span>
-                                </div>
-                                <span class="ms-2 flex-grow-1">Link(s)</span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 col-xl-6 text-muted small">
-                            <span >Website, whatsapp group, etc.</span>
-                        </div>
-                        <div class="col-12 col-lg-4 col-xl-3">
-                            <div class="row link-formset">
-                                {{ link_fs.management_form }}
-                                {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                {% for link_form in link_fs %}
-                                    <div class="link-form col-12 my-1">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="d-flex flex-row">
-                                                    <div class="delete-link-container pe-2 d-flex align-items-center"></div>
-                                                    <div class="flex-grow-1">
-                                                        {% with link_form as form  %}
-                                                            {% crispy form %}
-                                                        {% endwith %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                                <div class="col-12 justify-content-end order-last">
-                                    <div class="add-link-container d-flex justify-content-end my-1"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 js-childcare-formset-parent">
-                    <div class="row">
-                        <div class="col-12 col-lg-2 col-xl-3">
-                            <div class="d-flex">
-                                <div class="d-inline-block w-min-25px">
-                                    <span>
-                                        <i class="fa-solid fa-child-reaching"></i>
-                                    </span>
-                                </div>
-                                <span class="ms-2 flex-grow-1">Children's Programming</span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-10 col-xl-9 text-muted">
-                            <div class="row">
-                                <div class="col-12 small py-1">
-                                    <span >What programming is provided for children during shul (play room, groups, teen minyan, etc.)?</span>
-                                </div>
-                                <div class="col-12">
-                                    <div class="row gx-3">
-                                        <div class="col-auto">{{ form.has_no_childcare|as_crispy_field }}</div>
-                                        <div class="col">
-                                            <label for="id_has_no_childcare" class="small">Shul has no childcare programs</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    {{ childcare_fs.management_form }}
-                                    {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                    <div class="row overflow-auto">
-                                        <div class="col-12" style="min-width: 625px">
-                                            <div class="row gx-2 small align-items-end">
-                                                <div class="col-auto">
-                                                    {# just for spacing #}
-                                                    <button class="btn btn-link py-0 px-1"
-                                                            disabled
-                                                            style="color: rgba(0, 0, 0, 0)">
-                                                        <i class="fa fa-xmark"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="col-3 col-md-2">Program Name</div>
-                                                <div class="col-2">From Age</div>
-                                                <div class="col-2">To Age</div>
-                                                <div class="col-2">Duration</div>
-                                                <div class="col">Parental Supervision Required</div>
-                                            </div>
-                                            <div class="row childcare-formset striped">
-                                                {% for form in childcare_fs %}
-                                                    {% crispy form %}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 justify-content-end order-last">
-                                        <div class="add-childcare-container d-flex justify-content-end my-1"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% for field in form.visible_fields %}
-                    <div class="col-12">
-                        {% if field.name in "has_female_leadership,can_say_kaddish" %}
-                            {% include "eznashdb/includes/form_field_with_help_text.html" %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
             </div>
         </div>
+    </div>
+    <div class="col-4">
+        <div class="w-100">{{ form.address|as_crispy_field }}</div>
     </div>
 </div>
 <script defer src="{% static 'eznashdb/js/shul_form.js' %}"></script>

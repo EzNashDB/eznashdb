@@ -8,70 +8,103 @@
           enctype="multipart/form-data"
           novalidate
           id="shul_form"
-          class="row d-flex flex-column h-100">
+          class="row h-100">
         {% csrf_token %}
-        <div class="col-12">
-            <h4>
-                {% if object %}
-                    Edit Shul: {{ object.name }}
-                {% else %}
-                    Add a Shul
-                {% endif %}
-            </h4>
-        </div>
-        <div class="shadow-scroll overflow-auto col flex-grow-1">
-            <div class="shadow-scroll__shadow-wrapper row">
-                <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
-                <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
-                <div class="shadow-scroll__scroll-box rooms-scroll col"></div>
-            </div>
-            <div class="row shadow-scroll__content">
+        <div class="col h-100 d-flex flex-column">
+            <div class="row">
                 <div class="col-12">
-                    <div class="row">
-                        <div class="col">
-                            <div class="sticky-top row bg-white rounded" style="z-index: 1022;">
-                                <h5 class="col-12 py-2 m-0">Shul Details</h5>
-                                <hr class="col-12 m-0">
-                            </div>
-                            <div class=" pb-0 pt-2">{% crispy form %}</div>
+                    <h3 class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if object %}
+                                Edit Shul: {{ object.name }}
+                            {% else %}
+                                Add a Shul
+                            {% endif %}
                         </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary w-100">Save</button>
+                        </div>
+                    </h3>
+                </div>
+            </div>
+            <div class="row flex-grow-1 overflow-hidden">
+                <div class="col-12 h-100 shadow-scroll">
+                    <div class="shadow-scroll__shadow-wrapper">
+                        <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
+                        <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
+                        <div class="shadow-scroll__scroll-box rooms-scroll px-3"></div>
                     </div>
-                    <div class="row flex-grow-1">
-                        <div class="col">
-                            <div class="sticky-top row bg-white rounded">
-                                <h5 class="col-12 py-2 m-0">Rooms</h5>
-                                <hr class="col-12 m-0">
+                    <div class="row shadow-scroll__content">
+                        <div class="col-12">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div class="sticky-top row bg-white rounded-top">
+                                        <h5 class="col-12 py-2 m-0">Shul Details</h5>
+                                    </div>
+                                    {% crispy form %}
+                                </div>
                             </div>
                             <div class="row">
-                                {{ room_fs.management_form }}
-                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                <div class="room-formset col">
-                                    {% for room_form in room_fs %}
-                                        <div class="room-form row">
-                                            {% with room_form as form  %}
-                                                <div class="col-12">{% crispy room_form %}</div>
-                                            {% endwith %}
+                                <hr class="col-12 m-0">
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div class="sticky-top row bg-white rounded-top">
+                                        <h5 class="col-12 py-2 m-0">Rooms</h5>
+                                    </div>
+                                    <div class="row">
+                                        {{ room_fs.management_form }}
+                                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                        <div class="room-formset col striped">
+                                            {% for form in room_fs %}
+                                                {% crispy form %}
+                                            {% endfor %}
                                         </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="col-12">
-                                    <div class="row justify-content-end">
-                                        <div class="add-room-container col-12 col-lg-3 d-flex justify-content-end mb-2"></div>
+                                        <div class="col-12">
+                                            <div class="row justify-content-start">
+                                                <div class="add-room-container col-12 d-flex justify-content-start"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <hr class="col-12 m-0">
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div class="sticky-top row bg-white rounded-top">
+                                        <h5 class="col-12 py-2 m-0">{{ FIELDS_OPTIONS.CHILDCARE.label }}</h5>
+                                    </div>
+                                    <div class="row js-childcare-formset-parent">
+                                        <div class="col-12">
+                                            {{ form.has_no_childcare|as_crispy_field }}
+                                            {{ childcare_fs.management_form }}
+                                            {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                        </div>
+                                        <div class="childcare-formset col-8 striped">
+                                            {% for form in childcare_fs %}
+                                                {% crispy form %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="row justify-content-start">
+                                                <div class="add-childcare-container col-12 d-flex justify-content-start"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr class="col-12 m-0">
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
+                                    <button type="submit" class="btn btn-primary w-100 mt-2">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 py-2">
-            <div class="row">
-                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
-                    <button type="submit" class="btn btn-sm btn-primary w-100">
-                        <span>Submit</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
                 </div>
             </div>
         </div>
@@ -91,11 +124,11 @@
             formCssClass: 'link-form',
             formsParentCssClass: 'link-formset',
             prefix: '{{ link_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
-            addText: 'Add another link <i class="fa fa-plus"></i>',
+            addCssClass:'btn btn-sm btn-secondary form-text',
+            addText: '<i class="fa fa-plus"></i> Add another link',
             addContainerClass: 'add-link-container',
-            deleteCssClass:'delete-link btn btn-link py-0 px-1 text-danger text-nowrap align-top',
-            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteCssClass:'delete-link btn btn-sm btn-danger py-0 px-1',
+            deleteText: '<i class="fa fa-trash-can"></i>',
             deleteContainerClass: 'delete-link-container',
             hideLastAddForm: {% if link_fs.1 %} true {% else %} false {% endif %},
         });
@@ -104,11 +137,11 @@
             formCssClass: 'childcare-form',
             formsParentCssClass: 'childcare-formset',
             prefix: '{{ childcare_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
-            addText: 'Add another program <i class="fa fa-plus"></i>',
+            addCssClass:'btn btn-sm btn-secondary form-text',
+            addText: '<i class="fa fa-plus"></i> Add another program',
             addContainerClass: 'add-childcare-container',
-            deleteCssClass:'delete-childcare-program btn btn-link py-0 px-1 text-danger text-nowrap align-top',
-            deleteText: '<i class="fa fa-xmark"></i>',
+            deleteCssClass:'delete-childcare-program btn btn-sm btn-danger py-0 px-1',
+            deleteText: '<i class="fa fa-trash-can"></i>',
             deleteContainerClass: 'delete-childcare-container',
             hideLastAddForm: {% if childcare_fs.1 %} true {% else %} false {% endif %},
         });
@@ -118,11 +151,11 @@
             formsParentCssClass: 'room-formset',
             scrollCssClass: 'rooms-scroll',
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-outline-secondary py-0 px-1',
-            addText: 'Add another room <i class="fa fa-plus"></i>',
+            addCssClass:'btn btn-sm btn-secondary form-text',
+            addText: '<i class="fa fa-plus"></i> Add another room',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'delete-room btn btn-sm btn-outline-danger py-0 px-1',
-            deleteText: 'Delete room <i class="fa fa-xmark"></i>',
+            deleteCssClass:'delete-room btn btn-sm btn-danger py-0 px-1',
+            deleteText: '<i class="fa fa-trash-can"></i>',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });
