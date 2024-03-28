@@ -149,11 +149,13 @@ class ChildcareProgramForm(ModelForm):
             "name": "Program Name",
             "min_age": "From Age",
             "max_age": "To Age",
-            "supervision_required": "Parental Supervision Required",
+            "supervision_required": "Parental Supervision",
         }
         widgets = {
             "name": TextInput(attrs={"class": "fw-bold"}),
-            "supervision_required": NullableBooleanWidget(),
+            "supervision_required": NullableBooleanWidget(
+                choices=((True, "Required"), (False, "Not required"))
+            ),
         }
 
     def __init__(self, *args, **kwargs):

@@ -7,15 +7,15 @@
     </div>
     <div class="col">
         <div class="row">
-            <div class="col-3">{{ form.name|as_crispy_field }}</div>
-            <div class="col-3">
+            <div class="col-12 col-sm-6 col-md-4 col-xl-3">{{ form.name|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
                 <div class="row gx-2">
                     <div class="col-6">{{ form.min_age|as_crispy_field }}</div>
                     <div class="col-6">{{ form.max_age|as_crispy_field }}</div>
                 </div>
             </div>
-            <div class="col-3">{{ form.supervision_required|as_crispy_field }}</div>
-            <div class="col-3">{{ form.duration|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6 col-md-4 col-xl-3">{{ form.supervision_required|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6 col-md-4 col-xl-3">{{ form.duration|as_crispy_field }}</div>
         </div>
     </div>
 </div>
