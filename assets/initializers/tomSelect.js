@@ -6,6 +6,11 @@ export default function initializeTomSelects() {
     let settings = {
       controlInput: null,
       dropdownParent: "body",
+      render: {
+        dropdown: function () {
+          return '<div class="z-1021"></div>';
+        },
+      },
       onInitialize: function () {
         updateSelectedDisplay(this);
       },
