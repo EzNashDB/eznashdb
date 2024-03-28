@@ -4,14 +4,12 @@
     {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 </div>
 <div class="row">
-    <div class="col-8">
+    <div class="col-12 col-lg-8">
         <div class="row">
-            <div class="col-6">{{ form.name|as_crispy_field }}</div>
-            <div class="col-6">{{ form.can_say_kaddish|as_crispy_field }}</div>
-        </div>
-        <div class="row">
-            <div class="col-6">{{ form.has_female_leadership|as_crispy_field }}</div>
-            <div class="col-6">
+            <div class="col-12 col-sm-6">{{ form.name|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6">{{ form.can_say_kaddish|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6">{{ form.has_female_leadership|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6">
                 <label class="form-label small">{{ FIELDS_OPTIONS.LINKS.label }}</label>
                 <div class="row link-formset">
                     {{ link_fs.management_form }}
@@ -36,7 +34,7 @@
             </div>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-12 col-lg-4">
         <div class="w-100">{{ form.address|as_crispy_field }}</div>
     </div>
 </div>
