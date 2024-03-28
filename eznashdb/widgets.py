@@ -11,4 +11,5 @@ class MultiSelectWidget(SelectMultiple):
 class NullableBooleanWidget(Select):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.choices = [(None, "---------"), (True, "Yes"), (False, "No")]
+        choices = kwargs.pop("choices", ((True, "Yes"), (False, "No")))
+        self.choices = [(None, "---------"), *choices]

@@ -82,7 +82,7 @@
                                             {{ childcare_fs.management_form }}
                                             {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                         </div>
-                                        <div class="childcare-formset col-8 striped">
+                                        <div class="childcare-formset col-12 col-xl-8 striped">
                                             {% for form in childcare_fs %}
                                                 {% crispy form %}
                                             {% endfor %}
