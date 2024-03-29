@@ -28,5 +28,12 @@ def describe_validation():
         ],
     )
     def lat_and_lon_are_required(lat, lon, is_valid):
-        form = ShulForm(data={"name": "test shul", "latitude": lat, "longitude": lon})
+        form = ShulForm(
+            data={
+                "name": "test shul",
+                "address": "some address",
+                "latitude": lat,
+                "longitude": lon,
+            }
+        )
         assert form.is_valid() is is_valid

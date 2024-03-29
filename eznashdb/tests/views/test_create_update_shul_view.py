@@ -104,6 +104,7 @@ def describe_create():
                 "name": "test shul",
                 "latitude": "1",
                 "longitude": "1",
+                "address": "some address",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
                 **get_link_fs_metadata_fields(),

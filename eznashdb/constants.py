@@ -31,6 +31,9 @@ class LabelWithIcon:
     def __str__(self) -> str:
         return mark_safe(f"""<span>{self.icon_html}{self.label}</span>""")
 
+    def __getitem__(self, item):
+        return str(self)[item]
+
 
 @dataclass()
 class FieldOptions:
