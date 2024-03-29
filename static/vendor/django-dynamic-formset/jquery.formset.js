@@ -56,9 +56,9 @@
       },
       insertDeleteLink = function (row) {
         var delCssSelector = $.trim(options.deleteCssClass).replace(
-            /\s+/g,
-            "."
-          ),
+          /\s+/g,
+          "."
+        ),
           addCssSelector = $.trim(options.addCssClass).replace(/\s+/g, ".");
 
         var delButtonHTML =
@@ -144,9 +144,8 @@
           };
           bootbox.dialog({
             title: "Are you sure?",
-            message: `Do you want to delete${
-              options.modelName ? ` this ${options.modelName}` : ``
-            }?`,
+            message: `Do you want to delete${options.modelName ? ` this ${options.modelName}` : ``
+              }?`,
             centerVertical: true,
             backdrop: true,
             buttons: {
@@ -178,19 +177,19 @@
           // we keep the forms hidden (thanks for the bug report and suggested fix Mike)
           del.before(
             '<input type="hidden" name="' +
-              del.attr("name") +
-              '" id="' +
-              del.attr("id") +
-              '" value="on" />'
+            del.attr("name") +
+            '" id="' +
+            del.attr("id") +
+            '" value="on" />'
           );
           row.hide();
         } else {
           del.before(
             '<input type="hidden" name="' +
-              del.attr("name") +
-              '" id="' +
-              del.attr("id") +
-              '" />'
+            del.attr("name") +
+            '" id="' +
+            del.attr("id") +
+            '" />'
           );
         }
         // Hide any labels associated with the DELETE checkbox:
@@ -224,12 +223,11 @@
         });
         insertDeleteLink(template);
       } else {
-        // Destroy all bs-multiselects. They create bugs because of duplicate ids. They should be
-        // re-initialize elsewhere. Can use the `formsetInitialized` event dispatched below
-        const oldMultiselects = $(".bs-multiselect").data("multiselect");
-        if (oldMultiselects) {
-          oldMultiselects.destroy();
-        }
+        // Destroy all tomselects. They should be re-initialize elsewhere. Can use the `formsetInitialized`
+        // event dispatched below
+        document.querySelectorAll("select.tom-select").forEach((el) => {
+          if (!!el.tomselect) el.tomselect.destroy();
+        })
         // Otherwise, use the last form in the formset; this works much better if you've got
         // extra (>= 1) forms (thnaks to justhamade for pointing this out):
         template = $("." + options.formCssClass + ":last")
@@ -353,5 +351,5 @@
     removed: null,                   // Function called each time a form is deleted
     hideLastAddForm: false,          // When set to true, hide last empty add form (becomes visible when clicking on add button)
     scrollCssClass: null            // Class of div to scroll to the bottom of after new form is added
-};
+  };
 })(jQuery);
