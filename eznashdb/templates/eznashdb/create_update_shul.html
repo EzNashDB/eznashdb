@@ -36,23 +36,20 @@
                     </div>
                     <div class="row shadow-scroll__content">
                         <div class="col-12">
-                            <div class="row mb-2">
+                            <div class="row">
                                 <div class="col">
                                     <div class="sticky-top row bg-white rounded-top">
-                                        <h5 class="col-12 py-2 m-0">Shul Details</h5>
+                                        <h5 class="col-12 pt-3">Shul Details</h5>
                                     </div>
                                     {% crispy form %}
                                 </div>
                             </div>
                             <div class="row">
-                                <hr class="col-12 m-0">
-                            </div>
-                            <div class="row mb-2">
                                 <div class="col">
                                     <div class="sticky-top row bg-white rounded-top">
-                                        <h5 class="col-12 py-2 m-0">Rooms</h5>
+                                        <h5 class="col-12 pt-3">Rooms</h5>
                                     </div>
-                                    <div class="row">
+                                    <div class="row mb-3">
                                         {{ room_fs.management_form }}
                                         {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                         <div class="room-formset col striped">
@@ -69,14 +66,11 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <hr class="col-12 m-0">
-                            </div>
-                            <div class="row mb-2">
                                 <div class="col">
                                     <div class="sticky-top row bg-white rounded-top">
-                                        <h5 class="col-12 py-2 m-0">{{ FIELDS_OPTIONS.CHILDCARE.label }}</h5>
+                                        <h5 class="col-12 pt-3">{{ FIELDS_OPTIONS.CHILDCARE.label }}</h5>
                                     </div>
-                                    <div class="row js-childcare-formset-parent">
+                                    <div class="row mb-3 js-childcare-formset-parent">
                                         <div class="col-12">
                                             {{ form.has_no_childcare|as_crispy_field }}
                                             {{ childcare_fs.management_form }}
@@ -96,11 +90,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <hr class="col-12 m-0">
-                            </div>
-                            <div class="row mb-2">
                                 <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
-                                    <button type="submit" class="btn btn-primary w-100 mt-2">Save</button>
+                                    <div class="py-3">
+                                        <button type="submit" class="btn btn-primary w-100">Save</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
