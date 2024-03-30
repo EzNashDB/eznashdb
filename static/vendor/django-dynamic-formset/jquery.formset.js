@@ -298,7 +298,7 @@
           formsParent = $(`.${options.formsParentCssClass}`),
           delCssSelector = $.trim(options.deleteCssClass).replace(/\s+/g, ".");
         applyExtraClasses(row, formCount);
-        if (formsParent) {
+        if (formsParent.length) {
           formsParent.append(row);
         } else {
           row.insertBefore(buttonRow).show();
@@ -315,12 +315,8 @@
         }
         // Check if we've exceeded the maximum allowed number of forms:
         if (!showAddButton()) buttonRow.hide();
-        // Scroll down so the new form is visible
-        if (options.scrollCssClass) {
-          $(`.${options.scrollCssClass}`).animate({
-            scrollTop: $(`.${options.scrollCssClass}`).prop("scrollHeight"),
-          });
-        }
+        // Scroll new form into view
+        row[0].scrollIntoView({ behavior: "smooth", block: "center" })
         // If a post-add callback was supplied, call it with the added form:
         if (options.added) options.added(row);
         return false;
@@ -350,6 +346,5 @@
     added: null,                     // Function called each time a new form is added
     removed: null,                   // Function called each time a form is deleted
     hideLastAddForm: false,          // When set to true, hide last empty add form (becomes visible when clicking on add button)
-    scrollCssClass: null            // Class of div to scroll to the bottom of after new form is added
   };
 })(jQuery);
