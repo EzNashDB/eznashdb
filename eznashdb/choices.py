@@ -7,7 +7,7 @@ LAYOUT_CHOICES = (
         ),
     ),
     (
-        "Elevated",
+        "Elevated (higher, but not balcony)",
         (
             ("is_elevated_side", "Side"),
             ("is_elevated_back", "Back"),
