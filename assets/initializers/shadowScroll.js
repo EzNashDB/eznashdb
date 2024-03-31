@@ -1,3 +1,5 @@
+const throttle = require("lodash.throttle");
+
 class ShadowScrollInitializer {
   constructor(wrapperEl) {
     this.isScrollable = false;
@@ -58,7 +60,10 @@ class ShadowScrollInitializer {
   }
 
   listenForScroll() {
-    this.scrollBox.addEventListener("scroll", (e) => this.setShadows());
+    this.scrollBox.addEventListener(
+      "scroll",
+      throttle((e) => this.setShadows(), 100)
+    );
   }
 
   listenForResize() {

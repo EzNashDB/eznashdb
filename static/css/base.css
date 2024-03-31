@@ -133,6 +133,7 @@ td.td-shrink {
   z-index: 3000;
   height: 10px;
   width: 100%;
+  transition: .1s;
 }
 
 .shadow-scroll__scroll-box {
