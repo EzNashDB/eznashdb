@@ -10,7 +10,7 @@
             <div class="col-12 col-sm-6">{{ form.can_say_kaddish|as_crispy_field }}</div>
             <div class="col-12 col-sm-6">{{ form.has_female_leadership|as_crispy_field }}</div>
             <div class="col-12 col-sm-6">
-                <label class="form-label small">{{ FIELDS_OPTIONS.LINKS.label }}</label>
+                <label class="form-label">{{ FIELDS_OPTIONS.LINKS.label }}</label>
                 <div class="row link-formset mb-3">
                     {{ link_fs.management_form }}
                     {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}

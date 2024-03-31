@@ -10,8 +10,10 @@
             <div class="col-12 col-sm-6 col-md-4 col-xl-2">{{ form.name|as_crispy_field }}</div>
             <div class="col-12 col-sm-6 col-md-4 col-xl-2">{{ form.layout|as_crispy_field }}</div>
             <div class="col-12 col-sm-6 col-md-4 col-xl-2">{{ form.relative_size|as_crispy_field }}</div>
-            <div class="col-12 col-sm-6 col-md-4 col-xl-2">{{ form.is_wheelchair_accessible|as_crispy_field }}</div>
-            <div class="col-12 col-md-8 col-xl-4">{{ form.see_hear_score|as_crispy_field }}</div>
+            <div class="col-12 col-sm-6 col-md-4 col-xl-3 col-xxl-2">
+                {{ form.is_wheelchair_accessible|as_crispy_field }}
+            </div>
+            <div class="col-12 col-md-8 col-xl-3 col-xxl-4">{{ form.see_hear_score|as_crispy_field }}</div>
         </div>
     </div>
 </div>

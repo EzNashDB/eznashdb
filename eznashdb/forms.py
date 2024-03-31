@@ -49,8 +49,6 @@ class ShulForm(ModelForm):
         self.helper = helper = FormHelper()
         helper.template = "eznashdb/shul_form.html"
         helper.form_tag = False
-        helper.field_class = "input-group-sm"
-        helper.label_class = "small"
         self.fields["address"].required = True
 
     def clean(self):
@@ -102,8 +100,6 @@ class RoomForm(ModelForm):
         helper.template = "eznashdb/room_form.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group-sm"
-        helper.label_class = "small"
         if self.instance.pk:
             self.initial["layout"] = [
                 field for field in LAYOUT_FIELDS if getattr(self.instance, field, False)
@@ -131,7 +127,7 @@ class ShulLinkForm(ModelForm):
         helper.field_template = "bootstrap5/no_margin_field.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group-sm w-100"
+        helper.field_class = "w-100"
         self.helper.form_show_labels = False
 
     def save(self, commit=True):
@@ -164,8 +160,6 @@ class ChildcareProgramForm(ModelForm):
         helper.template = "eznashdb/childcare_program_form.html"
         helper.form_tag = False
         helper.disable_csrf = True
-        helper.field_class = "input-group-sm"
-        helper.label_class = "small"
 
     def save(self, commit=True):
         instance = super(ChildcareProgramForm, self).save(commit=False)
