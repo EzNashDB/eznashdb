@@ -1,5 +1,6 @@
 import json
 import urllib
+from json.decoder import JSONDecodeError
 from typing import Any
 
 import requests
@@ -155,7 +156,10 @@ class AddressLookupView(View):
         OSM_params = urllib.parse.urlencode(OSM_param_dict)
         OSM_url = settings.BASE_OSM_URL + "?" + OSM_params
         response = requests.get(OSM_url)
-        if type(response.json()) != list:
+        try:
+            if type(response.json()) != list:
+                response.status_code = 500
+        except JSONDecodeError:
             response.status_code = 500
         return response
 
