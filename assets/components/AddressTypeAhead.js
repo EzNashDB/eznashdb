@@ -22,6 +22,7 @@ export const AddressTypeAhead = ({
   const [options, setOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 1000);
+  const [isSearchError, setIsSearchError] = useState(false);
   const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -33,11 +34,18 @@ export const AddressTypeAhead = ({
     fetch(`${SEARCH_URL}?q=${debouncedSearchQuery}`)
       .then((resp) => resp.json())
       .then((items) => {
+        if (items.error) {
+          throw new Error(items.error);
+        }
         setOptions(items);
-        setIsLoading(false);
       })
       .catch((error) => {
+        setOptions([]);
+        setIsSearchError(true);
         console.error("Error:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [debouncedSearchQuery]);
 
@@ -49,6 +57,7 @@ export const AddressTypeAhead = ({
   };
 
   const handleInputChange = (text, e) => {
+    if (isSearchError) setIsSearchError(false);
     onInput(text);
     handleSearch(text);
   };
@@ -60,6 +69,13 @@ export const AddressTypeAhead = ({
   // Bypass client-side filtering by returning `true`. Results are already
   // filtered by the search endpoint, so no need to do it again.
   const filterBy = () => true;
+
+  const genericSearchError = (
+    <div class="alert alert-danger m-0 py-1 px-2" role="alert">
+      An error occurred. Please try again.
+    </div>
+  );
+
   return (
     <AsyncTypeahead
       selected={[inputValue]}
@@ -75,6 +91,7 @@ export const AddressTypeAhead = ({
       options={options}
       onInputChange={handleInputChange}
       placeholder="Search or drag..."
+      promptText={isSearchError ? genericSearchError : "Type to search..."}
       inputProps={{
         name: "address",
         className: `${!isValid && "is-invalid"}`,
