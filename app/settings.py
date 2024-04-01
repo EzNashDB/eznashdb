@@ -16,6 +16,7 @@ from os.path import dirname, join
 from pathlib import Path
 
 import dj_database_url
+import sentry_sdk
 from dotenv import load_dotenv
 
 dotenv_path = join(dirname(__file__), "../.env")
@@ -189,3 +190,17 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CRISPY_CLASS_CONVERTERS = {"textinput": "textinput rounded", "select": "select rounded"}
+
+# Sentry
+
+if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
