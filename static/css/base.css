@@ -43,6 +43,18 @@ td.td-shrink {
   z-index: 1021;
 }
 
+.z-1030 {
+  /*
+    Exception case: above dropdown that is above sticky-top
+  */
+  z-index: 1030;
+}
+
+.z-3001 {
+  /* Above shadow-scroll__shadow */
+  z-index: 3001;
+}
+
 /* Alpine.js */
 [x-cloak] { display: none !important; }
 

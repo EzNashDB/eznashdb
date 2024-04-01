@@ -8,7 +8,7 @@ export default function initializeTomSelects() {
       dropdownParent: "body",
       render: {
         dropdown: function () {
-          return '<div class="z-1021"></div>';
+          return '<div class="z-3001"></div>';
         },
       },
       onInitialize: function () {
