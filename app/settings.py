@@ -204,3 +204,9 @@ if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
         # We recommend adjusting this value in production.
         profiles_sample_rate=1.0,
     )
+
+# Geocoding
+MAPS_CO_API_KEY = os.environ.get("MAPS_CO_API_KEY")
+BASE_OSM_URL = (
+    MAPS_CO_API_KEY and "https://geocode.maps.co/search" or "https://nominatim.openstreetmap.org/"
+)

@@ -3,6 +3,7 @@ import urllib
 from typing import Any
 
 import requests
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
@@ -10,7 +11,7 @@ from django.views import View
 from django.views.generic import DeleteView, UpdateView
 from django_filters.views import FilterView
 
-from eznashdb.constants import BASE_OSM_URL, FieldsOptions
+from eznashdb.constants import FieldsOptions
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import ChildcareProgramFormSet, RoomFormSet, ShulForm, ShulLinkFormSet
 from eznashdb.models import Shul
@@ -149,9 +150,10 @@ class AddressLookupView(View):
             "addressdetails": 1,
             "namedetails": 1,
             "q": q,
+            "api_key": settings.MAPS_CO_API_KEY,
         }
         OSM_params = urllib.parse.urlencode(OSM_param_dict)
-        OSM_url = BASE_OSM_URL + "?" + OSM_params
+        OSM_url = settings.BASE_OSM_URL + "?" + OSM_params
         response = requests.get(OSM_url)
         if type(response.json()) != list:
             response.status_code = 500
@@ -179,9 +181,13 @@ class AddressLookupView(View):
             return JsonResponse(self.format_results(results), safe=False)
 
     def format_results(self, results):
-        palestine = "الأراضي الفلسطينية"
-        israel = "ישראל"
+        israel_palestine_pairs = [
+            ("ישראל", "الأراضي الفلسطينية"),
+            ("Israel", "Palestinian Territory"),
+        ]
+
         for result in results:
             result["id"] = result.get("place_id")
-            result["display_name"] = result.get("display_name", "").replace(palestine, israel)
+            for israel, palestine in israel_palestine_pairs:
+                result["display_name"] = result.get("display_name", "").replace(palestine, israel)
         return results

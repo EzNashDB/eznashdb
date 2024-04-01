@@ -21,7 +21,7 @@ export const AddressTypeAhead = ({
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 1000);
   const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
