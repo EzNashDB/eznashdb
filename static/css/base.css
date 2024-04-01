@@ -137,21 +137,22 @@ td.td-shrink {
   padding: 0.5rem 1rem;
 }
 
-.shadow-scroll__top-shadow {
-  top: 0;
-  background: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.20), transparent);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.20), transparent);
-  border-top-left-radius: var(--bs-border-radius) !important;
-  border-top-right-radius: var(--bs-border-radius) !important;
-}
-
 .shadow-scroll__shadow {
+  pointer-events: none;
   position: absolute;
   left: 0;
   z-index: 3000;
   height: 10px;
   width: 100%;
   opacity: .5;
+}
+
+.shadow-scroll__top-shadow {
+  top: 0;
+  background: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.20), transparent);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.20), transparent);
+  border-top-left-radius: var(--bs-border-radius) !important;
+  border-top-right-radius: var(--bs-border-radius) !important;
 }
 
 .shadow-scroll__bottom-shadow {
