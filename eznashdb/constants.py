@@ -98,6 +98,3 @@ class FieldsOptions:
         "fa-solid fa-cubes",
         "Where is the women's section located?",
     )
-
-
-BASE_OSM_URL = "https://nominatim.openstreetmap.org/"

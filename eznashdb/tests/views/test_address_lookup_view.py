@@ -93,11 +93,26 @@ def describe_israel_searches():
         assert response.status_code == 200
         assert response.json() == osm_response * 2
 
-    def returns_israel_for_palestine(client, mock_osm):
+    @pytest.mark.parametrize(
+        ("display_name", "israel", "palestine"),
+        [
+            (
+                "מעלה שומרון, קרני שומרון, שטח C, יהודה ושומרון, الأراضي الفلسطينية",
+                "ישראל",
+                "الأراضي الفلسطينية",
+            ),
+            (
+                "Maale Shomron, Karney Shomron, Area C, Judea and Samaria, Palestinian Territory",
+                "Israel",
+                "Palestinian Territory",
+            ),
+        ],
+    )
+    def returns_israel_for_palestine(client, mock_osm, display_name, israel, palestine):
         DUMMY_OSM_RECORD = {
             "name": "osm response",
             "place_id": 1,
-            "display_name": "מעלה שומרון, קרני שומרון, שטח C, יהודה ושומרון, الأراضي الفلسطينية",
+            "display_name": display_name,
         }
 
         osm_response = [DUMMY_OSM_RECORD]
@@ -107,5 +122,5 @@ def describe_israel_searches():
         response = client.get(url, data=query_params)
 
         response_record = response.json()[0]
-        assert "ישראל" in response_record["display_name"]
-        assert "الأراضي الفلسطينية" not in response_record["display_name"]
+        assert israel in response_record["display_name"]
+        assert palestine not in response_record["display_name"]
