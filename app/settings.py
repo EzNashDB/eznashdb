@@ -73,6 +73,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "enforce_host.EnforceHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -209,3 +210,6 @@ MAPS_CO_API_KEY = os.environ.get("MAPS_CO_API_KEY")
 BASE_OSM_URL = (
     MAPS_CO_API_KEY and "https://geocode.maps.co/search" or "https://nominatim.openstreetmap.org/"
 )
+
+# Enforce host
+ENFORCE_HOST = os.environ.get("ENFORCE_HOST")
