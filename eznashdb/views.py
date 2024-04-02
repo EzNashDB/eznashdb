@@ -1,4 +1,5 @@
 import json
+import time
 import urllib
 from json.decoder import JSONDecodeError
 from typing import Any
@@ -179,7 +180,11 @@ class AddressLookupView(View):
             if israel in query:
                 modified_query = modified_query.replace(israel, palestine)
         if modified_query != query:
+            # Sleep to avoid too many requests error
+            time.sleep(1)
             response_2 = self.get_OSM_response(modified_query)
+            # Leave JSONDecodeError unhandled at this point. Users will get results from first query
+            # and errors will get logged
             results.extend(response_2.json().copy())
         if OSM_response.status_code == 200:
             return JsonResponse(self.format_results(results), safe=False)
