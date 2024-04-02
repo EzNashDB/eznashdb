@@ -71,7 +71,7 @@ export const AddressTypeAhead = ({
   const filterBy = () => true;
 
   const genericSearchError = (
-    <div class="alert alert-danger m-0 py-1 px-2" role="alert">
+    <div className="alert alert-danger m-0 py-1 px-2 text-wrap" role="alert">
       An error occurred. Please try again.
     </div>
   );
