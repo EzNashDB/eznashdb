@@ -12,8 +12,6 @@ export const AddressInput = ({
   initialIsValid,
 }) => {
   const hasCoordsInProps = !!String(lat) && !!String(lon);
-  const hasInitialValidAddress = hasCoordsInProps && initialIsValid;
-  const [isDisabled, setIsDisabled] = useState(hasInitialValidAddress);
   const [inputValue, setInputValue] = useState({ display_name });
   const [locationHistory, setLocationHistory] = useState({
     locations: [
@@ -111,10 +109,6 @@ export const AddressInput = ({
     setInputValue({ display_name: text });
   };
 
-  const toggleDisabled = (e) => {
-    setIsDisabled(!isDisabled);
-  };
-
   return (
     <>
       <div
@@ -128,7 +122,6 @@ export const AddressInput = ({
           lon={currLocation.lon}
           zoom={currLocation.zoom}
           onMoveEnd={handleMapMoveEnd}
-          isDisabled={isDisabled}
         />
         <div
           className="position-absolute w-100 p-2 pb-0"
@@ -142,12 +135,11 @@ export const AddressInput = ({
               onInput={handleOnInput}
               onAddressSelected={handleAddressSelected}
               isValid={isValid}
-              isDisabled={isDisabled}
             />
             <ButtonGroup className="ms-1 shadow-sm">
               <Button
                 variant="light"
-                disabled={isDisabled || locationHistory.currIdx === 0}
+                disabled={locationHistory.currIdx === 0}
                 onClick={goToPrevLocation}
               >
                 <i className="fa-solid fa-arrow-left"></i>
@@ -155,31 +147,14 @@ export const AddressInput = ({
               <Button
                 variant="light"
                 disabled={
-                  isDisabled ||
                   locationHistory.currIdx ===
-                    locationHistory.locations.length - 1
+                  locationHistory.locations.length - 1
                 }
                 onClick={goToNextLocation}
               >
                 <i className="fa-solid fa-arrow-right"></i>
               </Button>
             </ButtonGroup>
-
-            {isDisabled && (
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={toggleDisabled}
-                className="ms-1"
-              >
-                <span className="text-nowrap">
-                  <span className="me-1">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </span>
-                  Edit
-                </span>
-              </Button>
-            )}
           </div>
         </div>
         <input
