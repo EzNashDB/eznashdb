@@ -38,10 +38,9 @@ DEBUG = os.getenv("DEBUG", False) == "True"
 ALLOWED_HOSTS = [
     "ezratnashim.com",
     "www.ezratnashim.com",
-    "eznashdb.herokuapp.com",
     "eznashdb.fly.dev",
-    "localhost",
-    "127.0.0.1",
+    "66.241.125.16",
+    "2a09:8280:1::3:a314",
     # Additional allowed hosts can be defined as a JSON list in the .env
     *json.loads(os.environ.get("EXTRA_HOSTS", "[]")),
 ]
