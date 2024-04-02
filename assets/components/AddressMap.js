@@ -52,7 +52,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
     <div>
       <div className="h-100 d-inline-block w-100 position-absolute">
         <div
-          className="position-absolute"
+          className="position-absolute click-through"
           style={{
             top: "50%",
             left: "50%",
