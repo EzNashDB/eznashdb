@@ -121,7 +121,7 @@ export const AddressInput = ({
         className={`h-100 d-inline-block w-100 position-relative ${
           !isValid && "is-invalid"
         }`}
-        style={{ minHeight: "175px" }}
+        style={{ minHeight: "180px" }}
       >
         <AddressMap
           lat={currLocation.lat}
@@ -144,18 +144,15 @@ export const AddressInput = ({
               isValid={isValid}
               isDisabled={isDisabled}
             />
-
             <ButtonGroup className="ms-1 shadow-sm">
               <Button
-                size="sm"
                 variant="light"
                 disabled={isDisabled || locationHistory.currIdx === 0}
                 onClick={goToPrevLocation}
               >
-                <i className="fa-solid fa-angle-left"></i>
+                <i className="fa-solid fa-arrow-left"></i>
               </Button>
               <Button
-                size="sm"
                 variant="light"
                 disabled={
                   isDisabled ||
@@ -164,9 +161,10 @@ export const AddressInput = ({
                 }
                 onClick={goToNextLocation}
               >
-                <i className="fa-solid fa-angle-right"></i>
+                <i className="fa-solid fa-arrow-right"></i>
               </Button>
             </ButtonGroup>
+
             {isDisabled && (
               <Button
                 size="sm"

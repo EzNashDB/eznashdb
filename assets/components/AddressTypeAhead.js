@@ -102,7 +102,7 @@ export const AddressTypeAhead = ({
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
-          <InputGroup size="sm">
+          <InputGroup>
             <Form.Control
               {...inputProps}
               ref={(node) => {
