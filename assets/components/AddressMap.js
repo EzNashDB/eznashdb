@@ -50,18 +50,6 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
     return null;
   };
 
-  const GestureController = () => {
-    // Based on https://github.com/elmarquis/Leaflet.GestureHandling/issues/73#issuecomment-1880153256
-    const map = useMap();
-
-    useEffect(() => {
-      map.addHandler("gestureHandling", GestureHandling);
-      map.gestureHandling.enable();
-    }, [map]);
-
-    return null;
-  };
-
   const gestureControllerCss = `
     .leaflet-container:after {
           font-size: 1.5em;
@@ -88,6 +76,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
             }}
           ></img>
         </div>
+        <style>{gestureControllerCss}</style>
         <MapContainer
           center={[lat, lon]}
           zoom={zoom}
@@ -96,10 +85,9 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
           scrollWheelZoom={true}
           dragging={true}
           worldCopyJump={true}
+          gestureHandling={true}
           className="position-relative rounded h-100"
         >
-          <style>{gestureControllerCss}</style>
-          <GestureController />
           <ChangeMapState center={[lat, lon]} zoom={zoom} dragging={true} />
           <MapEvents />
           <TileLayer
