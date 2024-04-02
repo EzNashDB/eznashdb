@@ -7,8 +7,10 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import { useMap } from "react-leaflet/hooks";
+import { GestureHandling } from "leaflet-gesture-handling";
+import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 
-export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
+export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
   const MapEvents = useCallback(() => {
     useMapEvents({
       dragend: onMoveEnd,
@@ -48,6 +50,24 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
     return null;
   };
 
+  const GestureController = () => {
+    // Based on https://github.com/elmarquis/Leaflet.GestureHandling/issues/73#issuecomment-1880153256
+    const map = useMap();
+
+    useEffect(() => {
+      map.addHandler("gestureHandling", GestureHandling);
+      map.gestureHandling.enable();
+    }, [map]);
+
+    return null;
+  };
+
+  const gestureControllerCss = `
+    .leaflet-container:after {
+          font-size: 1.5em;
+        }
+  `;
+
   return (
     <div>
       <div className="h-100 d-inline-block w-100 position-absolute">
@@ -73,22 +93,20 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isDisabled }) => {
           zoom={zoom}
           minZoom={1}
           zoomControl={false}
-          scrollWheelZoom={!isDisabled}
-          dragging={!isDisabled}
+          scrollWheelZoom={true}
+          dragging={true}
           worldCopyJump={true}
           className="position-relative rounded h-100"
         >
-          <ChangeMapState
-            center={[lat, lon]}
-            zoom={zoom}
-            dragging={!isDisabled}
-          />
+          <style>{gestureControllerCss}</style>
+          <GestureController />
+          <ChangeMapState center={[lat, lon]} zoom={zoom} dragging={true} />
           <MapEvents />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {!isDisabled && <ZoomControl position="bottomleft" />}
+          <ZoomControl position="bottomleft" />
         </MapContainer>
       </div>
     </div>

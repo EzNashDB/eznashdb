@@ -16,7 +16,6 @@ export const AddressTypeAhead = ({
   onInput,
   onAddressSelected,
   isValid,
-  isDisabled,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
@@ -98,7 +97,6 @@ export const AddressTypeAhead = ({
         autoComplete: "one-time-code",
         dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
         lang: `${inputIsHebrew ? "he" : "en"}`,
-        readOnly: isDisabled,
       }}
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
