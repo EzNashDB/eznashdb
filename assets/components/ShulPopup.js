@@ -145,7 +145,9 @@ export const ShulPopup = ({ shul }) => {
                         <i className="fa-solid fa-link"></i>
                       </span>
                       <a
-                        href={link.link}
+                        href={`${link.link.includes("//") ? "" : "//"}${
+                          link.link
+                        }`}
                         target="_blank"
                         className="btn btn-sm btn-link p-0"
                       >
