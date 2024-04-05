@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Popup } from "react-leaflet";
-import { Card, ListGroup, Badge } from "react-bootstrap";
-import { hasHebrew } from "../utils/text";
+import { Card } from "react-bootstrap";
 
 export const ShulPopup = ({ shul }) => {
-  const isHebrewAddress = hasHebrew(shul.address);
-  const boolToIcon = (bool) => {
-    if (bool === true) {
-      return <i className="fa-solid fa-check"></i>;
-    } else if (bool === false) {
-      return <i className="fa-solid fa-xmark"></i>;
-    } else {
-      return "--";
-    }
+  const boolToYesNo = (bool) => {
+    let text = "--";
+    if (bool === true) text = "Yes";
+    else if (bool === false) text = "No";
+    return <span className="small fw-bold">{text}</span>;
   };
 
   const scoreToStars = (score) => {
@@ -63,9 +58,13 @@ export const ShulPopup = ({ shul }) => {
     },
   };
 
-  const getRoomLayoutBadge = (room, layoutType) => {
+  const getRoomLayoutDisplay = (room, layoutType) => {
     const layoutTypeData = ROOM_LAYOUT_TYPES[layoutType];
-    const icon = <i className={`me-1 ${layoutTypeData.icon}`}></i>;
+    const icon = (
+      <div className="w-15px d-inline-block text-center me-1">
+        <i className={`${layoutTypeData.icon}`}></i>
+      </div>
+    );
     const subLabels = [];
     let roomHasLayoutType = false;
     for (const field in layoutTypeData.fields) {
@@ -76,41 +75,37 @@ export const ShulPopup = ({ shul }) => {
     }
     return (
       roomHasLayoutType && (
-        <Badge
-          bg="light"
-          className="border text-dark ms-1 mt-1"
-          key={layoutType}
-        >
+        <div className="d-flex align-items-center">
           {icon}
           <span className="fw-bold">{layoutType}</span>
           {subLabels && (
             <span className="ms-1 fw-normal">{subLabels.join(", ")}</span>
           )}
-        </Badge>
+        </div>
       )
     );
   };
 
-  const getRoomLayoutBadges = (room) => {
-    const badges = [];
+  const getRoomLayoutDisplays = (room) => {
+    const displays = [];
     for (const layoutType in ROOM_LAYOUT_TYPES) {
-      const badge = getRoomLayoutBadge(room, layoutType);
-      if (badge) {
-        badges.push(badge);
+      const display = getRoomLayoutDisplay(room, layoutType);
+      if (display) {
+        displays.push(display);
       }
     }
-    return badges.length > 0 ? (
-      badges
+    return displays.length > 0 ? (
+      displays
     ) : (
-      <Badge bg="light" className="border text-dark ms-1 mt-1">
-        <div className="w-15px d-inline-block text-center">--</div>
-        Room layout not saved
-      </Badge>
+      <div className="d-flex align-items-center">
+        <div className="w-15px d-inline-block text-center me-1">--</div>
+        No layout info saved
+      </div>
     );
   };
 
   return (
-    <Popup id={shul.id} minWidth={325}>
+    <Popup id={shul.id} className="shul-popup">
       <Card>
         <Card.Header className="fw-bold p-1 pe-4 d-flex align-items-center">
           <a
@@ -121,90 +116,107 @@ export const ShulPopup = ({ shul }) => {
           </a>
           {shul.name}
         </Card.Header>
-        <Card.Body className="p-2 pt-1">
-          <div className="d-flex">
-            <div className="me-1">
-              <i className="fa-solid fa-location-dot"></i>
-            </div>
-            <div
-              dir={isHebrewAddress ? "rtl" : "ltr"}
-              lang={isHebrewAddress ? "he" : "en"}
-              className="text-truncate"
-            >
-              {shul.address}
+        <Card.Body className="px-2 py-1">
+          <div className="row gx-0">
+            <div className="col">
+              <div className="row gx-3">
+                <div className="col-12">
+                  <div>
+                    {(shul.links.length > 0 &&
+                      shul.links.map((link) => (
+                        <div
+                          key={link.id}
+                          className="d-inline-block me-2 w-100"
+                        >
+                          <div className="text-nowrap w-100 d-flex align-items-center">
+                            <span className="me-2 w-15px">
+                              <i className="fa-solid fa-link"></i>
+                            </span>
+                            <a
+                              href={`${link.link.includes("//") ? "" : "//"}${
+                                link.link
+                              }`}
+                              target="_blank"
+                              className="btn btn-sm btn-link p-0 flex-grow-1 text-start text-truncate"
+                            >
+                              {link.link}
+                            </a>
+                          </div>
+                        </div>
+                      ))) || (
+                      <div className="d-flex small">
+                        <div className="me-2 w-15px">
+                          <i className="fa-solid fa-link"></i>
+                        </div>
+                        <span className="text-muted">No links saved</span>
+                      </div>
+                    )}
+                  </div>
+                  <hr className="my-1" />
+                </div>
+                <div className="col-7 col-sm-6 small">
+                  <span className="me-2 w-15px d-inline-block">
+                    <i className="fa-solid fa-user-shield"></i>
+                  </span>
+                  Female Leadership: {boolToYesNo(shul.has_female_leadership)}
+                </div>
+                <div className="col-5 col-sm-6 small">
+                  <span className="me-2 w-15px d-inline-block">
+                    <i className="fa-solid fa-comment"></i>
+                  </span>
+                  Kaddish: {boolToYesNo(shul.can_say_kaddish)}
+                </div>
+              </div>
+              <hr className="my-1" />
             </div>
           </div>
-          {shul.links.length > 0 && (
-            <>
-              <hr className="my-1" />
-              <div>
-                {shul.links.map((link) => (
-                  <div key={link.id} className="d-inline-block me-2">
-                    <div className="text-nowrap w-100 d-flex align-items-center">
-                      <span className="me-1">
-                        <i className="fa-solid fa-link"></i>
-                      </span>
-                      <a
-                        href={`${link.link.includes("//") ? "" : "//"}${
-                          link.link
-                        }`}
-                        target="_blank"
-                        className="btn btn-sm btn-link p-0"
-                      >
-                        {link.link.substring(0, 35)}
-                        {link.link.length > 35 && "..."}
-                      </a>
+          <div className="row">
+            <div className="col-12">
+              <h6>Rooms</h6>
+            </div>
+          </div>
+          <div
+            className="striped overflow-auto row w-100 m-auto gx-0"
+            style={{ maxHeight: "75px" }}
+          >
+            <div className="col striped">
+              {(shul.rooms.length > 0 &&
+                shul.rooms.map((room) => (
+                  <div className="row gx-0 small ps-1">
+                    <div className="col-12 col-sm-3">{room.name}</div>
+                    <div className="col-3 col-sm-2">
+                      <div className="row gx-0">
+                        <div className="col-6">
+                          <div className="d-flex align-items-center">
+                            <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                            <span className="small fw-bold">
+                              {room.relative_size || "--"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="col-6">
+                          <div className="d-flex align-items-center justify-content-center">
+                            <i className="fa-solid fa-wheelchair me-1"></i>
+                            {boolToYesNo(room.is_wheelchair_accessible)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-4 col-sm-3 text-center">
+                      <div className="d-flex align-items-center justify-content-center">
+                        <i className="fa-solid fa-eye me-1"></i>
+                        <span className="small">
+                          {scoreToStars(room.see_hear_score)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col-5 col-sm-4 small">
+                      {getRoomLayoutDisplays(room)}
                     </div>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-          <hr className="my-1" />
-          <div className="d-flex justify-content-between">
-            <span className="me-1">
-              Childcare: {boolToIcon(shul.has_childcare)}
-            </span>
-            <span className="me-1">
-              Kaddish: {boolToIcon(shul.can_say_kaddish)}
-            </span>
-            <span>
-              Female Leadership: {boolToIcon(shul.has_female_leadership)}
-            </span>
+                ))) || <span className="text-muted small">No rooms saved</span>}
+            </div>
           </div>
-          <ListGroup variant="flush">
-            {shul.rooms.map((room) => (
-              <ListGroup.Item key={room.id} className="p-0 border-0">
-                <hr className="my-1" />
-                <div>
-                  <div className="d-inline-block me-1">{room.name}</div>
-                  <div className="d-inline-block float-end">
-                    <span>
-                      <Badge bg="light" className="border text-dark me-1">
-                        <i className="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
-                        {room.relative_size || "--"}
-                      </Badge>
-                    </span>
-                    <span>
-                      <Badge bg="light" className="border text-dark me-1">
-                        <i className="fa-solid fa-wheelchair me-1"></i>
-                        {boolToIcon(room.is_wheelchair_accessible)}
-                      </Badge>
-                    </span>
-                    <span>
-                      <Badge bg="light" className="border text-dark">
-                        <i className="fa-solid fa-eye me-1"></i>
-                        {scoreToStars(room.see_hear_score)}
-                      </Badge>
-                    </span>
-                  </div>
-                  <div className="d-inline-block float-end text-end w-100">
-                    {getRoomLayoutBadges(room)}
-                  </div>
-                </div>
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
         </Card.Body>
       </Card>
     </Popup>
