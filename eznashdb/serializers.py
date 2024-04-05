@@ -16,9 +16,13 @@ class LinkSerializer(serializers.ModelSerializer):
 
 
 class ShulSerializer(serializers.ModelSerializer):
-    rooms = RoomSerializer(many=True)
+    rooms = serializers.SerializerMethodField()
     links = LinkSerializer(many=True)
 
     class Meta:
         model = Shul
         fields = "__all__"
+
+    def get_rooms(self, obj):
+        ordered_rooms = obj.rooms.order_by("pk")
+        return RoomSerializer(ordered_rooms, many=True).data
