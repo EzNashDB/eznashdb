@@ -115,7 +115,7 @@ export const ShulPopup = ({ shul }) => {
           </a>
           {shul.name}
         </Card.Header>
-        <Card.Body className="px-2 py-1">
+        <Card.Body className="p-2 pt-1">
           <div className="row gx-0">
             <div className="col">
               <div className="row gx-3">
