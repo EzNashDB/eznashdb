@@ -2,7 +2,7 @@
 <div class="row room-form position-relative pt-2">
     <div class="col-auto position-absolute end-0 top-0 p-1">
         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-        {% if "DELETE" in form.visible_fields %}{{ form.fields.DELETE }}{% endif %}
+        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
         <div class="delete-room-container"></div>
     </div>
     <div class="col">
