@@ -89,13 +89,10 @@ export const ShulPopup = ({ shul }) => {
   };
 
   const getRoomLayoutDisplays = (room) => {
-    const displays = [];
-    for (const layoutType in ROOM_LAYOUT_TYPES) {
-      const display = getRoomLayoutDisplay(room, layoutType);
-      if (display) {
-        displays.push(display);
-      }
-    }
+    let displays = Object.keys(ROOM_LAYOUT_TYPES)
+      .map((layoutType) => getRoomLayoutDisplay(room, layoutType))
+      .filter((display) => !!display)
+      .map((display, i) => <div key={i}>{display}</div>);
     return displays.length > 0 ? (
       displays
     ) : (
@@ -183,8 +180,8 @@ export const ShulPopup = ({ shul }) => {
           >
             <div className="col striped">
               {(shul.rooms.length > 0 &&
-                shul.rooms.map((room) => (
-                  <div className="row gx-0 small ps-1">
+                shul.rooms.map((room, i) => (
+                  <div className="row gx-0 small ps-1" key={i}>
                     <div className="col-12 col-sm-3">{room.name}</div>
                     <div className="col-3 col-sm-2">
                       <div className="row gx-0">
