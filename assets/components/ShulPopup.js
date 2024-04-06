@@ -75,12 +75,14 @@ export const ShulPopup = ({ shul }) => {
     }
     return (
       roomHasLayoutType && (
-        <div className="d-flex align-items-center">
+        <div className="d-flex align-items-top">
           {icon}
-          <span className="fw-bold">{layoutType}</span>
-          {subLabels && (
-            <span className="ms-1 fw-normal">{subLabels.join(", ")}</span>
-          )}
+          <span>
+            <span className="fw-bold">{layoutType}</span>
+            {subLabels && (
+              <span className="ms-1 fw-normal">{subLabels.join(", ")}</span>
+            )}
+          </span>
         </div>
       )
     );
@@ -203,7 +205,7 @@ export const ShulPopup = ({ shul }) => {
                       </div>
                     </div>
                     <div className="col-4 col-sm-3 text-center">
-                      <div className="d-flex align-items-center justify-content-center">
+                      <div className="d-flex align-items-center px-3">
                         <i className="fa-solid fa-eye me-1"></i>
                         <span className="small">
                           {scoreToStars(room.see_hear_score)}
