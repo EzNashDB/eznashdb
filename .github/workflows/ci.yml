@@ -9,12 +9,13 @@ on:
       - main
 
 env:
-    POETRY_VERSION: 1.6.1
-    DATABASE_NAME: github_actions
-    DATABASE_USER: postgres
-    DATABASE_PASSWORD: postgres
-    DATABASE_HOST: 127.0.0.1
-    DATABASE_PORT: 5432
+  POETRY_VERSION: 1.6.1
+  DATABASE_NAME: github_actions
+  DATABASE_USER: postgres
+  DATABASE_PASSWORD: postgres
+  DATABASE_HOST: 127.0.0.1
+  DATABASE_PORT: 5432
+  SECRET_KEY: "insecurekey"
 
 jobs:
   CI:
