@@ -103,6 +103,17 @@ export const ShulPopup = ({ shul }) => {
     );
   };
 
+  const renderChildcareDuration = (value) => {
+    switch (value) {
+      case "ALL":
+        return "Full";
+      case "PART":
+        return "Part";
+      default:
+        return "--";
+    }
+  };
+
   return (
     <Popup id={shul.id} className="shul-popup">
       <Card>
@@ -175,7 +186,7 @@ export const ShulPopup = ({ shul }) => {
             </div>
           </div>
           <div
-            className="striped overflow-auto row w-100 m-auto gx-0"
+            className="striped overflow-auto row w-100 m-auto gx-0 mb-3"
             style={{ maxHeight: "75px" }}
           >
             <div className="col striped">
@@ -214,6 +225,40 @@ export const ShulPopup = ({ shul }) => {
                     </div>
                   </div>
                 ))) || <span className="text-muted small">No rooms saved</span>}
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-12">
+              <h6>Childcare & Youth Programming</h6>
+            </div>
+          </div>
+          <div
+            className="striped overflow-auto row w-100 m-auto gx-0"
+            style={{ maxHeight: "75px" }}
+          >
+            <div className="col striped">
+              {console.log(shul)}
+              {(shul.childcare_programs.length > 0 &&
+                shul.childcare_programs.map((childcare, i) => (
+                  <div className="row gx-0 small ps-1" key={i}>
+                    <div className="col-12 col-sm-3">{childcare.name}</div>
+                    <div className="col-2 col-sm-2">
+                      {childcare.min_age} - {childcare.max_age}
+                    </div>
+                    <div className="col-6 col-sm-5">
+                      <span className="me-2">Supervision required</span>
+                      <span>{boolToYesNo(childcare.supervision_required)}</span>
+                    </div>
+                    <div className="col-4 col-sm-2 small ps-2">
+                      <i className="fa-solid fa-clock me-1"></i>
+                      {renderChildcareDuration(childcare.duration)}
+                    </div>
+                  </div>
+                ))) || (
+                <span className="text-muted small">
+                  No childcare programs saved
+                </span>
+              )}
             </div>
           </div>
         </Card.Body>
