@@ -22,7 +22,7 @@ class MultiSelectModelFieldWithUnknownFilter(MultiSelectWithUnknownFilter):
     ):
         super().__init__(label, choices, *args, **kwargs)
         self.model_field = model_field
-        self.method = self.filter_method
+        self.method = kwargs.pop("method", self.filter_method)
 
     def filter_method(self, qs, name, value):
         raise NotImplementedError
