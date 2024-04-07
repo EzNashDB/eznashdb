@@ -41,19 +41,20 @@ ALLOWED_HOSTS = [
     "eznashdb.fly.dev",
     "66.241.125.16",
     "2a09:8280:1::3:a314",
-    # Additional allowed hosts can be defined as a JSON list in the .env
-    *json.loads(os.environ.get("EXTRA_HOSTS", "[]")),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ezratnashim.com",
     "https://www.ezratnashim.com",
     "https://eznashdb.fly.dev",
-    "https://localhost",
-    "https://*.127.0.0.1",
 ]
 
-# Application definition
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+    CSRF_TRUSTED_ORIGINS += [
+        "https://localhost",
+        "https://*.127.0.0.1",
+    ]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
