@@ -35,5 +35,5 @@ class ShulSerializer(serializers.ModelSerializer):
         return RoomSerializer(ordered_rooms, many=True).data
 
     def get_childcare_programs(self, obj):
-        ordered_programs = obj.childcare_programs.order_by("pk")
+        ordered_programs = obj.childcare_programs.order_by("min_age")
         return ChildcareSerializer(ordered_programs, many=True).data
