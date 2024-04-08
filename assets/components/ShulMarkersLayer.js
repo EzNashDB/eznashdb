@@ -4,6 +4,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { ShulPopup } from "./ShulPopup";
 import "../css/map.css";
 import { ShulsFoundCount } from "./ShulsFoundCount";
+import Control from "react-leaflet-custom-control";
 
 export const ShulMarkersLayer = () => {
   // Based on https://stackoverflow.com/a/67825424
@@ -42,9 +43,9 @@ export const ShulMarkersLayer = () => {
 
   return (
     <>
-      <div className="position-absolute end-0 top-0 z-1001">
+      <Control prepend position="topright">
         <ShulsFoundCount shulCount={shuls.length} />
-      </div>
+      </Control>
       <MarkerClusterGroup chunkedLoading showCoverageOnHover={false}>
         {latLonShuls.map((shul, index) => (
           <Marker
@@ -57,7 +58,7 @@ export const ShulMarkersLayer = () => {
               }
             }}
           >
-            <ShulPopup shul={shul} />
+            <ShulPopup shul={shul} markerRef={markerRefs.current[shul.id]} />
           </Marker>
         ))}
       </MarkerClusterGroup>
