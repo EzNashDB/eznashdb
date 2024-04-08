@@ -18,7 +18,7 @@ export const ShulsFoundCount = ({ shulCount }) => {
     <div
       ref={divRef}
       style={{ cursor: "initial" }}
-      className="mx-1 fw-normal fs-5 opacity-75"
+      className="fw-normal fs-5 opacity-75"
     >
       <Badge bg="dark">{shulsFoundLabel}</Badge>
     </div>

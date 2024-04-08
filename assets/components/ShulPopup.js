@@ -2,7 +2,7 @@ import React from "react";
 import { Popup } from "react-leaflet";
 import { Card } from "react-bootstrap";
 
-export const ShulPopup = ({ shul }) => {
+export const ShulPopup = ({ shul, markerRef }) => {
   const boolToYesNo = (bool) => {
     let text = "--";
     if (bool === true) text = "Yes";
@@ -115,16 +115,27 @@ export const ShulPopup = ({ shul }) => {
   };
 
   return (
-    <Popup id={shul.id} className="shul-popup">
-      <Card>
-        <Card.Header className="fw-bold p-1 pe-4 d-flex align-items-center">
+    <Popup id={shul.id} className="shul-popup" closeButton={false}>
+      <Card
+        style={{
+          // push below shul totals badge
+          marginTop: "40px",
+        }}
+      >
+        <Card.Header className="fw-bold p-1 d-flex align-items-center">
           <a
             className="btn btn-xs text-primary link-primary py-0 me-1"
             href={`/shuls/${shul.id}/update`}
           >
             <i className="fa-solid fa-pen-to-square"></i>
           </a>
-          {shul.name}
+          <span className="flex-grow-1">{shul.name}</span>
+          <button
+            className="btn btn-sm py-0 px-1"
+            onClick={(e) => markerRef.closePopup()}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
         </Card.Header>
         <Card.Body className="p-2 pt-1">
           <div className="row gx-0">
@@ -147,7 +158,7 @@ export const ShulPopup = ({ shul }) => {
                                 link.link
                               }`}
                               target="_blank"
-                              className="btn btn-sm btn-link p-0 flex-grow-1 text-start text-truncate"
+                              className="btn btn-sm btn-link p-0 text-start text-truncate"
                             >
                               {link.link}
                             </a>
@@ -237,7 +248,6 @@ export const ShulPopup = ({ shul }) => {
             style={{ maxHeight: "75px" }}
           >
             <div className="col striped">
-              {console.log(shul)}
               {(shul.childcare_programs.length > 0 &&
                 shul.childcare_programs.map((childcare, i) => (
                   <div className="row gx-0 small ps-1" key={i}>
