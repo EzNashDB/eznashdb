@@ -44,12 +44,12 @@ def get_room_fields(room_index: int):
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def GET_request_create(rf_GET):
     return rf_GET("eznashdb:create_shul")
 
 
-@pytest.fixture()
+@pytest.fixture
 def GET_request_update(rf_GET):
     def _generate_request(**params):
         return rf_GET("eznashdb:update_shul", params)

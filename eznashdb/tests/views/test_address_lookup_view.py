@@ -7,7 +7,7 @@ from django.urls import reverse
 DUMMY_OSM_RECORD = {"name": "osm response", "place_id": 1}
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_osm(mocker):
     def _mock_osm(response_data, status_code=200):
         original_get = requests.get

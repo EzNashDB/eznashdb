@@ -17,7 +17,7 @@ def _enable_db_access_for_all_tests(db):
     pass
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_user(django_user_model):
     user = django_user_model.objects.create(
         username="test_user",
@@ -26,7 +26,7 @@ def test_user(django_user_model):
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def rf_GET(rf) -> Callable:
     def _GET_request(
         view_name: str, url_params: dict = DEFAULT_ARG, query_params: dict = DEFAULT_ARG

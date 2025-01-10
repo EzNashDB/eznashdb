@@ -102,7 +102,7 @@ class CreateUpdateShulView(UpdateView):
             childcare.save()
 
     def get_context_data(self, **kwargs):
-        context = super(CreateUpdateShulView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["room_fs"] = self.get_room_fs()
         context["link_fs"] = self.get_link_fs()
         context["childcare_fs"] = self.get_childcare_fs()
@@ -158,7 +158,7 @@ class AddressLookupView(View):
         OSM_url = settings.BASE_OSM_URL + "?" + OSM_params
         response = requests.get(OSM_url)
         try:
-            if type(response.json()) != list:
+            if type(response.json()) is not list:
                 response.status_code = 500
         except JSONDecodeError:
             response.status_code = 500

@@ -8,39 +8,34 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v2.5.1" # Use the sha or tag you want to point at
     hooks:
-      - id: black
-        name: Python Black Formatter
-        entry: .venv/bin/black
-        language: system
-        files: '.*\.py$'
+      - id: prettier
+        name: Prettier
+        files: '.*\.js$'
+        exclude: "^static/vendor|dist/"
 
-      - id: pycln
-        name: "Python: Remove unused imports"
-        entry: .venv/bin/pycln
-        args: [--config=pyproject.toml]
-        language: system
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.4
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
 
-      - id: isort
-        name: Python Sort Imports
-        entry: .venv/bin/isort
-        language: system
-        files: '.*\.py$'
-
-      - id: flake8
-        name: Python Flake8 Linter
-        entry: .venv/bin/flake8heavened
-        language: system
-        files: '.*\.py$'
-
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.32.1
+    hooks:
       - id: djlint-django
         name: Django djLint
-        entry: .venv/bin/djlint --profile=django --quiet --reformat
-        language: system
         files: '.*\.html$'
         exclude: "bootstrap5/.*"
+        args: [--profile=django, --quiet, --reformat]
 
+  - repo: local
+    hooks:
       - id: migrations
         name: Django Migrations
         entry: .venv/bin/python manage.py makemigrations --check --no-input
@@ -54,11 +49,3 @@ repos:
         language: system
         pass_filenames: false
         files: '.*\.js$'
-
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v2.5.1" # Use the sha or tag you want to point at
-    hooks:
-      - id: prettier
-        name: Prettier
-        files: '.*\.js$'
-        exclude: "^static/vendor|dist/"
