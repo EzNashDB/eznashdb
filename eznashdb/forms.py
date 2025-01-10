@@ -107,7 +107,7 @@ class RoomForm(ModelForm):
         self.fields["layout"].choices = LAYOUT_CHOICES
 
     def save(self, commit=True):
-        instance = super(RoomForm, self).save(commit=False)
+        instance = super().save(commit=False)
         layout = self.cleaned_data["layout"]
         for layout_type in RoomLayoutType:
             setattr(instance, layout_type.value, layout_type.value in layout)
@@ -131,7 +131,7 @@ class ShulLinkForm(ModelForm):
         self.helper.form_show_labels = False
 
     def save(self, commit=True):
-        instance = super(ShulLinkForm, self).save(commit=False)
+        instance = super().save(commit=False)
         if commit:
             instance.save()
         return instance
@@ -162,7 +162,7 @@ class ChildcareProgramForm(ModelForm):
         helper.disable_csrf = True
 
     def save(self, commit=True):
-        instance = super(ChildcareProgramForm, self).save(commit=False)
+        instance = super().save(commit=False)
         if commit:
             instance.save()
         return instance

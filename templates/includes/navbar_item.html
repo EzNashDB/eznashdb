@@ -1,8 +1,6 @@
 <li class="nav-item">
     <a class="nav-link
-              {% if item.view_name == current_view_name %}
-                  active
-              {% endif %}"
+              {% if item.view_name == current_view_name %}active{% endif %}"
        aria-current="page"
        href="{% url item.view_name %}">{{ item.label }}</a>
 </li>

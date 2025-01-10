@@ -24,13 +24,14 @@
 			"extensions": [
 				"batisteo.vscode-django",
 				"eamodio.gitlens",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"charliermarsh.ruff"
 			],
 			"settings": {
 				"python.venvPath": ".",
 				"[python]": {
 					"editor.formatOnSave": true,
-					"editor.defaultFormatter": "ms-python.black-formatter"
+					"editor.defaultFormatter": "charliermarsh.ruff"
 				}
 			}
 		}

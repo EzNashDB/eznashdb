@@ -6,7 +6,7 @@ from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
 
 
-@pytest.fixture()
+@pytest.fixture
 def GET_request(rf_GET):
     return rf_GET("eznashdb:shuls", query_params={"format": "list"})
 

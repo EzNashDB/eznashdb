@@ -6,7 +6,7 @@ from eznashdb.filtersets import ShulFilterSet
 from eznashdb.models import Shul
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_request(rf, test_user):
     request = rf.get("/")
     request.user = test_user
