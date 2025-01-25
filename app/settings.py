@@ -36,8 +36,6 @@ ALLOWED_HOSTS = [
     "eznashdb.fly.dev",
     "66.241.125.16",
     "2a09:8280:1::3:a314",
-    "0.0.0.0",
-    "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -51,6 +49,10 @@ if DEBUG:
     CSRF_TRUSTED_ORIGINS += [
         "https://localhost",
         "https://*.127.0.0.1",
+    ]
+    ALLOWED_HOSTS += [
+        "0.0.0.0",
+        "localhost",
     ]
 
 INSTALLED_APPS = [
