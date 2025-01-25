@@ -9,8 +9,8 @@ import {
 import { useMap } from "react-leaflet/hooks";
 import { GestureHandling } from "leaflet-gesture-handling";
 import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
-import '../vendor/leaflet-history/base.js'
-import '../vendor/leaflet-history/base.css'
+import "../vendor/leaflet-history/base.js";
+import "../vendor/leaflet-history/base.css";
 import Control from "react-leaflet-custom-control";
 import { AddressTypeAhead } from "./AddressTypeAhead2.js";
 
@@ -21,12 +21,12 @@ export const AddressMap2 = ({
   place_id,
   initialIsValid,
 }) => {
-  const [inputValue, setInputValue] = useState(display_name)
+  const [inputValue, setInputValue] = useState(display_name);
   const hasCoordsInProps = !!String(lat) && !!String(lon);
   const zoom = hasCoordsInProps ? 16 : 1;
   const onMoveEnd = (e) => {
-    console.log(e)
-  }
+    console.log(e);
+  };
   const MapEvents = useCallback(() => {
     useMapEvents({
       dragend: onMoveEnd,
@@ -37,7 +37,7 @@ export const AddressMap2 = ({
 
   const ChangeMapState = ({ center, zoom, dragging }) => {
     const map = useMap();
-    window.addressMap = map
+    window.addressMap = map;
 
     useEffect(() => {
       const historyControl = new L.HistoryControl({}).addTo(map);
@@ -65,7 +65,7 @@ export const AddressMap2 = ({
 
   return (
     <div style={{ minHeight: "180px" }} className="position-relative">
-      <div className="h-100 d-inline-block w-100 position-absolute" >
+      <div className="h-100 d-inline-block w-100 position-absolute">
         <div
           className="position-absolute click-through"
           style={{
@@ -75,10 +75,7 @@ export const AddressMap2 = ({
             zIndex: 401, // Above map TileLayer
           }}
         >
-          <img
-            src="/static/dist/images/marker-icon-2x.png"
-            height="38"
-          ></img>
+          <img src="/static/dist/images/marker-icon-2x.png" height="38"></img>
         </div>
         <style>{gestureControllerCss}</style>
         <MapContainer
@@ -103,7 +100,9 @@ export const AddressMap2 = ({
             <AddressTypeAhead
               inputValue={inputValue}
               onInput={setInputValue}
-              onAddressSelected={(e) => { console.log(e) }}
+              onAddressSelected={(e) => {
+                console.log(e);
+              }}
               isValid={true}
             />
           </Control>
