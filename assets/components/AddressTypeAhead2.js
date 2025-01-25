@@ -18,16 +18,16 @@ export const AddressTypeAhead = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 1000);
   const [isSearchError, setIsSearchError] = useState(false);
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState([]);
   // const inputIsHebrew = hasHebrew(initialValue.display_name);
   const handleSearch = (query) => {
-    console.log(searchQuery)
+    console.log(searchQuery);
     setSearchQuery(query);
   };
 
   useEffect(() => {
-    console.log("useEfect: ", searchQuery)
-    console.log("debounced: ", debouncedSearchQuery)
+    console.log("useEfect: ", searchQuery);
+    console.log("debounced: ", debouncedSearchQuery);
     if (!searchQuery) return;
     setIsLoading(true);
     fetch(`${SEARCH_URL}?q=${searchQuery}`)
@@ -49,7 +49,7 @@ export const AddressTypeAhead = () => {
   }, [searchQuery]);
 
   const handleChange = (selected) => {
-    console.log(selected)
+    console.log(selected);
     const option = selected[0];
     if (option) {
       setSelected(selected);
