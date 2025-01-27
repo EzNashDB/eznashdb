@@ -6,15 +6,10 @@
 		"../docker-compose.yml",
 		"./docker-compose.dev.yml"
 	],
-	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
-		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
-	],
 	"service": "dev",
 	"workspaceFolder": "/app",
 	"shutdownAction": "none",
 	"remoteUser": "docker",
-	// "initializeCommand": "echo \"=====INITIALIZING=====\" ls && alias docker-compose=\"docker compose\"",
 	"forwardPorts": [
 		8000,
 		5432
