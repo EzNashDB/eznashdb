@@ -6,7 +6,7 @@ FROM ${BASE_IMAGE}
 SHELL ["/bin/bash", "--login", "-o", "pipefail", "-c"]
 
 ARG POETRY_VERSION=1.6.1
-ARG NODE_VERSION=18
+ARG NODE_VERSION=22
 ARG HOME=/home/docker
 ARG USERNAME=docker
 
