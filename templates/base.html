@@ -80,6 +80,21 @@
         {# htmx #}
         <script src="https://unpkg.com/htmx.org@1.9.10"></script>
         <script src="{% static 'dist/base.js' %}"></script>
+        {% if debug %}
+            <script>
+            {# django-debug-toolbar HTMX config, per https://django-debug-toolbar.readthedocs.io/en/latest/installation.html #}
+            if (typeof window.htmx !== "undefined") {
+                  htmx.on("htmx:afterSettle", function(detail) {
+                        if (
+                        typeof window.djdt !== "undefined"
+                        && detail.target instanceof HTMLBodyElement
+                        ) {
+                        djdt.show_toolbar();
+                        }
+                  });
+            }
+            </script>
+        {% endif %}
         <link rel="stylesheet"
               href="https://unpkg.com/react-bootstrap-typeahead/css/Typeahead.css" />
         <link rel="stylesheet"

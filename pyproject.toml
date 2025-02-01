@@ -106,6 +106,7 @@ requests = "^2.31.0"
 djangorestframework = "^3.14.0"
 sentry-sdk = {extras = ["django"], version = "^1.44.0"}
 django-enforce-host = "^1.1.0"
+django-debug-toolbar = "^5.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
