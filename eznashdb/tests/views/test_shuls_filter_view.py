@@ -127,19 +127,6 @@ def describe_filter():
         assert "shul 2" in str(soup)
         assert "shul 1" not in str(soup)
 
-    def filters_by_has_female_leadership(rf_GET):
-        Shul.objects.create(name="shul 1", has_female_leadership=False)
-        Shul.objects.create(name="shul 2", has_female_leadership=True)
-        request = rf_GET(
-            "eznashdb:shuls", query_params={"has_female_leadership": ["True"], "format": "list"}
-        )
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
     def filters_by_can_say_kaddish(rf_GET):
         Shul.objects.create(name="shul 1", can_say_kaddish=False)
         Shul.objects.create(name="shul 2", can_say_kaddish=True)

@@ -19,7 +19,6 @@ class ShulForm(ModelForm):
         fields = [
             "name",
             "address",
-            "has_female_leadership",
             "can_say_kaddish",
             "has_no_childcare",
             "latitude",
@@ -29,15 +28,12 @@ class ShulForm(ModelForm):
         labels = {
             "name": FieldsOptions.SHUL_NAME.label,
             "address": FieldsOptions.ADDRESS.label,
-            "has_female_leadership": FieldsOptions.FEMALE_LEADERSHIP.label,
             "can_say_kaddish": FieldsOptions.KADDISH.label,
         }
         help_texts = {
-            "has_female_leadership": FieldsOptions.FEMALE_LEADERSHIP.help_text,
             "can_say_kaddish": FieldsOptions.KADDISH.help_text,
         }
         widgets = {
-            "has_female_leadership": NullableBooleanWidget(),
             "can_say_kaddish": NullableBooleanWidget(),
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),

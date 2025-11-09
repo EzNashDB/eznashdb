@@ -54,14 +54,6 @@ class FieldsOptions:
         "fa-solid fa-tag",
         "Main Sanctuary, Beit Midrash, etc.",
     )
-    FEMALE_LEADERSHIP = FieldOptions(
-        "Female Leadership",
-        "fa-solid fa-user-shield",
-        """
-            Are any women in leadership positions (president, executive director,
-            halachic/spiritual leader, gabbai't, etc.)?
-        """,
-    )
     CHILDCARE = FieldOptions(
         "Childcare & Youth Programming",
         "fa-solid fa-child-reaching",

@@ -175,12 +175,6 @@ export const ShulPopup = ({ shul, markerRef }) => {
                   </div>
                   <hr className="my-1" />
                 </div>
-                <div className="col-7 col-sm-6 small">
-                  <span className="me-2 w-15px d-inline-block">
-                    <i className="fa-solid fa-user-shield"></i>
-                  </span>
-                  Female Leadership: {boolToYesNo(shul.has_female_leadership)}
-                </div>
                 <div className="col-5 col-sm-6 small">
                   <span className="me-2 w-15px d-inline-block">
                     <i className="fa-solid fa-comment"></i>

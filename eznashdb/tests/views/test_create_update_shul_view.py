@@ -75,7 +75,6 @@ def describe_create():
     def test_creates_shul_with_rooms(client):
         data = {
             "can_say_kaddish": "unknown",
-            "has_female_leadership": "unknown",
             "name": "test shul",
             "address": "123 Sesame Street",
             "latitude": "1",
@@ -99,7 +98,6 @@ def describe_create():
             reverse("eznashdb:create_shul"),
             data={
                 "can_say_kaddish": "unknown",
-                "has_female_leadership": "unknown",
                 "name": "test shul",
                 "latitude": "1",
                 "longitude": "1",

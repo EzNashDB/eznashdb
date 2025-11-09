@@ -22,11 +22,6 @@ def x_help_text(help_text):
 
 class ShulFilterSet(FilterSet):
     name = CharFilter(lookup_expr="icontains", label=FieldsOptions.SHUL_NAME.label)
-    has_female_leadership = BoolOrUnknownFilter(
-        model_field="has_female_leadership",
-        label=FieldsOptions.FEMALE_LEADERSHIP.label,
-        help_text=x_help_text(FieldsOptions.FEMALE_LEADERSHIP.help_text),
-    )
     can_say_kaddish = BoolOrUnknownFilter(
         model_field="can_say_kaddish",
         label=FieldsOptions.KADDISH.label,
