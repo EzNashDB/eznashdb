@@ -71,8 +71,7 @@ class FieldsOptions:
         "Visibility & Audibility",
         "fa-solid fa-eye",
         """
-            How well you can see and hear what is happening at the bima, aron, and pulpit
-            from the women's section?
+            How well can women see & hear what happens at the bima, aron, and pulpit?
         """,
     )
     LAYOUT = FieldOptions(
