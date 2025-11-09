@@ -58,10 +58,6 @@ class FieldsOptions:
         "Childcare & Youth Programming",
         "fa-solid fa-child-reaching",
     )
-    LINKS = FieldOptions(
-        "Links",
-        "fa-solid fa-link",
-    )
     RELATIVE_SIZE = FieldOptions(
         "Size",
         "fa-solid fa-up-right-and-down-left-from-center",

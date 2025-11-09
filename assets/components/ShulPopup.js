@@ -138,46 +138,6 @@ export const ShulPopup = ({ shul, markerRef }) => {
           </button>
         </Card.Header>
         <Card.Body className="p-2 pt-1">
-          <div className="row gx-0">
-            <div className="col">
-              <div className="row gx-3">
-                <div className="col-12">
-                  <div>
-                    {(shul.links.length > 0 &&
-                      shul.links.map((link) => (
-                        <div
-                          key={link.id}
-                          className="d-inline-block me-2 w-100"
-                        >
-                          <div className="text-nowrap w-100 d-flex align-items-center">
-                            <span className="me-2 w-15px">
-                              <i className="fa-solid fa-link"></i>
-                            </span>
-                            <a
-                              href={`${link.link.includes("//") ? "" : "//"}${
-                                link.link
-                              }`}
-                              target="_blank"
-                              className="btn btn-sm btn-link p-0 text-start text-truncate"
-                            >
-                              {link.link}
-                            </a>
-                          </div>
-                        </div>
-                      ))) || (
-                      <div className="d-flex small">
-                        <div className="me-2 w-15px">
-                          <i className="fa-solid fa-link"></i>
-                        </div>
-                        <span className="text-muted">No links saved</span>
-                      </div>
-                    )}
-                  </div>
-                  <hr className="my-1" />
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="row">
             <div className="col-12">
               <h6>Rooms</h6>
