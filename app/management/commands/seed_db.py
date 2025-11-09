@@ -7,7 +7,7 @@ from faker import Faker
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Room, Shul
-from eznashdb.random import random_bool, random_bool_or_None, random_choice_or_blank
+from eznashdb.random import random_bool, random_choice_or_blank
 
 User = get_user_model()
 fake = Faker()
@@ -85,7 +85,6 @@ class Command(BaseCommand):
                 defaults={
                     "created_by": self.user,
                     "address": fake.street_address(),
-                    "can_say_kaddish": random_bool_or_None(),
                 },
             )
             self._create_shul_rooms(shul)

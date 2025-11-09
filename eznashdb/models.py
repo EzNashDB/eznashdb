@@ -22,7 +22,6 @@ class Shul(models.Model):
     place_id = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=255, blank=True)
     has_no_childcare = models.BooleanField(null=True, blank=True)
-    can_say_kaddish = models.BooleanField(null=True, blank=True)
 
     class Meta:
         verbose_name = "shul"

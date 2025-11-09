@@ -127,17 +127,6 @@ def describe_filter():
         assert "shul 2" in str(soup)
         assert "shul 1" not in str(soup)
 
-    def filters_by_can_say_kaddish(rf_GET):
-        Shul.objects.create(name="shul 1", can_say_kaddish=False)
-        Shul.objects.create(name="shul 2", can_say_kaddish=True)
-        request = rf_GET("eznashdb:shuls", query_params={"can_say_kaddish": ["True"], "format": "list"})
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
     def filters_by_relative_size(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(relative_size=RelativeSize.M)

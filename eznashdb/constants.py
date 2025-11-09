@@ -62,11 +62,6 @@ class FieldsOptions:
         "Links",
         "fa-solid fa-link",
     )
-    KADDISH = FieldOptions(
-        "Kaddish",
-        "fa-solid fa-comment",
-        "Can women say kaddish?",
-    )
     RELATIVE_SIZE = FieldOptions(
         "Size",
         "fa-solid fa-up-right-and-down-left-from-center",
