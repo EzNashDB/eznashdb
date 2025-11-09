@@ -6,8 +6,8 @@ from django.core.management.base import BaseCommand
 from faker import Faker
 
 from eznashdb.enums import RelativeSize, SeeHearScore
-from eznashdb.models import Room, Shul
-from eznashdb.random import random_bool, random_choice_or_blank
+from eznashdb.models import Shul
+from eznashdb.random import random_choice_or_blank
 
 User = get_user_model()
 fake = Faker()
@@ -25,45 +25,9 @@ class RoomCreator:
                 "created_by": self._shul.created_by,
                 "relative_size": random_choice_or_blank(list(RelativeSize)),
                 "see_hear_score": random_choice_or_blank(list(SeeHearScore)),
-                "is_same_height_side": False,
-                "is_same_height_back": False,
-                "is_elevated_side": False,
-                "is_elevated_back": False,
-                "is_balcony": False,
-                "is_only_men": False,
-                "is_mixed_seating": False,
             },
         )
         return room
-
-
-class HasWomenRoomCreator(RoomCreator):
-    def create(self):
-        room = super().create()
-        params = {
-            "is_same_height_side": random_bool(),
-            "is_same_height_back": random_bool(),
-            "is_elevated_side": random_bool(),
-            "is_elevated_back": random_bool(),
-            "is_balcony": random_bool(),
-        }
-        Room.objects.filter(pk=room.pk).update(**params)
-        room.refresh_from_db()
-        return room
-
-
-class NoWomenRoomCreator(RoomCreator):
-    def create(self):
-        room = super().create()
-        room.is_only_men = True
-        return room.save()
-
-
-class MixedSeatingRoomCreator(RoomCreator):
-    def create(self):
-        room = super().create()
-        room.is_mixed_seating = True
-        return room.save()
 
 
 class Command(BaseCommand):
@@ -92,10 +56,4 @@ class Command(BaseCommand):
     def _create_shul_rooms(self, shul):
         room_count = random.choice([1, 2, 3])
         for j in range(room_count):
-            self._get_random_room_creator()(shul, j + 1).create()
-
-    def _get_random_room_creator(self) -> RoomCreator:
-        choices = [NoWomenRoomCreator, MixedSeatingRoomCreator]
-        for _ in range(3):
-            choices.append(HasWomenRoomCreator)
-        return random.choice(choices)
+            RoomCreator(shul, j + 1).create()

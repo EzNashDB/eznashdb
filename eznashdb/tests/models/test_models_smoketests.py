@@ -20,13 +20,6 @@ def test_models_smoketest(django_user_model):
         name="Test Room",
         relative_size=RelativeSize.S,
         see_hear_score=SeeHearScore._5,
-        is_same_height_side=True,
-        is_same_height_back=True,
-        is_elevated_side=True,
-        is_elevated_back=True,
-        is_balcony=True,
-        is_only_men=True,
-        is_mixed_seating=True,
     )
 
     # Assert all created

@@ -3,13 +3,6 @@ import { Popup } from "react-leaflet";
 import { Card } from "react-bootstrap";
 
 export const ShulPopup = ({ shul, markerRef }) => {
-  const boolToYesNo = (bool) => {
-    let text = "--";
-    if (bool === true) text = "Yes";
-    else if (bool === false) text = "No";
-    return <span className="small fw-bold">{text}</span>;
-  };
-
   const scoreToStars = (score) => {
     if (score === "") {
       return "--";
@@ -22,85 +15,6 @@ export const ShulPopup = ({ shul, markerRef }) => {
       stars.push(<span key={i}>{star}</span>);
     }
     return <span className="text-nowrap text-warning">{stars}</span>;
-  };
-  const ROOM_LAYOUT_TYPES = {
-    "Same height": {
-      icon: "fa-solid fa-arrows-left-right",
-      fields: {
-        is_same_height_side: "Side",
-        is_same_height_back: "Back",
-      },
-    },
-    Elevated: {
-      icon: "fa-solid fa-caret-up",
-      fields: {
-        is_elevated_side: "Side",
-        is_elevated_back: "Back",
-      },
-    },
-    Balcony: {
-      icon: "fa-solid fa-stairs",
-      fields: {
-        is_balcony: "",
-      },
-    },
-    "No women's section": {
-      icon: "fa-solid fa-xmark",
-      fields: {
-        is_only_men: "",
-      },
-    },
-    "Mixed seating": {
-      icon: "fa-solid fa-children",
-      fields: {
-        is_mixed_seating: "",
-      },
-    },
-  };
-
-  const getRoomLayoutDisplay = (room, layoutType) => {
-    const layoutTypeData = ROOM_LAYOUT_TYPES[layoutType];
-    const icon = (
-      <div className="w-15px d-inline-block text-center me-1">
-        <i className={`${layoutTypeData.icon}`}></i>
-      </div>
-    );
-    const subLabels = [];
-    let roomHasLayoutType = false;
-    for (const field in layoutTypeData.fields) {
-      if (room[field]) {
-        roomHasLayoutType = true;
-        subLabels.push(layoutTypeData.fields[field]);
-      }
-    }
-    return (
-      roomHasLayoutType && (
-        <div className="d-flex align-items-top">
-          {icon}
-          <span>
-            <span className="fw-bold">{layoutType}</span>
-            {subLabels && (
-              <span className="ms-1 fw-normal">{subLabels.join(", ")}</span>
-            )}
-          </span>
-        </div>
-      )
-    );
-  };
-
-  const getRoomLayoutDisplays = (room) => {
-    let displays = Object.keys(ROOM_LAYOUT_TYPES)
-      .map((layoutType) => getRoomLayoutDisplay(room, layoutType))
-      .filter((display) => !!display)
-      .map((display, i) => <div key={i}>{display}</div>);
-    return displays.length > 0 ? (
-      displays
-    ) : (
-      <div className="d-flex align-items-center">
-        <div className="w-15px d-inline-block text-center me-1">--</div>
-        No layout info saved
-      </div>
-    );
   };
 
   return (
@@ -155,9 +69,6 @@ export const ShulPopup = ({ shul, markerRef }) => {
                           {scoreToStars(room.see_hear_score)}
                         </span>
                       </div>
-                    </div>
-                    <div className="col-5 col-sm-4 small">
-                      {getRoomLayoutDisplays(room)}
                     </div>
                   </div>
                 ))) || <span className="text-muted small">No rooms saved</span>}
