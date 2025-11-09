@@ -13,9 +13,8 @@ from django.views import View
 from django.views.generic import DeleteView, UpdateView
 from django_filters.views import FilterView
 
-from eznashdb.constants import FieldsOptions
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import ChildcareProgramFormSet, RoomFormSet, ShulForm
+from eznashdb.forms import RoomFormSet, ShulForm
 from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
 
@@ -66,11 +65,9 @@ class CreateUpdateShulView(UpdateView):
 
     def form_valid(self, form):
         room_fs = self.get_room_fs()
-        childcare_fs = self.get_childcare_fs()
-        if not room_fs.is_valid() or not childcare_fs.is_valid():
+        if not room_fs.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         self.object = form.save()
-        self.childcare_fs_valid(childcare_fs)
         self.room_fs_valid(room_fs)
 
         return HttpResponseRedirect(self.get_success_url())
@@ -83,26 +80,13 @@ class CreateUpdateShulView(UpdateView):
             room.shul = self.object
             room.save()
 
-    def childcare_fs_valid(self, childcare_fs):
-        childcare_programs = childcare_fs.save(commit=False)
-        for obj in childcare_fs.deleted_objects:
-            obj.delete()
-        for childcare in childcare_programs:
-            childcare.shul = self.object
-            childcare.save()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["room_fs"] = self.get_room_fs()
-        context["childcare_fs"] = self.get_childcare_fs()
-        context["FIELDS_OPTIONS"] = FieldsOptions
         return context
 
     def get_room_fs(self):
         return self.get_formset(RoomFormSet, "rooms")
-
-    def get_childcare_fs(self):
-        return self.get_formset(ChildcareProgramFormSet, "childcare-programs")
 
     def get_formset(self, formset_class, prefix):
         if self.request.method == "GET":

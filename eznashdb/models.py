@@ -2,9 +2,8 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from eznashdb.choices import ZERO_TO_EIGHTEEN
 from eznashdb.constants import LAYOUT_FIELDS
-from eznashdb.enums import ChildcareProgramDuration, RelativeSize, SeeHearScore
+from eznashdb.enums import RelativeSize, SeeHearScore
 
 
 class Shul(models.Model):
@@ -21,7 +20,6 @@ class Shul(models.Model):
     longitude = models.CharField(max_length=255, blank=True)
     place_id = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=255, blank=True)
-    has_no_childcare = models.BooleanField(null=True, blank=True)
 
     class Meta:
         verbose_name = "shul"
@@ -62,22 +60,3 @@ class Room(models.Model):
 
     def has_layout_data(self):
         return any(getattr(self, field, False) for field in LAYOUT_FIELDS)
-
-
-class ChildcareProgram(models.Model):
-    shul = models.ForeignKey(
-        "eznashdb.Shul", on_delete=models.PROTECT, related_name="childcare_programs"
-    )
-    name = models.CharField(max_length=100)
-    min_age = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
-    max_age = models.IntegerField(choices=ZERO_TO_EIGHTEEN, null=True, blank=True)
-    supervision_required = models.BooleanField(null=True, blank=True)
-    duration = models.CharField(choices=ChildcareProgramDuration.choices, blank=True, max_length=20)
-
-    class Meta:
-        verbose_name = "childcare program"
-        verbose_name_plural = "childcare programs"
-        ordering = ["min_age", "max_age"]
-
-    def __str__(self) -> str:
-        return f"Childcare ({self.min_age}-{self.max_age}), {self.shul}"

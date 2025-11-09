@@ -24,8 +24,3 @@ class RoomLayoutType(models.TextChoices):
     is_balcony = ("is_balcony", _("Balcony"))
     is_only_men = ("is_only_men", _("Only Men"))
     is_mixed_seating = ("is_mixed_seating", _("Mixed Seating"))
-
-
-class ChildcareProgramDuration(models.TextChoices):
-    ALL = ("ALL", _("All of shabbat shacharit and mussaf"))
-    PART = ("PART", _("Part of shabbat shacharit and mussaf"))

@@ -5,21 +5,16 @@ from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factor
 from eznashdb.choices import LAYOUT_CHOICES
 from eznashdb.constants import LAYOUT_FIELDS, FieldsOptions
 from eznashdb.enums import RoomLayoutType
-from eznashdb.models import ChildcareProgram, Room, Shul
-from eznashdb.widgets import MultiSelectWidget, NullableBooleanWidget
+from eznashdb.models import Room, Shul
+from eznashdb.widgets import MultiSelectWidget
 
 
 class ShulForm(ModelForm):
-    has_no_childcare = forms.BooleanField(
-        required=False, label="Shul has no children's programming on shabbat"
-    )
-
     class Meta:
         model = Shul
         fields = [
             "name",
             "address",
-            "has_no_childcare",
             "latitude",
             "longitude",
             "place_id",
@@ -102,58 +97,10 @@ class RoomForm(ModelForm):
         return instance
 
 
-class ChildcareProgramForm(ModelForm):
-    class Meta:
-        model = ChildcareProgram
-        fields = ["shul", "name", "min_age", "max_age", "supervision_required", "duration"]
-        labels = {
-            "name": "Program Name",
-            "min_age": "From Age",
-            "max_age": "To Age",
-            "supervision_required": "Parental Supervision",
-        }
-        widgets = {
-            "name": TextInput(attrs={"class": "fw-bold"}),
-            "supervision_required": NullableBooleanWidget(
-                choices=((True, "Required"), (False, "Not required"))
-            ),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = helper = FormHelper()
-        helper.template = "eznashdb/childcare_program_form.html"
-        helper.form_tag = False
-        helper.disable_csrf = True
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if commit:
-            instance.save()
-        return instance
-
-    def clean(self):
-        cleaned_data = super().clean()
-        min_age = cleaned_data.get("min_age")
-        max_age = cleaned_data.get("max_age")
-        if None not in [min_age, max_age] and min_age > max_age:
-            self.add_error("min_age", "From Age must be less than To Age")
-
-
 RoomFormSet = inlineformset_factory(
     Shul,
     Room,
     form=RoomForm,
-    extra=1,
-    can_delete=True,
-    can_delete_extra=False,
-)
-
-
-ChildcareProgramFormSet = inlineformset_factory(
-    Shul,
-    ChildcareProgram,
-    form=ChildcareProgramForm,
     extra=1,
     can_delete=True,
     can_delete_extra=False,
