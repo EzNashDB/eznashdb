@@ -14,13 +14,3 @@ class SeeHearScore(models.TextChoices):
     _3 = ("3", _("3"))
     _2 = ("2", _("2"))
     _1 = ("1", _("1: Much more difficult"))
-
-
-class RoomLayoutType(models.TextChoices):
-    is_same_height_side = ("is_same_height_side", _("Same height - Side"))
-    is_same_height_back = ("is_same_height_back", _("Same height - Back"))
-    is_elevated_side = ("is_elevated_side", _("Elevated - Side"))
-    is_elevated_back = ("is_elevated_back", _("Elevated - Back"))
-    is_balcony = ("is_balcony", _("Balcony"))
-    is_only_men = ("is_only_men", _("Only Men"))
-    is_mixed_seating = ("is_mixed_seating", _("Mixed Seating"))

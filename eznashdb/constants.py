@@ -4,16 +4,6 @@ from django.utils.safestring import mark_safe
 
 DEFAULT_ARG = object()
 
-LAYOUT_FIELDS = [
-    "is_same_height_side",
-    "is_same_height_back",
-    "is_elevated_side",
-    "is_elevated_back",
-    "is_balcony",
-    "is_only_men",
-    "is_mixed_seating",
-]
-
 
 @dataclass()
 class LabelWithIcon:
@@ -65,9 +55,4 @@ class FieldsOptions:
         """
             How well can women see & hear what happens at the bima, aron, and pulpit?
         """,
-    )
-    LAYOUT = FieldOptions(
-        "Layout",
-        "fa-solid fa-cubes",
-        "Where is the women's section located?",
     )

@@ -4,11 +4,8 @@ from django.utils.safestring import mark_safe
 from django_filters import CharFilter, FilterSet
 
 from eznashdb.constants import FieldsOptions
-from eznashdb.enums import RelativeSize, RoomLayoutType, SeeHearScore
-from eznashdb.filters import (
-    MultipleChoiceOrUnknownCharFilter,
-    MultiSelectWithUnknownFilter,
-)
+from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.filters import MultipleChoiceOrUnknownCharFilter
 from eznashdb.models import Shul
 
 
@@ -35,12 +32,6 @@ class ShulFilterSet(FilterSet):
         help_text=x_help_text(FieldsOptions.SEE_HEAR.help_text),
         method="filter_rooms__see_hear_score",
     )
-    rooms__layout = MultiSelectWithUnknownFilter(
-        choices=RoomLayoutType.choices,
-        method="filter_room_layout",
-        label=FieldsOptions.LAYOUT.label,
-        help_text=x_help_text(FieldsOptions.LAYOUT.help_text),
-    )
 
     def filter_rooms__relative_size(self, qs, name, value):
         value = [x if x != "--" else "" for x in value]
@@ -63,28 +54,6 @@ class ShulFilterSet(FilterSet):
         self.form.helper = helper = FormHelper()
         helper.field_template = "bootstrap5/no_margin_field.html"
         helper.field_class = "input-group-sm"
-
-    def filter_room_layout(self, qs, name, value):
-        include_None = "--" in value
-        values = [v for v in value if v != "--"]
-
-        query = Q()
-        layout_fields = [
-            "is_same_height_side",
-            "is_same_height_back",
-            "is_elevated_side",
-            "is_elevated_back",
-            "is_balcony",
-            "is_only_men",
-            "is_mixed_seating",
-        ]
-        for field in layout_fields:
-            if field in values:
-                query |= Q(**{f"rooms__{field}": True})
-        if include_None:
-            all_False = {f"rooms__{field}": False for field in layout_fields}
-            query |= Q(**all_False) | Q(rooms__isnull=True)
-        return qs.filter(query).distinct()
 
     @property
     def qs(self):

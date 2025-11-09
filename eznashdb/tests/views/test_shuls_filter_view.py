@@ -35,40 +35,6 @@ def test_shows_app_name(GET_request):
         assert room.name in soup.get_text()
 
     def describe_rooms():
-        @pytest.mark.parametrize(
-            ("field_name", "display_values"),
-            [
-                ("is_same_height_side", ["same height", "side"]),
-                ("is_same_height_back", ["same height", "back"]),
-                ("is_elevated_side", ["elevated", "side"]),
-                ("is_elevated_back", ["elevated", "back"]),
-                ("is_balcony", ["balcony"]),
-                ("is_only_men", ["no women's section"]),
-                ("is_mixed_seating", ["mixed seating"]),
-            ],
-        )
-        def test_shows_boolean_room_layout_details(GET_request, field_name, display_values):
-            shul = Shul.objects.create(name="test shul")
-            shul.rooms.create(name="test_room", **{field_name: True})
-
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-            cards = soup.find_all(attrs={"class": "accordion-item"})
-            shul_card = [card for card in cards if shul.name in card.text][0]
-
-            for value in display_values:
-                assert value.lower() in str(shul_card.text).lower()
-
-        def test_shows_dashes_if_all_boolean_layout_fields_are_False(GET_request):
-            shul = Shul.objects.create(name="test shul")
-            shul.rooms.create(name="test_room")
-
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-            assert "--" in str(soup).lower()
-
         @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
         def test_shows_room_relative_size(GET_request, relative_size):
             shul = Shul.objects.create(name="test shul")
@@ -145,19 +111,6 @@ def describe_filter():
         Shul.objects.create(name="shul 2").rooms.create(see_hear_score=SeeHearScore._3)
         request = rf_GET(
             "eznashdb:shuls", query_params={"rooms__see_hear_score": ["3"], "format": "list"}
-        )
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
-    def filters_by_room_layout(rf_GET):
-        Shul.objects.create(name="shul 1")
-        Shul.objects.create(name="shul 2").rooms.create(is_same_height_side=True)
-        request = rf_GET(
-            "eznashdb:shuls", query_params={"rooms__layout": ["is_same_height_side"], "format": "list"}
         )
 
         response = ShulsFilterView.as_view()(request)
