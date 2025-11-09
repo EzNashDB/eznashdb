@@ -215,12 +215,6 @@ export const ShulPopup = ({ shul, markerRef }) => {
                             </span>
                           </div>
                         </div>
-                        <div className="col-6">
-                          <div className="d-flex align-items-center justify-content-center">
-                            <i className="fa-solid fa-wheelchair me-1"></i>
-                            {boolToYesNo(room.is_wheelchair_accessible)}
-                          </div>
-                        </div>
                       </div>
                     </div>
                     <div className="col-4 col-sm-3 text-center">

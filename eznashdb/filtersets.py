@@ -32,11 +32,6 @@ class ShulFilterSet(FilterSet):
         label=FieldsOptions.KADDISH.label,
         help_text=x_help_text(FieldsOptions.KADDISH.help_text),
     )
-    rooms__is_wheelchair_accessible = BoolOrUnknownFilter(
-        model_field="rooms__is_wheelchair_accessible",
-        label=FieldsOptions.WHEELCHAIR_ACCESS.label,
-        help_text=x_help_text(FieldsOptions.WHEELCHAIR_ACCESS.help_text),
-    )
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.choices,
