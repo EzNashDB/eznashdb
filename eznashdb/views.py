@@ -15,7 +15,7 @@ from django_filters.views import FilterView
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import ChildcareProgramFormSet, RoomFormSet, ShulForm, ShulLinkFormSet
+from eznashdb.forms import ChildcareProgramFormSet, RoomFormSet, ShulForm
 from eznashdb.models import Shul
 from eznashdb.serializers import ShulSerializer
 
@@ -66,12 +66,10 @@ class CreateUpdateShulView(UpdateView):
 
     def form_valid(self, form):
         room_fs = self.get_room_fs()
-        link_fs = self.get_link_fs()
         childcare_fs = self.get_childcare_fs()
-        if not room_fs.is_valid() or not link_fs.is_valid() or not childcare_fs.is_valid():
+        if not room_fs.is_valid() or not childcare_fs.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         self.object = form.save()
-        self.link_fs_valid(link_fs)
         self.childcare_fs_valid(childcare_fs)
         self.room_fs_valid(room_fs)
 
@@ -85,14 +83,6 @@ class CreateUpdateShulView(UpdateView):
             room.shul = self.object
             room.save()
 
-    def link_fs_valid(self, link_fs):
-        links = link_fs.save(commit=False)
-        for obj in link_fs.deleted_objects:
-            obj.delete()
-        for link in links:
-            link.shul = self.object
-            link.save()
-
     def childcare_fs_valid(self, childcare_fs):
         childcare_programs = childcare_fs.save(commit=False)
         for obj in childcare_fs.deleted_objects:
@@ -104,16 +94,12 @@ class CreateUpdateShulView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["room_fs"] = self.get_room_fs()
-        context["link_fs"] = self.get_link_fs()
         context["childcare_fs"] = self.get_childcare_fs()
         context["FIELDS_OPTIONS"] = FieldsOptions
         return context
 
     def get_room_fs(self):
         return self.get_formset(RoomFormSet, "rooms")
-
-    def get_link_fs(self):
-        return self.get_formset(ShulLinkFormSet, "shul-links")
 
     def get_childcare_fs(self):
         return self.get_formset(ChildcareProgramFormSet, "childcare-programs")

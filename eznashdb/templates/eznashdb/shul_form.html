@@ -7,29 +7,6 @@
     <div class="col-12 col-lg-8">
         <div class="row">
             <div class="col-12 col-sm-6">{{ form.name|as_crispy_field }}</div>
-            <div class="col-12 col-sm-6">
-                <label class="form-label">{{ FIELDS_OPTIONS.LINKS.label }}</label>
-                <div class="row link-formset mb-3">
-                    {{ link_fs.management_form }}
-                    {% for error in link_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                    {% for link_form in link_fs %}
-                        <div class="link-form col-12">
-                            <div class="d-flex flex-row">
-                                <div class="flex-grow-1">
-                                    {% with link_form as form %}
-                                        {% crispy form %}
-                                    {% endwith %}
-                                </div>
-                                <div class="delete-link-container ps-2"></div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    <div class="col-12 order-last">
-                        <div class="form-text">Website, whatsapp group, etc.</div>
-                        <div class="add-link-container d-flex justify-content-start"></div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <div class="col-12 col-lg-4">

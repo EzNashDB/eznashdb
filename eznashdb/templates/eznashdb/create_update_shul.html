@@ -112,19 +112,6 @@
         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
     }
     $(function() {
-        $('.link-form').formset({
-            modelName: 'link',
-            formCssClass: 'link-form',
-            formsParentCssClass: 'link-formset',
-            prefix: '{{ link_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary form-text',
-            addText: '<i class="fa fa-plus"></i> Add another link',
-            addContainerClass: 'add-link-container',
-            deleteCssClass:'delete-link btn btn-sm btn-danger py-0 px-1',
-            deleteText: '<i class="fa fa-trash-can"></i>',
-            deleteContainerClass: 'delete-link-container',
-            hideLastAddForm: {% if link_fs.1 %} true {% else %} false {% endif %},
-        });
         $('.childcare-form').formset({
             modelName: 'children\'s program',
             formCssClass: 'childcare-form',

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from eznashdb.models import ChildcareProgram, Room, Shul, ShulLink
+from eznashdb.models import ChildcareProgram, Room, Shul
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -15,16 +15,9 @@ class ChildcareSerializer(serializers.ModelSerializer):
         exclude = ["shul"]
 
 
-class LinkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShulLink
-        exclude = ["shul"]
-
-
 class ShulSerializer(serializers.ModelSerializer):
     rooms = serializers.SerializerMethodField()
     childcare_programs = serializers.SerializerMethodField()
-    links = LinkSerializer(many=True)
 
     class Meta:
         model = Shul
