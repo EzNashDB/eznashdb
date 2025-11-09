@@ -66,30 +66,6 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col">
-                                    <div class="sticky-top row bg-white rounded-top">
-                                        <h5 class="col-12 pt-3">{{ FIELDS_OPTIONS.CHILDCARE.label }}</h5>
-                                    </div>
-                                    <div class="row mb-3 js-childcare-formset-parent">
-                                        <div class="col-12">
-                                            {{ form.has_no_childcare|as_crispy_field }}
-                                            {{ childcare_fs.management_form }}
-                                            {% for error in childcare_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                        </div>
-                                        <div class="childcare-formset col-12 col-xl-8 striped">
-                                            {% for form in childcare_fs %}
-                                                {% crispy form %}
-                                            {% endfor %}
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="row justify-content-start">
-                                                <div class="add-childcare-container col-12 d-flex justify-content-start"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
                                     <div class="mb-3">
                                         <button type="submit" class="btn btn-primary w-100">Save</button>
@@ -112,19 +88,6 @@
         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
     }
     $(function() {
-        $('.childcare-form').formset({
-            modelName: 'children\'s program',
-            formCssClass: 'childcare-form',
-            formsParentCssClass: 'childcare-formset',
-            prefix: '{{ childcare_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary form-text',
-            addText: '<i class="fa fa-plus"></i> Add another program',
-            addContainerClass: 'add-childcare-container',
-            deleteCssClass:'delete-childcare-program btn btn-sm btn-danger py-0 px-1',
-            deleteText: '<i class="fa fa-trash-can"></i>',
-            deleteContainerClass: 'delete-childcare-container',
-            hideLastAddForm: {% if childcare_fs.1 %} true {% else %} false {% endif %},
-        });
         $('.room-form').formset({
             modelName: "room",
             formCssClass: 'room-form',

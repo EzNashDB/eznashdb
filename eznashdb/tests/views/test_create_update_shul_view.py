@@ -29,7 +29,6 @@ def get_fs_metadata_fields(
 
 
 get_room_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="rooms")
-get_childcare_fs_metadata_fields = partial(get_fs_metadata_fields, prefix="childcare-programs")
 
 
 def get_room_fields(room_index: int):
@@ -80,7 +79,6 @@ def describe_create():
             **get_room_fields(room_index=0),
             **get_room_fields(room_index=1),
             **get_room_fs_metadata_fields(total_forms=2),
-            **get_childcare_fs_metadata_fields(),
         }
 
         client.post(
@@ -100,7 +98,6 @@ def describe_create():
                 "address": "some address",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
-                **get_childcare_fs_metadata_fields(),
             },
             follow=True,
         )

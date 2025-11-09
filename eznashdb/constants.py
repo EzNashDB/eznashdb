@@ -54,10 +54,6 @@ class FieldsOptions:
         "fa-solid fa-tag",
         "Main Sanctuary, Beit Midrash, etc.",
     )
-    CHILDCARE = FieldOptions(
-        "Childcare & Youth Programming",
-        "fa-solid fa-child-reaching",
-    )
     RELATIVE_SIZE = FieldOptions(
         "Size",
         "fa-solid fa-up-right-and-down-left-from-center",
