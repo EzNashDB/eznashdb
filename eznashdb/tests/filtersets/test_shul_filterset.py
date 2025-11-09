@@ -85,67 +85,6 @@ class TestKaddishFilter(YesNoUnknownFilterTest):
     shul_model_field = "can_say_kaddish"
 
 
-def describe_wheelchair_access_filter():
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["True"]),
-            (False, ["False"]),
-            (None, ["--"]),
-        ],
-    )
-    def includes_shuls_that_match_single_value(test_request, value, query):
-        shul = Shul.objects.create()
-        shul.rooms.create(is_wheelchair_accessible=value)
-
-        data = {"rooms__is_wheelchair_accessible": query}
-        assert ShulFilterSet(data, request=test_request).qs.count() == 1
-
-    def shul_appears_once_if_multiple_rooms_match(test_request):
-        shul = Shul.objects.create()
-        shul.rooms.create(is_wheelchair_accessible=True)
-        shul.rooms.create(is_wheelchair_accessible=True)
-
-        data = {"rooms__is_wheelchair_accessible": ["True"]}
-        assert ShulFilterSet(data, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["True", "False"]),
-            (False, ["False", "--"]),
-            (None, ["True", "--"]),
-        ],
-    )
-    def includes_shuls_that_match_any_of_multiple_values(test_request, value, query):
-        shul = Shul.objects.create()
-        shul.rooms.create(is_wheelchair_accessible=value)
-
-        data = {"rooms__is_wheelchair_accessible": query}
-        assert ShulFilterSet(data, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["False", "--"]),
-            (False, ["True", "--"]),
-            (None, ["True", "False"]),
-        ],
-    )
-    def excludes_shuls_that_do_not_match_any_value(test_request, value, query):
-        shul = Shul.objects.create()
-        shul.rooms.create(is_wheelchair_accessible=value)
-
-        data = {"rooms__is_wheelchair_accessible": query}
-        assert ShulFilterSet(data, request=test_request).qs.count() == 0
-
-    def unknown_includes_shuls_without_rooms(test_request):
-        shul = Shul.objects.create()
-
-        data = {"rooms__is_wheelchair_accessible": ["--"]}
-        assert shul in ShulFilterSet(data, request=test_request).qs
-
-
 def describe_relative_size_filter():
     @pytest.mark.parametrize(
         ("value", "query"),

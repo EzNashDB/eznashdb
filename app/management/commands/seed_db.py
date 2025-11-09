@@ -25,7 +25,6 @@ class RoomCreator:
                 "created_by": self._shul.created_by,
                 "relative_size": random_choice_or_blank(list(RelativeSize)),
                 "see_hear_score": random_choice_or_blank(list(SeeHearScore)),
-                "is_wheelchair_accessible": random_bool_or_None(),
                 "is_same_height_side": False,
                 "is_same_height_back": False,
                 "is_elevated_side": False,
@@ -82,7 +81,7 @@ class Command(BaseCommand):
     def _create_shuls(self):
         for i in range(self.shul_count):
             shul, _ = Shul.objects.update_or_create(
-                name=f"Dummy Shul {i+1}",
+                name=f"Dummy Shul {i + 1}",
                 defaults={
                     "created_by": self.user,
                     "address": fake.street_address(),

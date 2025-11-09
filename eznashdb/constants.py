@@ -75,11 +75,6 @@ class FieldsOptions:
         "fa-solid fa-comment",
         "Can women say kaddish?",
     )
-    WHEELCHAIR_ACCESS = FieldOptions(
-        "Wheelchair Access",
-        "fa-solid fa-wheelchair",
-        "Is the women's section wheelchair accessible?",
-    )
     RELATIVE_SIZE = FieldOptions(
         "Size",
         "fa-solid fa-up-right-and-down-left-from-center",

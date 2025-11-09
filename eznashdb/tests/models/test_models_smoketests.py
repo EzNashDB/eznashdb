@@ -29,7 +29,6 @@ def test_models_smoketest(django_user_model):
         is_balcony=True,
         is_only_men=True,
         is_mixed_seating=True,
-        is_wheelchair_accessible=True,
     )
 
     # Assert all created

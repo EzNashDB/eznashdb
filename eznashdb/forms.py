@@ -74,24 +74,20 @@ class RoomForm(ModelForm):
             "name",
             "layout",
             "relative_size",
-            "is_wheelchair_accessible",
             "see_hear_score",
         ]
         labels = {
             "name": FieldsOptions.ROOM_NAME.label,
             "relative_size": FieldsOptions.RELATIVE_SIZE.label,
             "see_hear_score": FieldsOptions.SEE_HEAR.label,
-            "is_wheelchair_accessible": FieldsOptions.WHEELCHAIR_ACCESS.label,
         }
         help_texts = {
             "name": FieldsOptions.ROOM_NAME.help_text,
             "relative_size": FieldsOptions.RELATIVE_SIZE.help_text,
             "see_hear_score": FieldsOptions.SEE_HEAR.help_text,
-            "is_wheelchair_accessible": FieldsOptions.WHEELCHAIR_ACCESS.help_text,
         }
         widgets = {
             "name": TextInput(attrs={"class": "fw-bold"}),
-            "is_wheelchair_accessible": NullableBooleanWidget(),
         }
 
     def __init__(self, *args, **kwargs):

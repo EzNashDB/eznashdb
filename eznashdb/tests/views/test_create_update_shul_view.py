@@ -40,7 +40,6 @@ def get_room_fields(room_index: int):
         f"rooms-{room_index}-name": "test room 1",
         f"rooms-{room_index}-relative_size": "M",
         f"rooms-{room_index}-see_hear_score": "1",
-        f"rooms-{room_index}-is_wheelchair_accessible": "true",
     }
 
 

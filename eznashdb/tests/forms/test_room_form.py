@@ -12,7 +12,6 @@ def test_displays_room_fields():
     assert soup.find(attrs={"id": "id_name"})
     assert soup.find(attrs={"id": "id_relative_size"})
     assert soup.find(attrs={"id": "id_see_hear_score"})
-    assert soup.find(attrs={"id": "id_is_wheelchair_accessible"})
     assert soup.find(attrs={"id": "id_layout"})
 
 
@@ -24,7 +23,6 @@ def test_saves_room():
             "name": "test room",
             "relative_size": RelativeSize.M,
             "see_hear_score": SeeHearScore._3,
-            "is_wheelchair_accessible": True,
         }
     )
     form.save()
@@ -34,7 +32,6 @@ def test_saves_room():
     assert room.name == "test room"
     assert room.relative_size == RelativeSize.M
     assert room.see_hear_score == SeeHearScore._3
-    assert room.is_wheelchair_accessible is True
 
 
 def describe_room_layout_field():
@@ -47,7 +44,6 @@ def describe_room_layout_field():
                 "name": "test room",
                 "relative_size": RelativeSize.M,
                 "see_hear_score": SeeHearScore._3,
-                "is_wheelchair_accessible": True,
                 "layout": [field_name],
             }
         )
@@ -64,7 +60,6 @@ def describe_room_layout_field():
                 "name": "test room",
                 "relative_size": RelativeSize.M,
                 "see_hear_score": SeeHearScore._3,
-                "is_wheelchair_accessible": True,
                 "layout": [RoomLayoutType.is_elevated_back.value, RoomLayoutType.is_balcony.value],
             }
         )

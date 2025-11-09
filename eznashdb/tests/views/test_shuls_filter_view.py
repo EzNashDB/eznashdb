@@ -69,22 +69,6 @@ def test_shows_app_name(GET_request):
 
             assert "--" in str(soup).lower()
 
-        @pytest.mark.parametrize(
-            ("is_wheelchair_accessible", "expected"),
-            [(True, "check"), (False, "times"), (None, "--")],
-        )
-        def test_shows_wheelchair_data(GET_request, is_wheelchair_accessible, expected):
-            shul = Shul.objects.create(name="test shul")
-            shul.rooms.create(name="test_room", is_wheelchair_accessible=is_wheelchair_accessible)
-
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-            badges = soup.find_all(attrs={"class": "badge"})
-            wheelchair_badge = [el for el in badges if "wheelchair" in str(el)][0]
-
-            assert expected in str(wheelchair_badge)
-
         @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
         def test_shows_room_relative_size(GET_request, relative_size):
             shul = Shul.objects.create(name="test shul")
@@ -160,20 +144,6 @@ def describe_filter():
         Shul.objects.create(name="shul 1", can_say_kaddish=False)
         Shul.objects.create(name="shul 2", can_say_kaddish=True)
         request = rf_GET("eznashdb:shuls", query_params={"can_say_kaddish": ["True"], "format": "list"})
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
-    def filters_by_wheelchair_access(rf_GET):
-        Shul.objects.create(name="shul 1")
-        Shul.objects.create(name="shul 2").rooms.create(is_wheelchair_accessible=True)
-        request = rf_GET(
-            "eznashdb:shuls",
-            query_params={"rooms__is_wheelchair_accessible": ["True"], "format": "list"},
-        )
 
         response = ShulsFilterView.as_view()(request)
 
