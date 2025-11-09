@@ -1,6 +1,6 @@
 # Fix monodock git tags
 ARG PYTHON_VERSION=3.10
-ARG BASE_IMAGE=python:${PYTHON_VERSION}-slim-buster
+ARG BASE_IMAGE=python:${PYTHON_VERSION}-slim-bullseye
 FROM ${BASE_IMAGE}
 
 SHELL ["/bin/bash", "--login", "-o", "pipefail", "-c"]
