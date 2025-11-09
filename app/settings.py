@@ -68,6 +68,7 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.signals.SignalsPanel",
     "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
+    "pympler.panels.MemoryPanel",
 ]
 
 
@@ -124,9 +125,11 @@ if not TESTING:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
+        "pympler",
     ]
     MIDDLEWARE = [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
+        "app.middleware.MemoryMiddleware",
         *MIDDLEWARE,
     ]
 
