@@ -53,6 +53,6 @@ class FieldsOptions:
         "Visibility & Audibility",
         "fa-solid fa-eye",
         """
-            How well can women see & hear what happens at the bima, aron, and pulpit?
+            How well can women see and hear what happens at the bima, aron, and pulpit?
         """,
     )
