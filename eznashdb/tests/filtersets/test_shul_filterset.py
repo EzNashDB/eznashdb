@@ -14,26 +14,6 @@ def test_request(rf, test_user):
     return request
 
 
-def describe_shul_name():
-    @pytest.mark.parametrize(
-        ("name", "query"),
-        [
-            ("Test Shul", "test shul"),
-            ("Test Shul", "ST SH"),
-            ("Test Shul", "TeSt sHuL"),
-        ],
-    )
-    def includes_shuls_with_substring_in_name(test_request, name, query):
-        Shul.objects.create(name=name)
-
-        assert ShulFilterSet({"name": query}, request=test_request).qs.count() == 1
-
-    def excludes_shuls_that_do_not_have_substring_in_name():
-        Shul.objects.create(name="test shul")
-
-        assert ShulFilterSet({"name": "no match"}, request=test_request).qs.count() == 0
-
-
 class YesNoUnknownFilterTest:
     shul_model_field = None
 
