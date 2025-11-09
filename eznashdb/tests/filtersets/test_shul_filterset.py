@@ -77,10 +77,6 @@ class YesNoUnknownFilterTest:
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
 
 
-class TestFemaleLeadershipFilter(YesNoUnknownFilterTest):
-    shul_model_field = "has_female_leadership"
-
-
 class TestKaddishFilter(YesNoUnknownFilterTest):
     shul_model_field = "can_say_kaddish"
 

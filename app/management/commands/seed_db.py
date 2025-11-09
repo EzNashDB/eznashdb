@@ -85,7 +85,6 @@ class Command(BaseCommand):
                 defaults={
                     "created_by": self.user,
                     "address": fake.street_address(),
-                    "has_female_leadership": random_bool_or_None(),
                     "can_say_kaddish": random_bool_or_None(),
                 },
             )
