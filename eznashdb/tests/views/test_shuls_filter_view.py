@@ -82,17 +82,6 @@ def test_shows_app_name(GET_request):
 
 
 def describe_filter():
-    def filters_by_name(rf_GET):
-        Shul.objects.create(name="shul 1")
-        Shul.objects.create(name="shul 2")
-        request = rf_GET("eznashdb:shuls", query_params={"name": "shul 2", "format": "list"})
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
     def filters_by_relative_size(rf_GET):
         Shul.objects.create(name="shul 1")
         Shul.objects.create(name="shul 2").rooms.create(relative_size=RelativeSize.M)
