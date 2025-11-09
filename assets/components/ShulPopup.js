@@ -175,14 +175,7 @@ export const ShulPopup = ({ shul, markerRef }) => {
                   </div>
                   <hr className="my-1" />
                 </div>
-                <div className="col-5 col-sm-6 small">
-                  <span className="me-2 w-15px d-inline-block">
-                    <i className="fa-solid fa-comment"></i>
-                  </span>
-                  Kaddish: {boolToYesNo(shul.can_say_kaddish)}
-                </div>
               </div>
-              <hr className="my-1" />
             </div>
           </div>
           <div className="row">

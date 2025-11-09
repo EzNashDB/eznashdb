@@ -11,7 +11,6 @@ def test_models_smoketest(django_user_model):
         created_by=user,
         updated_by=[user.id],
         name="Test shul",
-        can_say_kaddish=False,
     )
 
     # Create room

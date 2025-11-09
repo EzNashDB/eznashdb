@@ -6,7 +6,6 @@ from django_filters import CharFilter, FilterSet
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import RelativeSize, RoomLayoutType, SeeHearScore
 from eznashdb.filters import (
-    BoolOrUnknownFilter,
     MultipleChoiceOrUnknownCharFilter,
     MultiSelectWithUnknownFilter,
 )
@@ -22,11 +21,6 @@ def x_help_text(help_text):
 
 class ShulFilterSet(FilterSet):
     name = CharFilter(lookup_expr="icontains", label=FieldsOptions.SHUL_NAME.label)
-    can_say_kaddish = BoolOrUnknownFilter(
-        model_field="can_say_kaddish",
-        label=FieldsOptions.KADDISH.label,
-        help_text=x_help_text(FieldsOptions.KADDISH.help_text),
-    )
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.choices,

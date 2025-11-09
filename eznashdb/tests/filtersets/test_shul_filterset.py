@@ -77,10 +77,6 @@ class YesNoUnknownFilterTest:
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
 
 
-class TestKaddishFilter(YesNoUnknownFilterTest):
-    shul_model_field = "can_say_kaddish"
-
-
 def describe_relative_size_filter():
     @pytest.mark.parametrize(
         ("value", "query"),

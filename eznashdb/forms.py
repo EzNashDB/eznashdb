@@ -19,7 +19,6 @@ class ShulForm(ModelForm):
         fields = [
             "name",
             "address",
-            "can_say_kaddish",
             "has_no_childcare",
             "latitude",
             "longitude",
@@ -28,13 +27,8 @@ class ShulForm(ModelForm):
         labels = {
             "name": FieldsOptions.SHUL_NAME.label,
             "address": FieldsOptions.ADDRESS.label,
-            "can_say_kaddish": FieldsOptions.KADDISH.label,
-        }
-        help_texts = {
-            "can_say_kaddish": FieldsOptions.KADDISH.help_text,
         }
         widgets = {
-            "can_say_kaddish": NullableBooleanWidget(),
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),
             "place_id": HiddenInput(),
