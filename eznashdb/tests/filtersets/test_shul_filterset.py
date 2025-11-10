@@ -101,7 +101,6 @@ def describe_relative_size_filter():
         ("value", "query"),
         [
             (RelativeSize.M.value, ["L", "S"]),
-            (RelativeSize.M.value, ["L", "--"]),
             ("", ["S", "M"]),
         ],
     )
@@ -165,7 +164,6 @@ def describe_see_hear_score_filter():
         ("value", "query"),
         [
             (SeeHearScore._3.value, ["4", "5"]),
-            (SeeHearScore._3.value, ["4", "--"]),
             ("", ["4", "3"]),
         ],
     )

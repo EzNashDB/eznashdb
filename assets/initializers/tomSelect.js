@@ -3,13 +3,20 @@ import TomSelect from "tom-select";
 export default function initializeTomSelects() {
   document.querySelectorAll("select.tom-select").forEach((el) => {
     if (!!el.tomselect) return;
+    const isMultiSelect = el.hasAttribute("multiple");
+    const renderUnescapedContent = (data, escape) => {
+      // prefer explicit data.html, then option.innerHTML, otherwise escape the text
+      const html =
+        data.html ?? data.$option?.innerHTML ?? escape(data.text ?? "");
+      return `<div>${html}</div>`;
+    };
     let settings = {
       controlInput: null,
       dropdownParent: "body",
       render: {
-        dropdown: function () {
-          return '<div class="z-3001"></div>';
-        },
+        dropdown: () => '<div class="z-3001"></div>',
+        option: renderUnescapedContent,
+        item: renderUnescapedContent,
       },
       onInitialize: function () {
         updateSelectedDisplay(this);
@@ -21,12 +28,14 @@ export default function initializeTomSelects() {
         updateSelectedDisplay(this);
       },
       plugins: {
-        checkbox_options: {
-          checkedClassNames: ["ts-checked"],
-          uncheckedClassNames: ["ts-unchecked"],
-        },
+        ...(isMultiSelect && {
+          checkbox_options: {
+            checkedClassNames: ["ts-checked"],
+            uncheckedClassNames: ["ts-unchecked"],
+          },
+        }),
         clear_button: {
-          title: "Remove all selected options",
+          title: (isMultiSelect && "Clear All") || "Clear",
         },
         no_backspace_delete: true,
       },

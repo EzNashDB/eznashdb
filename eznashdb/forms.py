@@ -1,6 +1,6 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
+from django.forms import HiddenInput, ModelForm, Select, TextInput, inlineformset_factory
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.models import Room, Shul
@@ -62,6 +62,7 @@ class RoomForm(ModelForm):
         }
         widgets = {
             "name": TextInput(attrs={"class": "fw-bold"}),
+            "see_hear_score": Select(attrs={"class": "tom-select"}),
         }
 
     def __init__(self, *args, **kwargs):

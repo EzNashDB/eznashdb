@@ -5,7 +5,7 @@ from django_filters import FilterSet
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import RelativeSize, SeeHearScore
-from eznashdb.filters import MultipleChoiceOrUnknownCharFilter
+from eznashdb.filters import MultipleChoiceOrUnknownCharFilter, MultiSelectModelFieldFilter
 from eznashdb.models import Shul
 
 
@@ -24,7 +24,7 @@ class ShulFilterSet(FilterSet):
         help_text=x_help_text(FieldsOptions.RELATIVE_SIZE.help_text),
         method="filter_rooms__relative_size",
     )
-    rooms__see_hear_score = MultipleChoiceOrUnknownCharFilter(
+    rooms__see_hear_score = MultiSelectModelFieldFilter(
         model_field="rooms__see_hear_score",
         choices=SeeHearScore.choices,
         label=FieldsOptions.SEE_HEAR.label,
