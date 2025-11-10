@@ -1,9 +1,10 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.forms import HiddenInput, ModelForm, Select, TextInput, inlineformset_factory
+from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.models import Room, Shul
+from eznashdb.widgets import SingleTomSelectWidget
 
 
 class ShulForm(ModelForm):
@@ -62,7 +63,7 @@ class RoomForm(ModelForm):
         }
         widgets = {
             "name": TextInput(attrs={"class": "fw-bold"}),
-            "see_hear_score": Select(attrs={"class": "tom-select"}),
+            "see_hear_score": SingleTomSelectWidget(),
         }
 
     def __init__(self, *args, **kwargs):
