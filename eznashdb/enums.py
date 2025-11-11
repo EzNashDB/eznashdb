@@ -11,6 +11,8 @@ class RelativeSize(models.TextChoices):
     L = "L", _(get_size_option_display("L", "Same size or larger"))
     M = "M", _(get_size_option_display("M", "Smaller, but at least half"))
     S = "S", _(get_size_option_display("S", "Less than half"))
+    X = "X", _(get_size_option_display("X", "No women's section"))
+    MIXED = "&", _(get_size_option_display("&", "Mixed seating"))
 
 
 def get_star_display(score):
