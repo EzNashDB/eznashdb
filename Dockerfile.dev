@@ -72,8 +72,6 @@ RUN useradd -d ${HOME} -m -s /bin/bash -g docker docker && \
     chmod 0440 /etc/sudoers.d/docker
 
 RUN mkdir -p /app && \
-    chmod 777 -R /app && \
-    chmod 777 -R ${HOME} && \
     chown -R docker:docker ${HOME} && \
     chown -R docker:docker /app
 

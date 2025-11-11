@@ -10,6 +10,7 @@
 	"workspaceFolder": "/app",
 	"shutdownAction": "none",
 	"remoteUser": "docker",
+	"postCreateCommand": "sudo chown -R docker:docker /home/docker",
 	"forwardPorts": [
 		8000,
 		5432
