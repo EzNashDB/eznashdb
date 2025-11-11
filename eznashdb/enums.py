@@ -3,10 +3,14 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 
+def get_size_option_display(letter, explanation):
+    return f"<kbd>{letter}</kbd><small> - {explanation}</small>"
+
+
 class RelativeSize(models.TextChoices):
-    S = ("S", _("S: Less than half of men's"))
-    M = ("M", _("M: Smaller than men's, but at least half"))
-    L = ("L", _("L: Same size as men's or larger"))
+    L = "L", _(get_size_option_display("L", "Same size or larger"))
+    M = "M", _(get_size_option_display("M", "Smaller, but at least half"))
+    S = "S", _(get_size_option_display("S", "Less than half"))
 
 
 def get_star_display(score):

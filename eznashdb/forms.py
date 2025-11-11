@@ -63,6 +63,7 @@ class RoomForm(ModelForm):
         }
         widgets = {
             "name": TextInput(attrs={"class": "fw-bold"}),
+            "relative_size": SingleTomSelectWidget(),
             "see_hear_score": SingleTomSelectWidget(),
         }
 
