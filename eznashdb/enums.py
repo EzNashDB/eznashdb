@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def get_size_option_display(letter, explanation):
-    return f"<kbd>{letter}</kbd><small> - {explanation}</small>"
+    return f"<span class='text-nowrap'><kbd>{letter}</kbd><small> - {explanation}</small></span>"
 
 
 class RelativeSize(models.TextChoices):
