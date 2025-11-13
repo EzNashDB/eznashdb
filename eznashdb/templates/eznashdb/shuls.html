@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="row flex-grow-1 map-row">
-                <div class="col-12">
+                <div class="col-6">
                     <div id="shuls-js-loader-wrapper">{% include "eznashdb/includes/shuls_js_loader.html" %}</div>
                     <div class="border rounded h-100 position-relative">
                         <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
@@ -51,6 +51,23 @@
                         <div id="shuls-map" class="h-100"></div>
                     </div>
                 </div>
+                {% comment %} new map {% endcomment %}
+                <div class="col-6">
+                    <div id="shuls-js-loader-wrapper">{% include "eznashdb/includes/shuls_js_loader.html" %}</div>
+                    <div class="border rounded h-100 position-relative">
+                        <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
+                            <div class="flex-grow-1 text-center">
+                                <span class="spinner-border spinner-border-lg"
+                                      style="width: 3rem;
+                                             height: 3rem"
+                                      role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            </div>
+                        </span>
+                        <div id="new-shuls-map" class="h-100"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -58,5 +75,180 @@
 
 {% block extra_media_bottom %}
     {{ block.super }}
+    <script defer>
+          const updateURLParams = (params) => {
+            const url = new URL(window.location.href);
+            for (const key in params) url.searchParams.set(key, params[key]);
+            const newURL = url.toString();
+            history.replaceState({}, "", newURL);
+        };
+        const deleteURLParams = (params) => {
+            const url = new URL(window.location.href);
+            params.forEach((param) => url.searchParams.delete(param));
+            const newURL = url.toString();
+            history.replaceState({}, "", newURL);
+        };
+        const updateURLLocationParams = (e) => {
+            const center = e.target.getCenter();
+            updateURLParams({
+            lat: center.lat,
+            lon: center.lng,
+            zoom: e.target.getZoom(),
+            });
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mapId = "new-shuls-map"
+            let startLat = urlParams.get("lat") || 20;
+            let startLon = urlParams.get("lon") || 10;
+            let startZoom = urlParams.get("zoom") || 2;
+            var map = L.map(mapId, {
+                center: [startLat, startLon],
+                zoom: startZoom,
+                scrollWheelZoom:true,
+                worldCopyJump:true,
+                minZoom:1,
+                zoomControl:false,
+            });
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?',
+                {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }
+            ).addTo(map);
+            L.control.zoom({position: 'bottomleft'}).addTo(map);
+            document.getElementById(mapId).classList.add('rounded');
+            map.whenReady(() => {
+            // small delay allows CSS/layout to finish
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 150);
+            });
+            // ---- Shuls-found control (topright) ----
+            const shulsFoundControl = L.control({ position: "topright" });
+            shulsFoundControl.onAdd = function () {
+                const container = L.DomUtil.create("div", "shuls-found-control");
+                container.style.cursor = "initial";
+                // Use the same classes you used in React so styling lines up if you have Bootstrap loaded.
+                // Default label is "0" wrapped in a dark badge.
+                const shulCount = {{object_list.count}}
+                const shulCountMsg = `${shulCount} ${shulCount === 1 ? 'shul':'shuls'} found`
+                container.innerHTML =
+                    `<div class="fw-normal fs-5 opacity-75"><span class="badge bg-dark">${shulCountMsg}</span></div>`;
+                // Prevent map interactions when clicking the control
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
+                return container;
+            };
+            shulsFoundControl.addTo(map);
+
+            // Markers
+            var markers = L.markerClusterGroup();
+            var myIcon = L.icon({
+                iconUrl: "{% static 'eznashdb/images/marker-icon.png' %}",
+                shadowUrl: "{% static 'eznashdb/images/marker-shadow.png' %}",
+                iconSize: [25, 41],
+                iconAnchor: [13, 41],
+                popupAnchor: [0, -34]
+            });
+            const urlQueryParams = new URLSearchParams(window.location.search);
+            let selectedPin = null
+            let addMarker;
+            let marker;
+            {% for shul in object_list %}
+
+            // popup HTML rendered on the server; use escapejs for plain text and |safe for pre-rendered HTML fragments
+            var popupHtml_{{ shul.id }} = `
+            <div style="margin-top:40px;">
+                <div class="card">
+                <div class="card-header fw-bold p-1 d-flex align-items-center">
+                    <a class="btn btn-xs text-primary link-primary py-0 me-1" href="/shuls/{{ shul.id|escapejs }}/update">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <span class="flex-grow-1">{{ shul.name|escapejs }}</span>
+                    <button type="button" class="btn btn-sm py-0 px-1 shul-popup-close" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="card-body p-2 pt-1">
+                    <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1" style="max-height:75px">
+                    <div class="col striped">
+                        {% if shul.rooms %}
+                        {% for room in shul.rooms.all %}
+                            <div class="row gx-0 small ps-1">
+                            <div class="col-12 col-sm-3">{{ room.name|escapejs }}</div>
+
+                            <div class="col-3 col-sm-2">
+                                <div class="row gx-0">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                    <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                                    <span class="small fw-bold">{{ room.relative_size|default_if_none:"--"|escapejs }}</span>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4 col-sm-3 text-center">
+                                <div class="d-flex align-items-center px-3">
+                                <i class="fa-solid fa-eye me-1"></i>
+                                <!-- Server-rendered star HTML expected here (marked safe in Python) -->
+                                <span class='text-nowrap d-flex'>{{ room.get_see_hear_score_display|safe }}</span>
+                                </div>
+                            </div>
+                            </div>
+                        {% endfor %}
+                        {% else %}
+                        <span class="text-muted small">No rooms saved</span>
+                        {% endif %}
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            `;
+
+            addMarker = (shulId, latitude, longitude, popupId) => {
+                // create marker using shul.latitude/shul.longitude and the custom icon
+                var marker = L.marker([latitude, longitude], { icon: myIcon });
+
+                // bind popup and wire the close button when popup DOM is available
+                marker.bindPopup(popupHtml_{{ shul.id }}, { className: 'shul-popup', closeButton: false, shulId: shulId, popupId: popupId });
+                if (urlQueryParams.get('selectedPin') === String(popupId)) {
+                    selectedPin = marker
+                }
+                marker.on('popupopen', function () {
+                    var popupEl = marker.getPopup().getElement();
+                    if (!popupEl) return;
+                    var closeBtn = popupEl.querySelector('.shul-popup-close');
+                    if (closeBtn) {
+                        // attach handler (popup DOM is recreated each open so this is safe)
+                        closeBtn.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        marker_{{ shul.id }}.closePopup();
+                        });
+                    }
+                })
+
+                markers.addLayer(marker);
+            }
+            addMarker({{shul.id}}, parseFloat({{shul.latitude}}), parseFloat({{shul.longitude}}), String({{shul.id}}))
+            addMarker({{shul.id}}, parseFloat({{shul.latitude}}), parseFloat({{shul.longitude}} - 360), '-'+String({{shul.id}}))
+            addMarker({{shul.id}}, parseFloat({{shul.latitude}}), parseFloat({{shul.longitude}} + 360), '+'+String({{shul.id}}))
+
+
+            {% endfor %}
+            map.addLayer(markers);
+            if (selectedPin) {
+                selectedPin.openPopup()
+            }
+            map.on('moveend', e => updateURLLocationParams(e))
+            map.on('zoomend', e => updateURLLocationParams(e))
+            map.on('popupopen', e => updateURLParams({ selectedPin: e.popup.options.shulId }))
+            map.on('popupclose', e => deleteURLParams(["selectedPin"]))
+        });
+
+    </script>
     <script defer src="{% static 'dist/shulsMap.js' %}"></script>
 {% endblock extra_media_bottom %}
