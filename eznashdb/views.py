@@ -35,7 +35,7 @@ class ShulsFilterView(FilterView):
 
     def get_template_names(self) -> list[str]:
         if "Hx-Request" in self.request.headers:
-            return ["eznashdb/includes/shuls_js_loader.html"]
+            return ["eznashdb/includes/shul_markers_js.html"]
         return super().get_template_names()
 
 
