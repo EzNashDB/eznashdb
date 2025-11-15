@@ -1,0 +1,59 @@
+<script id="shul-markers-js" hx-swap-oob="true">
+    window.shuls = {{serialized_shuls|safe}}
+    document.dispatchEvent(new Event("shulsDataLoaded"));
+    window.SHUL_MARKERS_API = window.SHUL_MARKERS_API || {}
+    window.SHUL_MARKERS_API = {
+        ...window.SHUL_MARKERS_API,
+        updateShulsFoundCount: () => {
+            if (window.SHUL_MARKERS_API.shulsFoundControl) {
+                window.SHUL_MARKERS_API.shulsFoundControl.remove();
+            }
+            const map = window.SHUL_MAP_API.map;
+            // ---- Shuls-found control (topright) ----
+            const shulsFoundControl = L.control({ position: "topright" });
+            shulsFoundControl.onAdd = function () {
+                const container = L.DomUtil.create("div", "shuls-found-control");
+                container.style.cursor = "initial";
+                const shulCount = {{object_list.count}};
+                const shulCountMsg = `${shulCount} ${shulCount === 1 ? "shul" : "shuls"} found`;
+                container.innerHTML = `
+                    <div class="fw-normal fs-5 opacity-75">
+                        <span class="badge bg-dark">${shulCountMsg}</span>
+                    </div>`;
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
+                return container;
+            };
+            shulsFoundControl.addTo(map);
+            window.SHUL_MARKERS_API.shulsFoundControl = shulsFoundControl
+        },
+
+        addShulMarkers: () => {
+            const api = window.SHUL_MAP_API;
+            {% for shul in object_list %}
+                api.popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
+                // Add the three wrap-around variants (original, -360, +360)
+                (function () {
+                    const id = {{ shul.id }};
+                    const lat = parseFloat({{ shul.latitude }});
+                    const lon = parseFloat({{ shul.longitude }});
+                    // original
+                    api.addMarker(id, lat, lon, String(id));
+                    // wrap-around west
+                    api.addMarker(id, lat, lon - 360, "-" + String(id));
+                    // wrap-around east
+                    api.addMarker(id, lat, lon + 360, "+" + String(id));
+                })();
+            {% endfor %}
+        },
+
+        replaceMapShuls: () => {
+            const mapApi = window.SHUL_MAP_API;
+            const markersApi = window.SHUL_MARKERS_API;
+            mapApi.clearMarkers()
+            markersApi.updateShulsFoundCount();
+            markersApi.addShulMarkers();
+            mapApi.openSelectedMarker();
+        },
+    }
+</script>
