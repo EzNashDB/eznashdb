@@ -77,218 +77,211 @@
     {{ block.super }}
     <script defer>
         (function () {
-        // Utilities for URL param management
-        const updateURLParams = (params) => {
-            const url = new URL(window.location.href);
-            for (const key in params) url.searchParams.set(key, params[key]);
-            history.replaceState({}, "", url.toString());
-        };
-        const deleteURLParams = (params) => {
-            const url = new URL(window.location.href);
-            params.forEach((param) => url.searchParams.delete(param));
-            history.replaceState({}, "", url.toString());
-        };
-
-        const updateURLLocationParams = (map) => {
-            const center = map.getCenter();
-            updateURLParams({
-            lat: center.lat,
-            lon: center.lng,
-            zoom: map.getZoom(),
-            });
-        };
-
-        // Map initialization when DOM is ready
-        document.addEventListener("DOMContentLoaded", () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const mapId = "new-shuls-map";
-            const startLat = parseFloat(urlParams.get("lat")) || 20;
-            const startLon = parseFloat(urlParams.get("lon")) || 10;
-            const startZoom = parseInt(urlParams.get("zoom"), 10) || 2;
-
-            const map = L.map(mapId, {
-                center: [startLat, startLon],
-                zoom: startZoom,
-                scrollWheelZoom: true,
-                worldCopyJump: true,
-                minZoom: 1,
-                zoomControl: false,
-            });
-
-            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?", {
-            attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            }).addTo(map);
-
-            L.control.zoom({ position: "bottomleft" }).addTo(map);
-            document.getElementById(mapId).classList.add("rounded");
-
-            map.whenReady(() => {
-            // small delay allows CSS/layout to finish
-                setTimeout(() => map.invalidateSize(), 150);
-            });
-
-            // ---- Shuls-found control (topright) ----
-            const shulsFoundControl = L.control({ position: "topright" });
-            shulsFoundControl.onAdd = function () {
-            const container = L.DomUtil.create("div", "shuls-found-control");
-            container.style.cursor = "initial";
-            const shulCount = {{object_list.count}};
-            const shulCountMsg = `${shulCount} ${shulCount === 1 ? "shul" : "shuls"} found`;
-            container.innerHTML = `<div class="fw-normal fs-5 opacity-75"><span class="badge bg-dark">${shulCountMsg}</span></div>`;
-            L.DomEvent.disableClickPropagation(container);
-            L.DomEvent.disableScrollPropagation(container);
-            return container;
+            // Utilities for URL param management
+            const updateURLParams = (params) => {
+                const url = new URL(window.location.href);
+                for (const key in params) url.searchParams.set(key, params[key]);
+                history.replaceState({}, "", url.toString());
             };
-            shulsFoundControl.addTo(map);
+            const deleteURLParams = (params) => {
+                const url = new URL(window.location.href);
+                params.forEach((param) => url.searchParams.delete(param));
+                history.replaceState({}, "", url.toString());
+            };
 
-            // Icon
-            const myIcon = L.icon({
-                iconUrl: "{% static 'eznashdb/images/marker-icon.png' %}",
-                shadowUrl: "{% static 'eznashdb/images/marker-shadow.png' %}",
-                iconSize: [25, 41],
-                iconAnchor: [13, 41],
-                popupAnchor: [0, -34],
-            });
+            const updateURLLocationParams = (map) => {
+                const center = map.getCenter();
+                updateURLParams({
+                lat: center.lat,
+                lon: center.lng,
+                zoom: map.getZoom(),
+                });
+            };
 
-            // Read selectedPin from URL once
-            const selectedPinIdFromURL = urlParams.get("selectedPin");
+            const initMap = () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const mapId = "new-shuls-map";
+                const startLat = parseFloat(urlParams.get("lat")) || 20;
+                const startLon = parseFloat(urlParams.get("lon")) || 10;
+                const startZoom = parseInt(urlParams.get("zoom"), 10) || 2;
 
-            // Storage for popups and markers so we can easily replace later (HTMX usage)
-            const popupHtmlMap = {};      // keyed by shul id (string) -> html string
-            const markersByPopupId = {};  // keyed by popupId (string like '123', '+123', '-123') -> marker instance
-
-            // Create marker cluster group (or LayerGroup if you don't use clustering)
-            const markersLayer = L.markerClusterGroup();
-            // Exported-ish helper functions (kept local here, but easy to expose globally if you want)
-            const api = {
-            addMarker: (shulId, lat, lon, popupId) => {
-                const popupHtml = popupHtmlMap[String(shulId)];
-                if (!popupHtml) {
-                console.warn("No popup HTML for shulId", shulId);
-                }
-                const marker = L.marker([lat, lon], { icon: myIcon });
-
-                // Bind popup with metadata in options for easy lookup later
-                marker.bindPopup(popupHtml || "", {
-                className: "shul-popup",
-                closeButton: false,
-                shulId: shulId,
-                popupId: popupId,
+                const map = L.map(mapId, {
+                    center: [startLat, startLon],
+                    zoom: startZoom,
+                    scrollWheelZoom: true,
+                    worldCopyJump: true,
+                    minZoom: 1,
+                    zoomControl: false,
                 });
 
-                // When popup opens, wire the close button (popup DOM is recreated each open)
-                marker.on("popupopen", (e) => {
-                const popupEl = e.popup.getElement();
-                if (!popupEl) return;
-                const closeBtn = popupEl.querySelector(".shul-popup-close");
-                if (closeBtn) {
-                    // Use e.popup._source which is the marker that opened this popup
-                    closeBtn.addEventListener("click", (ev) => {
-                    ev.preventDefault();
-                    if (e.popup && e.popup._source) e.popup._source.closePopup();
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?", {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(map);
+                L.control.zoom({ position: "bottomleft" }).addTo(map);
+                document.getElementById(mapId).classList.add("rounded");
+
+                map.whenReady(() => {
+                // small delay allows CSS/layout to finish
+                    setTimeout(() => map.invalidateSize(), 150);
+                });
+
+                            // Keep URL in sync with map movements and popup state
+                map.on("moveend", () => updateURLLocationParams(map));
+                map.on("zoomend", () => updateURLLocationParams(map));
+                map.on("popupopen", (e) => {
+                    // store the shul id of the open popup in the URL
+                    if (e.popup && e.popup.options && e.popup.options.shulId !== undefined) {
+                        updateURLParams({ selectedPin: e.popup.options.shulId });
+                    }
+                });
+
+                map.on("popupclose", () => {
+                    deleteURLParams(["selectedPin"]);
+                });
+
+                const markersLayer = L.markerClusterGroup();
+                map.addLayer(markersLayer);
+
+                const popupHtmlMap = {};      // keyed by shul id (string) -> html string
+                const markersByPopupId = {};  // keyed by popupId (string like '123', '+123', '-123') -> marker instance
+
+                const markerIcon = L.icon({
+                    iconUrl: "{% static 'eznashdb/images/marker-icon.png' %}",
+                    shadowUrl: "{% static 'eznashdb/images/marker-shadow.png' %}",
+                    iconSize: [25, 41],
+                    iconAnchor: [13, 41],
+                    popupAnchor: [0, -34],
+                })
+
+                const addMarker = (shulId, lat, lon, popupId) => {
+                    // Add a shul marker to the map, using pre-generated html from popupHtmlMap
+                    const popupHtml = popupHtmlMap[String(shulId)];
+                    if (!popupHtml) {
+                    console.warn("No popup HTML for shulId", shulId);
+                    }
+                    const marker = L.marker([lat, lon], { icon: markerIcon });
+
+                    // Bind popup with metadata in options for easy lookup later
+                    marker.bindPopup(popupHtml || "", {
+                        className: "shul-popup",
+                        closeButton: false,
+                        shulId: shulId,
+                        popupId: popupId,
+                    });
+
+                    // When popup opens, wire the close button (popup DOM is recreated each open)
+                    marker.on("popupopen", (e) => {
+                        const popupEl = e.popup.getElement();
+                        if (!popupEl) return;
+                        const closeBtn = popupEl.querySelector(".shul-popup-close");
+                        if (closeBtn) {
+                            // Use e.popup._source which is the marker that opened this popup
+                            closeBtn.addEventListener("click", (ev) => {
+                            ev.preventDefault();
+                            if (e.popup && e.popup._source) e.popup._source.closePopup();
+                            });
+                        }
+                    });
+                    markersLayer.addLayer(marker);
+                    markersByPopupId[String(popupId)] = marker;
+                    // If this marker corresponds to the requested selectedPin, return it for opening after the layer is added to map
+                    return marker;
+                }
+
+                const clearMarkers = () => {
+                    markersLayer.clearLayers();
+                    for (const k in markersByPopupId) delete markersByPopupId[k];
+                }
+
+                const replaceMarkers = (markersData) => {
+                    clearMarkers();
+                    markersData.forEach((md) => {
+                    addMarker(md.id, md.lat, md.lon, md.popupId);
                     });
                 }
-                });
 
-                markersLayer.addLayer(marker);
-                markersByPopupId[String(popupId)] = marker;
+                const openSelectedMarker = () => {
+                    // If URL requested a selectedPin, open it. If using clusters, zoomToShowLayer is used to ensure visibility.
+                    const api = window.SHUL_MAP_API
+                    const selectedPinIdFromURL = urlParams.get("selectedPin");
+                    if (selectedPinIdFromURL) {
+                        const target = api.markersByPopupId[String(selectedPinIdFromURL)];
+                        if (target) {
+                            // if markersLayer is a MarkerClusterGroup, prefer zoomToShowLayer
+                            if (typeof api.markersLayer.zoomToShowLayer === "function") {
+                                api.markersLayer.zoomToShowLayer(target, () => target.openPopup());
+                            } else {
+                                // ensure marker is on the map and then open
+                                setTimeout(() => target.openPopup(), 0);
+                            }
+                        }
+                    }
+                }
 
-                // If this marker corresponds to the requested selectedPin, return it for opening after the layer is added to map
-                return marker;
-            },
-
-            clearMarkers: () => {
-                markersLayer.clearLayers();
-                for (const k in markersByPopupId) delete markersByPopupId[k];
-            },
-
-            // Replace markers (intended for HTMX responses). Accepts an array of objects { id, lat, lon, popupId }
-            // This is a convenience; your HTMX success handler can call api.clearMarkers(); then loop and api.addMarker(...)
-            replaceMarkers: (markersData) => {
-                api.clearMarkers();
-                markersData.forEach((md) => {
-                api.addMarker(md.id, md.lat, md.lon, md.popupId);
-                });
-                // if you need to re-add the cluster to the map, ensure map.addLayer(markersLayer) was called earlier
-            },
-
-            markersLayer,
-            markersByPopupId,
-            popupHtmlMap,
-            };
-
-            // -----------------------------------------------------------------------
-            // Server-rendered popup HTML for each shul
-            // We insert each popup HTML into popupHtmlMap keyed by the shul id (string).
-            // Keep the server-side template rendering here as before.
-            // -----------------------------------------------------------------------
-            {% for shul in object_list %}
-                popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
-                // Add the three wrap-around variants (original, -360, +360)
-                (function () {
-                const id = {{ shul.id }};
-                const lat = parseFloat({{ shul.latitude }});
-                const lon = parseFloat({{ shul.longitude }});
-                // original
-                api.addMarker(id, lat, lon, String(id));
-                // wrap-around west
-                api.addMarker(id, lat, lon - 360, "-" + String(id));
-                // wrap-around east
-                api.addMarker(id, lat, lon + 360, "+" + String(id));
-                })();
-            {% endfor %}
-
-            // Add marker layer to map (do this once after all markers added)
-            map.addLayer(markersLayer);
-
-            // If URL requested a selectedPin, open it. If using clusters, zoomToShowLayer is used to ensure visibility.
-            if (selectedPinIdFromURL) {
-            const target = api.markersByPopupId[String(selectedPinIdFromURL)];
-            if (target) {
-                // if markersLayer is a MarkerClusterGroup, prefer zoomToShowLayer
-                if (typeof markersLayer.zoomToShowLayer === "function") {
-                markersLayer.zoomToShowLayer(target, () => target.openPopup());
-                } else {
-                // ensure marker is on the map and then open
-                setTimeout(() => target.openPopup(), 0);
+                window.SHUL_MAP_API = {
+                    ...(window.SHUL_MAP_API || {}),
+                    map,
+                    markersLayer,
+                    popupHtmlMap,
+                    markersByPopupId,
+                    addMarker,
+                    clearMarkers,
+                    replaceMarkers,
+                    openSelectedMarker,
                 }
             }
+
+            const addShulsFoundCount = () => {
+                const map = window.SHUL_MAP_API.map;
+                // ---- Shuls-found control (topright) ----
+                const shulsFoundControl = L.control({ position: "topright" });
+                shulsFoundControl.onAdd = function () {
+                    const container = L.DomUtil.create("div", "shuls-found-control");
+                    container.style.cursor = "initial";
+                    const shulCount = {{object_list.count}};
+                    const shulCountMsg = `${shulCount} ${shulCount === 1 ? "shul" : "shuls"} found`;
+                    container.innerHTML = `
+                        <div class="fw-normal fs-5 opacity-75">
+                            <span class="badge bg-dark">${shulCountMsg}</span>
+                        </div>`;
+                    L.DomEvent.disableClickPropagation(container);
+                    L.DomEvent.disableScrollPropagation(container);
+                    return container;
+                };
+                shulsFoundControl.addTo(map);
             }
 
-            // Keep URL in sync with map movements and popup state
-            map.on("moveend", () => updateURLLocationParams(map));
-            map.on("zoomend", () => updateURLLocationParams(map));
-
-            map.on("popupopen", (e) => {
-            // store the shul id of the open popup in the URL
-            if (e.popup && e.popup.options && e.popup.options.shulId !== undefined) {
-                updateURLParams({ selectedPin: e.popup.options.shulId });
+            const addShulMarkers = () => {
+                const api = window.SHUL_MAP_API;
+                {% for shul in object_list %}
+                    api.popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
+                    // Add the three wrap-around variants (original, -360, +360)
+                    (function () {
+                        const id = {{ shul.id }};
+                        const lat = parseFloat({{ shul.latitude }});
+                        const lon = parseFloat({{ shul.longitude }});
+                        // original
+                        api.addMarker(id, lat, lon, String(id));
+                        // wrap-around west
+                        api.addMarker(id, lat, lon - 360, "-" + String(id));
+                        // wrap-around east
+                        api.addMarker(id, lat, lon + 360, "+" + String(id));
+                    })();
+                {% endfor %}
             }
-            });
 
-            map.on("popupclose", () => {
-                deleteURLParams(["selectedPin"]);
-            });
+            const addShulsToMap = () => {
+                addShulsFoundCount();
+                addShulMarkers();
+            }
 
-            // Expose limited API for HTMX usage: window.SHUL_MAP_API.replaceMarkers([...])
-            // replaceMarkers should accept an array of objects: { id, lat, lon, popupId } and can be called when new HTMX results arrive.
-            window.SHUL_MAP_API = window.SHUL_MAP_API || {};
-            window.SHUL_MAP_API._internal = api; // internal maps and helpers
-            window.SHUL_MAP_API.replaceMarkers = (markersData) => {
-            // example markersData item: { id: 123, lat: 51.5, lon: -0.09, popupId: '123' }
-            api.clearMarkers();
-            markersData.forEach((md) => {
-                // Ensure popupHtmlMap has html for the shul id; if you are rendering popup html on HTMX response,
-                // you should update popupHtmlMap accordingly before calling replaceMarkers (or include popupHtml in md)
-                api.addMarker(md.id, md.lat, md.lon, md.popupId);
+            // Map initialization when DOM is ready
+            document.addEventListener("DOMContentLoaded", () => {
+                initMap();
+                addShulsToMap();
+                window.SHUL_MAP_API.openSelectedMarker();
             });
-            // If markers layer wasn't added (rare), ensure it's on the map
-            if (!map.hasLayer(markersLayer)) map.addLayer(markersLayer);
-            };
-
-            // --- end DOMContentLoaded handler ---
-        });
         })();
     </script>
     <script defer src="{% static 'dist/shulsMap.js' %}"></script>
