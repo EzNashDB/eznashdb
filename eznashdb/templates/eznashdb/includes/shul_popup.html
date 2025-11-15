@@ -1,0 +1,48 @@
+<div style="margin-top:40px;">
+    <div class="card">
+        <div class="card-header fw-bold p-1 d-flex align-items-center">
+            <a class="btn btn-xs text-primary link-primary py-0 me-1"
+               href="/shuls/{{ shul.id|escapejs }}/update">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            <span class="flex-grow-1">{{ shul.name|escapejs }}</span>
+            <button type="button"
+                    class="btn btn-sm py-0 px-1 shul-popup-close"
+                    aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="card-body p-2 pt-1">
+            <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1"
+                 style="max-height:75px">
+                <div class="col striped">
+                    {% if shul.rooms %}
+                        {% for room in shul.rooms.all %}
+                            <div class="row gx-0 small ps-1">
+                                <div class="col-12 col-sm-3">{{ room.name|escapejs }}</div>
+                                <div class="col-3 col-sm-2">
+                                    <div class="row gx-0">
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                                                <span class="small fw-bold">{{ room.relative_size|default_if_none:"--"|escapejs }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 col-sm-3 text-center">
+                                    <div class="d-flex align-items-center px-3">
+                                        <i class="fa-solid fa-eye me-1"></i>
+                                        <span class='text-nowrap d-flex'>{{ room.get_see_hear_score_display|safe }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted small">No rooms saved</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
