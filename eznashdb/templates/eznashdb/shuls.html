@@ -122,7 +122,9 @@
                     deleteURLParams(["selectedPin"]);
                 });
 
-                const markersLayer = L.markerClusterGroup();
+                const markersLayer = L.markerClusterGroup({
+                    showCoverageOnHover: false,
+                });
                 map.addLayer(markersLayer);
 
                 const popupHtmlMap = {};      // keyed by shul id (string) -> html string
