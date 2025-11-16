@@ -11,13 +11,12 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
-    <div class="card-body p-2 pt-1 pe-1">
-        <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1"
-             style="max-height:200px">
-            <div class="col striped">
+    <div class="card-body p-2 overflow-auto" style="max-height:200px">
+        <div class="row w-100 m-auto gx-0 mt-1">
+            <div class="col">
                 {% if shul.rooms.exists %}
                     {% for room in shul.rooms.all %}
-                        <div class="row gx-0 p-2 rounded">
+                        <div class="row gx-0 mb-2 p-2 rounded bg-light border">
                             <div class="col-12 mb-2">{{ room.name }}</div>
                             <div class="col-12">
                                 <div class="row gx-0 ps-3">
