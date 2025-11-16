@@ -45,12 +45,12 @@ class FieldsOptions:
         "Main Sanctuary, Beit Midrash, etc.",
     )
     RELATIVE_SIZE = FieldOptions(
-        "Size <small>(vs Men's Section)</small>",
+        "Size <small>(vs Men's)</small>",
         "fa-solid fa-up-right-and-down-left-from-center",
         "How large is the women's section?",
     )
     SEE_HEAR = FieldOptions(
-        "Visibility & Audibility",
+        "Visibility & Audibility <small>(vs Men's)</small>",
         "fa-solid fa-eye",
         """
             How well can women see and hear what happens at the bima, aron, and pulpit?
