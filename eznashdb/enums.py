@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def get_size_option_display(letter, explanation):
-    return f"<span class='text-nowrap'><kbd>{letter}</kbd><small> - {explanation}</small></span>"
+    return f"<span class='text-nowrap'><kbd class='fw-bold'>{letter}</kbd><small> - {explanation}</small></span>"
 
 
 class RelativeSize(models.TextChoices):
@@ -23,7 +23,9 @@ def get_star_display(score):
         else:
             divs.append("<i class='fa-regular fa-star text-warning'></i>")
     stars = "".join(divs)
-    return f"<small>{stars} ({score})</small>"
+    return (
+        f"<span class='text-nowrap'><kbd class='fw-bold'>{score}</kbd> <small> - {stars}</small></span>"
+    )
 
 
 class SeeHearScore(models.TextChoices):
