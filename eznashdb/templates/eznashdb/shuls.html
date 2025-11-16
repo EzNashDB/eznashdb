@@ -233,10 +233,10 @@
             // Map initialization when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
-                window.SHUL_MARKERS_API.replaceMapShuls();
+                window.SHUL_MAP_API.replaceMapShuls();
             });
             document.addEventListener("htmx:afterSettle", () => {
-                window.SHUL_MARKERS_API.replaceMapShuls();
+                window.SHUL_MAP_API.replaceMapShuls();
             });
         })();
     </script>

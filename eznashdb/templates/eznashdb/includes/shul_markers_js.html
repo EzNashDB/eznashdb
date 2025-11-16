@@ -2,10 +2,9 @@
     (() => {
         window.shuls = {{serialized_shuls|safe}}
         document.dispatchEvent(new Event("shulsDataLoaded"));
-        window.SHUL_MARKERS_API = window.SHUL_MARKERS_API || {}
         const updateShulsFoundCount = () => {
-            if (window.SHUL_MARKERS_API.shulsFoundControl) {
-                window.SHUL_MARKERS_API.shulsFoundControl.remove();
+            if (window.SHUL_MAP_API.shulsFoundControl) {
+                window.SHUL_MAP_API.shulsFoundControl.remove();
             }
             const map = window.SHUL_MAP_API.map;
             // ---- Shuls-found control (topright) ----
@@ -24,7 +23,7 @@
                 return container;
             };
             shulsFoundControl.addTo(map);
-            window.SHUL_MARKERS_API.shulsFoundControl = shulsFoundControl
+            window.SHUL_MAP_API.shulsFoundControl = shulsFoundControl
         }
 
         const addShulMarkers = () => {
@@ -54,8 +53,8 @@
             mapApi.openSelectedMarker();
         }
 
-        window.SHUL_MARKERS_API = {
-            ...window.SHUL_MARKERS_API,
+        window.SHUL_MAP_API = {
+            ...window.SHUL_MAP_API,
             updateShulsFoundCount,
             addShulMarkers,
             replaceMapShuls,
