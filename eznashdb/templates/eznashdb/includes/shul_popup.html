@@ -26,14 +26,14 @@
                                             <span style="width:20px;" class="d-inline-block text-center me-2">
                                                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
                                             </span>
-                                            <span>{{ room.get_relative_size_display|safe|default:"<kbd>-</kbd> -" }}</span>
+                                            <span>{{ room.get_relative_size_display|safe|default:"<kbd class='fw-bold'>?</kbd> -" }}</span>
                                         </div>
                                         <div class="col-12 mb-2">
                                             <span style="width:20px;" class="d-inline-block text-center me-2">
                                                 <i class="fa-solid fa-eye"></i>
                                             </span>
                                             <span>
-                                            {{ room.get_see_hear_score_display|safe|default:"<kbd>-</kbd> - " }}</span>
+                                            {{ room.get_see_hear_score_display|safe|default:"<kbd class='fw-bold'>?</kbd> - " }}</span>
                                         </div>
                                     </div>
                                 </div>
