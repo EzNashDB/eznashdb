@@ -9,7 +9,7 @@ body {
   height: 100vh;
   /* fallback for Js load */
   height: var(--doc-height);
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .spinner-overlay {
