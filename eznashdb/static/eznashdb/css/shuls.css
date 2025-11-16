@@ -1,12 +1,3 @@
-.shul-filters-row {
-    min-height: 6rem;
-    height: 10rem;
-}
-
-.map-row {
-    min-height: 100px;
-}
-
 .leaflet-container {
     font-family: unset;
 }
