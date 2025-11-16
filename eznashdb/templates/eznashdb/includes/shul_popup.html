@@ -16,7 +16,7 @@
             <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1"
                  style="max-height:200px">
                 <div class="col striped">
-                    {% if shul.rooms %}
+                    {% if shul.rooms.exists %}
                         {% for room in shul.rooms.all %}
                             <div class="row gx-0 p-2 rounded">
                                 <div class="col-12 mb-2">{{ room.name }}</div>
