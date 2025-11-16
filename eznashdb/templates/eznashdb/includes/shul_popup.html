@@ -1,48 +1,46 @@
-<div style="margin-top:40px;">
-    <div class="card">
-        <div class="card-header fw-bold p-1 d-flex align-items-center">
-            <a class="btn btn-xs text-primary link-primary py-0 me-1"
-               href="/shuls/{{ shul.id }}/update">
-                <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <span class="flex-grow-1">{{ shul.name }}</span>
-            <button type="button"
-                    class="btn btn-sm py-0 px-1 shul-popup-close"
-                    aria-label="Close">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="card-body p-2 pt-1 pe-1">
-            <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1"
-                 style="max-height:200px">
-                <div class="col striped">
-                    {% if shul.rooms.exists %}
-                        {% for room in shul.rooms.all %}
-                            <div class="row gx-0 p-2 rounded">
-                                <div class="col-12 mb-2">{{ room.name }}</div>
-                                <div class="col-12">
-                                    <div class="row gx-0 ps-3">
-                                        <div class="col-12 mb-2">
-                                            <span style="width:20px;" class="d-inline-block text-center">
-                                                <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
-                                            </span>
-                                            <span>{{ room.get_relative_size_display|safe|default:"<kbd class='fw-bold'>?</kbd> -" }}</span>
-                                        </div>
-                                        <div class="col-12 mb-2">
-                                            <span style="width:20px;" class="d-inline-block text-center">
-                                                <i class="fa-solid fa-eye me-1"></i>
-                                            </span>
-                                            <span>
-                                            {{ room.get_see_hear_score_display|safe|default:"<kbd class='fw-bold'>?</kbd> - " }}</span>
-                                        </div>
+<div class="card">
+    <div class="card-header fw-bold p-1 d-flex align-items-center">
+        <a class="btn btn-xs text-primary link-primary py-0 me-1"
+           href="/shuls/{{ shul.id }}/update">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <span class="flex-grow-1">{{ shul.name }}</span>
+        <button type="button"
+                class="btn btn-sm py-0 px-1 shul-popup-close"
+                aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div class="card-body p-2 pt-1 pe-1">
+        <div class="striped overflow-auto row w-100 m-auto gx-0 mt-1"
+             style="max-height:200px">
+            <div class="col striped">
+                {% if shul.rooms.exists %}
+                    {% for room in shul.rooms.all %}
+                        <div class="row gx-0 p-2 rounded">
+                            <div class="col-12 mb-2">{{ room.name }}</div>
+                            <div class="col-12">
+                                <div class="row gx-0 ps-3">
+                                    <div class="col-12 mb-2">
+                                        <span style="width:20px;" class="d-inline-block text-center">
+                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                                        </span>
+                                        <span>{{ room.get_relative_size_display|safe|default:"<kbd class='fw-bold'>?</kbd> -" }}</span>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <span style="width:20px;" class="d-inline-block text-center">
+                                            <i class="fa-solid fa-eye me-1"></i>
+                                        </span>
+                                        <span>
+                                        {{ room.get_see_hear_score_display|safe|default:"<kbd class='fw-bold'>?</kbd> - " }}</span>
                                     </div>
                                 </div>
                             </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="text-muted small">No rooms saved</span>
-                    {% endif %}
-                </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted small">No rooms saved</span>
+                {% endif %}
             </div>
         </div>
     </div>
