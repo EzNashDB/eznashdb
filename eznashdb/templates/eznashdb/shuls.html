@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="row flex-grow-1 map-row">
-                <div class="col-6">
+                <div class="col-12">
                     <div class="border rounded h-100 position-relative">
                         <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
                             <div class="flex-grow-1 text-center">
@@ -48,22 +48,6 @@
                             </div>
                         </span>
                         <div id="shuls-map" class="h-100"></div>
-                    </div>
-                </div>
-                {% comment %} new map {% endcomment %}
-                <div class="col-6">
-                    <div class="border rounded h-100 position-relative">
-                        <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
-                            <div class="flex-grow-1 text-center">
-                                <span class="spinner-border spinner-border-lg"
-                                      style="width: 3rem;
-                                             height: 3rem"
-                                      role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </span>
-                            </div>
-                        </span>
-                        <div id="new-shuls-map" class="h-100"></div>
                     </div>
                 </div>
             </div>
@@ -98,7 +82,7 @@
 
             const initMap = () => {
                 const urlParams = new URLSearchParams(window.location.search);
-                const mapId = "new-shuls-map";
+                const mapId = "shuls-map";
                 const startLat = parseFloat(urlParams.get("lat")) || 20;
                 const startLon = parseFloat(urlParams.get("lon")) || 10;
                 const startZoom = parseInt(urlParams.get("zoom"), 10) || 2;
@@ -241,5 +225,5 @@
         })();
     </script>
     {% include "eznashdb/includes/shul_markers_js.html" %}
-    <script defer src="{% static 'dist/shulsMap.js' %}"></script>
+    <script defer src="{% static 'eznashdb/js/map_spinner.js' %}"></script>
 {% endblock extra_media_bottom %}
