@@ -69,7 +69,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
           }}
         >
           <img
-            src="/static/dist/images/marker-icon-2x.png"
+            src="/static/img/marker-icon-2x.png"
             style={{
               width: "25px",
               height: "41px",
