@@ -9,6 +9,7 @@ body {
   height: 100vh;
   /* fallback for Js load */
   height: var(--doc-height);
+  font-family: 'Roboto', sans-serif;
 }
 
 .spinner-overlay {
@@ -42,6 +43,7 @@ td.td-shrink {
 .z-1001 {
   z-index: 1001;
 }
+
 .z-1021 {
   /* Above sticky-top */
   z-index: 1021;
@@ -60,7 +62,9 @@ td.td-shrink {
 }
 
 /* Alpine.js */
-[x-cloak] { display: none !important; }
+[x-cloak] {
+  display: none !important;
+}
 
 /* bootstrap collapse */
 .btn .fa-chevron-up {
