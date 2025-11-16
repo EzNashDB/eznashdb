@@ -8,7 +8,7 @@
 }
 
 .shul-popup .leaflet-popup-content {
-    max-width: 500px;
+    max-width: 275px;
     width: calc(100vw - 40px) !important;
 }
 
