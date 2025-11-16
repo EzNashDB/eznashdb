@@ -1,12 +1,3 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { ShulsMap } from "../components/ShulsMap";
-
-const renderMap = () => {
-  const shulsMapContainer = document.getElementById("shuls-map");
-  createRoot(shulsMapContainer).render(<ShulsMap />);
-};
-
 class SpinnerManager {
   constructor() {
     this._spinnerOverlays = Array.from(
@@ -28,10 +19,6 @@ class SpinnerManager {
     });
   }
 }
-
-document.addEventListener("DOMContentLoaded", (e) => {
-  renderMap();
-});
 
 document.addEventListener("htmx:beforeSend", (e) => {
   new SpinnerManager().show();
