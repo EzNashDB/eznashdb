@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
@@ -13,57 +13,21 @@ export const AddressInput = ({
 }) => {
   const hasCoordsInProps = !!String(lat) && !!String(lon);
   const [inputValue, setInputValue] = useState({ display_name });
-  const [locationHistory, setLocationHistory] = useState({
-    locations: [
-      {
-        display_name,
-        lat,
-        lon,
-        place_id,
-        zoom: hasCoordsInProps ? 16 : 1,
-      },
-    ],
-    currIdx: 0,
-  });
-  const currLocation = locationHistory.locations[locationHistory.currIdx];
+  const initialLocation = useRef({
+    display_name,
+    lat,
+    lon,
+    place_id,
+    zoom: hasCoordsInProps ? 16 : 1,
+  }).current;
+  const [currLocation, setCurrLocation] = useState(initialLocation);
   const isValid = initialIsValid;
 
-  const setNewLocation = (location) => {
-    const prevLocations = locationHistory.locations.slice(
-      0,
-      locationHistory.currIdx + 1
-    );
-    location.lat = String(location.lat);
-    location.lon = String(location.lon);
-    const newLocations = [...prevLocations, location];
-    setLocationHistory({
-      locations: newLocations,
-      currIdx: newLocations.length - 1,
-    });
-  };
-
-  const goToLocationByIndex = (locationIndex) => {
-    setLocationHistory({
-      ...locationHistory,
-      currIdx: locationIndex,
-    });
+  const resetLocation = () => {
+    setCurrLocation(initialLocation);
     setInputValue({
-      display_name: locationHistory.locations[locationIndex].display_name,
+      display_name: initialLocation.display_name,
     });
-  };
-
-  const goToPrevLocation = (e) => {
-    const newIdx = locationHistory.currIdx - 1;
-    if (newIdx >= 0) {
-      goToLocationByIndex(newIdx);
-    }
-  };
-
-  const goToNextLocation = (e) => {
-    const newIdx = locationHistory.currIdx + 1;
-    if (newIdx < locationHistory.locations.length) {
-      goToLocationByIndex(newIdx);
-    }
   };
 
   const handleMapMoveEnd = useCallback(
@@ -82,27 +46,27 @@ export const AddressInput = ({
         !isRoundedEqual(oldLon, newLon, 5);
       const isNewZoom = map.getZoom() !== currLocation.zoom;
       if (isNewCenter) {
-        setNewLocation({
-          lat: center.lat,
-          lon: center.lng,
+        setCurrLocation({
+          lat: String(center.lat),
+          lon: String(center.lng),
           place_id: null,
           display_name: `${newLat}, ${newLon}`,
           zoom: map.getZoom(),
         });
         setInputValue({ display_name: `${newLat}, ${newLon}` });
       } else if (isNewZoom) {
-        setNewLocation({
+        setCurrLocation({
           ...currLocation,
           zoom: map.getZoom(),
         });
       }
     },
-    [locationHistory]
+    [currLocation]
   );
 
   const handleAddressSelected = (address) => {
     setInputValue({ display_name: address.display_name });
-    setNewLocation({ ...address, zoom: 16 });
+    setCurrLocation({ ...address, zoom: 16 });
   };
 
   const handleOnInput = (text) => {
@@ -139,20 +103,10 @@ export const AddressInput = ({
             <ButtonGroup className="ms-1 shadow-sm">
               <Button
                 variant="light"
-                disabled={locationHistory.currIdx === 0}
-                onClick={goToPrevLocation}
+                disabled={currLocation == initialLocation}
+                onClick={resetLocation}
               >
-                <i className="fa-solid fa-arrow-left"></i>
-              </Button>
-              <Button
-                variant="light"
-                disabled={
-                  locationHistory.currIdx ===
-                  locationHistory.locations.length - 1
-                }
-                onClick={goToNextLocation}
-              >
-                <i className="fa-solid fa-arrow-right"></i>
+                <i className="fa-solid fa-rotate-left"></i>
               </Button>
             </ButtonGroup>
           </div>
