@@ -93,15 +93,13 @@
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });
-    })
-    const roomFormSet = document.getElementsByClassName('room-formset')[0]
-    roomFormSet.addEventListener('click', function(e) {
-        const accordionButton = e.target.closest('.accordion-button');
-        if (accordionButton) {
-            e.preventDefault();
-            const accordionItem = accordionButton.closest('.accordion-item');
-            const collapseDiv = accordionItem.querySelector('.accordion-collapse');
+    });
+    (()=>{
+        const roomFormSet = document.querySelector('.room-formset')
+        const toggleAccordionHeader = (accordionItem) => {
             // toggle js-show/hide-on-open elements
+            const collapseDiv = accordionItem.querySelector('.accordion-collapse');
+            const accordionButton = accordionItem.querySelector('.accordion-button');
             for (let elem of roomFormSet.getElementsByClassName('js-hide-on-open')) {
                 elem.classList.remove('d-none');
             }
@@ -118,11 +116,28 @@
                     elem.classList.remove('d-none');
                 }
             }
-            // Toggle using Bootstrap's Collapse API
-            const bsCollapse = new bootstrap.Collapse(collapseDiv, {
-                toggle: true
-            });
         }
-    });
+        roomFormSet.addEventListener('click', function(e) {
+            const accordionButton = e.target.closest('.accordion-button');
+            if (accordionButton) {
+                e.preventDefault();
+                const accordionItem = accordionButton.closest('.accordion-item');
+                const collapseDiv = accordionItem.querySelector('.accordion-collapse');
+                toggleAccordionHeader(accordionItem)
+                // Toggle using Bootstrap's Collapse API
+                const bsCollapse = new bootstrap.Collapse(collapseDiv);
+                bsCollapse.toggle()
+                accordionButton.classList.toggle('collapsed');
+
+            }
+        });
+        {% if not shul.rooms.exists %}
+            const accordionItem = roomFormSet.querySelector('.accordion-item');
+            toggleAccordionHeader(accordionItem)
+            const collapseDiv = accordionItem.querySelector('.accordion-collapse');
+            collapseDiv.classList.add('show')
+        {% endif %}
+    })();
+
     </script>
 {% endblock extra_media_bottom %}
