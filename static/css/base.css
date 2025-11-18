@@ -75,6 +75,15 @@ td.td-shrink {
   transform: rotate(180deg);
 }
 
+/* colors */
+.bg-alert-danger {
+  background-color: var(--bs-danger-bg-subtle);
+}
+
+.text-alert-danger {
+  color: var(--bs-danger-text-emphasis);
+}
+
 /* width utils */
 .w-15px {
   width: 15px;
