@@ -1,7 +1,24 @@
 {% load crispy_forms_tags %}
 <div class="accordion-item room-form"
-     x-data='{ roomName: "{{ form.instance.name }}", sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:"<kbd class='fw-bold'>?</kbd> -"|escapejs }}", seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:"<kbd class='fw-bold'>?</kbd> -"|escapejs }}", handleTomFieldChange(event) { this.updateIfMatch(event, "relative_size", "sizeBanner"); this.updateIfMatch(event, "see_hear_score", "seeHearBanner"); }, updateIfMatch(event, eventFieldName, stateFieldName) { const sourceElem = event.detail.element; const isChildSource = $el.contains(sourceElem); const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName); if (!isChildSource || !isFieldNameMatch) return; this[stateFieldName] = event.detail.html; }, }'
-     @tom-select-changed.window="handleTomFieldChange($event)">
+    {# djlint:off #}
+      x-data='{
+        roomName: "{{ form.instance.name }}",
+        sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:"<kbd class='fw-bold'>?</kbd> -"|escapejs }}",
+        seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:"<kbd class='fw-bold'>?</kbd> -"|escapejs }}",
+        handleTomFieldChange(event) {
+          this.updateIfMatch(event, "relative_size", "sizeBanner");
+          this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
+        },
+        updateIfMatch(event, eventFieldName, stateFieldName) {
+          const sourceElem = event.detail.element;
+          const isChildSource = $el.contains(sourceElem);
+          const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
+          if (!isChildSource || !isFieldNameMatch) return;
+          this[stateFieldName] = event.detail.html;
+        }
+      }'
+    {# djlint:on #}
+    @tom-select-changed.window="handleTomFieldChange($event)">
     <h2 class="accordion-header">
         <button class="accordion-button collapsed p-2 bg-light"
                 type="button"
