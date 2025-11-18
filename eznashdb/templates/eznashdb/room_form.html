@@ -23,7 +23,13 @@
 @tom-select-changed.window="handleTomFieldChanged($event)"
 >
 <h2 class="accordion-header">
-    <button class="accordion-button collapsed p-2 bg-light"
+    <button class="accordion-button collapsed p-2
+                   {% if form.errors %}
+                       bg-alert-danger text-alert-danger
+                   {% else %}
+                       bg-light
+                   {% endif %}
+                   m-0"
             type="button"
             data-bs-toggle="collapse"
             aria-expanded="false"
