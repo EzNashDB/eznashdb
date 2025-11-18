@@ -27,6 +27,21 @@ export default function initializeTomSelects() {
       onItemRemove: function () {
         updateSelectedDisplay(this);
       },
+      onChange: function (value) {
+        let option = this.options[value];
+        let html = option.html || option.text || value;
+
+        window.dispatchEvent(
+          new CustomEvent("tom-select-changed", {
+            detail: {
+              html: html,
+              fieldName: this.input.name,
+              fieldId: this.input.id,
+              element: this.input,
+            },
+          })
+        );
+      },
       plugins: {
         ...(isMultiSelect && {
           checkbox_options: {

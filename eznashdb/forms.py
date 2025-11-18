@@ -53,18 +53,16 @@ class RoomForm(ModelForm):
         ]
         labels = {
             "name": FieldsOptions.ROOM_NAME.label,
-            "relative_size": FieldsOptions.RELATIVE_SIZE.label,
-            "see_hear_score": FieldsOptions.SEE_HEAR.label,
+            "relative_size": FieldsOptions.RELATIVE_SIZE.help_with_icon,
+            "see_hear_score": FieldsOptions.SEE_HEAR.help_with_icon,
         }
         help_texts = {
             "name": FieldsOptions.ROOM_NAME.help_text,
-            "relative_size": FieldsOptions.RELATIVE_SIZE.help_text,
-            "see_hear_score": FieldsOptions.SEE_HEAR.help_text,
         }
         widgets = {
-            "name": TextInput(attrs={"class": "fw-bold"}),
-            "relative_size": SingleTomSelectWidget(),
-            "see_hear_score": SingleTomSelectWidget(),
+            "name": TextInput(attrs={"class": "form-control form-control-sm", "x-model": "roomName"}),
+            "relative_size": SingleTomSelectWidget(attrs={"class": "form-control form-control-sm"}),
+            "see_hear_score": SingleTomSelectWidget(attrs={"class": "form-control form-control-sm"}),
         }
 
     def __init__(self, *args, **kwargs):
