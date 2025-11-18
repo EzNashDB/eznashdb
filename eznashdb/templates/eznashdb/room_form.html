@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 <div class="accordion-item room-form"
-    {% with dropdown_default="<kbd class='fw-bold'>?</kbd> -" %}
+    {% with dropdown_default="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
     {# djlint:off #}
       x-data='{
         roomName: "{{ form.instance.name }}",
