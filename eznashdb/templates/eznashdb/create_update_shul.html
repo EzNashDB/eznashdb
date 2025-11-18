@@ -3,6 +3,11 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block extra_media_top %}
+    <link rel="stylesheet"
+          href="{% static 'eznashdb/css/create_update_shul.css' %}">
+{% endblock extra_media_top %}
+
 {% block content %}
     <form method="POST"
           enctype="multipart/form-data"
@@ -21,58 +26,45 @@
                                 Add a Shul
                             {% endif %}
                         </div>
-                        <div>
-                            <button type="submit" class="btn btn-primary w-100">Save</button>
-                        </div>
                     </h3>
                 </div>
             </div>
-            <div class="row flex-grow-1 overflow-hidden">
-                <div class="col-12 h-100 shadow-scroll">
-                    <div class="shadow-scroll__shadow-wrapper">
-                        <div class="shadow-scroll__shadow shadow-scroll__top-shadow"></div>
-                        <div class="shadow-scroll__shadow shadow-scroll__bottom-shadow"></div>
-                        <div class="shadow-scroll__scroll-box px-3"></div>
-                    </div>
-                    <div class="row shadow-scroll__content">
+            <div class="row flex-grow-1 overflow-auto">
+                <div class="col-12 h-100">
+                    <div class="row">
                         <div class="col-12">
                             <div class="row">
-                                <div class="col">
-                                    <div class="sticky-top z-1030 row bg-white rounded-top">
-                                        <h5 class="col-12 pt-3">Shul Details</h5>
-                                    </div>
-                                    {% crispy form %}
+                                <div class="col-12 col-md-5 col-lg-4">
+                                    <div class="mt-3">{% crispy form %}</div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col">
-                                    <div class="sticky-top row bg-white rounded-top">
-                                        <h5 class="col-12 pt-3">Rooms</h5>
+                                    <div class="row">
+                                        <h5 class="col-12 pt-3 mb-2">Rooms</h5>
                                     </div>
                                     <div class="row mb-3">
                                         {{ room_fs.management_form }}
                                         {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                        <div class="room-formset col striped">
+                                        <div class="room-formset accordion" id="roomsAccordion">
                                             {% for form in room_fs %}
                                                 {% crispy form %}
                                             {% endfor %}
                                         </div>
                                         <div class="col-12">
-                                            <div class="row justify-content-start">
-                                                <div class="add-room-container col-12 d-flex justify-content-start"></div>
+                                            <div class="row justify-content-end">
+                                                <div class="add-room-container col-12 d-flex justify-content-end"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-12 col-lg-4 col-xl-6 col-xxl-4 mx-auto">
-                                    <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary w-100">Save</button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary w-100">Save</button>
                     </div>
                 </div>
             </div>
@@ -93,14 +85,44 @@
             formCssClass: 'room-form',
             formsParentCssClass: 'room-formset',
             prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary form-text',
+            addCssClass:'btn btn-sm btn-secondary form-text mt-2',
             addText: '<i class="fa fa-plus"></i> Add another room',
             addContainerClass: 'add-room-container',
-            deleteCssClass:'delete-room btn btn-sm btn-danger py-0 px-1',
-            deleteText: '<i class="fa fa-trash-can"></i>',
+            deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
+            deleteText: '<i class="fa fa-times"></i> Delete room',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
         });
     })
+    const roomFormSet = document.getElementsByClassName('room-formset')[0]
+    roomFormSet.addEventListener('click', function(e) {
+        const accordionButton = e.target.closest('.accordion-button');
+        if (accordionButton) {
+            e.preventDefault();
+            const accordionItem = accordionButton.closest('.accordion-item');
+            const collapseDiv = accordionItem.querySelector('.accordion-collapse');
+            // toggle js-show/hide-on-open elements
+            for (let elem of roomFormSet.getElementsByClassName('js-hide-on-open')) {
+                elem.classList.remove('d-none');
+            }
+            if (!collapseDiv.classList.contains('show')) {
+                for (let elem of accordionButton.getElementsByClassName('js-hide-on-open')) {
+                    elem.classList.add('d-none');
+                }
+            }
+            for (let elem of roomFormSet.getElementsByClassName('js-show-on-open')) {
+                elem.classList.add('d-none');
+            }
+            if (!collapseDiv.classList.contains('show')) {
+                for (let elem of accordionButton.getElementsByClassName('js-show-on-open')) {
+                    elem.classList.remove('d-none');
+                }
+            }
+            // Toggle using Bootstrap's Collapse API
+            const bsCollapse = new bootstrap.Collapse(collapseDiv, {
+                toggle: true
+            });
+        }
+    });
     </script>
 {% endblock extra_media_bottom %}

@@ -35,9 +35,13 @@ class FieldOptions:
     def label(self) -> str:
         return self.icon_class and LabelWithIcon(self.label_str, self.icon_class) or self.label_str
 
+    @property
+    def help_with_icon(self) -> str:
+        return self.icon_class and LabelWithIcon(self.help_text, self.icon_class) or self.help_text
+
 
 class FieldsOptions:
-    SHUL_NAME = FieldOptions("Name", "fa-solid fa-synagogue")
+    SHUL_NAME = FieldOptions("Shul Name", "fa-solid fa-synagogue")
     ADDRESS = FieldOptions("Address", "fa-solid fa-location-dot")
     ROOM_NAME = FieldOptions(
         "Room Name",
