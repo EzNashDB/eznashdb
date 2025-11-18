@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<div class="accordion-item room-form"
+<div class="accordion-item room-form" id="{{ room_fs.prefix }}-{{ forloop.counter0 }}-form"
     {% with dropdown_default="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
     {# djlint:off #}
       x-data='{
@@ -21,6 +21,13 @@
     {# djlint:on #}
 {% endwith %}
 @tom-select-changed.window="handleTomFieldChanged($event)"
+x-init="
+const collapseEl = $el.querySelector('.accordion-collapse');
+collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
+collapseEl.addEventListener('hide.bs.collapse', () => {
+if (openRoom === $el.id) openRoom = null;
+});
+"
 >
 <h2 class="accordion-header">
     <button class="accordion-button collapsed p-2
@@ -31,10 +38,12 @@
                    {% endif %}
                    m-0"
             type="button"
-            data-bs-toggle="collapse"
-            aria-expanded="false"
-            aria-controls="collapseThree">
-        <div class="row w-100 small js-hide-on-open justify-content-end">
+            @click="const collapseEl = $el.closest('.accordion-item').querySelector('.accordion-collapse'); new bootstrap.Collapse(collapseEl, { toggle: true });"
+            :class="{ 'collapsed': openRoom !== $el.closest('.accordion-item').id }"
+            :aria-expanded="openRoom === $el.closest('.accordion-item').id">
+        <div class="row w-100 small justify-content-end"
+             x-show="openRoom !== $el.closest('.accordion-item').id"
+             x-cloak>
             <div class="col-12 col-lg-3 text-nowrap mb-2 mb-lg-0">
                 <span class="pe-3 text-primary">
                     <i class="fas fa-edit"></i>
