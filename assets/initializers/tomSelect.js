@@ -29,7 +29,7 @@ export default function initializeTomSelects() {
       },
       onChange: function (value) {
         let option = this.options[value];
-        let html = option.html || option.text || value;
+        let html = option?.html || option?.text || value;
 
         window.dispatchEvent(
           new CustomEvent("tom-select-changed", {
