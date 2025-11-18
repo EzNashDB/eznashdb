@@ -215,9 +215,7 @@
           options.formTemplate instanceof $
             ? options.formTemplate
             : $(options.formTemplate);
-        template
-          .removeAttr("id")
-          .addClass(options.formCssClass + " formset-custom-template");
+        template.addClass(options.formCssClass + " formset-custom-template");
         template.find(childElementSelector).each(function () {
           updateElementIndex($(this), options.prefix, "__prefix__");
         });
@@ -231,8 +229,7 @@
         // Otherwise, use the last form in the formset; this works much better if you've got
         // extra (>= 1) forms (thnaks to justhamade for pointing this out):
         template = $("." + options.formCssClass + ":last")
-          .clone(true)
-          .removeAttr("id");
+          .clone(true);
         template.find('input:hidden[id $= "-DELETE"]').remove();
         // Clear all cloned fields, except those the user wants to keep (thanks to brunogola for the suggestion):
         template
@@ -303,9 +300,14 @@
         } else {
           row.insertBefore(buttonRow).show();
         }
+        // Update all child element indices to the new form count
         row.find(childElementSelector).each(function () {
           updateElementIndex($(this), options.prefix, formCount);
         });
+
+        // Also update the row itself (the wrapper element)
+        updateElementIndex(row, options.prefix, formCount);
+
         totalForms.val(formCount + 1);
         // Check if we're above the minimum allowed number of forms -> show all delete link(s)
         if (showDeleteLinks()) {
