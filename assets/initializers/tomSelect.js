@@ -14,7 +14,6 @@ export default function initializeTomSelects() {
       controlInput: null,
       dropdownParent: "body",
       render: {
-        dropdown: () => '<div class="z-3001"></div>',
         option: renderUnescapedContent,
         item: renderUnescapedContent,
       },
