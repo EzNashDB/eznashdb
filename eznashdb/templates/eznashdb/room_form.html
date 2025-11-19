@@ -1,84 +1,93 @@
 {% load crispy_forms_tags %}
 <div class="accordion-item room-form" id="{{ room_fs.prefix }}-{{ forloop.counter0 }}-form"
-    {% with dropdown_default="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
     {# djlint:off #}
-      x-data='{
-        roomName: "{{ form.instance.name }}",
-        sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:dropdown_default|escapejs }}",
-        seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:dropdown_default|escapejs }}",
-        handleTomFieldChanged(event) {
-          this.updateIfMatch(event, "relative_size", "sizeBanner");
-          this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
-        },
-        updateIfMatch(event, eventFieldName, stateFieldName) {
-          const sourceElem = event.detail.element;
-          const isChildSource = $el.contains(sourceElem);
-          const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
-          if (!isChildSource || !isFieldNameMatch) return;
-          this[stateFieldName] = event.detail.html || "{{dropdown_default|escapejs}}";
-        },
-      }'
+        {% with dropdown_default="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
+        x-data='{
+            roomName: "{{ form.instance.name }}",
+            sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:dropdown_default|escapejs }}",
+            seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:dropdown_default|escapejs }}",
+            handleTomFieldChanged(event) {
+            this.updateIfMatch(event, "relative_size", "sizeBanner");
+            this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
+            },
+            updateIfMatch(event, eventFieldName, stateFieldName) {
+            const sourceElem = event.detail.element;
+            const isChildSource = $el.contains(sourceElem);
+            const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
+            if (!isChildSource || !isFieldNameMatch) return;
+            this[stateFieldName] = event.detail.html || "{{dropdown_default|escapejs}}";
+            },
+        }'
+        {% endwith %}
+        x-init="
+        const collapseEl = $el.querySelector('.accordion-collapse');
+        collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
+        collapseEl.addEventListener('hide.bs.collapse', () => {
+            // Only clear if THIS room is the one currently active
+            if (openRoom === $el.id) {
+            openRoom = null;
+            }
+        });"
     {# djlint:on #}
-{% endwith %}
-@tom-select-changed.window="handleTomFieldChanged($event)"
-x-init="
-const collapseEl = $el.querySelector('.accordion-collapse');
-collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
-collapseEl.addEventListener('hide.bs.collapse', () => {
-if (openRoom === $el.id) openRoom = null;
-});
-"
->
-<h2 class="accordion-header">
-    <button class="accordion-button collapsed p-2
-                   {% if form.errors %}
-                       bg-alert-danger text-alert-danger
-                   {% else %}
-                       bg-light
-                   {% endif %}
-                   m-0"
+    @tom-select-changed.window="handleTomFieldChanged($event)"
+    >
+    <h2 class="accordion-header">
+        <button class="accordion-button p-2
+            {% if form.errors %}
+                bg-alert-danger text-alert-danger
+            {% else %}
+                bg-light
+            {% endif %}
+            m-0"
             type="button"
-            @click="const collapseEl = $el.closest('.accordion-item').querySelector('.accordion-collapse'); new bootstrap.Collapse(collapseEl, { toggle: true });"
+            {# djlint:off #}
+            @click="
+                const collapseEl = $el.closest('.accordion-item').querySelector('.accordion-collapse');
+                new bootstrap.Collapse(collapseEl, { toggle: true });
+            "
+            {# djlint:on #}
             :class="{ 'collapsed': openRoom !== $el.closest('.accordion-item').id }"
             :aria-expanded="openRoom === $el.closest('.accordion-item').id">
-        <div class="row w-100 small justify-content-end"
-             x-show="openRoom !== $el.closest('.accordion-item').id"
-             x-cloak>
-            <div class="col-12 col-lg-3 text-nowrap mb-2 mb-lg-0">
-                <span class="pe-3 text-primary">
-                    <i class="fas fa-edit"></i>
-                </span>
-                <span x-html='roomName || "Unnamed room"'></span>
+            <div class="row w-100 small justify-content-end"
+                 x-show="openRoom !== $el.closest('.accordion-item').id"
+                 x-cloak>
+                <div class="col-12 col-lg-3 text-nowrap mb-2 mb-lg-0">
+                    <span class="pe-3 text-primary">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                    <span x-html='roomName || "Unnamed room"'></span>
+                </div>
+                <div class="col-11 col-sm-5 col-md-6 col-lg-5 text-nowrap mb-2 mb-lg-0">
+                    <span class="ms-3">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center me-2"></i>
+                        <span x-html="sizeBanner"></span>
+                    </span>
+                </div>
+                <div class="col-11 col-sm-6 col-lg-4 text-nowrap mb-2 mb-lg-0">
+                    <span class="ms-3">
+                        <i class="fa-solid fa-eye me-2"></i>
+                        <span x-html="seeHearBanner"></span>
+                    </span>
+                </div>
             </div>
-            <div class="col-11 col-sm-5 col-md-6 col-lg-5 text-nowrap mb-2 mb-lg-0">
-                <span class="ms-3">
-                    <i class="fa-solid fa-up-right-and-down-left-from-center me-2"></i>
-                    <span x-html="sizeBanner"></span>
-                </span>
+        </button>
+    </h2>
+    <div class="accordion-collapse collapse"
+         :class="{ 'show': openRoom === $el.closest('.accordion-item').id }"
+         data-bs-parent="#roomsAccordion">
+        <div class="accordion-body position-relative">
+            <div class="col-auto position-absolute end-0 top-0 p-1">
+                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                </div>
+                <div class="col">
+                    <div class="row small">
+                        <div class="col-12 col-lg-6">{{ form.name|as_crispy_field }}</div>
+                        <div class="col-12 col-lg-6">{{ form.relative_size|as_crispy_field }}</div>
+                        <div class="col-12 col-lg-12">{{ form.see_hear_score|as_crispy_field }}</div>
+                    </div>
+                    <div class="delete-room-container"></div>
+                </div>
             </div>
-            <div class="col-11 col-sm-6 col-lg-4 text-nowrap mb-2 mb-lg-0">
-                <span class="ms-3">
-                    <i class="fa-solid fa-eye me-2"></i>
-                    <span x-html="seeHearBanner"></span>
-                </span>
-            </div>
-        </div>
-    </button>
-</h2>
-<div class="accordion-collapse collapse" data-bs-parent="#roomsAccordion">
-    <div class="accordion-body position-relative">
-        <div class="col-auto position-absolute end-0 top-0 p-1">
-            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-            {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-        </div>
-        <div class="col">
-            <div class="row small">
-                <div class="col-12 col-lg-6">{{ form.name|as_crispy_field }}</div>
-                <div class="col-12 col-lg-6">{{ form.relative_size|as_crispy_field }}</div>
-                <div class="col-12 col-lg-12">{{ form.see_hear_score|as_crispy_field }}</div>
-            </div>
-            <div class="delete-room-container"></div>
         </div>
     </div>
-</div>
-</div>
