@@ -35,7 +35,7 @@ import Alpine from "alpinejs";
     initializeShadowScrolls,
     initializeAlpine,
   ]);
-  onDocumentEvent("formsetInitialized", [initializeTomSelects]);
+  onDocumentEvent("formset-initialized", [initializeTomSelects]);
   onDOMChange([initializeTomSelects, initializeTooltips]);
   window.addEventListener("resize", setBodyHeight);
 })();

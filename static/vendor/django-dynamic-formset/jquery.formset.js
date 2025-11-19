@@ -221,7 +221,7 @@
         });
         insertDeleteLink(template);
       } else {
-        // Destroy all tomselects. They should be re-initialize elsewhere. Can use the `formsetInitialized`
+        // Destroy all tomselects. They should be re-initialize elsewhere. Can use the `formset-initialized`
         // event dispatched below
         document.querySelectorAll("select.tom-select").forEach((el) => {
           if (!!el.tomselect) el.tomselect.destroy();
@@ -252,6 +252,9 @@
       }
       // FIXME: Perhaps using $.data would be a better idea?
       options.formTemplate = template;
+      if (typeof options.prepareTemplate === "function") {
+        options.prepareTemplate(template);
+      }
 
       var addButtonHTML =
         '<a class="' +
@@ -324,7 +327,7 @@
         return false;
       });
     }
-    document.dispatchEvent(new CustomEvent("formsetInitialized"));
+    document.dispatchEvent(new CustomEvent("formset-initialized"));
 
     return $$;
   };
@@ -345,6 +348,7 @@
     formsParentCssClass: 'dynamic-form-parent',    // CSS class applied to parent of formset forms
     extraClasses: [],                // Additional CSS classes, which will be applied to each form in turn
     keepFieldValues: '',             // jQuery selector for fields whose values should be kept when the form is cloned
+    prepareTemplate: null,           // Function to modify the form template after it's been created
     added: null,                     // Function called each time a new form is added
     removed: null,                   // Function called each time a form is deleted
     hideLastAddForm: false,          // When set to true, hide last empty add form (becomes visible when clicking on add button)

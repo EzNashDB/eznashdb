@@ -44,9 +44,13 @@
                                     <div class="row mb-3">
                                         {{ room_fs.management_form }}
                                         {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                        <div class="room-formset accordion"
-                                             id="roomsAccordion"
-                                             x-data="{ openRoom: null }">
+                                        <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
+                                            {% if not shul.rooms.exists %}
+                                                'rooms-0-form'
+                                            {% else %}
+                                                null
+                                            {% endif %}
+                                            }">
                                             {% for form in room_fs %}
                                                 {% crispy form %}
                                             {% endfor %}
@@ -94,6 +98,18 @@
             deleteText: '<i class="fa fa-times"></i> Delete room',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
+            prepareTemplate: (template) => {
+                const collapseEl = template.find('.accordion-collapse');
+                collapseEl.removeClass('show');
+            },
+            added: (row) => {
+                const accordion = document.getElementById('roomsAccordion');
+                const alpineData = Alpine.$data(accordion);
+                const collapseEl = row.find('.accordion-collapse')[0];
+                const collapse = new bootstrap.Collapse(collapseEl);
+                collapse.show()
+                alpineData.openRoom = row.attr('id');
+            },
         });
     });
     </script>
