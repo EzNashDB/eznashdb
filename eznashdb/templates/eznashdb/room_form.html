@@ -53,13 +53,13 @@
             <div class="row w-100 justify-content-end"
                  x-show="openRoom !== $el.closest('.accordion-item').id"
                  x-cloak>
-                <div class="col-12 col-lg-3 text-nowrap mb-2 mb-lg-0">
+                <div class="col-12 col-lg-3 mb-2 mb-lg-0 d-flex align-items-center">
                     <span class="pe-3 text-primary">
                         <i class="fas fa-edit"></i>
                     </span>
-                    <span x-html='roomName || "Unnamed room"'></span>
+                    <div class="inline-block" x-html='roomName || "Unnamed room"'></div>
                 </div>
-                <div class="col-11 col-lg-5 text-nowrap mb-2 mb-lg-0">
+                <div class="col-11 col-lg-5 text-nowrap mb-2 mb-lg-0 d-flex align-items-center">
                     <span class="ms-3">
                         <span style="width:20px;" class="me-2 d-inline-block">
                             <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
@@ -67,7 +67,7 @@
                         <span x-html="sizeBanner"></span>
                     </span>
                 </div>
-                <div class="col-11 col-lg-4 text-nowrap mb-2 mb-lg-0">
+                <div class="col-11 col-lg-4 text-nowrap mb-2 mb-lg-0 d-flex align-items-center">
                     <span class="ms-3">
                         <span style="width:20px;" class="me-2 d-inline-block">
                             <i class="fa-solid fa-eye"></i>
