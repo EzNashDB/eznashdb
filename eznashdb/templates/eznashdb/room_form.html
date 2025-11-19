@@ -31,7 +31,7 @@
     @tom-select-changed.window="handleTomFieldChanged($event)"
     >
     <h2 class="accordion-header">
-        <button class="accordion-button p-2
+        <button class="accordion-button
             {% if form.errors %}
                 bg-alert-danger text-alert-danger
             {% else %}
@@ -47,7 +47,7 @@
             {# djlint:on #}
             :class="{ 'collapsed': openRoom !== $el.closest('.accordion-item').id }"
             :aria-expanded="openRoom === $el.closest('.accordion-item').id">
-            <div class="row w-100 small justify-content-end"
+            <div class="row w-100 justify-content-end"
                  x-show="openRoom !== $el.closest('.accordion-item').id"
                  x-cloak>
                 <div class="col-12 col-lg-3 text-nowrap mb-2 mb-lg-0">
@@ -80,7 +80,7 @@
                 {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                 </div>
                 <div class="col">
-                    <div class="row small">
+                    <div class="row">
                         <div class="col-12 col-lg-6">{{ form.name|as_crispy_field }}</div>
                         <div class="col-12 col-lg-6">{{ form.relative_size|as_crispy_field }}</div>
                         <div class="col-12 col-lg-12">{{ form.see_hear_score|as_crispy_field }}</div>
