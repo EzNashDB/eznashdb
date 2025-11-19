@@ -60,9 +60,9 @@ class RoomForm(ModelForm):
             "name": FieldsOptions.ROOM_NAME.help_text,
         }
         widgets = {
-            "name": TextInput(attrs={"class": "form-control form-control-sm", "x-model": "roomName"}),
-            "relative_size": SingleTomSelectWidget(attrs={"class": "form-control form-control-sm"}),
-            "see_hear_score": SingleTomSelectWidget(attrs={"class": "form-control form-control-sm"}),
+            "name": TextInput(attrs={"x-model": "roomName"}),
+            "relative_size": SingleTomSelectWidget(),
+            "see_hear_score": SingleTomSelectWidget(),
         }
 
     def __init__(self, *args, **kwargs):
