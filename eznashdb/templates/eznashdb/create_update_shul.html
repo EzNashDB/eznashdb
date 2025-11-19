@@ -107,8 +107,11 @@
                 const alpineData = Alpine.$data(accordion);
                 const collapseEl = row.find('.accordion-collapse')[0];
                 const collapse = new bootstrap.Collapse(collapseEl);
-                collapse.show()
+                collapseEl.addEventListener('shown.bs.collapse', () => {
+                    collapseEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, { once: true });
                 alpineData.openRoom = row.attr('id');
+                collapse.show();
             },
         });
     });
