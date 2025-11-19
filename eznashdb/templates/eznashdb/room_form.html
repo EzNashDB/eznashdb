@@ -7,27 +7,26 @@
             sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:dropdown_default|escapejs }}",
             seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:dropdown_default|escapejs }}",
             handleTomFieldChanged(event) {
-            this.updateIfMatch(event, "relative_size", "sizeBanner");
-            this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
+                this.updateIfMatch(event, "relative_size", "sizeBanner");
+                this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
             },
             updateIfMatch(event, eventFieldName, stateFieldName) {
-            const sourceElem = event.detail.element;
-            const isChildSource = $el.contains(sourceElem);
-            const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
-            if (!isChildSource || !isFieldNameMatch) return;
-            this[stateFieldName] = event.detail.html || "{{dropdown_default|escapejs}}";
+                const sourceElem = event.detail.element;
+                const isChildSource = $el.contains(sourceElem);
+                const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
+                if (!isChildSource || !isFieldNameMatch) return;
+                this[stateFieldName] = event.detail.html || "{{dropdown_default|escapejs}}";
             },
         }'
         {% endwith %}
         x-init="
-        const collapseEl = $el.querySelector('.accordion-collapse');
-        collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
-        collapseEl.addEventListener('hide.bs.collapse', () => {
-            // Only clear if THIS room is the one currently active
-            if (openRoom === $el.id) {
-            openRoom = null;
-            }
-        });"
+            const collapseEl = $el.querySelector('.accordion-collapse');
+            collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
+            collapseEl.addEventListener('hide.bs.collapse', () => {
+                const isClosingActiveRoom = openRoom === $el.id
+                if (isClosingActiveRoom) openRoom = null;
+            });
+        "
     {# djlint:on #}
     @tom-select-changed.window="handleTomFieldChanged($event)"
     >
