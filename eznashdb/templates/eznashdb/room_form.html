@@ -22,6 +22,9 @@
         x-init="
             const collapseEl = $el.querySelector('.accordion-collapse');
             collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
+            collapseEl.addEventListener('shown.bs.collapse', () => {
+                collapseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
             collapseEl.addEventListener('hide.bs.collapse', () => {
                 const isClosingActiveRoom = openRoom === $el.id
                 if (isClosingActiveRoom) openRoom = null;
