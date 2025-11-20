@@ -254,9 +254,9 @@ if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
 
 # Geocoding
 MAPS_CO_API_KEY = os.environ.get("MAPS_CO_API_KEY")
-BASE_OSM_URL = (
-    MAPS_CO_API_KEY and "https://geocode.maps.co/search" or "https://nominatim.openstreetmap.org/"
-)
+MAPS_CO_DOMAIN = "https://geocode.maps.co/search"
+NOMINATIM_DOMAIN = "https://nominatim.openstreetmap.org/"
+BASE_OSM_URL = MAPS_CO_API_KEY and MAPS_CO_DOMAIN or NOMINATIM_DOMAIN
 
 # Enforce host
 ENFORCE_HOST = os.environ.get("ENFORCE_HOST")

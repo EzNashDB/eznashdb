@@ -26,7 +26,7 @@ class YesNoUnknownFilterTest:
         ],
     )
     def test_includes_shuls_that_match_single_value(self, test_request, value, query):
-        Shul.objects.create(**{self.shul_model_field: value})
+        Shul.objects.create(latitude=123, longitude=123, **{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
@@ -39,7 +39,7 @@ class YesNoUnknownFilterTest:
         ],
     )
     def test_includes_shuls_that_match_any_of_multiple_values(self, test_request, value, query):
-        Shul.objects.create(**{self.shul_model_field: value})
+        Shul.objects.create(latitude=123, longitude=123, **{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
 
@@ -52,7 +52,7 @@ class YesNoUnknownFilterTest:
         ],
     )
     def test_excludes_shuls_that_do_not_match_any_value(self, test_request, value, query):
-        Shul.objects.create(**{self.shul_model_field: value})
+        Shul.objects.create(latitude=123, longitude=123, **{self.shul_model_field: value})
 
         assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
 
@@ -68,14 +68,14 @@ def describe_relative_size_filter():
         ],
     )
     def includes_shuls_that_match_single_value(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def shul_appears_once_if_multiple_rooms_match(test_request):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(relative_size=RelativeSize.M.value)
         shul.rooms.create(relative_size=RelativeSize.M.value)
 
@@ -91,7 +91,7 @@ def describe_relative_size_filter():
         ],
     )
     def includes_shuls_that_match_any_of_multiple_values(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
@@ -105,14 +105,14 @@ def describe_relative_size_filter():
         ],
     )
     def excludes_shuls_that_do_not_match_any_value(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(relative_size=value)
 
         data = {"rooms__relative_size": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
 
     def unknown_includes_shuls_without_rooms(test_request):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
 
         data = {"rooms__relative_size": ["--"]}
         assert shul in ShulFilterSet(data, request=test_request).qs
@@ -131,14 +131,14 @@ def describe_see_hear_score_filter():
         ],
     )
     def includes_shuls_that_match_single_value(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
     def shul_appears_once_if_multiple_rooms_match(test_request):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(see_hear_score=SeeHearScore._3.value)
         shul.rooms.create(see_hear_score=SeeHearScore._3.value)
 
@@ -154,7 +154,7 @@ def describe_see_hear_score_filter():
         ],
     )
     def includes_shuls_that_match_any_of_multiple_values(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
@@ -168,14 +168,14 @@ def describe_see_hear_score_filter():
         ],
     )
     def excludes_shuls_that_do_not_match_any_value(test_request, value, query):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
         shul.rooms.create(see_hear_score=value)
 
         data = {"rooms__see_hear_score": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
 
     def unknown_includes_shuls_without_rooms(test_request):
-        shul = Shul.objects.create()
+        shul = Shul.objects.create(latitude=123, longitude=123)
 
         data = {"rooms__see_hear_score": ["--"]}
         assert shul in ShulFilterSet(data, request=test_request).qs

@@ -14,7 +14,7 @@ def test_displays_room_fields():
 
 
 def test_saves_room():
-    shul = Shul.objects.create()
+    shul = Shul.objects.create(latitude=123, longitude=123)
     form = RoomForm(
         data={
             "shul": shul,

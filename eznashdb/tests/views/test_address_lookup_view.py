@@ -2,6 +2,7 @@ import urllib
 
 import pytest
 import requests
+from django.conf import settings
 from django.urls import reverse
 
 DUMMY_OSM_RECORD = {"name": "osm response", "place_id": 1}
@@ -14,7 +15,7 @@ def mock_osm(mocker):
 
         def side_effect(*args, **kwargs):
             url = kwargs.get("url") or args[0]
-            if "openstreetmap" in url:
+            if (settings.NOMINATIM_DOMAIN in url) or (settings.MAPS_CO_DOMAIN in url):
                 mock_response = mocker.Mock()
                 mock_response.json.return_value = response_data
                 mock_response.status_code = status_code
