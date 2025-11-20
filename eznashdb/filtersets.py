@@ -1,4 +1,3 @@
-from crispy_forms.helper import FormHelper
 from django.db.models import Prefetch, Q
 from django.utils.safestring import mark_safe
 from django_filters import FilterSet
@@ -47,12 +46,6 @@ class ShulFilterSet(FilterSet):
             query |= Q(rooms__isnull=True)
         qs = qs.filter(query).distinct()
         return qs
-
-    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
-        super().__init__(data, queryset, request=request, prefix=prefix)
-        self.form.helper = helper = FormHelper()
-        helper.field_template = "bootstrap5/no_margin_field.html"
-        helper.field_class = "input-group-sm"
 
     @property
     def qs(self):
