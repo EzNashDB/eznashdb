@@ -11,6 +11,8 @@ def test_models_smoketest(django_user_model):
         created_by=user,
         updated_by=[user.id],
         name="Test shul",
+        latitude=123.456,
+        longitude=123.456,
     )
 
     # Create room

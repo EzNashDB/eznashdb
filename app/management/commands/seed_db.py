@@ -49,6 +49,8 @@ class Command(BaseCommand):
                 defaults={
                     "created_by": self.user,
                     "address": fake.street_address(),
+                    "latitude": self.get_random_lat_lon(),
+                    "longitude": self.get_random_lat_lon(),
                 },
             )
             self._create_shul_rooms(shul)
@@ -57,3 +59,6 @@ class Command(BaseCommand):
         room_count = random.choice([1, 2, 3])
         for j in range(room_count):
             RoomCreator(shul, j + 1).create()
+
+    def get_random_lat_lon(self):
+        return round(random.uniform(-90, 90), 6)

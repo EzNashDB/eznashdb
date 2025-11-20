@@ -5,7 +5,7 @@ from eznashdb.views import DeleteShulView
 
 
 def test_deletes_shul(rf, test_user):
-    shul = Shul.objects.create(name="test shul")
+    shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
     request = rf.post(reverse("eznashdb:delete_shul", kwargs={"pk": shul.pk}))
     request.user = test_user
 
@@ -17,7 +17,7 @@ def test_deletes_shul(rf, test_user):
 
 
 def test_deletes_rooms(rf, test_user):
-    shul = Shul.objects.create(name="test shul")
+    shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
     Room.objects.create(shul=shul, name="room1")
     Room.objects.create(shul=shul, name="room2")
     request = rf.post(

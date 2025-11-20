@@ -36,7 +36,8 @@ class ShulForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if not (cleaned_data.get("latitude") and cleaned_data.get("longitude")):
+        empty_values = [None, ""]
+        if any(cleaned_data.get(field_name) in empty_values for field_name in ["latitude", "longitude"]):
             self.add_error("address", "Please select a valid address.")
 
 
