@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import json
 import os
-import sys
 from os.path import dirname, join
 from pathlib import Path
 
@@ -30,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False) == "True"
-TESTING = "test" in sys.argv
+TESTING = os.environ.get("TESTING", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     "ezratnashim.com",

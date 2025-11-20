@@ -10,7 +10,7 @@ __pycache__/
 .flakeheaven_cache
 
 # testmon
-.testmondata
+.testmondata*
 .testmondata-journal
 
 # Node
