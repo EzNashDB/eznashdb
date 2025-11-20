@@ -5,10 +5,26 @@
 
 {% block content %}
     <form method="POST"
-          enctype="multipart/form-data"
-          novalidate
-          id="shul_form"
-          class="row h-100">
+        enctype="multipart/form-data"
+        novalidate
+        id="shul_form"
+        class="row h-100"
+        x-data="{ dirty: false }"
+        @input="dirty = true"
+        @submit="dirty = false"
+        {# djlint:off #}
+        x-init="
+            window.addEventListener('beforeunload', e => {
+                // Setting e.returnValue triggers the browser's built-in
+                // 'unsaved changes' warning.
+                if (dirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            })
+            "
+        {# djlint:on #}
+        >
         {% csrf_token %}
         <div class="col h-100 d-flex flex-column">
             <div class="row">
