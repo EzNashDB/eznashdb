@@ -9,21 +9,28 @@
         novalidate
         id="shul_form"
         class="row h-100"
-        x-data="{ dirty: false }"
-        @input="dirty = true"
-        @submit="dirty = false"
         {# djlint:off #}
+        x-data="{
+            dirtyFields: new Set(),
+            markDirty(e) {
+                if (e.target.name) this.dirtyFields.add(e.target.name);
+            },
+            clearDirty() {
+                this.dirtyFields.clear();
+            }
+        }"
         x-init="
             window.addEventListener('beforeunload', e => {
-                // Setting e.returnValue triggers the browser's built-in
-                // 'unsaved changes' warning.
-                if (dirty) {
+                // Trigger built-in browser warning if any fields are dirty.
+                if (dirtyFields.size > 0) {
                     e.preventDefault();
                     e.returnValue = '';
                 }
             })
-            "
+        "
         {# djlint:on #}
+        @input="markDirty($event)"
+        @submit="clearDirty()"
         >
         {% csrf_token %}
         <div class="col h-100 d-flex flex-column">
