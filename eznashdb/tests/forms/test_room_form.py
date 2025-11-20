@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.forms import RoomForm
-from eznashdb.models import Room, Shul
+from eznashdb.models import Room
 
 
 def test_displays_room_fields():
@@ -13,11 +13,10 @@ def test_displays_room_fields():
     assert soup.find(attrs={"id": "id_see_hear_score"})
 
 
-def test_saves_room():
-    shul = Shul.objects.create(latitude=123, longitude=123)
+def test_saves_room(test_shul):
     form = RoomForm(
         data={
-            "shul": shul,
+            "shul": test_shul,
             "name": "test room",
             "relative_size": RelativeSize.M,
             "see_hear_score": SeeHearScore._3,
@@ -26,7 +25,7 @@ def test_saves_room():
     form.save()
 
     room = Room.objects.first()
-    assert room.shul == shul
+    assert room.shul == test_shul
     assert room.name == "test room"
     assert room.relative_size == RelativeSize.M
     assert room.see_hear_score == SeeHearScore._3

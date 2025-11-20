@@ -105,16 +105,15 @@ def describe_create():
 
 
 def describe_update():
-    def initializes_with_shul_and_room_data(GET_request_update):
-        shul = Shul.objects.create(name="test shul")
-        room1 = shul.rooms.create(name="test room 1")
-        room2 = shul.rooms.create(name="test room 2")
+    def initializes_with_shul_and_room_data(GET_request_update, test_shul):
+        room1 = test_shul.rooms.create(name="test room 1")
+        room2 = test_shul.rooms.create(name="test room 2")
 
-        response = CreateUpdateShulView.as_view()(GET_request_update(pk=shul.pk), pk=shul.pk)
+        response = CreateUpdateShulView.as_view()(GET_request_update(pk=test_shul.pk), pk=test_shul.pk)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         inputs = soup.find_all("input")
         input_values = {input_element.get("value") for input_element in inputs}
-        assert shul.name in input_values
+        assert test_shul.name in input_values
         assert room1.name in input_values
         assert room2.name in input_values
