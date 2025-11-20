@@ -17,17 +17,17 @@ def test_shows_app_name(GET_request):
 
     assert "Ezrat Nashim Database" in soup.get_text()
 
-    def test_shows_shul_address(GET_request):
-        Shul.objects.create(name="test shul", address="test address", latitude=123, longitude=123)
+    def test_shows_shul_address(GET_request, test_shul):
+        test_shul.address = "test address"
+        test_shul.save()
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "test address" in str(soup)
 
-    def test_shows_room_name(GET_request):
-        shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
-        room = shul.rooms.create(name="test_room")
+    def test_shows_room_name(GET_request, test_shul):
+        room = test_shul.rooms.create(name="test_room")
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -36,18 +36,16 @@ def test_shows_app_name(GET_request):
 
     def describe_rooms():
         @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
-        def test_shows_room_relative_size(GET_request, relative_size):
-            shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
-            shul.rooms.create(name="test_room", relative_size=relative_size)
+        def test_shows_room_relative_size(test_shul, GET_request, relative_size):
+            test_shul.rooms.create(name="test_room", relative_size=relative_size)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
             assert relative_size.value in str(soup)
 
-        def test_displays_dashes_for_unknown_relative_size(GET_request):
-            shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
-            shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
+        def test_displays_dashes_for_unknown_relative_size(test_shul, GET_request):
+            test_shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -55,9 +53,8 @@ def test_shows_app_name(GET_request):
             assert "--" in soup.text
 
         @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
-        def test_shows_room_see_hear_score(GET_request, see_hear_score):
-            shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
-            shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
+        def test_shows_room_see_hear_score(test_shul, GET_request, see_hear_score):
+            test_shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")
@@ -71,9 +68,8 @@ def test_shows_app_name(GET_request):
             assert str(soup).count(filled_class) == expected_filled_star_count
             assert str(soup).count(empty_class) == expected_empty_star_count
 
-        def test_shows_dashes_for_unknown_see_hear_score(GET_request):
-            shul = Shul.objects.create(name="test shul", latitude=123, longitude=123)
-            shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
+        def test_shows_dashes_for_unknown_see_hear_score(test_shul, GET_request):
+            test_shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
 
             response = ShulsFilterView.as_view()(GET_request)
             soup = BeautifulSoup(str(response.render().content), features="html.parser")

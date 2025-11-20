@@ -5,6 +5,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.urls import resolve, reverse
 
 from eznashdb.constants import DEFAULT_ARG
+from eznashdb.models import Shul
 
 
 @pytest.fixture(autouse=True)
@@ -24,6 +25,17 @@ def test_user(django_user_model):
     )
     user.set_password("password")
     return user
+
+
+@pytest.fixture
+def test_shul(test_user):
+    return Shul.objects.create(
+        created_by=test_user,
+        updated_by=[test_user.id],
+        name="Test shul",
+        latitude=123.456,
+        longitude=123.456,
+    )
 
 
 @pytest.fixture
