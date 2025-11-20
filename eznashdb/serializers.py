@@ -17,5 +17,5 @@ class ShulSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_rooms(self, obj):
-        ordered_rooms = obj.rooms.order_by("pk")
+        ordered_rooms = obj.rooms.all()
         return RoomSerializer(ordered_rooms, many=True).data

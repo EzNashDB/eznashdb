@@ -1,12 +1,12 @@
 from crispy_forms.helper import FormHelper
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.utils.safestring import mark_safe
 from django_filters import FilterSet
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filters import MultipleChoiceOrUnknownCharFilter, MultiSelectModelFieldFilter
-from eznashdb.models import Shul
+from eznashdb.models import Room, Shul
 
 
 def x_help_text(help_text):
@@ -56,7 +56,7 @@ class ShulFilterSet(FilterSet):
 
     @property
     def qs(self):
-        return super().qs.prefetch_related("rooms")
+        return super().qs.prefetch_related(Prefetch("rooms", queryset=Room.objects.all().order_by("pk")))
 
     class Meta:
         model = Shul
