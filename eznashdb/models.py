@@ -15,8 +15,8 @@ class Shul(models.Model):
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=255, blank=True)
-    latitude = models.CharField(max_length=255, blank=True)
-    longitude = models.CharField(max_length=255, blank=True)
+    latitude = models.DecimalField(max_digits=22, decimal_places=17)
+    longitude = models.DecimalField(max_digits=22, decimal_places=17)
     place_id = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=255, blank=True)
 
