@@ -1,8 +1,6 @@
-import json
 import time
 import urllib
 from json.decoder import JSONDecodeError
-from typing import Any
 
 import requests
 from django.conf import settings
@@ -16,22 +14,11 @@ from django_filters.views import FilterView
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulForm
 from eznashdb.models import Shul
-from eznashdb.serializers import ShulSerializer
 
 
 class ShulsFilterView(FilterView):
     template_name = "eznashdb/shuls.html"
     filterset_class = ShulFilterSet
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["serialized_shuls"] = self.get_serialized_shuls(context["filter"].qs)
-        return context
-
-    def get_serialized_shuls(self, qs):
-        serialized_shuls = ShulSerializer(qs, many=True).data
-        json_shuls = json.dumps(serialized_shuls)
-        return json_shuls
 
     def get_template_names(self) -> list[str]:
         if "Hx-Request" in self.request.headers:

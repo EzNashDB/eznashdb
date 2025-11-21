@@ -1,6 +1,5 @@
 <script id="shul-markers-js" hx-swap-oob="true" defer>
     (() => {
-        window.shuls = {{serialized_shuls|safe}}
         document.dispatchEvent(new Event("shulsDataLoaded"));
         const updateShulsFoundCount = () => {
             if (window.SHUL_MAP_API.shulsFoundControl) {
