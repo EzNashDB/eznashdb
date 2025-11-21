@@ -99,12 +99,12 @@ django-cors-headers = "^3.11.0"
 psycopg2-binary = "^2.9.5"
 django-filter = "^23.2"
 django-crispy-forms = "^2.0"
-crispy-bootstrap5 = "^0.7"
 faker = "^19.1.0"
 requests = "^2.31.0"
 sentry-sdk = {extras = ["django"], version = "^1.44.0"}
 django-enforce-host = "^1.1.0"
 django-debug-toolbar = "^5.0.1"
+crispy-bootstrap5 = "^2025.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
