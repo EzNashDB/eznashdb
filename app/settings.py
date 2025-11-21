@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "crispy_forms",
     "crispy_bootstrap5",
-    "rest_framework",
     "app",
     "eznashdb",
     "users",
