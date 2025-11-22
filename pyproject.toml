@@ -105,6 +105,7 @@ sentry-sdk = {extras = ["django"], version = "^1.44.0"}
 django-enforce-host = "^1.1.0"
 django-debug-toolbar = "^5.0.1"
 crispy-bootstrap5 = "^2025.6"
+django-htmx = "^1.26.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

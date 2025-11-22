@@ -1,7 +1,9 @@
 {% load static %}
+{% load django_htmx %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        {% htmx_script %}
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XS4PGLT5WW"></script>
         <script>
@@ -70,7 +72,8 @@
         {% endblock extra_media_top %}
 
     </head>
-    <body class="d-flex flex-column">
+    <body class="d-flex flex-column"
+          hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
         {% include 'includes/navbar.html' %}
         <div class="overflow-y-auto flex-grow-1">
             <div class="container py-3 h-100 overflow-hidden">
@@ -93,8 +96,6 @@
         {# django-dynamic-formsets #}
         <script type="text/javascript"
                 src="{% static 'vendor/django-dynamic-formset/jquery.formset.js' %}"></script>
-        {# htmx #}
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
         <script src="{% static 'dist/base.js' %}"></script>
         {% if debug %}
             <script>

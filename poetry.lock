@@ -386,6 +386,21 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-htmx"
+version = "1.26.0"
+description = "Extensions for using Django with htmx."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "django_htmx-1.26.0-py3-none-any.whl", hash = "sha256:3a80ffaa6df5a07e833752cd8ada7cee0fa711787841ab17a805075b1aecacc7"},
+    {file = "django_htmx-1.26.0.tar.gz", hash = "sha256:88ecc2f8a3f13ad5a50e6b16be127f04fba369124cc40a09b21ce33babb04aa6"},
+]
+
+[package.dependencies]
+asgiref = ">=3.6"
+django = ">=4.2"
+
+[[package]]
 name = "djlint"
 version = "1.19.13"
 description = "HTML Template Linter and Formatter"
@@ -1524,4 +1539,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c7de27cd7a488bc49753a2402eb05905b15391faa56f5796a8277498d27e2ef6"
+content-hash = "2fc96a69ff0af7801b15a21026fe4307360b5b5749651242ca56c25b88f26c5e"
