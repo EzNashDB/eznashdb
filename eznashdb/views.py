@@ -22,7 +22,7 @@ class ShulsFilterView(FilterView):
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx:
-            return ["eznashdb/includes/shul_markers_js.html"]
+            return ["eznashdb/shuls.html#shul_markers_js"]
         return super().get_template_names()
 
 
