@@ -41,7 +41,7 @@ def test_shul(test_user):
 @pytest.fixture
 def rf_GET(rf) -> Callable:
     def _GET_request(
-        view_name: str, url_params: dict = DEFAULT_ARG, query_params: dict = DEFAULT_ARG
+        view_name: str, url_params: dict = DEFAULT_ARG, query_params: dict = DEFAULT_ARG, htmx=False
     ) -> WSGIRequest:
         if url_params == DEFAULT_ARG:
             url_params = {}
@@ -50,6 +50,7 @@ def rf_GET(rf) -> Callable:
         url = reverse(view_name, kwargs=url_params)
         request = rf.get(url, query_params)
         request.resolver_match = resolve(url)
+        request.htmx = htmx
         return request
 
     return _GET_request
