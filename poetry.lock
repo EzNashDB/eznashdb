@@ -401,6 +401,24 @@ asgiref = ">=3.6"
 django = ">=4.2"
 
 [[package]]
+name = "django-template-partials"
+version = "25.3"
+description = "Reusable named inline-partials for the Django Template Language"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django_template_partials-25.3-py2.py3-none-any.whl", hash = "sha256:a19334934cf40e4e1218802a4ddfdf22b8f78cc5a0b8c75a18b97e6ea4f3c108"},
+    {file = "django_template_partials-25.3.tar.gz", hash = "sha256:6d11f7bb049ce3032e6fe3331137b771e34239ce1af18c55ef6a9b667cf2ef36"},
+]
+
+[package.dependencies]
+Django = "*"
+
+[package.extras]
+docs = ["Sphinx"]
+tests = ["coverage", "django_coverage_plugin"]
+
+[[package]]
 name = "djlint"
 version = "1.19.13"
 description = "HTML Template Linter and Formatter"
@@ -1539,4 +1557,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2fc96a69ff0af7801b15a21026fe4307360b5b5749651242ca56c25b88f26c5e"
+content-hash = "46ce3cba17e3a75033ca5aa14efa3d99cbfde991faaf4c857f25e9d12936607a"

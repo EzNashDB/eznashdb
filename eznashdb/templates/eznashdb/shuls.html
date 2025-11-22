@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load partials %}
 
 {% block extra_media_top %}
     <link rel="stylesheet" href="{% static 'eznashdb/css/shuls.css' %}">
@@ -49,7 +50,7 @@
 {% block extra_media_bottom %}
     {{ block.super }}
     <script defer>
-        (function () {
+        (() => {
             // Utilities for URL param management
             const updateURLParams = (params) => {
                 const url = new URL(window.location.href);
@@ -210,13 +211,79 @@
             // Map initialization when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
-                window.SHUL_MAP_API.replaceMapShuls();
-            });
-            document.addEventListener("htmx:afterSettle", () => {
-                window.SHUL_MAP_API.replaceMapShuls();
             });
         })();
     </script>
-    {% include "eznashdb/includes/shul_markers_js.html" %}
-    <script defer src="{% static 'eznashdb/js/map_spinner.js' %}"></script>
+    {% partialdef shul_markers_js inline=True %}
+    <script id="shul-markers-js" hx-swap-oob="true" defer>
+        (() => {
+            document.dispatchEvent(new Event("shulsDataLoaded"));
+            const updateShulsFoundCount = () => {
+                if (window.SHUL_MAP_API.shulsFoundControl) {
+                    window.SHUL_MAP_API.shulsFoundControl.remove();
+                }
+                const map = window.SHUL_MAP_API.map;
+                // ---- Shuls-found control (topright) ----
+                const shulsFoundControl = L.control({ position: "topright" });
+                shulsFoundControl.onAdd = function () {
+                    const container = L.DomUtil.create("div", "shuls-found-control");
+                    container.style.cursor = "initial";
+                    const shulCount = {{object_list.count}};
+                    const shulCountMsg = `${shulCount} ${shulCount === 1 ? "shul" : "shuls"} found`;
+                    container.innerHTML = `
+                        <div class="fw-normal fs-5 opacity-75">
+                            <span class="badge bg-dark">${shulCountMsg}</span>
+                        </div>`;
+                    L.DomEvent.disableClickPropagation(container);
+                    L.DomEvent.disableScrollPropagation(container);
+                    return container;
+                };
+                shulsFoundControl.addTo(map);
+                window.SHUL_MAP_API.shulsFoundControl = shulsFoundControl
+            }
+
+            const addShulMarkers = () => {
+                const mapApi = window.SHUL_MAP_API;
+                {% for shul in object_list %}
+                    mapApi.popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
+                    // Add the three wrap-around variants (original, -360, +360)
+                    (() => {
+                        const id = {{ shul.id }};
+                        const lat = parseFloat({{ shul.latitude }});
+                        const lon = parseFloat({{ shul.longitude }});
+                        // original
+                        mapApi.addMarker(id, lat, lon, String(id));
+                        // wrap-around west
+                        mapApi.addMarker(id, lat, lon - 360, "-" + String(id));
+                        // wrap-around east
+                        mapApi.addMarker(id, lat, lon + 360, "+" + String(id));
+                    })();
+                {% endfor %}
+            }
+
+            const replaceMapShuls = () => {
+                const mapApi = window.SHUL_MAP_API;
+                mapApi.clearMarkers()
+                updateShulsFoundCount();
+                addShulMarkers();
+                mapApi.openSelectedMarker();
+            }
+
+            window.SHUL_MAP_API = {
+                ...window.SHUL_MAP_API,
+                updateShulsFoundCount,
+                addShulMarkers,
+                replaceMapShuls,
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    window.SHUL_MAP_API.replaceMapShuls();
+                });
+            } else {
+                window.SHUL_MAP_API.replaceMapShuls();
+            }
+        })()
+    </script>
+{% endpartialdef shul_markers_js %}
+<script defer src="{% static 'eznashdb/js/map_spinner.js' %}"></script>
 {% endblock extra_media_bottom %}
