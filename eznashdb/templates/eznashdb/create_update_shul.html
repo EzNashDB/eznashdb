@@ -22,7 +22,7 @@
         x-init="
             window.addEventListener('beforeunload', e => {
                 // Trigger built-in browser warning if any fields are dirty.
-                if (dirtyFields.size > 0) {
+                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
                     e.preventDefault();
                     e.returnValue = '';
                 }
