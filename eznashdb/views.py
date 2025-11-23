@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DeleteView, UpdateView
 from django_filters.views import FilterView
+from django_htmx.http import HttpResponseClientRedirect
 
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulForm
@@ -52,6 +53,13 @@ class CreateUpdateShulView(UpdateView):
     def is_update(self):
         return self.get_object() is not None
 
+    def form_invalid(self, form):
+        return TemplateResponse(
+            self.request,
+            "eznashdb/create_update_shul.html#shul_form",
+            self.get_context_data(form=form),
+        )
+
     def form_valid(self, form):
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
@@ -62,12 +70,16 @@ class CreateUpdateShulView(UpdateView):
                 # Return modal partial
                 return TemplateResponse(
                     self.request,
-                    "eznashdb/includes/nearby_shuls_modal.html",
-                    {"nearby_shuls": nearby_shuls},
+                    "eznashdb/create_update_shul.html#shul_form",
+                    {
+                        "nearby_shuls": nearby_shuls,
+                        **self.get_context_data(form=form),
+                    },
                 )
         self.object = form.save()
         self.room_fs_valid(room_fs)
-
+        if self.request.htmx:
+            return HttpResponseClientRedirect(self.get_success_url())
         return HttpResponseRedirect(self.get_success_url())
 
     def check_nearby_shuls(self, form):

@@ -28,3 +28,4 @@ const initAddressInput = () => {
   createRoot(addressContainer).render(<AddressInput {...getProps()} />);
 };
 document.addEventListener("DOMContentLoaded", initAddressInput);
+document.addEventListener("htmx:afterSettle", initAddressInput);

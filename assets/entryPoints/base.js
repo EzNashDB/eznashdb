@@ -35,5 +35,6 @@ import Alpine from "alpinejs";
   ]);
   onDocumentEvent("formset-initialized", [initializeTomSelects]);
   onDOMChange([initializeTomSelects, initializeTooltips]);
+  onDocumentEvent("htmx:afterSettle", [initializeTomSelects]);
   window.addEventListener("resize", setBodyHeight);
 })();
