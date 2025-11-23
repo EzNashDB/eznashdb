@@ -2,8 +2,10 @@
 
 {% load static %}
 {% load crispy_forms_tags %}
+{% load partials %}
 
 {% block content %}
+    {% partialdef shul_form inline=True %}
     <form method="POST"
         enctype="multipart/form-data"
         novalidate
@@ -34,18 +36,17 @@
         }
     }"
     x-init="
-        window.addEventListener('beforeunload', e => {
+        window.onbeforeunload = (e) => {
             // Trigger built-in browser warning if any fields are dirty.
             if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
-                e.preventDefault();
-                e.returnValue = '';
+                return '';  // Return empty string to trigger warning
             }
-        })
+        }
     "
         {# djlint:on #}
         @input="markDirty($event)"
         @change="markDirty($event)"
-        @submit="handleSubmit($event)"
+        {% comment %} @submit="handleSubmit($event)" {% endcomment %}
         >
         {% csrf_token %}
         <div class="col h-100 d-flex flex-column">
@@ -103,54 +104,68 @@
             <div class="row justify-content-center">
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="mt-3">
-                        <button type="submit" class="btn btn-primary w-100">Save</button>
+                        <button type="submit"
+                                class="btn btn-primary w-100"
+                                hx-post='{{ request.path }}'
+                                hx-target='#shul_form'
+                                hx-swap='outerHTML'>Save</button>
                     </div>
                 </div>
             </div>
         </div>
+        {% if nearby_shuls %}
+            {% include "eznashdb/includes/nearby_shuls_modal.html" %}
+        {% endif %}
+        <script>
+            window.shulForm = {
+                errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
+            }
+        </script>
+        <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
     </form>
-    <div id="duplicate-shuls-modal-wrapper"></div>
+{% endpartialdef %}
 {% endblock content %}
 
 {% block extra_media_bottom %}
     {{ block.super }}
-    <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
     <script type="text/javascript">
-    const shulForm = {
-        errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
-    }
-    document.getElementById('duplicate-shuls-modal-wrapper').addEventListener('htmx:afterSwap', function(e) {
-        const modalEl = document.getElementById('duplicate-shuls-modal');
+    document.addEventListener("htmx:afterSettle", (e) =>{
+        const modalEl = document.getElementById('nearby-shuls-modal');
+        console.log(modalEl)
         if (modalEl) {
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
     });
-    $(function() {
-        $('.room-form').formset({
-            modelName: "room",
-            formCssClass: 'room-form',
-            formsParentCssClass: 'room-formset',
-            prefix: '{{ room_fs.prefix }}',
-            addCssClass:'btn btn-sm btn-secondary form-text mt-2',
-            addText: '<i class="fa fa-plus"></i> Add another room',
-            addContainerClass: 'add-room-container',
-            deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
-            deleteText: '<i class="fa fa-times"></i> Delete room',
-            deleteContainerClass: 'delete-room-container',
-            hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
-            prepareTemplate: (template) => {
-                const collapseEl = template.find('.accordion-collapse');
-                collapseEl.removeClass('show');
-            },
-            added: (row) => {
-                const accordion = document.getElementById('roomsAccordion');
-                const alpineData = Alpine.$data(accordion);
-                alpineData.openRoom = row.attr('id');
-                const collapseEl = row.find('.accordion-collapse')[0];
-                new bootstrap.Collapse(collapseEl, {show: true});
-            },
+    const initRoomFormSet = () => {
+        $(function() {
+            $('.room-form').formset({
+                modelName: "room",
+                formCssClass: 'room-form',
+                formsParentCssClass: 'room-formset',
+                prefix: '{{ room_fs.prefix }}',
+                addCssClass:'btn btn-sm btn-secondary form-text mt-2',
+                addText: '<i class="fa fa-plus"></i> Add another room',
+                addContainerClass: 'add-room-container',
+                deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
+                deleteText: '<i class="fa fa-times"></i> Delete room',
+                deleteContainerClass: 'delete-room-container',
+                hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
+                prepareTemplate: (template) => {
+                    const collapseEl = template.find('.accordion-collapse');
+                    collapseEl.removeClass('show');
+                },
+                added: (row) => {
+                    const accordion = document.getElementById('roomsAccordion');
+                    const alpineData = Alpine.$data(accordion);
+                    alpineData.openRoom = row.attr('id');
+                    const collapseEl = row.find('.accordion-collapse')[0];
+                    new bootstrap.Collapse(collapseEl, {show: true});
+                },
+            });
         });
-    });
+    }
+    document.addEventListener("DOMContentLoaded", initRoomFormSet);
+    document.addEventListener("htmx:afterSettle", initRoomFormSet);
     </script>
 {% endblock extra_media_bottom %}

@@ -1,4 +1,4 @@
-<div class="modal fade" id="duplicate-shuls-modal" tabindex="-1">
+<div class="modal fade" id="nearby-shuls-modal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -17,15 +17,16 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        data-bs-target="#duplicate-shuls-modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit"
-                        class="btn btn-primary"
-                        onclick="const form = document.getElementById('shul_form'); const alpineData = Alpine.$data(form); // clear dirtyFields to allow non-htmx submit alpineData.clearDirty(); form.submit();">
-                    Save Anyway
-                </button>
+                    class="btn btn-primary"
+                    {# djlint:off #}
+                        onclick="
+                        window.onbeforeunload = null;
+                        document.getElementById('shul_form').submit();
+                        "
+                    {# djlint:on #}
+                    >Save Anyway</button>
             </div>
         </div>
     </div>
