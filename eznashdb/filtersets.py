@@ -1,5 +1,4 @@
 from django.db.models import Prefetch, Q
-from django.utils.safestring import mark_safe
 from django_filters import FilterSet
 
 from eznashdb.constants import FieldsOptions
@@ -8,26 +7,17 @@ from eznashdb.filters import MultipleChoiceOrUnknownCharFilter, MultiSelectModel
 from eznashdb.models import Room, Shul
 
 
-def x_help_text(help_text):
-    """
-    Add wrapper div to help text so it can respond to alpine.js
-    """
-    return mark_safe(f"""<div x-show="showHelpText" x-cloak x-transition>{help_text}</div>""")
-
-
 class ShulFilterSet(FilterSet):
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.choices,
         label=FieldsOptions.RELATIVE_SIZE.label,
-        help_text=x_help_text(FieldsOptions.RELATIVE_SIZE.help_text),
         method="filter_rooms__relative_size",
     )
     rooms__see_hear_score = MultiSelectModelFieldFilter(
         model_field="rooms__see_hear_score",
         choices=SeeHearScore.choices,
         label=FieldsOptions.SEE_HEAR.label,
-        help_text=x_help_text(FieldsOptions.SEE_HEAR.help_text),
         method="filter_rooms__see_hear_score",
     )
 

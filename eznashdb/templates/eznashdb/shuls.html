@@ -8,7 +8,7 @@
 {% endblock extra_media_top %}
 
 {% block content %}
-    <div class="row h-100" x-data="{ showHelpText: false }">
+    <div class="row h-100">
         <div class="col h-100 d-flex flex-column">
             <div class="row mb-1">
                 <div class="col-6">
@@ -16,12 +16,7 @@
                 </div>
                 <div class="col-6 d-flex flex-column align-items-end">
                     <span class="text-nowrap">
-                        <button type="button"
-                                x-on:click="showHelpText = ! showHelpText"
-                                class="btn btn-info btn-sm">
-                            <i class="fa-solid fa-question"></i>
-                            <span x-text="showHelpText ? 'Hide' : 'Show'">Show</span> help text
-                        </button>
+                        <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary "><i class="fa fa-plus"></i> Add a Shul</a>
                     </span>
                 </div>
             </div>
