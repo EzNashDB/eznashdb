@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { AddressInput } from "../components/AddressInput";
 
-document.addEventListener("DOMContentLoaded", () => {
+const initAddressInput = () => {
   const addressInput = document.querySelector("input[name=address]");
   const addressParent = addressInput.parentElement;
   // Wrap input in container div to use as react root
@@ -26,4 +26,5 @@ document.addEventListener("DOMContentLoaded", () => {
     return values;
   };
   createRoot(addressContainer).render(<AddressInput {...getProps()} />);
-});
+};
+document.addEventListener("DOMContentLoaded", initAddressInput);

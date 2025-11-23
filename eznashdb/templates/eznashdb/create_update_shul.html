@@ -10,27 +10,42 @@
         id="shul_form"
         class="row h-100"
         {# djlint:off #}
-        x-data="{
-            dirtyFields: new Set(),
-            markDirty(e) {
-                if (e.target.name) this.dirtyFields.add(e.target.name);
-            },
-            clearDirty() {
-                this.dirtyFields.clear();
+    x-data="{
+        dirtyFields: new Set(),
+        markDirty(e) {
+            if (e.target.name) this.dirtyFields.add(e.target.name);
+        },
+        clearDirty() {
+            this.dirtyFields.clear();
+        },
+        locationChanged() {
+            return this.dirtyFields.has('latitude') || this.dirtyFields.has('longitude');
+        },
+        handleSubmit(e) {
+            const needsHtmx = this.locationChanged();
+            if (needsHtmx) {
+                e.preventDefault();
+                htmx.ajax('POST', '{{ request.path }}', {
+                    source: $el,
+                    target: '#duplicate-shuls-modal-wrapper',  // Changed to target the form itself
+                    swap: 'innerHTML'      // Replace the entire form
+                });
             }
-        }"
-        x-init="
-            window.addEventListener('beforeunload', e => {
-                // Trigger built-in browser warning if any fields are dirty.
-                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
-                    e.preventDefault();
-                    e.returnValue = '';
-                }
-            })
-        "
+        }
+    }"
+    x-init="
+        window.addEventListener('beforeunload', e => {
+            // Trigger built-in browser warning if any fields are dirty.
+            if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        })
+    "
         {# djlint:on #}
         @input="markDirty($event)"
-        @submit="clearDirty()"
+        @change="markDirty($event)"
+        @submit="handleSubmit($event)"
         >
         {% csrf_token %}
         <div class="col h-100 d-flex flex-column">
@@ -94,6 +109,7 @@
             </div>
         </div>
     </form>
+    <div id="duplicate-shuls-modal-wrapper"></div>
 {% endblock content %}
 
 {% block extra_media_bottom %}
@@ -103,6 +119,13 @@
     const shulForm = {
         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
     }
+    document.getElementById('duplicate-shuls-modal-wrapper').addEventListener('htmx:afterSwap', function(e) {
+        const modalEl = document.getElementById('duplicate-shuls-modal');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    });
     $(function() {
         $('.room-form').formset({
             modelName: "room",
