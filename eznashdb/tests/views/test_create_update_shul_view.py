@@ -117,3 +117,45 @@ def describe_update():
         assert test_shul.name in input_values
         assert room1.name in input_values
         assert room2.name in input_values
+
+
+def test_lists_duplicates_if_any_found(client):
+    # Create some nearby shuls
+    nearby_shul_1 = Shul.objects.create(
+        name="Nearby Shul 1",
+        address="456 Nearby St",
+        latitude=0.0005,  # Within 0.001 degrees
+        longitude=0.0005,
+    )
+    nearby_shul_2 = Shul.objects.create(
+        name="Nearby Shul 2",
+        address="789 Adjacent Ave",
+        latitude=-0.0008,  # Within 0.001 degrees
+        longitude=-0.0003,
+    )
+    # Create a far away shul that should not be listed
+    Shul.objects.create(
+        name="Far Away Shul",
+        address="999 Distant Dr",
+        latitude=1.0,
+        longitude=1.0,
+    )
+
+    response = client.post(
+        reverse("eznashdb:create_shul"),
+        data={
+            "name": "New Test Shul",
+            "latitude": "0.0",
+            "longitude": "0.0",
+            "address": "123 Test St",
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+        },
+        headers={"HX-Request": "true"},  # Simulate HTMX request
+    )
+
+    soup = BeautifulSoup(response.content, features="html.parser")
+
+    # Check that modal is shown
+    assert nearby_shul_1.name in str(soup)
+    assert nearby_shul_2.name in str(soup)

@@ -1,11 +1,13 @@
 import time
 import urllib
+from decimal import Decimal
 from json.decoder import JSONDecodeError
 
 import requests
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
+from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DeleteView, UpdateView
@@ -54,10 +56,37 @@ class CreateUpdateShulView(UpdateView):
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
+        if self.request.htmx:
+            nearby_shuls = self.check_nearby_shuls(form)
+            if nearby_shuls.exists():
+                # Return modal partial
+                return TemplateResponse(
+                    self.request,
+                    "eznashdb/includes/nearby_shuls_modal.html",
+                    {"nearby_shuls": nearby_shuls},
+                )
         self.object = form.save()
         self.room_fs_valid(room_fs)
 
         return HttpResponseRedirect(self.get_success_url())
+
+    def check_nearby_shuls(self, form):
+        lat = form.cleaned_data.get("latitude")
+        lon = form.cleaned_data.get("longitude")
+
+        if lat is None or lon is None:
+            return Shul.objects.none()
+
+        # Define the search box (±0.001 degrees)
+        lat_delta = Decimal("0.001")
+        lon_delta = Decimal("0.001")
+
+        return Shul.objects.filter(
+            latitude__gte=lat - lat_delta,
+            latitude__lte=lat + lat_delta,
+            longitude__gte=lon - lon_delta,
+            longitude__lte=lon + lon_delta,
+        ).exclude(pk=self.object.pk if self.object else None)
 
     def room_fs_valid(self, room_fs):
         rooms = room_fs.save(commit=False)

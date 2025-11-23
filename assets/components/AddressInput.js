@@ -23,6 +23,19 @@ export const AddressInput = ({
   const [currLocation, setCurrLocation] = useState(initialLocation);
   const isValid = initialIsValid;
 
+  // Dispatch change events when lat/lon change
+  useEffect(() => {
+    const latInput = document.getElementById("id_latitude");
+    const lonInput = document.getElementById("id_longitude");
+
+    if (latInput && currLocation.lat) {
+      latInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    if (lonInput && currLocation.lon) {
+      lonInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }, [currLocation.lat, currLocation.lon]);
+
   const resetLocation = () => {
     setCurrLocation(initialLocation);
     setInputValue({
