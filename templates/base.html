@@ -23,6 +23,12 @@
               rel="stylesheet">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {# open-graph #}
+        <meta property="og:title" content="The Ezrat Nashim Database">
+        <meta property="og:description"
+              content="Mapping women's spaces in synagogues around the world">
+        <meta property="og:image"
+              content="{{ request.get_host }}{% static 'img/og_preview.png' %}">
         {# twitter bootstrap #}
         <link rel="stylesheet"
               href="{% static 'vendor/bootstrap-5.3.0/bootstrap.min.css' %}"
