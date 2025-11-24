@@ -12,9 +12,6 @@
             markDirty(e) {
                 if (e.target.name) this.dirtyFields.add(e.target.name);
             },
-            locationChanged() {
-                return this.dirtyFields.has('latitude') || this.dirtyFields.has('longitude');
-            },
         }"
         x-init="
             window.onbeforeunload = (e) => {
