@@ -51,12 +51,12 @@ class FieldsOptions:
     RELATIVE_SIZE = FieldOptions(
         "Size <small>(vs Men's)</small>",
         "fa-solid fa-up-right-and-down-left-from-center",
-        "How large is the women's section?",
+        "How large is the women's section (vs men's)?",
     )
     SEE_HEAR = FieldOptions(
         "Visibility & Audibility <small>(vs Men's)</small>",
         "fa-solid fa-eye",
         """
-            How well can women see and hear what happens at the bima, aron, and pulpit?
+            How well can women see and hear from the women's section?
         """,
     )
