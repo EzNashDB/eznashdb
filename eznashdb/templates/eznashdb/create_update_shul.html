@@ -10,6 +10,7 @@
         x-data="{ isDirty: false }"
         x-init="
             window.onbeforeunload = (e) => {
+                if (window.htmxSubmitting) return;
                 // Trigger built-in browser warning if any fields are dirty.
                 if (isDirty || !!'{{form.errors|escapejs}}') {
                     return '';
@@ -85,6 +86,7 @@
                             <div class="mt-3">
                                 <button type="submit"
                                         class="btn btn-primary w-100"
+                                        hx-vals='{"submit_type": "main_submit"}'
                                         hx-post='{{ request.path }}'
                                         hx-target='#shul_form'
                                         hx-swap='outerHTML'>Save</button>
@@ -110,6 +112,10 @@
 {% block extra_media_bottom %}
     {{ block.super }}
     <script type="text/javascript">
+    window.htmxSubmitting = false;
+    document.body.addEventListener("htmx:beforeRequest", (e) => {
+        if (e.target?.type === 'submit') window.htmxSubmitting = true;
+    });
     document.addEventListener("htmx:afterSettle", (e) =>{
         const modalEl = document.getElementById('nearby-shuls-modal');
         if (modalEl) {
