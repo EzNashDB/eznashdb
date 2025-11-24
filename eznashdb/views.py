@@ -64,23 +64,16 @@ class CreateUpdateShulView(UpdateView):
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
-        if self.request.htmx:
+        submit_type = self.request.POST.get("submit_type")
+        if submit_type == "main_submit":
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
-                # Return modal partial
-                return TemplateResponse(
-                    self.request,
-                    "eznashdb/create_update_shul.html#shul_form",
-                    {
-                        "nearby_shuls": nearby_shuls,
-                        **self.get_context_data(form=form),
-                    },
-                )
+                partial_template = "eznashdb/create_update_shul.html#shul_form"
+                context = {"nearby_shuls": nearby_shuls, **self.get_context_data(form=form)}
+                return TemplateResponse(self.request, partial_template, context)
         self.object = form.save()
         self.room_fs_valid(room_fs)
-        if self.request.htmx:
-            return HttpResponseClientRedirect(self.get_success_url())
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseClientRedirect(self.get_success_url())
 
     def check_nearby_shuls(self, form):
         lat = form.cleaned_data.get("latitude")
