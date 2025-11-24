@@ -5,93 +5,85 @@
 {% load partials %}
 
 {% block content %}
-    {% partialdef shul_form inline=True %}
-    <form method="POST"
-        enctype="multipart/form-data"
-        novalidate
-        id="shul_form"
-        class="row h-100"
+    <div class="row h-100" id="shul-form-state-holder"
         {# djlint:off #}
-    x-data="{
-        dirtyFields: new Set(),
-        markDirty(e) {
-            if (e.target.name) this.dirtyFields.add(e.target.name);
-        },
-        clearDirty() {
-            this.dirtyFields.clear();
-        },
-        locationChanged() {
-            return this.dirtyFields.has('latitude') || this.dirtyFields.has('longitude');
-        },
-        handleSubmit(e) {
-            const needsHtmx = this.locationChanged();
-            if (needsHtmx) {
-                e.preventDefault();
-                htmx.ajax('POST', '{{ request.path }}', {
-                    source: $el,
-                    target: '#duplicate-shuls-modal-wrapper',  // Changed to target the form itself
-                    swap: 'innerHTML'      // Replace the entire form
-                });
+        x-data="{
+            dirtyFields: new Set(),
+            markDirty(e) {
+                if (e.target.name) this.dirtyFields.add(e.target.name);
+            },
+            clearDirty() {
+                this.dirtyFields.clear();
+            },
+            locationChanged() {
+                return this.dirtyFields.has('latitude') || this.dirtyFields.has('longitude');
+            },
+        }"
+        x-init="
+            window.onbeforeunload = (e) => {
+                // Trigger built-in browser warning if any fields are dirty.
+                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
+                    return '';  // Return empty string to trigger warning
+                }
             }
-        }
-    }"
-    x-init="
-        window.onbeforeunload = (e) => {
-            // Trigger built-in browser warning if any fields are dirty.
-            if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
-                return '';  // Return empty string to trigger warning
-            }
-        }
-    "
+        "
         {# djlint:on #}
-        @input="markDirty($event)"
-        @change="markDirty($event)"
-        {% comment %} @submit="handleSubmit($event)" {% endcomment %}
         >
-        {% csrf_token %}
-        <div class="col h-100 d-flex flex-column">
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="d-flex justify-content-between align-items-center">
-                        <div>
-                            {% if object %}
-                                Edit Shul: {{ object.name }}
-                            {% else %}
-                                Add a Shul
-                            {% endif %}
-                        </div>
-                    </h3>
-                </div>
-            </div>
-            <div class="row flex-grow-1 overflow-auto">
-                <div class="col-12 h-100">
+        <div class="col h-100">
+            {% partialdef shul_form inline=True %}
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  novalidate
+                  id="shul_form"
+                  class="row h-100"
+                  @input="markDirty($event)"
+                  @change="markDirty($event)">
+                {% csrf_token %}
+                <div class="col h-100 d-flex flex-column">
                     <div class="row">
                         <div class="col-12">
-                            <div class="row">
-                                <div class="col-12 col-md-5 col-lg-4">
-                                    <div class="mt-3">{% crispy form %}</div>
+                            <h3 class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if object %}
+                                        Edit Shul: {{ object.name }}
+                                    {% else %}
+                                        Add a Shul
+                                    {% endif %}
                                 </div>
-                                <div class="col">
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="row flex-grow-1 overflow-auto">
+                        <div class="col-12 h-100">
+                            <div class="row">
+                                <div class="col-12">
                                     <div class="row">
-                                        <h5 class="col-12 pt-3 mb-2">Rooms</h5>
-                                    </div>
-                                    <div class="row mb-3">
-                                        {{ room_fs.management_form }}
-                                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                        <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
-                                            {% if not shul.rooms.exists %}
-                                                'rooms-0-form'
-                                            {% else %}
-                                                null
-                                            {% endif %}
-                                            }">
-                                            {% for form in room_fs %}
-                                                {% crispy form %}
-                                            {% endfor %}
+                                        <div class="col-12 col-md-5 col-lg-4">
+                                            <div class="mt-3">{% crispy form %}</div>
                                         </div>
-                                        <div class="col-12">
-                                            <div class="row justify-content-end">
-                                                <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                        <div class="col">
+                                            <div class="row">
+                                                <h5 class="col-12 pt-3 mb-2">Rooms</h5>
+                                            </div>
+                                            <div class="row mb-3">
+                                                {{ room_fs.management_form }}
+                                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
+                                                    {% if not shul.rooms.exists %}
+                                                        'rooms-0-form'
+                                                    {% else %}
+                                                        null
+                                                    {% endif %}
+                                                    }">
+                                                    {% for form in room_fs %}
+                                                        {% crispy form %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -99,31 +91,31 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="mt-3">
-                        <button type="submit"
-                                class="btn btn-primary w-100"
-                                hx-post='{{ request.path }}'
-                                hx-target='#shul_form'
-                                hx-swap='outerHTML'>Save</button>
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="mt-3">
+                                <button type="submit"
+                                        class="btn btn-primary w-100"
+                                        hx-post='{{ request.path }}'
+                                        hx-target='#shul_form'
+                                        hx-swap='outerHTML'>Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        {% if nearby_shuls %}
-            {% include "eznashdb/includes/nearby_shuls_modal.html" %}
-        {% endif %}
-        <script>
-            window.shulForm = {
-                errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
-            }
-        </script>
-        <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
-    </form>
-{% endpartialdef %}
+                {% if nearby_shuls %}
+                    {% include "eznashdb/includes/nearby_shuls_modal.html" %}
+                {% endif %}
+                <script>
+                    window.shulForm = {
+                        errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
+                    }
+                </script>
+                <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
+            </form>
+        {% endpartialdef %}
+    </div>
+</div>
 {% endblock content %}
 
 {% block extra_media_bottom %}
@@ -131,7 +123,6 @@
     <script type="text/javascript">
     document.addEventListener("htmx:afterSettle", (e) =>{
         const modalEl = document.getElementById('nearby-shuls-modal');
-        console.log(modalEl)
         if (modalEl) {
             const modal = new bootstrap.Modal(modalEl);
             modal.show();

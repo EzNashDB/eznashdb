@@ -22,9 +22,16 @@ export const AddressInput = ({
   }).current;
   const [currLocation, setCurrLocation] = useState(initialLocation);
   const isValid = initialIsValid;
+  const isFirstRender = useRef(true);
 
   // Dispatch change events when lat/lon change
   useEffect(() => {
+    // Skip the first render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const latInput = document.getElementById("id_latitude");
     const lonInput = document.getElementById("id_longitude");
 
