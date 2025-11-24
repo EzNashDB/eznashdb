@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <div class="row h-100">
+        <div class="col h-100 d-flex flex-column">
+            <div class="row mb-3">
+                <div class="col-12 text-center">
+                    <h1 class="mb-3">Contact Us</h1>
+                    <div class="text-center ">
+                        <p class="text-muted mb-2">
+                            Email us at <a href="mailto:ezratnashimdb@gmail.com">ezratnashimdb@gmail.com</a>
+                        </p>
+                        <a href="https://www.facebook.com/profile.php?id=61583770480933"
+                           target="_blank"
+                           class="btn btn-sm btn-primary">
+                            <i class="fa-brands fa-facebook-f"></i> Follow us on Facebook
+                        </a>
+                    </div>
+                </p>
+            </div>
+        </div>
+        <div class="row justify-content-center flex-grow-1">
+            <div class="col-lg-8 pb-3 h-100">
+                <div class="ratio h-100 rounded shadow">
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc8oApWnbuXsosStSSvkfmavSvtZh2PU7Y5NCYsSs_l0lTmUw/viewform?embedded=true&amp;hl=en"
+                            title="Contact Form"
+                            loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

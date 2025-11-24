@@ -10,5 +10,6 @@ def navbar(request):
         "navbar_items": [
             NavbarItem("Search Shuls", "eznashdb:shuls"),
             NavbarItem("Add a Shul", "eznashdb:create_shul"),
+            NavbarItem("Contact Us", "eznashdb:contact_us"),
         ],
     }
