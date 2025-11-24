@@ -96,12 +96,14 @@ def describe_create():
                 "latitude": "1",
                 "longitude": "1",
                 "address": "some address",
+                "submit_type": "main_submit",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
-            follow=True,
         )
-        assert response.resolver_match.view_name == "eznashdb:shuls"
+        redirect_url = response.headers.get("HX-Redirect")
+        final_dest = client.get(redirect_url)
+        assert final_dest.resolver_match.view_name == "eznashdb:shuls"
 
 
 def describe_update():
@@ -148,6 +150,7 @@ def test_lists_duplicates_if_any_found(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
+            "submit_type": "main_submit",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
