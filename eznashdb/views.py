@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DeleteView, UpdateView
+from django.views.generic import DeleteView, TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -191,3 +191,7 @@ class AddressLookupView(View):
             for israel, palestine in israel_palestine_pairs:
                 result["display_name"] = result.get("display_name", "").replace(palestine, israel)
         return results
+
+
+class ContactUsView(TemplateView):
+    template_name = "eznashdb/contact_us.html"
