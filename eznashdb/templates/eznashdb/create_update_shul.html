@@ -7,17 +7,12 @@
 {% block content %}
     <div class="row h-100" id="shul-form-state-holder"
         {# djlint:off #}
-        x-data="{
-            dirtyFields: new Set(),
-            markDirty(e) {
-                if (e.target.name) this.dirtyFields.add(e.target.name);
-            },
-        }"
+        x-data="{ isDirty: false }"
         x-init="
             window.onbeforeunload = (e) => {
                 // Trigger built-in browser warning if any fields are dirty.
-                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
-                    return '';  // Return empty string to trigger warning
+                if (isDirty || !!'{{form.errors|escapejs}}') {
+                    return '';
                 }
             }
         "
@@ -30,8 +25,8 @@
                   novalidate
                   id="shul_form"
                   class="row h-100"
-                  @input="markDirty($event)"
-                  @change="markDirty($event)">
+                  @input="isDirty = true"
+                  @change="isDirty = true">
                 {% csrf_token %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row">
