@@ -54,7 +54,7 @@ class FieldsOptions:
         "How large is the women's section (vs men's)?",
     )
     SEE_HEAR = FieldOptions(
-        "Visibility & Audibility <small>(vs Men's)</small>",
+        "Visibility & Audibility",
         "fa-solid fa-eye",
         """
             How well can women see and hear from the women's section?
