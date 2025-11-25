@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card h-100">
     <div class="card-header fw-bold p-1 d-flex align-items-center">
         <a class="btn btn-sm text-primary link-primary"
            href="/shuls/{{ shul.id }}/update">
@@ -9,7 +9,7 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
-    <div class="card-body p-2 overflow-auto" style="max-height:200px">
+    <div class="card-body p-2 overflow-auto" style="height:200px">
         <div class="row w-100 m-auto gx-0 mt-1">
             <div class="col">
                 {% if shul.rooms.exists %}
