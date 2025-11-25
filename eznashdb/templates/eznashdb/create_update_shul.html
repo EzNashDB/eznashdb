@@ -51,45 +51,50 @@
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <div class="mt-3">{% crispy form %}</div>
                                         </div>
-                                        <div class="col">
-                                            <div class="row">
-                                                <h5 class="col-12 pt-3 mb-2">Rooms</h5>
-                                            </div>
-                                            <div class="row mb-3">
-                                                {{ room_fs.management_form }}
-                                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                                <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
-                                                    {% if not shul.rooms.exists %}
-                                                        'rooms-0-form'
-                                                    {% else %}
-                                                        null
-                                                    {% endif %}
-                                                    }">
-                                                    {% for form in room_fs %}
-                                                        {% crispy form %}
-                                                    {% endfor %}
+                                        {% if form.instance.pk %}
+                                            <div class="col">
+                                                <div class="row">
+                                                    <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
                                                 </div>
-                                                <div class="col-12">
-                                                    <div class="row justify-content-end">
-                                                        <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                <div class="row mb-3">
+                                                    {{ room_fs.management_form }}
+                                                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                    <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
+                                                        {% if not shul.rooms.exists %}
+                                                            'rooms-0-form'
+                                                        {% else %}
+                                                            null
+                                                        {% endif %}
+                                                        }">
+                                                        {% for form in room_fs %}
+                                                            {% crispy form %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="row justify-content-end">
+                                                            <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-12 col-md-6 col-lg-4">
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-4 mx-auto">
                             <div class="mt-3">
                                 <button type="submit"
                                         class="btn btn-primary w-100"
                                         hx-vals='{"submit_type": "main_submit"}'
                                         hx-post='{{ request.path }}'
                                         hx-target='#shul_form'
-                                        hx-swap='outerHTML'>Save</button>
+                                        hx-swap='outerHTML'>
+                                    Save
+                                    {% if not form.instance.pk %}and Add Rooms <i class=" ms-2 fa-solid fa-arrow-right"></i>{% endif %}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -123,6 +128,7 @@
             modal.show();
         }
     });
+    {% if form.instance.pk %}
     const initRoomFormSet = () => {
         $(function() {
             $('.room-form').formset({
@@ -153,5 +159,31 @@
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') === 'create_new_shul') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') !== 'create_new_shul') return;
+
+            const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
+            const header = document.getElementById('rooms-form-header');
+
+            if (!roomCollapseEl || !header) return;
+            const scrollToHeader = () => {
+                header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            if (!roomCollapseEl.classList.contains('show')) {
+                roomCollapseEl.addEventListener('shown.bs.collapse', scrollToHeader, { once: true });
+                roomCollapse.show();
+            } else {
+                // Already open - wait for layout to stabilize before scrolling
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(scrollToHeader);
+                });
+            }
+        }
+    })
+    {% endif %}
     </script>
 {% endblock extra_media_bottom %}

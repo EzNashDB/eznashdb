@@ -58,27 +58,24 @@ def GET_request_update(rf_GET):
 
 
 def describe_create():
-    def test_shows_page_title(GET_request_create):
+    def shows_page_title(GET_request_create):
         response = CreateUpdateShulView.as_view()(GET_request_create)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "add a shul" in soup.get_text().lower()
 
-    def test_shows_form(GET_request_create):
+    def shows_form(GET_request_create):
         response = CreateUpdateShulView.as_view()(GET_request_create)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert soup.find("form")
 
-    def test_creates_shul_with_rooms(client):
+    def creates_shul(client):
         data = {
             "name": "test shul",
             "address": "123 Sesame Street",
             "latitude": "1",
             "longitude": "1",
-            **get_room_fields(room_index=0),
-            **get_room_fields(room_index=1),
-            **get_room_fs_metadata_fields(total_forms=2),
         }
 
         client.post(
@@ -86,9 +83,8 @@ def describe_create():
             data=data,
         )
         assert Shul.objects.count() == 1
-        assert Shul.objects.first().rooms.count() == 2
 
-    def test_redirects_to_shuls_list_view(client):
+    def redirects_to_update_view(client):
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -103,7 +99,7 @@ def describe_create():
         )
         redirect_url = response.headers.get("HX-Redirect")
         final_dest = client.get(redirect_url)
-        assert final_dest.resolver_match.view_name == "eznashdb:shuls"
+        assert final_dest.resolver_match.view_name == "eznashdb:update_shul"
 
 
 def describe_update():
@@ -119,6 +115,41 @@ def describe_update():
         assert test_shul.name in input_values
         assert room1.name in input_values
         assert room2.name in input_values
+
+    def adds_rooms_to_shul(client, test_shul):
+        data = {
+            "name": test_shul.name,
+            "address": test_shul.address,
+            "latitude": test_shul.latitude,
+            "longitude": test_shul.longitude,
+            **get_room_fields(room_index=0),
+            **get_room_fields(room_index=1),
+            **get_room_fs_metadata_fields(total_forms=2),
+        }
+
+        client.post(
+            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
+            data=data,
+        )
+
+        test_shul.refresh_from_db()
+        assert test_shul.rooms.count() == 2
+
+    def redirects_to_shuls_view(client, test_shul):
+        response = client.post(
+            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
+            data={
+                "name": test_shul.name,
+                "address": test_shul.address,
+                "latitude": test_shul.latitude,
+                "longitude": test_shul.longitude,
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+        )
+        redirect_url = response.headers.get("HX-Redirect")
+        final_dest = client.get(redirect_url)
+        assert final_dest.resolver_match.view_name == "eznashdb:shuls"
 
 
 def test_lists_duplicates_if_any_found(client):
