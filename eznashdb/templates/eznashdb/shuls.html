@@ -39,6 +39,12 @@
                 </div>
             </div>
         </div>
+        <div class="offcanvas offcanvas-bottom p-0 rounded-top"
+             tabindex="-1"
+             id="shulOffcanvas"
+             aria-labelledby="shulOffcanvasLabel">
+            <div class="offcanvas-body p-0"></div>
+        </div>
     </div>
 {% endblock %}
 
@@ -66,6 +72,10 @@
                 zoom: map.getZoom(),
                 });
             };
+
+            const isSmallScreen = () => {
+                return window.innerWidth < 768 || window.innerHeight < 600;
+            }
 
             const initMap = () => {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -98,16 +108,11 @@
                             // Keep URL in sync with map movements and popup state
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
-                map.on("popupopen", (e) => {
-                    // store the shul id of the open popup in the URL
-                    if (e.popup && e.popup.options && e.popup.options.shulId !== undefined) {
-                        updateURLParams({ selectedPin: e.popup.options.shulId });
-                    }
-                });
-
                 map.on("popupclose", () => {
-                    deleteURLParams(["selectedPin"]);
-                });
+                    // Only remove selectedPin param on large screens where popup was actually used
+                    if (!isSmallScreen()) {
+                        deleteURLParams(["selectedPin"]);
+}                });
 
                 const markersLayer = L.markerClusterGroup({
                     showCoverageOnHover: false,
@@ -126,37 +131,47 @@
                 })
 
                 const addMarker = (shulId, lat, lon, popupId) => {
-                    // Add a shul marker to the map, using pre-generated html from popupHtmlMap
-                    const popupHtml = popupHtmlMap[String(shulId)];
-                    if (!popupHtml) {
-                    console.warn("No popup HTML for shulId", shulId);
-                    }
+                    const popupHtml = popupHtmlMap[String(shulId)] || "";
                     const marker = L.marker([lat, lon], { icon: markerIcon });
 
-                    // Bind popup with metadata in options for easy lookup later
-                    marker.bindPopup(popupHtml || "", {
+                    // Bind popup once during marker creation (for large screens)
+                    marker.bindPopup(popupHtml, {
                         className: "shul-popup",
                         closeButton: false,
                         shulId: shulId,
                         popupId: popupId,
                     });
-
-                    // When popup opens, wire the close button (popup DOM is recreated each open)
-                    marker.on("popupopen", (e) => {
-                        const popupEl = e.popup.getElement();
-                        if (!popupEl) return;
-                        const closeBtn = popupEl.querySelector(".shul-popup-close");
-                        if (closeBtn) {
-                            // Use e.popup._source which is the marker that opened this popup
-                            closeBtn.addEventListener("click", (ev) => {
-                            ev.preventDefault();
-                            if (e.popup && e.popup._source) e.popup._source.closePopup();
-                            });
+                    // Remove Leaflet's default onclick handler
+                    marker.off('click')
+                    marker.on("click", (e) => {
+                        if (isSmallScreen()) {
+                            // Small screen → use Bootstrap offcanvas
+                            const offcanvasEl = document.getElementById("shulOffcanvas");
+                            offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
+                            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                            bsOffcanvas.show();
+                        } else {
+                            // Large screen → open the already-bound popup
+                            marker.openPopup();
+                            // Set up close button listener after popup opens
+                            setTimeout(() => {
+                                const popupEl = marker.getPopup().getElement();
+                                if (popupEl) {
+                                    const closeBtn = popupEl.querySelector(".shul-popup-close");
+                                    if (closeBtn) {
+                                        closeBtn.addEventListener("click", (ev) => {
+                                            ev.preventDefault();
+                                            marker.closePopup();
+                                        });
+                                    }
+                                }
+                            }, 0);
                         }
+                        updateURLParams({ selectedPin: shulId });
                     });
+
                     markersLayer.addLayer(marker);
                     markersByPopupId[String(popupId)] = marker;
-                    // If this marker corresponds to the requested selectedPin, return it for opening after the layer is added to map
                     return marker;
                 }
 
@@ -181,10 +196,10 @@
                         if (target) {
                             // if markersLayer is a MarkerClusterGroup, prefer zoomToShowLayer
                             if (typeof api.markersLayer.zoomToShowLayer === "function") {
-                                api.markersLayer.zoomToShowLayer(target, () => target.openPopup());
+                                api.markersLayer.zoomToShowLayer(target, () => target.fire('click'));
                             } else {
                                 // ensure marker is on the map and then open
-                                setTimeout(() => target.openPopup(), 0);
+                                setTimeout(() => target.fire('click'), 0);
                             }
                         }
                     }
@@ -203,9 +218,25 @@
                 }
             }
 
+            const setupOffCanvasListeners = () => {
+                const offcanvasEl = document.getElementById("shulOffcanvas");
+                const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
+                    deleteURLParams(["selectedPin"]);
+                }, { once: true });
+                const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", (ev) => {
+                        ev.preventDefault();
+                        bsOffcanvas.hide();
+                    });
+                }
+            }
+
             // Map initialization when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
+                setupOffCanvasListeners();
             });
         })();
     </script>
