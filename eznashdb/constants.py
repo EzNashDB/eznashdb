@@ -49,7 +49,7 @@ class FieldsOptions:
         "Main Sanctuary, Beit Midrash, etc.",
     )
     RELATIVE_SIZE = FieldOptions(
-        "Size <small>(vs Men's)</small>",
+        "Size of Women's Section",
         "fa-solid fa-up-right-and-down-left-from-center",
         "How large is the women's section (vs men's)?",
     )
