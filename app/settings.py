@@ -17,6 +17,7 @@ from pathlib import Path
 
 import dj_database_url
 import sentry_sdk
+from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
 dotenv_path = join(dirname(__file__), "../.env")
@@ -156,6 +157,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "app.wsgi.application"
 
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "secondary",
+    messages.INFO: "info",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
