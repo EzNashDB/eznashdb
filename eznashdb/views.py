@@ -35,13 +35,16 @@ class CreateUpdateShulView(UpdateView):
     template_name = "eznashdb/create_update_shul.html"
 
     def get_success_url(self) -> str:
-        url = reverse_lazy("eznashdb:shuls")
-        lat = self.object.latitude
-        lon = self.object.longitude
-        url += f"?lat={lat}&lon={lon}&selectedPin={self.object.pk}"
-        if lat and lon:
-            url += "&zoom=17"
-        return url
+        if self.is_update:
+            url = reverse_lazy("eznashdb:shuls")
+            lat = self.object.latitude
+            lon = self.object.longitude
+            url += f"?lat={lat}&lon={lon}&selectedPin={self.object.pk}"
+            if lat and lon:
+                url += "&zoom=17"
+            return url
+        else:
+            return reverse_lazy("eznashdb:update_shul", kwargs={"pk": self.object.pk})
 
     def get_object(self, queryset=None):
         try:
@@ -61,9 +64,10 @@ class CreateUpdateShulView(UpdateView):
         )
 
     def form_valid(self, form):
-        room_fs = self.get_room_fs()
-        if not room_fs.is_valid():
-            return self.render_to_response(self.get_context_data(form=form))
+        if self.is_update:
+            room_fs = self.get_room_fs()
+            if not room_fs.is_valid():
+                return self.render_to_response(self.get_context_data(form=form))
         submit_type = self.request.POST.get("submit_type")
         if submit_type == "main_submit":
             nearby_shuls = self.check_nearby_shuls(form)
@@ -72,8 +76,12 @@ class CreateUpdateShulView(UpdateView):
                 context = {"nearby_shuls": nearby_shuls, **self.get_context_data(form=form)}
                 return TemplateResponse(self.request, partial_template, context)
         self.object = form.save()
-        self.room_fs_valid(room_fs)
-        return HttpResponseClientRedirect(self.get_success_url())
+        if self.is_update:
+            self.room_fs_valid(room_fs)
+        success_url = self.get_success_url()
+        if not self.is_update:
+            success_url += "?from=create_new_shul"
+        return HttpResponseClientRedirect(success_url)
 
     def check_nearby_shuls(self, form):
         lat = form.cleaned_data.get("latitude")

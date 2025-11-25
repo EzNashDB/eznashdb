@@ -33,6 +33,7 @@ def test_shul(test_user):
         created_by=test_user,
         updated_by=[test_user.id],
         name="Test shul",
+        address="123, Sesame Street",
         latitude=123.456,
         longitude=123.456,
     )
