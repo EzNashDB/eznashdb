@@ -5,6 +5,7 @@ from json.decoder import JSONDecodeError
 
 import requests
 from django.conf import settings
+from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
@@ -81,6 +82,13 @@ class CreateUpdateShulView(UpdateView):
         success_url = self.get_success_url()
         if not self.is_update:
             success_url += "?from=create_new_shul"
+        else:
+            if self.request.POST.get("from") == "create_new_shul":
+                messages.success(self.request, "Success! Your shul has been added to the map.")
+                success_url += f"&newShul={self.object.pk}"
+            else:
+                messages.success(self.request, "Success! Your shul has been updated.")
+                success_url += f"&updatedShul={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 
     def check_nearby_shuls(self, form):

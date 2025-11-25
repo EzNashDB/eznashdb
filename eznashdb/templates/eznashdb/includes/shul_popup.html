@@ -4,7 +4,14 @@
            href="/shuls/{{ shul.id }}/update">
             <i class="fa-solid fa-pen-to-square"></i>
         </a>
-        <span class="flex-grow-1">{{ shul.name }}</span>
+        <span class="flex-grow-1">{{ shul.name }}
+            {% if request.GET.newShul == shul.pk|stringformat:"s" %}
+                <span class="badge bg-success">Just Added</span>
+            {% endif %}
+            {% if request.GET.updatedShul == shul.pk|stringformat:"s" %}
+                <span class="badge bg-success">Just Updated</span>
+            {% endif %}
+        </span>
         <button type="button" class="btn-close shul-popup-close " aria-label="Close"></button>
     </div>
     <div class="card-body p-2 overflow-auto" style="height:200px">

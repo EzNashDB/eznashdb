@@ -88,11 +88,16 @@
                             <div class="row ">
                                 <div class="col-12 col-md-6 order-md-1 mt-3">
                                     <button type="submit"
-                                            class="btn btn-primary w-100"
-                                            hx-vals='{"submit_type": "main_submit"}'
-                                            hx-post='{{ request.path }}'
-                                            hx-target='#shul_form'
-                                            hx-swap='outerHTML'>
+                                        class="btn btn-primary w-100"
+                                        {# djlint:off #}
+                                            hx-vals='{
+                                                "submit_type": "main_submit",
+                                                "from": "{{ request.GET.from|default:"" }}"
+                                            }'
+                                        {# djlint:on #}
+                                        hx-post='{{ request.path }}'
+                                        hx-target='#shul_form'
+                                        hx-swap='outerHTML'>
                                         Save
                                         {% if not form.instance.pk %}
                                             and Add Rooms
