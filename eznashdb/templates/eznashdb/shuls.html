@@ -148,8 +148,21 @@
                             // Small screen → use Bootstrap offcanvas
                             const offcanvasEl = document.getElementById("shulOffcanvas");
                             offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
+
                             const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                            // Remove URL param when offcanvas is hidden
+                            offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
+                                deleteURLParams(["selectedPin"]);
+                            }, { once: true });
                             bsOffcanvas.show();
+
+                            const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
+                            if (closeBtn) {
+                                closeBtn.addEventListener("click", (ev) => {
+                                    ev.preventDefault();
+                                    bsOffcanvas.hide();
+                                });
+                            }
                         } else {
                             // Large screen → open the already-bound popup
                             marker.openPopup();
@@ -218,25 +231,9 @@
                 }
             }
 
-            const setupOffCanvasListeners = () => {
-                const offcanvasEl = document.getElementById("shulOffcanvas");
-                const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
-                offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                    deleteURLParams(["selectedPin"]);
-                }, { once: true });
-                const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
-                if (closeBtn) {
-                    closeBtn.addEventListener("click", (ev) => {
-                        ev.preventDefault();
-                        bsOffcanvas.hide();
-                    });
-                }
-            }
-
             // Map initialization when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
-                setupOffCanvasListeners();
             });
         })();
     </script>
