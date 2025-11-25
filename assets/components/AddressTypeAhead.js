@@ -89,7 +89,7 @@ export const AddressTypeAhead = ({
       useCache={false}
       options={options}
       onInputChange={handleInputChange}
-      placeholder="Search by name or address..."
+      placeholder="e.g., Young Israel, Teaneck"
       promptText={isSearchError ? genericSearchError : "Type to search..."}
       inputProps={{
         name: "address",
