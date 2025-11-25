@@ -27,6 +27,10 @@ body {
   pointer-events: none;
 }
 
+.max-h-fit {
+  max-height: fit-content;
+}
+
 .striped> :nth-child(even of :not([style*="display: none;"])) {
   /* Based on bootstrap table-striped styling */
   --bs-table-color-type: var(--bs-table-color);
