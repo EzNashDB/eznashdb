@@ -8,9 +8,9 @@ def get_size_option_display(letter, explanation):
 
 
 class RelativeSize(models.TextChoices):
-    L = "L", _(get_size_option_display("L", "Same size or larger"))
-    M = "M", _(get_size_option_display("M", "Smaller, but at least half"))
-    S = "S", _(get_size_option_display("S", "Less than half"))
+    L = "L", _(get_size_option_display("L", "Equal or larger than men's"))
+    M = "M", _(get_size_option_display("M", "At least half men's size"))
+    S = "S", _(get_size_option_display("S", "Less than half men's size"))
     X = "X", _(get_size_option_display("X", "No women's section"))
     MIXED = "&", _(get_size_option_display("&", "Mixed seating"))
 
