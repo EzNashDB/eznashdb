@@ -4,19 +4,9 @@ from django.contrib import admin
 from .models import Shul  # explicitly import Shul for customization
 
 
-# Custom admin for Shul
+# Custom admin for Shul — only affects list page
 class ShulAdmin(admin.ModelAdmin):
     list_display = ("name", "address", "created_at", "updated_at")
-    readonly_fields = ("created_at", "updated_at")
-    fieldsets = (
-        (None, {"fields": ("name", "address")}),
-        (
-            "Timestamps",
-            {
-                "fields": ("created_at", "updated_at"),
-            },
-        ),
-    )
 
 
 # Register Shul with custom admin
