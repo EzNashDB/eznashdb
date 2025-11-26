@@ -4,6 +4,16 @@
 {% load crispy_forms_tags %}
 {% load partials %}
 
+{% block title %}
+    The Ezrat Nashim Database -
+    {% if not form.instance.pk %}
+        Add
+    {% else %}
+        Update
+    {% endif %}
+    Shul
+{% endblock %}
+
 {% block content %}
     <div class="row h-100"
         {# djlint:off #}
