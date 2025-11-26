@@ -2,12 +2,14 @@ import time
 import urllib
 from decimal import Decimal
 from json.decoder import JSONDecodeError
+from urllib.parse import quote_plus
 
 import requests
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
@@ -207,6 +209,18 @@ class AddressLookupView(View):
             for israel, palestine in israel_palestine_pairs:
                 result["display_name"] = result.get("display_name", "").replace(palestine, israel)
         return results
+
+
+class GoogleMapsProxyView(View):
+    def get(self, request, *args, **kwargs):
+        shul_id = request.GET.get("id")
+        if not shul_id:
+            return HttpResponseBadRequest("Missing 'id' parameter.")
+
+        shul = get_object_or_404(Shul, pk=shul_id)
+        query = quote_plus(shul.name)
+        maps_url = f"https://www.google.com/maps/search/{query}/@{shul.latitude},{shul.longitude},15z"
+        return redirect(maps_url)
 
 
 class ContactUsView(TemplateView):
