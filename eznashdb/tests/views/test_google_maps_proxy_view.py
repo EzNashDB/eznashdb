@@ -1,65 +1,55 @@
-import urllib
-from decimal import Decimal
+import urllib.parse
 
 import pytest
 from django.urls import reverse
 
-from eznashdb.models import Shul
+
+@pytest.mark.django_db
+def test_google_maps_redirect_uses_address_field_with_full_street_address(client, test_shul):
+    test_shul.address = "Synagogue Ohel Abraham, Rue de Montévidéo, Paris 75116"
+    test_shul.save()
+
+    url = reverse("eznashdb:google_maps_proxy")
+    response = client.get(url, data={"id": test_shul.id})
+
+    assert response.status_code == 302
+    assert response.url.startswith("https://www.google.com/maps")
+    assert urllib.parse.quote_plus(test_shul.address) in response.url
 
 
 @pytest.mark.django_db
-def test_redirects_to_google_maps(client):
-    # Create a dummy shul
-    shul = Shul.objects.create(
-        name="Test Shul",
-        latitude=Decimal("31.7767"),
-        longitude=Decimal("35.2345"),
-    )
+def test_google_maps_redirect_uses_address_field_with_lat_lon_coords(client, test_shul):
+    test_shul.address = "40.913415282803335,-74.01149690151216"
+    test_shul.save()
 
     url = reverse("eznashdb:google_maps_proxy")
-    response = client.get(url, data={"id": shul.id})
-
-    # Check that the response is a redirect
+    response = client.get(url, data={"id": test_shul.id})
     assert response.status_code == 302
-
-    assert response.url.startswith("https://www.google.com/maps/search/")
-    assert str(shul.latitude) in response.url
-    assert str(shul.longitude) in response.url
-    assert shul.name.replace(" ", "+") in response.url
+    assert response.url.startswith("https://www.google.com/maps")
+    assert urllib.parse.quote_plus(test_shul.address) in response.url
 
 
 @pytest.mark.django_db
 def test_google_maps_redirect_invalid_id(client):
-    # Use an ID that doesn't exist
     url = reverse("eznashdb:google_maps_proxy")
     response = client.get(url, data={"id": 999999})
-
-    # Should return 404 or some error
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
 def test_google_maps_redirect_missing_id(client):
-    # Call the view without an id param
     url = reverse("eznashdb:google_maps_proxy")
     response = client.get(url)
-
-    # Should return 400 or some error
     assert response.status_code == 400
 
 
 @pytest.mark.django_db
-def test_google_maps_redirect_name_encoding(client):
-    # Shul with special characters
-    shul = Shul.objects.create(
-        name="בית כנסת",
-        latitude=Decimal("31.7767"),
-        longitude=Decimal("35.2345"),
-    )
+def test_google_maps_redirect_unicode_address(client, test_shul):
+    test_shul.address = "בית הכנסת הגדול, 56, המלך ג׳ורג׳, מחנה ישראל, ירושלים | القدس, נפת ירושלים, מחוז ירושלים, 9426222, ישראל"
+    test_shul.save()
 
     url = reverse("eznashdb:google_maps_proxy")
-    response = client.get(url, data={"id": shul.id})
+    response = client.get(url, data={"id": test_shul.id})
 
     assert response.status_code == 302
-    # URL should be properly URL-encoded
-    assert urllib.parse.quote_plus(shul.name) in response.url
+    assert urllib.parse.quote_plus(test_shul.address) in response.url
