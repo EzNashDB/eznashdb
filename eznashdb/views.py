@@ -2,7 +2,6 @@ import time
 import urllib
 from decimal import Decimal
 from json.decoder import JSONDecodeError
-from urllib.parse import quote_plus
 
 import requests
 from django.conf import settings
@@ -219,9 +218,11 @@ class GoogleMapsProxyView(View):
 
         shul = get_object_or_404(Shul, pk=shul_id)
 
-        # Use the address field to search google maps (either full address or "lat,lon")
-        query = quote_plus(shul.address)
-        maps_url = f"https://www.google.com/maps?q={query}"
+        # Round coordinates to 5 decimal places (~1 meter accuracy)
+        lat = round(float(shul.latitude), 5)
+        lon = round(float(shul.longitude), 5)
+
+        maps_url = f"https://www.google.com/maps/place/{lat},{lon}/@{lat},{lon},17z"
 
         return redirect(maps_url)
 
