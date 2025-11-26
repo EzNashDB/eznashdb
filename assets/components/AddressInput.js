@@ -95,6 +95,9 @@ export const AddressInput = ({
 
   return (
     <>
+      <div className="text-muted small mb-2">
+        Try: "Young Israel, Teaneck" (include full city name)
+      </div>
       <div
         className={`h-100 d-inline-block w-100 position-relative ${
           !isValid && "is-invalid"
