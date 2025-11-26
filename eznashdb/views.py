@@ -218,8 +218,11 @@ class GoogleMapsProxyView(View):
             return HttpResponseBadRequest("Missing 'id' parameter.")
 
         shul = get_object_or_404(Shul, pk=shul_id)
-        query = quote_plus(shul.name)
-        maps_url = f"https://www.google.com/maps/search/{query}/@{shul.latitude},{shul.longitude},15z"
+
+        # Use the address field to search google maps (either full address or "lat,lon")
+        query = quote_plus(shul.address)
+        maps_url = f"https://www.google.com/maps?q={query}"
+
         return redirect(maps_url)
 
 
