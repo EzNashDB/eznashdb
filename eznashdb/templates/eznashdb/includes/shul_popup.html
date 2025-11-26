@@ -12,39 +12,45 @@
                 <span class="badge bg-success">Just Updated</span>
             {% endif %}
         </span>
-        <button type="button" class="btn-close shul-popup-close " aria-label="Close"></button>
+        <button type="button" class="btn-close shul-popup-close" aria-label="Close"></button>
     </div>
-    <div class="card-body p-2 overflow-auto" style="height:200px">
-        <div class="row w-100 m-auto gx-0 mt-1">
-            <div class="col">
-                {% if shul.rooms.exists %}
-                    {% for room in shul.rooms.all %}
-                        <div class="row gx-0 mb-2 p-2 rounded bg-light border">
-                            <div class="col-12 mb-2">{{ room.name }}</div>
-                            <div class="col-12">
-                                {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
-                                <div class="row gx-0 ps-3">
-                                    <div class="col-12 mb-2 text-nowrap">
-                                        <span style="width:20px;" class="d-inline-block text-center">
-                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
-                                        </span>
-                                        <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
-                                    </div>
-                                    <div class="col-12 mb-2 text-nowrap">
-                                        <span style="width:20px;" class="d-inline-block text-center">
-                                            <i class="fa-solid fa-eye me-1"></i>
-                                        </span>
-                                        <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
-                                    </div>
-                                </div>
-                            {% endwith %}
+    <div class="card-body p-2 overflow-auto" style="max-height:200px">
+        <div class="w-100 m-auto mt-1">
+            <div class="text-center mb-2">
+                <a target="_blank"
+                   href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
+                   class="btn btn-sm btn-primary w-100">
+                    <i class="fa-brands fa-google me-1"></i>
+                    Search on Google Maps
+                </a>
+            </div>
+            {% if shul.rooms.exists %}
+                {% for room in shul.rooms.all %}
+                    <div class="mb-2 p-2 rounded bg-light border">
+                        <div class="mb-2 fw-semibold">{{ room.name }}</div>
+                        {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
+                        <div class="ps-3">
+                            <div class="mb-2">
+                                <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
+                                   style="width:16px;
+                                          display:inline-block;
+                                          text-align:center"></i>
+                                <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fa-solid fa-eye me-2"
+                                   style="width:16px;
+                                          display:inline-block;
+                                          text-align:center"></i>
+                                <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <span class="text-muted small">No rooms saved</span>
-            {% endif %}
-        </div>
+                    {% endwith %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <span class="text-muted small">No rooms saved</span>
+        {% endif %}
     </div>
 </div>
 </div>
