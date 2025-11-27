@@ -26,29 +26,31 @@
                 </a>
             </div>
             {% if shul.rooms.exists %}
-                {% for room in shul.rooms.all %}
-                    <div class="mb-2 p-2 rounded bg-light border">
-                        <div class="mb-2 fw-semibold">{{ room.name }}</div>
-                        {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
-                        <div class="ps-3">
-                            <div class="mb-2">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
-                                   style="width:16px;
-                                          display:inline-block;
-                                          text-align:center"></i>
-                                <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                <div class="d-flex flex-column gap-2">
+                    {% for room in shul.rooms.all %}
+                        <div class="p-2 rounded bg-light border">
+                            <div class="mb-2 fw-semibold">{{ room.name }}</div>
+                            {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
+                            <div class="ps-3">
+                                <div class="mb-2">
+                                    <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
+                                       style="width:16px;
+                                              display:inline-block;
+                                              text-align:center"></i>
+                                    <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                                </div>
+                                <div class="mb-2">
+                                    <i class="fa-solid fa-eye me-2"
+                                       style="width:16px;
+                                              display:inline-block;
+                                              text-align:center"></i>
+                                    <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
+                                </div>
                             </div>
-                            <div class="mb-2">
-                                <i class="fa-solid fa-eye me-2"
-                                   style="width:16px;
-                                          display:inline-block;
-                                          text-align:center"></i>
-                                <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
-                            </div>
-                        </div>
-                    {% endwith %}
-                </div>
-            {% endfor %}
+                        {% endwith %}
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
             <span class="text-muted small">No rooms saved</span>
         {% endif %}
