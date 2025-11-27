@@ -42,7 +42,7 @@ class FieldOptions:
 
 class FieldsOptions:
     SHUL_NAME = FieldOptions("Shul Name", "fa-solid fa-synagogue")
-    ADDRESS = FieldOptions("Address (search or drag)", "fa-solid fa-location-dot")
+    ADDRESS = FieldOptions("Address", "fa-solid fa-location-dot")
     ROOM_NAME = FieldOptions(
         "Room Name",
         "fa-solid fa-tag",
