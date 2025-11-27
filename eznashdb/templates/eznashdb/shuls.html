@@ -122,17 +122,19 @@
                 const popupHtmlMap = {};      // keyed by shul id (string) -> html string
                 const markersByPopupId = {};  // keyed by popupId (string like '123', '+123', '-123') -> marker instance
 
-                const markerIcon = L.icon({
-                    iconUrl: "{% static 'eznashdb/images/marker-icon.png' %}",
-                    shadowUrl: "{% static 'eznashdb/images/marker-shadow.png' %}",
-                    iconSize: [25, 41],
-                    iconAnchor: [13, 41],
-                    popupAnchor: [0, -34],
-                })
+                function singleClusterIcon() {
+                    return L.divIcon({
+                        html: `<div class="marker-cluster marker-cluster-single">
+                                <span>1</span>
+                            </div>`,
+                        className: 'marker-cluster-wrapper',
+                        iconSize: [38, 38]
+                    });
+                }
 
                 const addMarker = (shulId, lat, lon, popupId) => {
                     const popupHtml = popupHtmlMap[String(shulId)] || "";
-                    const marker = L.marker([lat, lon], { icon: markerIcon });
+                    const marker = L.marker([lat, lon], { icon: singleClusterIcon() });
 
                     // Bind popup once during marker creation (for large screens)
                     marker.bindPopup(popupHtml, {
