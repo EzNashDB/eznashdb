@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>Opening Google Maps...</p>
+    <script>
+    gtag('event', 'shul_map_redirect', {
+        'shul_id': '{{ shul.id }}',
+        'shul_name': '{{ shul.name|escapejs }}'
+    });
+
+    setTimeout(function() {
+        window.location.href = '{{ maps_url }}';
+    }, 100);
+    </script>
+{% endblock %}

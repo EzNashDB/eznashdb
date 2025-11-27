@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
@@ -218,13 +218,14 @@ class GoogleMapsProxyView(View):
 
         shul = get_object_or_404(Shul, pk=shul_id)
 
-        # Round coordinates to 5 decimal places (~1 meter accuracy)
         lat = round(float(shul.latitude), 5)
         lon = round(float(shul.longitude), 5)
 
         maps_url = f"https://www.google.com/maps/place/{lat},{lon}/@{lat},{lon},17z"
 
-        return redirect(maps_url)
+        context = {"maps_url": maps_url, "shul": shul}
+
+        return render(request, "maps_redirect.html", context)
 
 
 class ContactUsView(TemplateView):
