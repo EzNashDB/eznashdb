@@ -1,8 +1,8 @@
 <div class="card h-100">
     <div class="card-header fw-bold p-1 d-flex align-items-center">
-        <a class="btn btn-sm text-primary link-primary"
+        <a class="btn btn-sm btn-outline-primary text-nowrap me-2"
            href="/shuls/{{ shul.id }}/update">
-            <i class="fa-solid fa-pen-to-square"></i>
+            <i class="fa-solid fa-pen-to-square"></i> Edit
         </a>
         <span class="flex-grow-1">{{ shul.name }}
             {% if request.GET.newShul == shul.pk|stringformat:"s" %}
