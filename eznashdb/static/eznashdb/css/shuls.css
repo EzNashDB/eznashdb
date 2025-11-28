@@ -24,12 +24,6 @@
     padding: 0px;
 }
 
-.leaflet-popup-content .btn-primary {
-    background-color: var(--bs-btn-bg);
-    color: var(--bs-btn-color);
-    border-color: var(--bs-btn-border-color);
-}
-
 /* Single cluster icon */
 .marker-cluster-wrapper {
     background: none;
