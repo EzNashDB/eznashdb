@@ -147,6 +147,9 @@
                     // Remove Leaflet's default onclick handler
                     marker.off('click')
                     marker.on("click", (e) => {
+                        gtag('event', 'marker_click', {
+                            'shul_id': shulId,
+                        });
                         if (isSmallScreen()) {
                             // Small screen → use Bootstrap offcanvas
                             const offcanvasEl = document.getElementById("shulOffcanvas");
