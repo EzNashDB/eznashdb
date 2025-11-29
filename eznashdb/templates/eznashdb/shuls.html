@@ -116,8 +116,115 @@
 
                 const markersLayer = L.markerClusterGroup({
                     showCoverageOnHover: false,
+                    spiderfyOnMaxZoom: false, // Don't spiderfy - show combined popup instead
+                    zoomToBoundsOnClick: false, // Don't zoom - show popup instead
                 });
                 map.addLayer(markersLayer);
+
+                // Handle cluster clicks - show combined popup for grouped shuls
+markersLayer.on('clusterclick', function(cluster) {
+    const childMarkers = cluster.layer.getAllChildMarkers();
+
+    // Check if all markers are for the same location (same display_lat/lon)
+    const firstPos = childMarkers[0].getLatLng();
+    const allSamePosition = childMarkers.every(m => {
+        const pos = m.getLatLng();
+        return Math.abs(pos.lat - firstPos.lat) < 0.0001 &&
+               Math.abs(pos.lng - firstPos.lng) < 0.0001;
+    });
+
+    if (!allSamePosition) {
+        // Regular cluster (different locations) - zoom in
+        cluster.layer.zoomToBounds({ padding: [20, 20] });
+        return;
+    }
+
+    // Security-grouped cluster - show combined popup
+    const popupContent = buildClusterPopup(childMarkers);
+
+    cluster.layer.bindPopup(popupContent, {
+        className: "shul-popup shul-cluster-popup",
+        closeButton: false,
+        maxHeight: 400,
+    }).openPopup();
+
+    // Set up close button
+    setTimeout(() => {
+        const popupEl = cluster.layer.getPopup().getElement();
+        if (popupEl) {
+            const closeBtn = popupEl.querySelector(".shul-popup-close");
+            if (closeBtn) {
+                closeBtn.addEventListener("click", (ev) => {
+                    ev.preventDefault();
+                    cluster.layer.closePopup();
+                });
+            }
+        }
+    }, 0);
+});
+
+function buildClusterPopup(markers) {
+    const uniqueShuls = new Map();
+
+    // Get unique shuls (since you have 3 markers per shul for wrap-around)
+    markers.forEach(marker => {
+        const popup = marker.getPopup();
+        const shulId = popup.options.shulId;
+        if (!uniqueShuls.has(shulId)) {
+            uniqueShuls.set(shulId, marker);
+        }
+    });
+
+    const shulCount = uniqueShuls.size;
+
+    let html = `
+        <div class="card">
+            <div class="card-header fw-bold p-2 d-flex align-items-center">
+                <span class="flex-grow-1">${shulCount} Shuls in this area</span>
+                <button type="button" class="btn-close shul-popup-close" aria-label="Close"></button>
+            </div>
+            <div class="card-body p-2 overflow-auto" style="max-height:300px">
+    `;
+
+    uniqueShuls.forEach((marker, shulId) => {
+        const popupHtml = popupHtmlMap[String(shulId)];
+        // Extract shul name and key info from the existing popup HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = popupHtml;
+
+
+        const shulName = tempDiv.querySelector('.card-header span')?.textContent.trim() || 'Unknown Shul';
+        const editLink = tempDiv.querySelector('a[href*="/update"]')?.href || '';
+        const googleMapsLink = tempDiv.querySelector('a[href*="{% url 'eznashdb:google_maps_proxy' %}"]')?.getAttribute('href') || '';
+        // Extract rooms info, excluding the Google Maps button
+        const cardBody = tempDiv.querySelector('.card-body');
+        const gmapsDiv = cardBody?.querySelector('.text-center');
+        if (gmapsDiv) gmapsDiv.remove();
+        const roomsInfo = cardBody?.innerHTML || '';
+
+        html += `
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex align-items-center mb-2">
+                    <a class="btn btn-sm btn-outline-primary text-nowrap me-2" href="${editLink}">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </a>
+                    <strong>${shulName}</strong>
+                </div>
+                <a target="_blank" rel="noopener noreferrer" href="${googleMapsLink}" class="btn btn-sm btn-primary w-100 mb-2">
+                    <i class="fa-brands fa-google me-1"></i> Open in Google Maps
+                </a>
+                ${roomsInfo}
+            </div>
+        `;
+    });
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    return html;
+}
 
                 const popupHtmlMap = {};      // keyed by shul id (string) -> html string
                 const markersByPopupId = {};  // keyed by popupId (string like '123', '+123', '-123') -> marker instance
