@@ -278,8 +278,8 @@
                     // Add the three wrap-around variants (original, -360, +360)
                     (() => {
                         const id = {{ shul.id }};
-                        const lat = parseFloat({{ shul.latitude }});
-                        const lon = parseFloat({{ shul.longitude }});
+                        const lat = parseFloat({{ shul.display_lat }});
+                        const lon = parseFloat({{ shul.display_lon }});
                         // original
                         mapApi.addMarker(id, lat, lon, String(id));
                         // wrap-around west

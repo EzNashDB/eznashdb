@@ -39,8 +39,8 @@ class CreateUpdateShulView(UpdateView):
     def get_success_url(self) -> str:
         if self.is_update:
             url = reverse_lazy("eznashdb:shuls")
-            lat = self.object.latitude
-            lon = self.object.longitude
+            lat = self.object.display_lat
+            lon = self.object.display_lon
             url += f"?lat={lat}&lon={lon}&selectedPin={self.object.pk}"
             if lat and lon:
                 url += "&zoom=17"
