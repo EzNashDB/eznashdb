@@ -27,9 +27,10 @@
             </div>
             {% if shul.rooms.exists %}
                 <div class="d-flex flex-column gap-2">
+                    <div>{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}:</div>
                     {% for room in shul.rooms.all %}
                         <div class="p-2 rounded bg-light border">
-                            <div class="mb-2 fw-semibold">{{ room.name }}</div>
+                            <div class="mb-2 fw-bold">{{ room.name }}</div>
                             {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
                             <div class="ps-3">
                                 <div class="mb-2">
