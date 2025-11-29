@@ -1,3 +1,5 @@
+import hashlib
+
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -26,6 +28,31 @@ class Shul(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
+
+    @property
+    def display_lat(self):
+        return self.rounded_lat + self.get_jitter("lat")
+
+    @property
+    def display_lon(self):
+        return self.rounded_lon + self.get_jitter("lon")
+
+    @property
+    def rounded_lat(self):
+        return self.round_coord(self.latitude)
+
+    @property
+    def rounded_lon(self):
+        return self.round_coord(self.longitude)
+
+    @staticmethod
+    def round_coord(value):
+        return float(round(value, 2))
+
+    def get_jitter(self, coord_type):
+        hash_input = f"{self.rounded_lat}_{self.rounded_lon}_{coord_type}".encode()
+        hash_value = int(hashlib.md5(hash_input).hexdigest(), 16)
+        return ((hash_value % 6000) - 3000) / 1000000
 
 
 class Room(models.Model):
