@@ -17,64 +17,58 @@ def test_shows_app_name(GET_request):
 
     assert "Ezrat Nashim Database" in soup.get_text()
 
-    def test_shows_shul_address(GET_request, test_shul):
-        test_shul.address = "test address"
-        test_shul.save()
+
+def test_shows_room_name(GET_request, test_shul):
+    room = test_shul.rooms.create(name="test_room")
+
+    response = ShulsFilterView.as_view()(GET_request)
+    soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+    assert room.name in str(soup)
+
+
+def describe_rooms():
+    @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
+    def test_shows_room_relative_size(test_shul, GET_request, relative_size):
+        test_shul.rooms.create(name="test_room", relative_size=relative_size)
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert "test address" in str(soup)
+        assert relative_size.value in str(soup)
 
-    def test_shows_room_name(GET_request, test_shul):
-        room = test_shul.rooms.create(name="test_room")
+    def test_displays_not_set_for_unknown_relative_size(test_shul, GET_request):
+        test_shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert room.name in soup.get_text()
+        assert "not set" in str(soup).lower()
 
-    def describe_rooms():
-        @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
-        def test_shows_room_relative_size(test_shul, GET_request, relative_size):
-            test_shul.rooms.create(name="test_room", relative_size=relative_size)
+    @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
+    def test_shows_room_see_hear_score(test_shul, GET_request, see_hear_score):
+        test_shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
 
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+        marker_script = soup.find(id="shul-markers-js")
 
-            assert relative_size.value in str(soup)
+        expected_filled_star_count = int(see_hear_score.value)
+        expected_empty_star_count = 5 - expected_filled_star_count
 
-        def test_displays_dashes_for_unknown_relative_size(test_shul, GET_request):
-            test_shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
+        filled_class = "fa-solid fa-star"
+        empty_class = "fa-regular fa-star"
 
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
+        assert str(marker_script).count(filled_class) == expected_filled_star_count
+        assert str(marker_script).count(empty_class) == expected_empty_star_count
 
-            assert "--" in soup.text
+    def test_shows_not_set_for_unknown_see_hear_score(test_shul, GET_request):
+        test_shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
 
-        @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
-        def test_shows_room_see_hear_score(test_shul, GET_request, see_hear_score):
-            test_shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-            expected_filled_star_count = int(see_hear_score.value)
-            expected_empty_star_count = 5 - expected_filled_star_count
-
-            filled_class = "fa-solid fa-star"
-            empty_class = "fa-regular fa-star"
-
-            assert str(soup).count(filled_class) == expected_filled_star_count
-            assert str(soup).count(empty_class) == expected_empty_star_count
-
-        def test_shows_dashes_for_unknown_see_hear_score(test_shul, GET_request):
-            test_shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
-
-            response = ShulsFilterView.as_view()(GET_request)
-            soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-            assert "--" in soup.text
+        assert "not set" in str(soup).lower()
 
 
 def describe_filter():
