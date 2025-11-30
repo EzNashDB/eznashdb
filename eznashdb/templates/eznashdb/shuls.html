@@ -8,9 +8,7 @@
 {% endblock extra_media_top %}
 
 {% block content %}
-    <div class="row h-100"
-         id="alpine-map-state-holder"
-         x-data="{ selectedShul: '{{ request.GET.selectedShul|default:'' }}' }">
+    <div class="row h-100">
         <div class="col h-100 d-flex flex-column">
             <div class="row mb-1">
                 <div class="col-6">
@@ -73,9 +71,15 @@
                     history.replaceState({}, "", url.toString());
                 };
 
+                const getURLParam = (param) => {
+                    const params = new URLSearchParams(window.location.search);
+                    return params.get(param)
+                }
+
                 return {
                     update: updateURLParams,
                     delete: deleteURLParams,
+                    get: getURLParam,
                 };
             })();
 
@@ -206,12 +210,6 @@
                         URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
                     } else if (!isSmallScreen()) {
                         URL_PARAMS_API.delete(["selectedShul"]);
-                    }
-
-                    const alpineMapStateHolder = document.getElementById('alpine-map-state-holder');
-                    if (alpineMapStateHolder && typeof Alpine !== 'undefined') {
-                        const alpineData = Alpine.$data(alpineMapStateHolder);
-                        alpineData.selectedShul = null;
                     }
                 });
 
