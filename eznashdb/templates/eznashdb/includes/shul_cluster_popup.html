@@ -18,11 +18,10 @@
                                 data-bs-target="#shul-{{ shul.id }}"
                                 aria-expanded="false"
                                 aria-controls="shul-{{ shul.id }}">
-                            <div class="d-flex w-100 pe-3">
+                            <div class="d-flex w-100 pe-3 align-items-center">
                                 <span class="fw-bold d-inline-block flex-grow-1">{{ shul.name }}</span>
-                                <span x-show="selectedShul !== {{ shul.pk }}"
-                                      class="ms-2 badge text-bg-secondary">
-                                    {{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}
+                                <span x-show="selectedShul !== {{ shul.pk }}" class="ms-2">
+                                    <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
                                 </span>
                             </div>
                         </button>
