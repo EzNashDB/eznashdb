@@ -142,6 +142,7 @@
                 // ============================================================================
 
                 markersLayer.on('clusterclick', (cluster) => {
+                    L.DomEvent.stop(cluster.originalEvent);
                     const childMarkers = cluster.layer.getAllChildMarkers();
                     const firstPos = childMarkers[0].getLatLng();
 
