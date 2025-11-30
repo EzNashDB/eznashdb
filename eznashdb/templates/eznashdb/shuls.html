@@ -56,26 +56,29 @@
     {{ block.super }}
     <script defer>
         (() => {
+            // ============================================================================
+            // URL PARAMS API
+            // ============================================================================
+
             window.URL_PARAMS_API = (() => {
-            let params = new URLSearchParams(window.location.search);
+                const updateURLParams = (params) => {
+                    const url = new URL(window.location.href);
+                    for (const key in params) url.searchParams.set(key, params[key]);
+                    history.replaceState({}, "", url.toString());
+                };
 
-            const updateURLParams = (params) => {
-                const url = new URL(window.location.href);
-                for (const key in params) url.searchParams.set(key, params[key]);
-                history.replaceState({}, "", url.toString());
-            };
+                const deleteURLParams = (params) => {
+                    const url = new URL(window.location.href);
+                    params.forEach((param) => url.searchParams.delete(param));
+                    history.replaceState({}, "", url.toString());
+                };
 
-            const deleteURLParams = (params) => {
-                const url = new URL(window.location.href);
-                params.forEach((param) => url.searchParams.delete(param));
-                history.replaceState({}, "", url.toString());
-            };
-
-            return {
-                update: updateURLParams,
-                delete: deleteURLParams,
-            };
+                return {
+                    update: updateURLParams,
+                    delete: deleteURLParams,
+                };
             })();
+
             // ============================================================================
             // UTILITY FUNCTIONS
             // ============================================================================
@@ -92,6 +95,75 @@
             const isSmallScreen = () => {
                 return window.innerWidth < 768 || window.innerHeight < 600;
             };
+
+            const getGridKey = (lat, lon) => {
+                return `${lat}_${lon}`;
+            };
+
+            // ============================================================================
+            // POPUP SETUP HELPER
+            // ============================================================================
+
+            function setupClusterPopup(targetElement, gridKey, shulIds, popupContent) {
+                URL_PARAMS_API.update({ selectedCluster: gridKey });
+
+                if (isSmallScreen()) {
+                    // Small screen - use offcanvas
+                    const offcanvasEl = document.getElementById("shulOffcanvas");
+                    offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupContent;
+
+                    const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                    offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
+                        URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
+                    }, { once: true });
+                    bsOffcanvas.show();
+
+                    const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
+                    if (closeBtn) {
+                        closeBtn.addEventListener("click", (ev) => {
+                            ev.preventDefault();
+                            bsOffcanvas.hide();
+                        });
+                    }
+
+                    autoOpenAccordionForSingleShuls(offcanvasEl, gridKey, shulIds);
+                } else {
+                    // Large screen - use popup
+                    targetElement.bindPopup(popupContent, {
+                        className: "shul-popup shul-cluster-popup",
+                        closeButton: false,
+                        maxHeight: 400,
+                        gridKey: gridKey,
+                        shulIds: shulIds,
+                        offset: [0, -7],
+                    }).openPopup();
+
+                    setTimeout(() => {
+                        const popupEl = targetElement.getPopup().getElement();
+                        if (!popupEl) return;
+
+                        const closeBtn = popupEl.querySelector(".shul-popup-close");
+                        if (closeBtn) {
+                            closeBtn.addEventListener("click", (ev) => {
+                                ev.preventDefault();
+                                targetElement.closePopup();
+                            });
+                        }
+
+                        autoOpenAccordionForSingleShuls(popupEl, gridKey, shulIds);
+                    }, 0);
+                }
+            }
+
+            function autoOpenAccordionForSingleShuls(containerEl, gridKey, shulIds) {
+                if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
+                    const firstShulId = shulIds[0];
+                    const accordionItem = containerEl.querySelector(`#shul-${firstShulId}`);
+                    if (accordionItem && !accordionItem.classList.contains('show')) {
+                        new bootstrap.Collapse(accordionItem, { toggle: true });
+                    }
+                }
+            }
 
             // ============================================================================
             // MAP INITIALIZATION
@@ -128,11 +200,18 @@
                 // Keep URL in sync with map movements
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
-                map.on("popupopen", (e) => {
+                map.on("popupclose", (e) => {
                     const popup = e.popup;
+                    if (popup.options.gridKey) {
+                        URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
+                    } else if (!isSmallScreen()) {
+                        URL_PARAMS_API.delete(["selectedShul"]);
+                    }
 
-                    if (popup.options?.gridKey) {
-                        URL_PARAMS_API.update({ selectedCluster: popup.options.gridKey });
+                    const alpineMapStateHolder = document.getElementById('alpine-map-state-holder');
+                    if (alpineMapStateHolder && typeof Alpine !== 'undefined') {
+                        const alpineData = Alpine.$data(alpineMapStateHolder);
+                        alpineData.selectedShul = null;
                     }
                 });
 
@@ -153,7 +232,7 @@
                 map.addLayer(markersLayer);
 
                 // ============================================================================
-                // CLUSTER POPUP HANDLING
+                // CLUSTER AND MARKER CLICK HANDLERS
                 // ============================================================================
 
                 markersLayer.on('clusterclick', (cluster) => {
@@ -175,7 +254,7 @@
                     }
 
                     // Security cluster - show combined popup
-                    const gridKey = `${firstPos.lat}_${firstPos.lng}`;
+                    const gridKey = getGridKey(firstPos.lat, firstPos.lng);
                     const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[gridKey];
 
                     if (!popupContent) {
@@ -184,77 +263,12 @@
                     }
 
                     // Get unique shul IDs in this cluster
-                    const uniqueShulIds = new Set();
-                    childMarkers.forEach(marker => {
-                        uniqueShulIds.add(marker.options.shulId);
-                    });
+                    const uniqueShulIds = [...new Set(childMarkers.map(m => m.options.shulId))];
 
-                    URL_PARAMS_API.update({ selectedCluster: gridKey });
-
-                    if (isSmallScreen()) {
-                        // Small screen - use offcanvas
-                        const offcanvasEl = document.getElementById("shulOffcanvas");
-                        offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupContent;
-
-                        const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
-                        offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                            URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
-                        }, { once: true });
-                        bsOffcanvas.show();
-
-                        const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
-                        if (closeBtn) {
-                            closeBtn.addEventListener("click", (ev) => {
-                                ev.preventDefault();
-                                bsOffcanvas.hide();
-                            });
-                        }
-
-                        // Auto-open accordion for single shuls
-                        if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
-                            const firstShulId = Array.from(uniqueShulIds)[0];
-                            const accordionItem = offcanvasEl.querySelector(`#shul-${firstShulId}`);
-                            if (accordionItem && !accordionItem.classList.contains('show')) {
-                                new bootstrap.Collapse(accordionItem, { toggle: true });
-                            }
-                        }
-                    } else {
-                        // Large screen - use popup
-                        cluster.layer.bindPopup(popupContent, {
-                            className: "shul-popup shul-cluster-popup",
-                            closeButton: false,
-                            maxHeight: 400,
-                            gridKey: gridKey,
-                            shulIds: Array.from(uniqueShulIds),
-                            offset: [0, -7],
-                        }).openPopup();
-
-                        // Setup close button and accordion listeners
-                        setTimeout(() => {
-                            const popupEl = cluster.layer.getPopup().getElement();
-                            if (!popupEl) return;
-
-                            const closeBtn = popupEl.querySelector(".shul-popup-close");
-                            if (closeBtn) {
-                                closeBtn.addEventListener("click", (ev) => {
-                                    ev.preventDefault();
-                                    cluster.layer.closePopup();
-                                });
-                            }
-
-                            // Auto-open accordion for single shuls
-                            if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
-                                const firstShulId = Array.from(uniqueShulIds)[0];
-                                const accordionItem = popupEl.querySelector(`#shul-${firstShulId}`);
-                                if (accordionItem && !accordionItem.classList.contains('show')) {
-                                    new bootstrap.Collapse(accordionItem, { toggle: true });
-                                }
-                            }
-                        }, 0);
-                    }
+                    setupClusterPopup(cluster.layer, gridKey, uniqueShulIds, popupContent);
                 });
 
-                // Handle single marker clicks (not in a cluster)
+                // Handle single marker clicks
                 markersLayer.on('click', (e) => {
                     const marker = e.layer;
                     const shulId = marker.options.shulId;
@@ -271,79 +285,7 @@
                         return;
                     }
 
-                    if (isSmallScreen()) {
-                        // Small screen - use offcanvas
-                        const offcanvasEl = document.getElementById("shulOffcanvas");
-                        offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupContent;
-
-                        const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
-                        offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                            URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
-                        }, { once: true });
-                        bsOffcanvas.show();
-
-                        const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
-                        if (closeBtn) {
-                            closeBtn.addEventListener("click", (ev) => {
-                                ev.preventDefault();
-                                bsOffcanvas.hide();
-                            });
-                        }
-
-                        // Auto-open accordion for single shuls
-                        if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
-                            const accordionItem = offcanvasEl.querySelector(`#shul-${shulId}`);
-                            if (accordionItem && !accordionItem.classList.contains('show')) {
-                                new bootstrap.Collapse(accordionItem, { toggle: true });
-                            }
-                        }
-                    } else {
-                        // Large screen - use popup
-                        marker.bindPopup(popupContent, {
-                            className: "shul-popup shul-cluster-popup",
-                            closeButton: false,
-                            maxHeight: 400,
-                            gridKey: gridKey,
-                            shulIds: [shulId],
-                        }).openPopup();
-
-                        // Setup close button and accordion listeners
-                        setTimeout(() => {
-                            const popupEl = marker.getPopup().getElement();
-                            if (!popupEl) return;
-
-                            const closeBtn = popupEl.querySelector(".shul-popup-close");
-                            if (closeBtn) {
-                                closeBtn.addEventListener("click", (ev) => {
-                                    ev.preventDefault();
-                                    marker.closePopup();
-                                });
-                            }
-
-                            // Auto-open accordion for single shuls
-                            if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
-                                const accordionItem = popupEl.querySelector(`#shul-${shulId}`);
-                                if (accordionItem && !accordionItem.classList.contains('show')) {
-                                    new bootstrap.Collapse(accordionItem, { toggle: true });
-                                }
-                            }
-                        }, 0);
-                    }
-
-                    URL_PARAMS_API.update({ selectedCluster: gridKey });
-                });
-
-                // Handle popup close - remove URL params
-                map.on("popupclose", (e) => {
-                    const popup = e.popup;
-                    if (popup.options.gridKey) {
-                        URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
-                    } else if (!isSmallScreen()) {
-                        URL_PARAMS_API.delete(["selectedShul"]);
-                    }
-                    const alpineMapStateHolder = document.getElementById('alpine-map-state-holder');
-                    const alpineData = Alpine.$data(alpineMapStateHolder);
-                    alpineData.selectedShul = null;
+                    setupClusterPopup(marker, gridKey, [shulId], popupContent);
                 });
 
                 // ============================================================================
@@ -357,17 +299,13 @@
                         html: `<div class="marker-cluster marker-cluster-single"><span>1</span></div>`,
                         className: 'marker-cluster-wrapper',
                         iconSize: [38, 38],
-                        popupAnchor: [0, -13],
                     });
                 }
 
                 const addMarker = (shulId, lat, lon, popupId) => {
                     const marker = L.marker([lat, lon], { icon: singleClusterIcon() });
-
-                    // Store shul ID for cluster popup handling
                     marker.options.shulId = shulId;
                     marker.options.popupId = popupId;
-
                     markersLayer.addLayer(marker);
                     markersByPopupId[String(popupId)] = marker;
                     return marker;
@@ -397,21 +335,17 @@
                         const cluster = api.markersLayer.getVisibleParent(target);
 
                         if (cluster && cluster instanceof L.MarkerCluster) {
-                            // Open cluster popup
-                            const clusterIcon = cluster._icon;
-                            if (clusterIcon) {
-                                clusterIcon.click();
+                            // Click cluster and expand specific accordion
+                            cluster._icon?.click();
 
-                                // Expand and scroll to specific accordion item
-                                setTimeout(() => {
-                                    const accordionItem = document.querySelector(`#shul-${selectedShulId}`);
-                                    if (accordionItem && !accordionItem.classList.contains('show')) {
-                                        new bootstrap.Collapse(accordionItem, { toggle: true });
-                                    }
-                                }, 200);
-                            }
+                            setTimeout(() => {
+                                const accordionItem = document.querySelector(`#shul-${selectedShulId}`);
+                                if (accordionItem && !accordionItem.classList.contains('show')) {
+                                    new bootstrap.Collapse(accordionItem, { toggle: true });
+                                }
+                            }, 200);
                         } else {
-                            // Single marker - trigger click event
+                            // Single marker
                             api.markersLayer.fire('click', { layer: target });
                         }
                     } else if (selectedCluster) {
@@ -425,24 +359,14 @@
                             if (target) {
                                 const cluster = api.markersLayer.getVisibleParent(target);
                                 if (cluster && cluster instanceof L.MarkerCluster) {
-                                    const clusterIcon = cluster._icon;
-                                    if (clusterIcon) {
-                                        clusterIcon.click();
-                                    }
+                                    cluster._icon?.click();
                                 } else {
-                                    // Single marker
                                     api.markersLayer.fire('click', { layer: target });
                                 }
                             }
                         }
                     }
                 };
-
-                const setAlpineSelectedShul = (value) => {
-                    stateHolder = document.getElementById('alpine-map-state-holder');
-                    const alpineData = Alpine.$data(stateHolder);
-                    alpineData.selectedShul = value;
-                }
 
                 // ============================================================================
                 // EXPOSE API
@@ -531,12 +455,11 @@
                 {% endfor %}
 
                 // Track which clusters are singles for auto-opening accordion
-                const singleShulClusters = new Set();
-                {% for grid_key, shuls in cluster_groups.items %}
-                    {% if shuls|length == 1 %}
-                        singleShulClusters.add("{{ grid_key }}");
-                    {% endif %}
-                {% endfor %}
+                const singleShulClusters = new Set([
+                    {% for grid_key, shuls in cluster_groups.items %}
+                        {% if shuls|length == 1 %}"{{ grid_key }}",{% endif %}
+                    {% endfor %}
+                ]);
 
                 mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
                 mapApi.shulToGridKey = shulToGridKey;
