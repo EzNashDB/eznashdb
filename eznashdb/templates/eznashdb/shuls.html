@@ -210,8 +210,6 @@
                             });
                         }
 
-                        setupAccordionListeners(offcanvasEl, Array.from(uniqueShulIds));
-
                         // Auto-open accordion for single shuls
                         if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
                             const firstShulId = Array.from(uniqueShulIds)[0];
@@ -242,8 +240,6 @@
                                     cluster.layer.closePopup();
                                 });
                             }
-
-                            setupAccordionListeners(popupEl, Array.from(uniqueShulIds));
 
                             // Auto-open accordion for single shuls
                             if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
@@ -293,8 +289,6 @@
                             });
                         }
 
-                        setupAccordionListeners(offcanvasEl, [shulId]);
-
                         // Auto-open accordion for single shuls
                         if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
                             const accordionItem = offcanvasEl.querySelector(`#shul-${shulId}`);
@@ -325,8 +319,6 @@
                                 });
                             }
 
-                            setupAccordionListeners(popupEl, [shulId]);
-
                             // Auto-open accordion for single shuls
                             if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
                                 const accordionItem = popupEl.querySelector(`#shul-${shulId}`);
@@ -349,28 +341,6 @@
                         URL_PARAMS_API.delete(["selectedShul"]);
                     }
                 });
-
-                // Setup accordion event listeners for URL sync
-                function setupAccordionListeners(popupEl, shulIds) {
-                    const accordionEl = popupEl.querySelector('#clusterShulsAccordion');
-                    if (!accordionEl) return;
-
-                    shulIds.forEach(shulId => {
-                        const collapseEl = popupEl.querySelector(`#shul-${shulId}`);
-                        if (!collapseEl) return;
-
-                        collapseEl.addEventListener('shown.bs.collapse', () => {
-                            URL_PARAMS_API.update({ selectedShul: shulId });
-                        });
-
-                        collapseEl.addEventListener('hidden.bs.collapse', () => {
-                            const anyOpen = popupEl.querySelector('.accordion-collapse.show');
-                            if (!anyOpen) {
-                                URL_PARAMS_API.delete(["selectedShul"]);
-                            }
-                        });
-                    });
-                }
 
                 // ============================================================================
                 // MARKER HANDLING
@@ -433,14 +403,6 @@
                                     const accordionItem = document.querySelector(`#shul-${selectedShulId}`);
                                     if (accordionItem && !accordionItem.classList.contains('show')) {
                                         new bootstrap.Collapse(accordionItem, { toggle: true });
-
-                                        accordionItem.addEventListener('shown.bs.collapse', () => {
-                                            const header = accordionItem.parentElement.querySelector('.accordion-header')
-                                            header.scrollIntoView({
-                                                behavior: 'smooth',
-                                                block: 'start'
-                                            });
-                                        }, { once: true });
                                     }
                                 }, 200);
                             }
