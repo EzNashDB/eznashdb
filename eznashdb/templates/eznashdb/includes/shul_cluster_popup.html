@@ -9,7 +9,28 @@
         <div class="accordion border rounded" id="clusterShulsAccordion">
             {% for shul in shuls %}
                 <div class="accordion-item border-0
-                            {% if not forloop.last %}border-bottom{% endif %}">
+                    {% if not forloop.last %}border-bottom{% endif %}"
+                    {# djlint:off #}
+                    x-init="
+                        const collapseEl = $el.querySelector('.accordion-collapse');
+                        collapseEl.addEventListener('show.bs.collapse', () => {
+                            selectedShul = {{shul.pk}};
+                            URL_PARAMS_API.update({'selectedShul': {{shul.pk}}});
+                        });
+                        collapseEl.addEventListener('shown.bs.collapse', () => {
+                            const header = $el.querySelector('.accordion-header')
+                            header.scrollIntoView({behavior: 'smooth', block: 'start'});
+                        });
+                        collapseEl.addEventListener('hide.bs.collapse', (e) => {
+                            const isClosingActiveRoom = selectedShul === {{shul.id}}
+                            if (isClosingActiveRoom) {
+                                selectedShul = null;
+                                URL_PARAMS_API.delete(['selectedShul']);
+                            };
+                        });
+                    "
+                    {# djlint:on #}
+                    >
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed"
                                 :class="selectedShul !== {{ shul.pk }} ? 'bg-light' : ''"
