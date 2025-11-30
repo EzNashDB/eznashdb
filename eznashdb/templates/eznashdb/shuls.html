@@ -351,15 +351,8 @@
                         const collapseEl = popupEl.querySelector(`#shul-${shulId}`);
                         if (!collapseEl) return;
 
-                        collapseEl.addEventListener('show.bs.collapse', () => {
-                            setAlpineSelectedShul(shulId)
-                        });
-
-                        collapseEl.addEventListener('hide.bs.collapse', () => {
-                            setAlpineSelectedShul('')
-                        });
-
                         collapseEl.addEventListener('shown.bs.collapse', () => {
+                            setAlpineSelectedShul(shulId)
                             updateURLParams({ selectedShul: shulId });
                         });
 
@@ -367,6 +360,7 @@
                             const anyOpen = popupEl.querySelector('.accordion-collapse.show');
                             if (!anyOpen) {
                                 deleteURLParams(["selectedShul"]);
+                                setAlpineSelectedShul('')
                             }
                         });
                     });
