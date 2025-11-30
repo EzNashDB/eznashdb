@@ -10,7 +10,7 @@
 .shul-popup .leaflet-popup-content {
     pointer-events: initial;
     margin-top: 40px;
-    max-width: 350px;
+    max-width: 425px;
     width: calc(100vw - 40px) !important;
 }
 

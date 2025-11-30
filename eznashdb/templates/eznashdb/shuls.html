@@ -8,7 +8,9 @@
 {% endblock extra_media_top %}
 
 {% block content %}
-    <div class="row h-100">
+    <div class="row h-100"
+         id="alpine-map-state-holder"
+         x-data="{ selectedShul: '{{ request.GET.selectedShul|default:'' }}' }">
         <div class="col h-100 d-flex flex-column">
             <div class="row mb-1">
                 <div class="col-6">
@@ -341,6 +343,14 @@
                         const collapseEl = popupEl.querySelector(`#shul-${shulId}`);
                         if (!collapseEl) return;
 
+                        collapseEl.addEventListener('show.bs.collapse', () => {
+                            setAlpineSelectedShul(shulId)
+                        });
+
+                        collapseEl.addEventListener('hide.bs.collapse', () => {
+                            setAlpineSelectedShul('')
+                        });
+
                         collapseEl.addEventListener('shown.bs.collapse', () => {
                             updateURLParams({ selectedShul: shulId });
                         });
@@ -453,6 +463,12 @@
                         }
                     }
                 };
+
+                const setAlpineSelectedShul = (value) => {
+                    stateHolder = document.getElementById('alpine-map-state-holder');
+                    const alpineData = Alpine.$data(stateHolder);
+                    alpineData.selectedShul = value;
+                }
 
                 // ============================================================================
                 // EXPOSE API
