@@ -142,7 +142,7 @@
                     spiderfyOnMaxZoom: false,
                     zoomToBoundsOnClick: false,
                     spiderfyDistanceMultiplier: 0,
-                    disableClusteringAtZoom: null,
+                    disableClusteringAtZoom: null
                 });
 
                 markersLayer.on('spiderfied', (e) => {
@@ -226,6 +226,7 @@
                             maxHeight: 400,
                             gridKey: gridKey,
                             shulIds: Array.from(uniqueShulIds),
+                            offset: [0, -7],
                         }).openPopup();
 
                         // Setup close button and accordion listeners
