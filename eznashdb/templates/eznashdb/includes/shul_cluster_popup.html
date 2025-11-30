@@ -18,7 +18,16 @@
                             URL_PARAMS_API.update({'selectedShul': {{shul.pk}}});
                         });
                         collapseEl.addEventListener('shown.bs.collapse', () => {
-                            const header = $el.querySelector('.accordion-header')
+                            // Adjust map to keep popup in view
+                            if (window.SHUL_MAP_API?.map) {
+                                setTimeout(() => {
+                                    const openPopup = window.SHUL_MAP_API.map._popup;
+                                    if (openPopup && openPopup._adjustPan) {
+                                        openPopup._adjustPan();
+                                    }
+                                }, 100);
+                            }
+                            const header = $el.querySelector('.accordion-header');
                             header.scrollIntoView({behavior: 'smooth', block: 'start'});
                         });
                         collapseEl.addEventListener('hide.bs.collapse', (e) => {
