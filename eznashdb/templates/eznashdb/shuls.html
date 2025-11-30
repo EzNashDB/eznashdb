@@ -120,6 +120,13 @@
                 // Keep URL in sync with map movements
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
+                map.on("popupopen", (e) => {
+                    const popup = e.popup;
+
+                    if (popup.options?.gridKey) {
+                        updateURLParams({ selectedCluster: popup.options.gridKey });
+                    }
+                });
 
                 // Create marker cluster group
                 const markersLayer = L.markerClusterGroup({
