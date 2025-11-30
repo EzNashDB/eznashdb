@@ -417,9 +417,10 @@
                                         new bootstrap.Collapse(accordionItem, { toggle: true });
 
                                         accordionItem.addEventListener('shown.bs.collapse', () => {
-                                            accordionItem.scrollIntoView({
+                                            const header = accordionItem.parentElement.querySelector('.accordion-header')
+                                            header.scrollIntoView({
                                                 behavior: 'smooth',
-                                                block: 'center'
+                                                block: 'start'
                                             });
                                         }, { once: true });
                                     }
