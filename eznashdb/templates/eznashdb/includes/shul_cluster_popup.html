@@ -19,7 +19,6 @@
                     x-init="
                         const collapseEl = $el.querySelector('.accordion-collapse');
                         collapseEl.addEventListener('show.bs.collapse', () => {
-                            selectedShul = {{shul.pk}};
                             URL_PARAMS_API.update({'selectedShul': {{shul.pk}}});
                         });
                         collapseEl.addEventListener('shown.bs.collapse', () => {
@@ -36,9 +35,8 @@
                             header.scrollIntoView({behavior: 'smooth', block: 'start'});
                         });
                         collapseEl.addEventListener('hide.bs.collapse', (e) => {
-                            const isClosingActiveRoom = selectedShul === {{shul.id}}
+                            const isClosingActiveRoom = URL_PARAMS_API.get('selectedShul') === String({{shul.pk}})
                             if (isClosingActiveRoom) {
-                                selectedShul = null;
                                 URL_PARAMS_API.delete(['selectedShul']);
                             };
                         });
