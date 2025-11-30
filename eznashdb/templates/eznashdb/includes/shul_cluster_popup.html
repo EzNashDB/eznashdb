@@ -57,7 +57,7 @@
                                         <span class="ms-2 badge bg-success">Just Updated</span>
                                     {% endif %}
                                 </span>
-                                <span x-show="selectedShul !== {{ shul.pk }}" class="ms-2">
+                                <span>
                                     <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
                                 </span>
                             </div>
@@ -69,19 +69,16 @@
                         <div class="accordion-body">
                             <div class="d-flex flex-column">
                                 <div class="d-flex gap-2 align-items-center">
-                                    <div class="flex-grow-1 ">
-                                        <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
-                                    </div>
+                                    <a class="btn btn-sm btn-outline-primary text-nowrap"
+                                       href="{% url 'eznashdb:update_shul' shul.id %}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
                                     <a target="_blank"
                                        rel="noopener noreferrer"
                                        href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
                                        class="btn btn-sm btn-primary">
                                         <i class="fa-brands fa-google me-1"></i>
                                         Open in Maps
-                                        <a class="btn btn-sm btn-outline-primary text-nowrap"
-                                           href="{% url 'eznashdb:update_shul' shul.id %}">
-                                            <i class="fa-solid fa-pen-to-square"></i> Edit
-                                        </a>
                                     </a>
                                 </div>
                                 {% for room in shul.rooms.all %}
