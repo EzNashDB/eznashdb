@@ -35,8 +35,7 @@ class ShulsFilterView(FilterView):
             grid_key = f"{shul.display_lat}_{shul.display_lon}"
             grid_groups[grid_key].append(shul)
 
-        # Only include groups with 2+ shuls
-        context["cluster_groups"] = {key: shuls for key, shuls in grid_groups.items() if len(shuls) > 1}
+        context["cluster_groups"] = dict(grid_groups)
 
         return context
 
