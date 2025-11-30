@@ -1,5 +1,6 @@
 import time
 import urllib
+from collections import defaultdict
 from decimal import Decimal
 from json.decoder import JSONDecodeError
 
@@ -24,6 +25,20 @@ from eznashdb.models import Shul
 class ShulsFilterView(FilterView):
     template_name = "eznashdb/shuls.html"
     filterset_class = ShulFilterSet
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Group shuls by their display coordinates
+        grid_groups = defaultdict(list)
+        for shul in context["object_list"]:
+            grid_key = f"{shul.display_lat}_{shul.display_lon}"
+            grid_groups[grid_key].append(shul)
+
+        # Only include groups with 2+ shuls
+        context["cluster_groups"] = {key: shuls for key, shuls in grid_groups.items() if len(shuls) > 1}
+
+        return context
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx:
