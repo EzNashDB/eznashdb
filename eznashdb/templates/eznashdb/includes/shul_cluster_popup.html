@@ -1,12 +1,12 @@
 <div class="card border">
     <div class="card-header">
-        <div class="ps-1 w-100 fw-bold d-flex align-items-center">
+        <div class="ps-1 w-100 d-flex align-items-center">
             <span class="flex-grow-1">{{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area</span>
             <button type="button" class="btn-close shul-popup-close" aria-label="Close"></button>
         </div>
     </div>
-    <div class="card-body overflow-auto" style="max-height:300px">
-        <div class="accordion border rounded" id="clusterShulsAccordion">
+    <div class="card-body p-0 overflow-auto" style="max-height:300px">
+        <div class="accordion accordion-flush" id="clusterShulsAccordion">
             {% for shul in shuls %}
                 <div class="accordion-item border-0
                     {% if not forloop.last %}border-bottom{% endif %}"
@@ -42,14 +42,14 @@
                     >
                     <h2 class="accordion-header" style="scroll-margin-top: 15px">
                         <button class="accordion-button collapsed"
-                                :class="selectedShul !== {{ shul.pk }} ? 'bg-light' : ''"
                                 type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#shul-{{ shul.id }}"
                                 aria-expanded="false"
                                 aria-controls="shul-{{ shul.id }}">
                             <div class="d-flex w-100 pe-3 align-items-center">
-                                <span class="fw-bold d-inline-block flex-grow-1">{{ shul.name }}
+                                <span class="fw-bold d-inline-block flex-grow-1">
+                                    <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
                                     {% if request.GET.newShul == shul.pk|stringformat:"s" %}
                                         <span class="badge bg-success">Just Added</span>
                                     {% endif %}
@@ -64,7 +64,8 @@
                         </button>
                     </h2>
                     <div id="shul-{{ shul.id }}"
-                         class="accordion-collapse collapse"
+                         class="accordion-collapse collapse
+                                {% if not forloop.last %}border-secondary-subtle border-bottom{% endif %}"
                          data-bs-parent="#clusterShulsAccordion">
                         <div class="accordion-body">
                             <div class="d-flex flex-column">
@@ -81,28 +82,33 @@
                                         Open in Maps
                                     </a>
                                 </div>
-                                {% for room in shul.rooms.all %}
-                                    <hr>
-                                    <div class="mb-2 fw-bold">{{ room.name }}</div>
-                                    {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
-                                    <div class="ps-3">
-                                        <div class="mb-2">
-                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
-                                               style="width:16px;
-                                                      display:inline-block;
-                                                      text-align:center"></i>
-                                            <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
-                                        </div>
-                                        <div class="mb-2">
-                                            <i class="fa-solid fa-eye me-2"
-                                               style="width:16px;
-                                                      display:inline-block;
-                                                      text-align:center"></i>
-                                            <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
-                                        </div>
-                                    </div>
-                                {% endwith %}
-                            {% endfor %}
+                                {% if shul.rooms.exists %}
+                                    <ul class="list-group mt-3">
+                                        {% for room in shul.rooms.all %}
+                                            <li class="list-group-item">
+                                                <div class="h6 fw-bold">{{ room.name }}</div>
+                                                {% with not_set_display="<kbd class='fw-bold'>?</kbd> - Not set" %}
+                                                <div class="ps-3 gap-2 d-flex flex-column">
+                                                    <div>
+                                                        <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
+                                                           style="width:16px;
+                                                                  display:inline-block;
+                                                                  text-align:center"></i>
+                                                        <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                                                    </div>
+                                                    <div>
+                                                        <i class="fa-solid fa-eye me-2"
+                                                           style="width:16px;
+                                                                  display:inline-block;
+                                                                  text-align:center"></i>
+                                                        <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
+                                                    </div>
+                                                </div>
+                                            {% endwith %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
