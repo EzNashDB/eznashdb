@@ -17,14 +17,16 @@
                                 data-bs-target="#shul-{{ shul.id }}"
                                 aria-expanded="false"
                                 aria-controls="shul-{{ shul.id }}">
-                            <strong>{{ shul.name }}</strong>
-                            <span class="ms-2 text-muted small">
-                                {% if shul.rooms.exists %}
-                                    ({{ shul.rooms.count }} room{{ shul.rooms.count|pluralize }})
-                                {% else %}
-                                    (no rooms saved)
-                                {% endif %}
-                            </span>
+                            <div>
+                                <span class="fw-bold">{{ shul.name }}</span>
+                                <span class="ms-2 text-muted small">
+                                    {% if shul.rooms.exists %}
+                                        ({{ shul.rooms.count }} room{{ shul.rooms.count|pluralize }})
+                                    {% else %}
+                                        (no rooms saved)
+                                    {% endif %}
+                                </span>
+                            </div>
                         </button>
                     </h2>
                     <div id="shul-{{ shul.id }}"
