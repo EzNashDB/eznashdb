@@ -109,15 +109,22 @@
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
                 map.on("popupclose", () => {
-                    // Only remove selectedPin param on large screens where popup was actually used
+                    // Only remove selectedShul param on large screens where popup was actually used
                     if (!isSmallScreen()) {
-                        deleteURLParams(["selectedPin"]);
+                        deleteURLParams(["selectedShul"]);
 }                });
 
                 const markersLayer = L.markerClusterGroup({
                     showCoverageOnHover: false,
                     spiderfyOnMaxZoom: false, // Don't spiderfy - show combined popup instead
                     zoomToBoundsOnClick: false, // Don't zoom - show popup instead
+                    spiderfyDistanceMultiplier: 0,
+                    disableClusteringAtZoom: null,
+                });
+                // Disable spiderfy completely
+                markersLayer.on('spiderfied', function(e) {
+                    e.preventDefault();
+                    return false;
                 });
                 map.addLayer(markersLayer);
 
@@ -139,7 +146,7 @@ markersLayer.on('clusterclick', function(cluster) {
         return;
     }
 
-    // Security-grouped cluster - get pre-rendered popup
+    // Get grid key from position
     const gridKey = `${firstPos.lat}_${firstPos.lng}`;
     const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[gridKey];
 
@@ -148,11 +155,23 @@ markersLayer.on('clusterclick', function(cluster) {
         return;
     }
 
+    // Get unique shul IDs in this cluster
+    const uniqueShulIds = new Set();
+    childMarkers.forEach(marker => {
+        const shulId = marker.getPopup().options.shulId;
+        uniqueShulIds.add(shulId);
+    });
+
     cluster.layer.bindPopup(popupContent, {
         className: "shul-popup shul-cluster-popup",
         closeButton: false,
         maxHeight: 400,
+        gridKey: gridKey,
+        shulIds: Array.from(uniqueShulIds),
     }).openPopup();
+
+    // Update URL params
+    updateURLParams({ selectedCluster: gridKey });
 
     // Set up close button
     setTimeout(() => {
@@ -165,9 +184,46 @@ markersLayer.on('clusterclick', function(cluster) {
                     cluster.layer.closePopup();
                 });
             }
+
+            // Set up accordion item listeners
+            setupAccordionListeners(popupEl, Array.from(uniqueShulIds));
         }
     }, 0);
 });
+
+// Handle popup close - remove URL params
+map.on("popupclose", (e) => {
+    const popup = e.popup;
+    if (popup.options.gridKey) {
+        // Cluster popup closed
+        deleteURLParams(["selectedCluster", "selectedShul"]);
+    } else if (!isSmallScreen()) {
+        // Single shul popup closed (large screen)
+        deleteURLParams(["selectedShul"]);
+    }
+});
+
+function setupAccordionListeners(popupEl, shulIds) {
+    const accordionEl = popupEl.querySelector('#clusterShulsAccordion');
+    if (!accordionEl) return;
+
+    shulIds.forEach(shulId => {
+        const collapseEl = popupEl.querySelector(`#shul-${shulId}`);
+        if (!collapseEl) return;
+
+        collapseEl.addEventListener('shown.bs.collapse', () => {
+            updateURLParams({ selectedShul: shulId });
+        });
+
+        collapseEl.addEventListener('hidden.bs.collapse', () => {
+            // Check if any accordion items are still open
+            const anyOpen = popupEl.querySelector('.accordion-collapse.show');
+            if (!anyOpen) {
+                deleteURLParams(["selectedShul"]);
+            }
+        });
+    });
+}
 
                 const popupHtmlMap = {};      // keyed by shul id (string) -> html string
                 const markersByPopupId = {};  // keyed by popupId (string like '123', '+123', '-123') -> marker instance
@@ -208,7 +264,7 @@ markersLayer.on('clusterclick', function(cluster) {
                             const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
                             // Remove URL param when offcanvas is hidden
                             offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                                deleteURLParams(["selectedPin"]);
+                                deleteURLParams(["selectedShul"]);
                             }, { once: true });
                             bsOffcanvas.show();
 
@@ -236,7 +292,7 @@ markersLayer.on('clusterclick', function(cluster) {
                                 }
                             }, 0);
                         }
-                        updateURLParams({ selectedPin: shulId });
+                        updateURLParams({ selectedShul: shulId });
                     });
 
                     markersLayer.addLayer(marker);
@@ -256,23 +312,87 @@ markersLayer.on('clusterclick', function(cluster) {
                     });
                 }
 
-                const openSelectedMarker = () => {
-                    // If URL requested a selectedPin, open it. If using clusters, zoomToShowLayer is used to ensure visibility.
-                    const api = window.SHUL_MAP_API
-                    const selectedPinIdFromURL = urlParams.get("selectedPin");
-                    if (selectedPinIdFromURL) {
-                        const target = api.markersByPopupId[String(selectedPinIdFromURL)];
-                        if (target) {
-                            // if markersLayer is a MarkerClusterGroup, prefer zoomToShowLayer
-                            if (typeof api.markersLayer.zoomToShowLayer === "function") {
-                                api.markersLayer.zoomToShowLayer(target, () => target.fire('click'));
-                            } else {
-                                // ensure marker is on the map and then open
-                                setTimeout(() => target.fire('click'), 0);
-                            }
+const openSelectedMarker = () => {
+    const api = window.SHUL_MAP_API;
+    const selectedShulId = urlParams.get("selectedShul");
+    const selectedCluster = urlParams.get("selectedCluster");
+
+    if (selectedShulId) {
+        // Find which cluster/grid this shul belongs to
+        const gridKey = api.shulToGridKey[selectedShulId];
+
+        if (!gridKey) return;
+
+        // Find a marker at this grid location
+        const target = api.markersByPopupId[String(selectedShulId)];
+        if (!target) return;
+
+        // Check if this is in a cluster
+        const cluster = api.markersLayer.getVisibleParent(target);
+
+        if (cluster && cluster instanceof L.MarkerCluster) {
+            // Click the cluster icon
+            const clusterIcon = cluster._icon;
+            if (clusterIcon) {
+                clusterIcon.click();
+            }
+
+// After cluster popup opens, expand the specific shul's accordion
+setTimeout(() => {
+    const accordionItem = document.querySelector(`#shul-${selectedShulId}`);
+    if (accordionItem && !accordionItem.classList.contains('show')) {
+        const collapse = new bootstrap.Collapse(accordionItem, { toggle: true });
+
+        // Scroll into view after accordion opens
+        accordionItem.addEventListener('shown.bs.collapse', () => {
+            accordionItem.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, { once: true });
+    }
+}, 200);
+        } else {
+            // Not in a cluster - open normally
+            setTimeout(() => target.fire('click'), 0);
+        }
+    } else if (selectedCluster) {
+        // Just open the cluster without expanding any accordion
+        // Find any shul in this cluster to trigger it
+        const shulIdInCluster = Object.keys(api.shulToGridKey).find(
+            id => api.shulToGridKey[id] === selectedCluster
+        );
+
+        console.log('Found shul in cluster:', shulIdInCluster);
+
+        if (shulIdInCluster) {
+            const target = api.markersByPopupId[String(shulIdInCluster)];
+            console.log('Target marker:', target);
+
+            if (target) {
+                const cluster = api.markersLayer.getVisibleParent(target);
+                console.log('Cluster:', cluster);
+                console.log('Is MarkerCluster?', cluster instanceof L.MarkerCluster);
+
+                if (cluster && cluster instanceof L.MarkerCluster) {
+                    // Just fire the click - don't use zoomToShowLayer
+
+                        const clusterIcon = cluster._icon;
+                        if (clusterIcon) {
+                            clusterIcon.click();
+                        } else {
+                            // Fallback: fire the event manually
+                            api.markersLayer.fire('clusterclick', {
+                                layer: cluster
+                            });
                         }
-                    }
+                } else {
+                    console.log('Not in a cluster at this zoom level');
                 }
+            }
+        }
+    }
+}
 
                 window.SHUL_MAP_API = {
                     ...(window.SHUL_MAP_API || {}),
@@ -321,32 +441,41 @@ markersLayer.on('clusterclick', function(cluster) {
                 window.SHUL_MAP_API.shulsFoundControl = shulsFoundControl
             }
 
-            const addShulMarkers = () => {
-                const mapApi = window.SHUL_MAP_API;
-                {% for shul in object_list %}
-                    mapApi.popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
-                    // Add the three wrap-around variants (original, -360, +360)
-                    (() => {
-                        const id = {{ shul.id }};
-                        const lat = parseFloat({{ shul.display_lat }});
-                        const lon = parseFloat({{ shul.display_lon }});
-                        // original
-                        mapApi.addMarker(id, lat, lon, String(id));
-                        // wrap-around west
-                        mapApi.addMarker(id, lat, lon - 360, "-" + String(id));
-                        // wrap-around east
-                        mapApi.addMarker(id, lat, lon + 360, "+" + String(id));
-                    })();
-                {% endfor %}
+const addShulMarkers = () => {
+    const mapApi = window.SHUL_MAP_API;
 
-                // Build cluster popups
-                const clusterPopupHtmlMap = {};
-                {% for grid_key, shuls in cluster_groups.items %}
-                    clusterPopupHtmlMap["{{ grid_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
-                {% endfor %}
+    // Build individual shul popups AND store grid key for each shul
+    const shulToGridKey = {};
 
-                mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
-            }
+    {% for shul in object_list %}
+        mapApi.popupHtmlMap["{{ shul.id }}"] = `{% include "eznashdb/includes/shul_popup.html" %}`;
+        shulToGridKey["{{ shul.id }}"] = "{{ shul.display_lat }}_{{ shul.display_lon }}";
+
+        // Add the three wrap-around variants (original, -360, +360)
+        (() => {
+            const id = {{ shul.id }};
+            const lat = parseFloat({{ shul.display_lat }});
+            const lon = parseFloat({{ shul.display_lon }});
+            // original
+            mapApi.addMarker(id, lat, lon, String(id));
+            // wrap-around west
+            mapApi.addMarker(id, lat, lon - 360, "-" + String(id));
+            // wrap-around east
+            mapApi.addMarker(id, lat, lon + 360, "+" + String(id));
+        })();
+    {% endfor %}
+
+    // Build cluster popups (for groups with 2+ shuls)
+    const clusterPopupHtmlMap = {};
+    {% for grid_key, shuls in cluster_groups.items %}
+        {% if shuls|length > 1 %}
+            clusterPopupHtmlMap["{{ grid_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
+        {% endif %}
+    {% endfor %}
+
+    mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
+    mapApi.shulToGridKey = shulToGridKey;
+}
 
             const replaceMapShuls = () => {
                 const mapApi = window.SHUL_MAP_API;
