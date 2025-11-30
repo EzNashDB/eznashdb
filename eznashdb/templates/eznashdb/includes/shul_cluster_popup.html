@@ -17,14 +17,11 @@
                                 data-bs-target="#shul-{{ shul.id }}"
                                 aria-expanded="false"
                                 aria-controls="shul-{{ shul.id }}">
-                            <div>
-                                <span class="fw-bold">{{ shul.name }}</span>
-                                <span class="ms-2 text-muted small">
-                                    {% if shul.rooms.exists %}
-                                        ({{ shul.rooms.count }} room{{ shul.rooms.count|pluralize }})
-                                    {% else %}
-                                        (no rooms saved)
-                                    {% endif %}
+                            <div class="d-flex w-100 pe-3">
+                                <span class="fw-bold d-inline-block flex-grow-1">{{ shul.name }}</span>
+                                <span x-show="selectedShul !== {{ shul.pk }}"
+                                      class="ms-2 badge text-bg-secondary">
+                                    {{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}
                                 </span>
                             </div>
                         </button>
@@ -33,48 +30,47 @@
                          class="accordion-collapse collapse"
                          data-bs-parent="#clusterShulsAccordion">
                         <div class="accordion-body">
-                            <div class="d-flex gap-2 mb-2">
-                                <a class="btn btn-sm btn-outline-primary text-nowrap"
-                                   href="{% url 'eznashdb:update_shul' shul.id %}">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </a>
-                                <a target="_blank"
-                                   rel="noopener noreferrer"
-                                   href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
-                                   class="btn btn-sm btn-primary flex-grow-1">
-                                    <i class="fa-brands fa-google me-1"></i>
-                                    Open in Google Maps
-                                </a>
-                            </div>
-                            {% if shul.rooms.exists %}
-                                <div class="d-flex flex-column gap-2">
-                                    {% for room in shul.rooms.all %}
-                                        <div class="p-2 rounded bg-light border">
-                                            <div class="mb-2 fw-bold">{{ room.name }}</div>
-                                            {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
-                                            <div class="ps-3">
-                                                <div class="mb-2">
-                                                    <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
-                                                       style="width:16px;
-                                                              display:inline-block;
-                                                              text-align:center"></i>
-                                                    <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <i class="fa-solid fa-eye me-2"
-                                                       style="width:16px;
-                                                              display:inline-block;
-                                                              text-align:center"></i>
-                                                    <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
-                                                </div>
-                                            </div>
-                                        {% endwith %}
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="flex-grow-1 ">
+                                        <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
                                     </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <span class="text-muted small">No rooms saved</span>
-                        {% endif %}
+                                    <a target="_blank"
+                                       rel="noopener noreferrer"
+                                       href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fa-brands fa-google me-1"></i>
+                                        Open in Maps
+                                    </a>
+                                    <a class="btn btn-sm btn-primary text-nowrap"
+                                       href="{% url 'eznashdb:update_shul' shul.id %}">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                </div>
+                                {% for room in shul.rooms.all %}
+                                    <div class="p-2 rounded bg-light border">
+                                        <div class="mb-2 fw-bold">{{ room.name }}</div>
+                                        {% with not_set_display="<kbd class='fw-bold'>?</kbd> <small>- Not set</small>" %}
+                                        <div class="ps-3">
+                                            <div class="mb-2">
+                                                <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
+                                                   style="width:16px;
+                                                          display:inline-block;
+                                                          text-align:center"></i>
+                                                <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <i class="fa-solid fa-eye me-2"
+                                                   style="width:16px;
+                                                          display:inline-block;
+                                                          text-align:center"></i>
+                                                <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
+                                            </div>
+                                        </div>
+                                    {% endwith %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
