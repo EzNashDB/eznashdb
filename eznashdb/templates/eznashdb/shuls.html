@@ -56,9 +56,8 @@
     {{ block.super }}
     <script defer>
         (() => {
-            // ============================================================================
-            // UTILITY FUNCTIONS
-            // ============================================================================
+            window.URL_PARAMS_API = (() => {
+            let params = new URLSearchParams(window.location.search);
 
             const updateURLParams = (params) => {
                 const url = new URL(window.location.href);
@@ -72,9 +71,18 @@
                 history.replaceState({}, "", url.toString());
             };
 
+            return {
+                update: updateURLParams,
+                delete: deleteURLParams,
+            };
+            })();
+            // ============================================================================
+            // UTILITY FUNCTIONS
+            // ============================================================================
+
             const updateURLLocationParams = (map) => {
                 const center = map.getCenter();
-                updateURLParams({
+                URL_PARAMS_API.update({
                     lat: center.lat,
                     lon: center.lng,
                     zoom: map.getZoom(),
@@ -124,7 +132,7 @@
                     const popup = e.popup;
 
                     if (popup.options?.gridKey) {
-                        updateURLParams({ selectedCluster: popup.options.gridKey });
+                        URL_PARAMS_API.update({ selectedCluster: popup.options.gridKey });
                     }
                 });
 
@@ -181,7 +189,7 @@
                         uniqueShulIds.add(marker.options.shulId);
                     });
 
-                    updateURLParams({ selectedCluster: gridKey });
+                    URL_PARAMS_API.update({ selectedCluster: gridKey });
 
                     if (isSmallScreen()) {
                         // Small screen - use offcanvas
@@ -190,7 +198,7 @@
 
                         const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
                         offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                            deleteURLParams(["selectedCluster", "selectedShul"]);
+                            URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
                         }, { once: true });
                         bsOffcanvas.show();
 
@@ -273,7 +281,7 @@
 
                         const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
                         offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                            deleteURLParams(["selectedCluster", "selectedShul"]);
+                            URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
                         }, { once: true });
                         bsOffcanvas.show();
 
@@ -329,16 +337,16 @@
                         }, 0);
                     }
 
-                    updateURLParams({ selectedCluster: gridKey });
+                    URL_PARAMS_API.update({ selectedCluster: gridKey });
                 });
 
                 // Handle popup close - remove URL params
                 map.on("popupclose", (e) => {
                     const popup = e.popup;
                     if (popup.options.gridKey) {
-                        deleteURLParams(["selectedCluster", "selectedShul"]);
+                        URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
                     } else if (!isSmallScreen()) {
-                        deleteURLParams(["selectedShul"]);
+                        URL_PARAMS_API.delete(["selectedShul"]);
                     }
                 });
 
@@ -352,15 +360,13 @@
                         if (!collapseEl) return;
 
                         collapseEl.addEventListener('shown.bs.collapse', () => {
-                            setAlpineSelectedShul(shulId)
-                            updateURLParams({ selectedShul: shulId });
+                            URL_PARAMS_API.update({ selectedShul: shulId });
                         });
 
                         collapseEl.addEventListener('hidden.bs.collapse', () => {
                             const anyOpen = popupEl.querySelector('.accordion-collapse.show');
                             if (!anyOpen) {
-                                deleteURLParams(["selectedShul"]);
-                                setAlpineSelectedShul('')
+                                URL_PARAMS_API.delete(["selectedShul"]);
                             }
                         });
                     });
