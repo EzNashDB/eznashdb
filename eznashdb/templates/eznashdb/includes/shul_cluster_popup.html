@@ -19,7 +19,14 @@
                                 aria-expanded="false"
                                 aria-controls="shul-{{ shul.id }}">
                             <div class="d-flex w-100 pe-3 align-items-center">
-                                <span class="fw-bold d-inline-block flex-grow-1">{{ shul.name }}</span>
+                                <span class="fw-bold d-inline-block flex-grow-1">{{ shul.name }}
+                                    {% if request.GET.newShul == shul.pk|stringformat:"s" %}
+                                        <span class="badge bg-success">Just Added</span>
+                                    {% endif %}
+                                    {% if request.GET.updatedShul == shul.pk|stringformat:"s" %}
+                                        <span class="ms-2 badge bg-success">Just Updated</span>
+                                    {% endif %}
+                                </span>
                                 <span x-show="selectedShul !== {{ shul.pk }}" class="ms-2">
                                     <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
                                 </span>
