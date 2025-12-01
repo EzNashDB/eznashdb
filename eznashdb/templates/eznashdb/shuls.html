@@ -160,9 +160,8 @@
             }
 
             function autoOpenAccordionForSingleShuls(containerEl, gridKey, shulIds) {
-                if (window.SHUL_MAP_API.singleShulClusters.has(gridKey)) {
-                    const firstShulId = shulIds[0];
-                    const accordionItem = containerEl.querySelector(`#shul-${firstShulId}`);
+                if (shulIds.length === 1) {
+                    const accordionItem = containerEl.querySelector(`#shul-${shulIds[0]}`);
                     if (accordionItem && !accordionItem.classList.contains('show')) {
                         new bootstrap.Collapse(accordionItem, { toggle: true });
                     }
@@ -452,16 +451,8 @@
                     clusterPopupHtmlMap["{{ grid_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
                 {% endfor %}
 
-                // Track which clusters are singles for auto-opening accordion
-                const singleShulClusters = new Set([
-                    {% for grid_key, shuls in cluster_groups.items %}
-                        {% if shuls|length == 1 %}"{{ grid_key }}",{% endif %}
-                    {% endfor %}
-                ]);
-
                 mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
                 mapApi.shulToGridKey = shulToGridKey;
-                mapApi.singleShulClusters = singleShulClusters;
             };
 
             // ============================================================================
