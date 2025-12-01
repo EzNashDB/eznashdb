@@ -129,8 +129,6 @@
                             bsOffcanvas.hide();
                         });
                     }
-
-                    autoOpenAccordionForSingleShuls(offcanvasEl, gridKey, shulIds);
                 } else {
                     // Large screen - use popup
                     targetElement.bindPopup(popupContent, {
@@ -152,20 +150,11 @@
                                 targetElement.closePopup();
                             });
                         }
-
-                        autoOpenAccordionForSingleShuls(popupEl, gridKey, shulIds);
                     }, 0);
                 }
             }
 
-            function autoOpenAccordionForSingleShuls(containerEl, gridKey, shulIds) {
-                if (shulIds.length === 1) {
-                    const accordionItem = containerEl.querySelector(`#shul-${shulIds[0]}`);
-                    if (accordionItem && !accordionItem.classList.contains('show')) {
-                        new bootstrap.Collapse(accordionItem, { toggle: true });
-                    }
-                }
-            }
+
 
             // ============================================================================
             // MAP INITIALIZATION
