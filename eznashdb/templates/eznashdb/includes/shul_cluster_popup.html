@@ -44,7 +44,8 @@
                         {# djlint:on #}
                         >
                         <h2 class="accordion-header" style="scroll-margin-top: 15px">
-                            <button class="accordion-button collapsed"
+                            <button class="accordion-button
+                                           {% if shuls|length != 1 %}collapsed{% endif %}"
                                     type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#shul-{{ shul.id }}"
@@ -68,6 +69,7 @@
                         </h2>
                         <div id="shul-{{ shul.id }}"
                              class="accordion-collapse collapse
+                                    {% if shuls|length == 1 %}show{% endif %}
                                     {% if not forloop.last %}border-secondary-subtle border-bottom{% endif %}"
                              data-bs-parent="#shuls-cluster-accordion">
                             <div class="accordion-body">
