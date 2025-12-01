@@ -192,14 +192,7 @@
                 // Keep URL in sync with map movements
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
-                map.on("popupclose", (e) => {
-                    const popup = e.popup;
-                    if (popup.options.gridKey) {
-                        URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
-                    } else if (!isSmallScreen()) {
-                        URL_PARAMS_API.delete(["selectedShul"]);
-                    }
-                });
+                map.on("popupclose", (e) => URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]));
 
                 // Create marker cluster group
                 const markersLayer = L.markerClusterGroup({
