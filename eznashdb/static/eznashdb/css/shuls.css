@@ -2,6 +2,10 @@
     font-family: unset;
 }
 
+.shuls-found-control {
+    cursor: initial;
+}
+
 /* Popup */
 .shul-cluster-popup {
     pointer-events: none;
@@ -9,7 +13,7 @@
 
 .shul-cluster-popup .leaflet-popup-content {
     pointer-events: initial;
-    margin-top: 40px;
+    margin-top: 60px;
     max-width: 425px;
     width: calc(100vw - 40px) !important;
 }
