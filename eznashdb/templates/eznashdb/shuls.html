@@ -204,6 +204,7 @@
                 });
 
                 markersLayer.on('spiderfied', (e) => {
+                    // Don't spiderfy - clustered shuls should stay together
                     e.preventDefault();
                     return false;
                 });
