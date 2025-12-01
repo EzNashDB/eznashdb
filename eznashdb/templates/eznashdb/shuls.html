@@ -197,7 +197,14 @@
                         URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterGridKey });
                     }
                 });
-                map.on("popupclose", (e) => URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]));
+                map.on("popupclose", (e) => {
+                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul"])
+
+                    const source = e.popup && e.popup._source;
+                    if (source && typeof source.unbindPopup === "function") {
+                        source.unbindPopup();
+                    }
+                });
 
                 // Create marker cluster group
                 const markersLayer = L.markerClusterGroup({
