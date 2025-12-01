@@ -11,7 +11,7 @@
             <span class="small text-muted">Exact locations not displayed</span>
         </div>
         <div class="flex-grow-1 overflow-auto">
-            <div class="accordion accordion-flush" id="clusterShulsAccordion">
+            <div class="accordion accordion-flush" id="shuls-cluster-accordion">
                 {% for shul in shuls %}
                     <div class="accordion-item border-0
                         {% if not forloop.last %}border-bottom{% endif %}"
@@ -69,7 +69,7 @@
                         <div id="shul-{{ shul.id }}"
                              class="accordion-collapse collapse
                                     {% if not forloop.last %}border-secondary-subtle border-bottom{% endif %}"
-                             data-bs-parent="#clusterShulsAccordion">
+                             data-bs-parent="#shuls-cluster-accordion">
                             <div class="accordion-body">
                                 <div class="d-flex flex-column">
                                     <div class="d-flex gap-2 align-items-center">
