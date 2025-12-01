@@ -107,11 +107,12 @@
             // ============================================================================
             // POPUP SETUP HELPER
             // ============================================================================
+            let lastOpenedClusterGridKey = null;
 
             function setupClusterPopup(targetElement, gridKey, popupContent) {
-                URL_PARAMS_API.update({ selectedCluster: gridKey });
 
                 if (isSmallScreen()) {
+                    URL_PARAMS_API.update({ selectedCluster: gridKey });
                     // Small screen - use offcanvas
                     const offcanvasEl = document.getElementById("shulOffcanvas");
                     offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupContent;
@@ -130,6 +131,7 @@
                         });
                     }
                 } else {
+                    lastOpenedClusterGridKey = gridKey;
                     // Large screen - use popup
                     targetElement.bindPopup(popupContent, {
                         className: "shul-cluster-popup",
@@ -190,6 +192,11 @@
                 // Keep URL in sync with map movements
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
+                map.on("popupopen", (e) => {
+                    if (lastOpenedClusterGridKey) {
+                        URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterGridKey });
+                    }
+                });
                 map.on("popupclose", (e) => URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]));
 
                 // Create marker cluster group
