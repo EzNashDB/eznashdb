@@ -184,6 +184,7 @@
                 L.control.zoom({ position: "bottomleft" }).addTo(map);
                 document.getElementById(mapId).classList.add("rounded");
 
+                // small delay allows CSS/layout to finish
                 map.whenReady(() => {
                     setTimeout(() => map.invalidateSize(), 150);
                 });
