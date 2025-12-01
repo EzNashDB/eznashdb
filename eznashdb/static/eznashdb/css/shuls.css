@@ -3,11 +3,11 @@
 }
 
 /* Popup */
-.shul-popup {
+.shul-cluster-popup {
     pointer-events: none;
 }
 
-.shul-popup .leaflet-popup-content {
+.shul-cluster-popup .leaflet-popup-content {
     pointer-events: initial;
     margin-top: 40px;
     max-width: 425px;
