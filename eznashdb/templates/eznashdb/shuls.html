@@ -255,8 +255,6 @@
 
                     if (!shulId) return;
 
-                    gtag('event', 'marker_click', { 'shul_id': shulId });
-
                     const gridKey = window.SHUL_MAP_API.shulToGridKey[shulId];
                     const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[gridKey];
 
