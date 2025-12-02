@@ -372,21 +372,11 @@
 
                     // Scroll within the popup container only
                     const header = item.querySelector('.accordion-header');
-                    const scrollContainer = item.closest('.overflow-auto'); // Find the scrollable parent
-
-                    if (scrollContainer && header) {
-                        const scrollMargin = 15; // matches your scroll-margin-top
-                        const containerRect = scrollContainer.getBoundingClientRect();
-                        const headerRect = header.getBoundingClientRect();
-
-                        // Calculate how far the header is from the top of the scroll container
-                        const relativeTop = headerRect.top - containerRect.top;
-
-                        scrollContainer.scrollTo({
-                            top: scrollContainer.scrollTop + relativeTop - scrollMargin,
-                            behavior: 'smooth'
-                        });
-                    }
+                    scrollIntoViewWithinContainer(header, {
+                        behavior: 'smooth',
+                        block: 'start',
+                        offset: 15
+                    });
                 });
 
                 collapseEl.addEventListener('hide.bs.collapse', () => {
