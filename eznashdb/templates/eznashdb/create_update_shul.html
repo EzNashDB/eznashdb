@@ -15,14 +15,14 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row h-100"
+    <div class="row h-100" id="shul-form-state"
         {# djlint:off #}
-        x-data="{ isDirty: false }"
+        x-data="{ dirtyFields: new Set() }"
         x-init="
             window.onbeforeunload = (e) => {
                 if (window.htmxSubmitting) return;
                 // Trigger built-in browser warning if any fields are dirty.
-                if (isDirty || !!'{{form.errors|escapejs}}') {
+                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
                     return '';
                 }
             }
@@ -36,8 +36,8 @@
                   novalidate
                   id="shul_form"
                   class="row h-100"
-                  @input="isDirty = true"
-                  @change="isDirty = true">
+                  @input="dirtyFields.add($event.target.name)"
+                  @change="dirtyFields.add($event.target.name)">
                 {% csrf_token %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row">
@@ -100,9 +100,13 @@
                                     <button type="submit"
                                         class="btn btn-primary w-100"
                                         {# djlint:off #}
-                                            hx-vals='{
+                                            hx-vals='js:{
                                                 "submit_type": "main_submit",
-                                                "from": "{{ request.GET.from|default:"" }}"
+                                                "from": "{{ request.GET.from|default:"" }}",
+                                                "address_changed": (() => {
+                                                    const dirtyFields = Alpine.$data(document.getElementById("shul-form-state")).dirtyFields;
+                                                    return dirtyFields.has("latitude") || dirtyFields.has("longitude");
+                                                })(),
                                             }'
                                         {# djlint:on #}
                                         hx-post='{{ request.path }}'

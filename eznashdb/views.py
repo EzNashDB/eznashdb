@@ -85,7 +85,8 @@ class CreateUpdateShulView(UpdateView):
             if not room_fs.is_valid():
                 return self.render_to_response(self.get_context_data(form=form))
         submit_type = self.request.POST.get("submit_type")
-        if submit_type == "main_submit":
+        address_changed = self.request.POST.get("address_changed") == "true"
+        if (submit_type == "main_submit") and address_changed:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
