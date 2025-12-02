@@ -12,13 +12,9 @@ function scrollIntoViewWithinContainer(element, options = {}) {
   const { behavior = "smooth", block = "start", offset = 0 } = options;
 
   // Find the nearest scrollable container
-  const scrollContainer =
-    element.closest(
-      '.overflow-auto, [style*="overflow: auto"], [style*="overflow: scroll"]'
-    ) ||
-    element.parentElement?.closest(
-      '.overflow-auto, [style*="overflow: auto"], [style*="overflow: scroll"]'
-    );
+  const scrollContainer = element.closest(
+    '.overflow-auto, [style*="overflow: auto"], [style*="overflow: scroll"]'
+  );
 
   if (!scrollContainer) {
     // No scrollable container found, fall back to regular scrollIntoView
