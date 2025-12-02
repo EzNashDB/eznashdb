@@ -200,7 +200,7 @@
 
             if (!roomCollapseEl || !header) return;
             const scrollToHeader = () => {
-                header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start' })
             };
 
             if (!roomCollapseEl.classList.contains('show')) {
