@@ -355,29 +355,45 @@
                     }
                 };
 
-                function initShulAccordion(item, shulId) {
-                    const collapseEl = item.querySelector('.accordion-collapse');
+            function initShulAccordion(item, shulId) {
+                const collapseEl = item.querySelector('.accordion-collapse');
 
-                    collapseEl.addEventListener('show.bs.collapse', () => {
-                        URL_PARAMS_API.update({ 'selectedShul': shulId });
-                    });
+                collapseEl.addEventListener('show.bs.collapse', () => {
+                    URL_PARAMS_API.update({ 'selectedShul': shulId });
+                });
 
-                    collapseEl.addEventListener('shown.bs.collapse', () => {
-                        if (window.SHUL_MAP_API?.map) {
-                            setTimeout(() => {
-                                const openPopup = window.SHUL_MAP_API.map._popup;
-                                if (openPopup && openPopup._adjustPan) openPopup._adjustPan();
-                            }, 100);
-                        }
-                        const header = item.querySelector('.accordion-header');
-                        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    });
+                collapseEl.addEventListener('shown.bs.collapse', () => {
+                    if (window.SHUL_MAP_API?.map) {
+                        setTimeout(() => {
+                            const openPopup = window.SHUL_MAP_API.map._popup;
+                            if (openPopup && openPopup._adjustPan) openPopup._adjustPan();
+                        }, 100);
+                    }
 
-                    collapseEl.addEventListener('hide.bs.collapse', () => {
-                        const isClosingActiveRoom = URL_PARAMS_API.get('selectedShul') === String(shulId);
-                        if (isClosingActiveRoom) URL_PARAMS_API.delete(['selectedShul']);
-                    });
-                }
+                    // Scroll within the popup container only
+                    const header = item.querySelector('.accordion-header');
+                    const scrollContainer = item.closest('.overflow-auto'); // Find the scrollable parent
+
+                    if (scrollContainer && header) {
+                        const scrollMargin = 15; // matches your scroll-margin-top
+                        const containerRect = scrollContainer.getBoundingClientRect();
+                        const headerRect = header.getBoundingClientRect();
+
+                        // Calculate how far the header is from the top of the scroll container
+                        const relativeTop = headerRect.top - containerRect.top;
+
+                        scrollContainer.scrollTo({
+                            top: scrollContainer.scrollTop + relativeTop - scrollMargin,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+
+                collapseEl.addEventListener('hide.bs.collapse', () => {
+                    const isClosingActiveRoom = URL_PARAMS_API.get('selectedShul') === String(shulId);
+                    if (isClosingActiveRoom) URL_PARAMS_API.delete(['selectedShul']);
+                });
+            }
 
                 // ============================================================================
                 // EXPOSE API
