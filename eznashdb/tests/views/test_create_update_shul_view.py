@@ -76,6 +76,7 @@ def describe_create():
             "address": "123 Sesame Street",
             "latitude": "1",
             "longitude": "1",
+            "address_changed": "true",
         }
 
         client.post(
@@ -93,6 +94,7 @@ def describe_create():
                 "longitude": "1",
                 "address": "some address",
                 "submit_type": "main_submit",
+                "address_changed": "true",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -122,6 +124,7 @@ def describe_update():
             "address": test_shul.address,
             "latitude": test_shul.latitude,
             "longitude": test_shul.longitude,
+            "address_changed": "false",
             **get_room_fields(room_index=0),
             **get_room_fields(room_index=1),
             **get_room_fs_metadata_fields(total_forms=2),
@@ -143,6 +146,7 @@ def describe_update():
                 "address": test_shul.address,
                 "latitude": test_shul.latitude,
                 "longitude": test_shul.longitude,
+                "address_changed": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -152,7 +156,7 @@ def describe_update():
         assert final_dest.resolver_match.view_name == "eznashdb:shuls"
 
 
-def test_lists_duplicates_if_any_found(client):
+def test_lists_duplicates_if_any_found_and_address_changed(client):
     # Create some nearby shuls
     nearby_shul_1 = Shul.objects.create(
         name="Nearby Shul 1",
@@ -182,6 +186,7 @@ def test_lists_duplicates_if_any_found(client):
             "longitude": "0.0",
             "address": "123 Test St",
             "submit_type": "main_submit",
+            "address_changed": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
@@ -193,3 +198,76 @@ def test_lists_duplicates_if_any_found(client):
     # Check that modal is shown
     assert nearby_shul_1.name in str(soup)
     assert nearby_shul_2.name in str(soup)
+
+
+def test_skips_duplicate_check_when_address_not_changed(client):
+    # Create some nearby shuls
+    nearby_shul_1 = Shul.objects.create(
+        name="Nearby Shul 1",
+        address="456 Nearby St",
+        latitude=0.0005,
+        longitude=0.0005,
+    )
+    nearby_shul_2 = Shul.objects.create(
+        name="Nearby Shul 2",
+        address="789 Adjacent Ave",
+        latitude=-0.0008,
+        longitude=-0.0003,
+    )
+
+    response = client.post(
+        reverse("eznashdb:create_shul"),
+        data={
+            "name": "New Test Shul",
+            "latitude": "0.0",
+            "longitude": "0.0",
+            "address": "123 Test St",
+            "submit_type": "main_submit",
+            "address_changed": "false",  # Address not changed
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+        },
+        headers={"HX-Request": "true"},
+    )
+
+    # Should redirect without showing modal
+    redirect_url = response.headers.get("HX-Redirect")
+    assert redirect_url is not None
+
+    # Modal should not be shown
+    soup = BeautifulSoup(response.content, features="html.parser")
+    assert nearby_shul_1.name not in str(soup)
+    assert nearby_shul_2.name not in str(soup)
+
+
+def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
+    # Create some nearby shuls
+    nearby_shul_1 = Shul.objects.create(
+        name="Nearby Shul 1",
+        address="456 Nearby St",
+        latitude=0.0005,
+        longitude=0.0005,
+    )
+
+    response = client.post(
+        reverse("eznashdb:create_shul"),
+        data={
+            "name": "New Test Shul",
+            "latitude": "0.0",
+            "longitude": "0.0",
+            "address": "123 Test St",
+            "submit_type": "other_submit",  # Not main_submit
+            "address_changed": "true",
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+        },
+        headers={"HX-Request": "true"},
+    )
+
+    # Should redirect without showing modal
+    redirect_url = response.headers.get("HX-Redirect")
+    assert redirect_url is not None
+
+    # Modal should not be shown
+    soup = BeautifulSoup(response.content, features="html.parser")
+    assert nearby_shul_1.name not in str(soup)
