@@ -75,9 +75,8 @@
         {% endblock extra_media_top %}
 
     </head>
-    <body class="d-flex flex-column"
-          hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
-        {% include 'includes/navbar.html' %}
+    <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+        <div class="fixed-top">{% include 'includes/navbar.html' %}</div>
         <!-- Messages Container -->
         {% if messages %}
             <div class="position-fixed top-0 end-0 p-3" style="z-index: 1060">
@@ -99,12 +98,13 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <div class="overflow-y-auto flex-grow-1">
-            <div class="container py-3 h-100 overflow-hidden">
+        <div class="main-scroll-container">
+            <div class="container py-3 h-100">
 
                 {% block content %}{% endblock %}
 
             </div>
+            {% include 'includes/footer.html' %}
         </div>
         {# twitter bootstrap #}
         <script type="text/javascript"
