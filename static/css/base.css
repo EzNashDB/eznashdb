@@ -10,12 +10,11 @@ body {
 
 body {
   overflow: hidden;
-  height: 100vh;
 }
 
 .main-scroll-container {
   margin-top: 56px;
-  height: calc(100vh - 56px);
+  height: calc(100% - 56px);
   overflow-y: auto;
 }
 
