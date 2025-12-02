@@ -321,7 +321,7 @@
         // Check if we've exceeded the maximum allowed number of forms:
         if (!showAddButton()) buttonRow.hide();
         // Scroll new form into view
-        row[0].scrollIntoView({ behavior: "smooth", block: "center" })
+        scrollIntoViewWithinContainer(row[0], { behavior: "smooth", block: "center" })
         // If a post-add callback was supplied, call it with the added form:
         if (options.added) options.added(row);
         return false;
