@@ -1,15 +1,29 @@
-from collections import namedtuple
+from dataclasses import dataclass
+
+from django.urls import reverse
+
+
+@dataclass
+class NavbarItem:
+    label: str
+    url: str
+    is_active: bool = False
 
 
 def navbar(request):
-    NavbarItem = namedtuple("NavbarItem", "label view_name")
-    current_app_name = request.resolver_match.app_names[0]
-    current_url_name = request.resolver_match.url_name
+    # Define your navbar items here
+    navbar_items = [
+        NavbarItem("Browse Shuls", reverse("eznashdb:shuls")),
+        NavbarItem("Add a Shul", reverse("eznashdb:create_shul")),
+        # NavbarItem("About", "/about/"),  #TODO Uncomment when flatpage is ready
+        NavbarItem("Contact", reverse("eznashdb:contact_us")),
+    ]
+
+    # Mark which item is active
+    current_path = request.path
+    for item in navbar_items:
+        item.is_active = item.url == current_path
+
     return {
-        "current_view_name": f"{current_app_name}:{current_url_name}",
-        "navbar_items": [
-            NavbarItem("Browse Shuls", "eznashdb:shuls"),
-            NavbarItem("Add a Shul", "eznashdb:create_shul"),
-            NavbarItem("Contact Us", "eznashdb:contact_us"),
-        ],
+        "navbar_items": navbar_items,
     }

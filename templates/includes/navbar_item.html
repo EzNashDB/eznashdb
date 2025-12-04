@@ -1,6 +1,6 @@
 <li class="nav-item">
     <a class="nav-link
-              {% if item.view_name == current_view_name %}active{% endif %}"
+              {% if item.is_active %}active{% endif %}"
        aria-current="page"
-       href="{% url item.view_name %}">{{ item.label }}</a>
+       href="{{ item.url }}">{{ item.label }}</a>
 </li>
