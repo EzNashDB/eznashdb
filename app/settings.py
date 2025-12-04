@@ -280,4 +280,5 @@ ENFORCE_HOST = os.environ.get("ENFORCE_HOST")
 TINYMCE_DEFAULT_CONFIG = {
     "height": 450,
     "width": "100%",
+    "plugins": "lists code",
 }
