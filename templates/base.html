@@ -98,7 +98,15 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <div class="main-scroll-container">
+        <div
+            {# djlint:off #}
+            class="main-scroll-container
+                  {% block main_scroll_container_classes %}
+                  d-flex flex-column
+                  {% endblock main_scroll_container_classes %}
+             "
+            {# djlint:on #}
+            >
             <div class="container py-3 h-100" style="min-height: fit-content">
 
                 {% block content %}{% endblock %}
