@@ -107,6 +107,7 @@ django-debug-toolbar = "^5.0.1"
 crispy-bootstrap5 = "^2025.6"
 django-htmx = "^1.26.0"
 django-template-partials = "^25.3"
+django-tinymce = "^5.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

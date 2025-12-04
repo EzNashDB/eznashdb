@@ -419,6 +419,20 @@ docs = ["Sphinx"]
 tests = ["coverage", "django_coverage_plugin"]
 
 [[package]]
+name = "django-tinymce"
+version = "5.0.0"
+description = "A Django application that contains a widget to render a"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "django_tinymce-5.0.0-py3-none-any.whl", hash = "sha256:c2e9c5efd2cc6c036f4c57e602b133180433e2bd1513b897089d3c4fb4e20579"},
+    {file = "django_tinymce-5.0.0.tar.gz", hash = "sha256:6257669ed596accf5fa967ff3061276b2c5352baac1bbc658fcd8252b12ca38a"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[[package]]
 name = "djlint"
 version = "1.19.13"
 description = "HTML Template Linter and Formatter"
@@ -1557,4 +1571,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "46ce3cba17e3a75033ca5aa14efa3d99cbfde991faaf4c857f25e9d12936607a"
+content-hash = "47dea5b07b696ec2b0aba46988ac563d8ddd02f360e812465eb9f69d47fc4073"
