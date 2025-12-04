@@ -15,7 +15,7 @@ def navbar(request):
     navbar_items = [
         NavbarItem("Browse Shuls", reverse("eznashdb:shuls")),
         NavbarItem("Add a Shul", reverse("eznashdb:create_shul")),
-        # NavbarItem("About", "/about/"),  #TODO Uncomment when flatpage is ready
+        NavbarItem("About", "/about/"),
         NavbarItem("Contact", reverse("eznashdb:contact_us")),
     ]
 
