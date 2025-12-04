@@ -107,7 +107,13 @@
              "
             {# djlint:on #}
             >
-            <div class="container py-3 h-100" style="min-height: fit-content">
+            <div
+                {# djlint:off #}
+                  class="container py-3
+                        {% block container_classes %}{% endblock container_classes %}
+                  "
+                {# djlint:on #}
+                style="min-height: fit-content">
 
                 {% block content %}{% endblock %}
 
