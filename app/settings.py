@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "tinymce",
     "corsheaders",
     "crispy_forms",
     "crispy_bootstrap5",
@@ -274,3 +275,9 @@ BASE_OSM_URL = MAPS_CO_API_KEY and MAPS_CO_DOMAIN or NOMINATIM_DOMAIN
 
 # Enforce host
 ENFORCE_HOST = os.environ.get("ENFORCE_HOST")
+
+# settings.py
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 450,
+    "width": "100%",
+}
