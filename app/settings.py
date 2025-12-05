@@ -127,7 +127,7 @@ if DEBUG:
         "0.0.0.0",
         "localhost",
     ]
-if not TESTING:
+if DEBUG and not TESTING:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
