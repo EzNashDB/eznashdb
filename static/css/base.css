@@ -122,3 +122,9 @@ td.td-shrink {
   /* Above input:focus (z-index: 5) */
   z-index: 10;
 }
+
+/* tomselect */
+.ts-dropdown [data-selectable].option {
+  display: flex;
+  align-items: center;
+}

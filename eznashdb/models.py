@@ -76,3 +76,15 @@ class Room(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}, {self.shul}"
+
+    def get_see_hear_score_display(self):
+        if self.see_hear_score:
+            return SeeHearScore(self.see_hear_score).get_display()
+        else:
+            return ""
+
+    def get_relative_size_display(self):
+        if self.relative_size:
+            return RelativeSize(self.relative_size).get_display()
+        else:
+            return ""

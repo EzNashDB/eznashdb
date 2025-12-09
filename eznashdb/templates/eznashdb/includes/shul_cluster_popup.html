@@ -67,15 +67,15 @@
                                                     <div class="h6 fw-bold">{{ room.name }}</div>
                                                     {% with not_set_display="<kbd class='fw-bold'>?</kbd> - Not set" %}
                                                     <div class="ps-3 gap-2 d-flex flex-column">
-                                                        <div>
-                                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-2"
+                                                        <div class="d-flex">
+                                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-3 mt-1"
                                                                style="width:16px;
                                                                       display:inline-block;
                                                                       text-align:center"></i>
                                                             <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
                                                         </div>
-                                                        <div>
-                                                            <i class="fa-solid fa-eye me-2"
+                                                        <div class="d-flex">
+                                                            <i class="fa-solid fa-eye me-3 mt-1"
                                                                style="width:16px;
                                                                       display:inline-block;
                                                                       text-align:center"></i>

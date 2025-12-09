@@ -10,13 +10,13 @@ from eznashdb.models import Room, Shul
 class ShulFilterSet(FilterSet):
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
-        choices=RelativeSize.choices,
+        choices=RelativeSize.get_display_choices(include_blank=True),
         label=FieldsOptions.RELATIVE_SIZE.label,
         method="filter_rooms__relative_size",
     )
     rooms__see_hear_score = MultiSelectModelFieldFilter(
         model_field="rooms__see_hear_score",
-        choices=SeeHearScore.choices,
+        choices=SeeHearScore.get_display_choices(include_blank=True),
         label=FieldsOptions.SEE_HEAR.label,
         method="filter_rooms__see_hear_score",
     )
