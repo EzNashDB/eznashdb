@@ -3,6 +3,7 @@ from django import forms
 from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
 
 from eznashdb.constants import FieldsOptions
+from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import SingleTomSelectWidget
 
@@ -72,6 +73,8 @@ class RoomForm(ModelForm):
         helper.template = "eznashdb/room_form.html"
         helper.form_tag = False
         helper.disable_csrf = True
+        self.fields["relative_size"].choices = RelativeSize.get_display_choices(include_blank=True)
+        self.fields["see_hear_score"].choices = SeeHearScore.get_display_choices(include_blank=True)
 
 
 RoomFormSet = inlineformset_factory(
