@@ -128,3 +128,19 @@ td.td-shrink {
   display: flex;
   align-items: center;
 }
+
+/* TomSelect: Prevent hidden clear button from blocking dropdown clicks */
+.ts-wrapper .clear-button {
+  pointer-events: none !important;
+}
+
+/* Enable clear button when focused or hovered (with items selected) */
+.ts-wrapper.plugin-clear_button.focus.has-items .clear-button,
+.ts-wrapper.plugin-clear_button:not(.disabled):hover.has-items .clear-button {
+  pointer-events: auto !important;
+}
+
+/* Show clear button when items are selected (visible but not yet clickable until focused/hovered) */
+.ts-wrapper.plugin-clear_button.has-items .clear-button {
+  opacity: 1;
+}
