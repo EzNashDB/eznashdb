@@ -89,5 +89,16 @@ export default function initializeTomSelects() {
         instance.control.removeChild(childElement);
       }
     }
+
+    // Fix dropdown position after control height changes.
+    // Changing the control's content above can cause the dropdown to misalign.
+    // Wait for layout to complete, then recalculate the correct position.
+    if (instance.isOpen) {
+      requestAnimationFrame(() => {
+        const rect = instance.control.getBoundingClientRect();
+        instance.dropdown.style.top = `${rect.bottom}px`;
+        instance.dropdown.style.left = `${rect.left}px`;
+      });
+    }
   }
 }
