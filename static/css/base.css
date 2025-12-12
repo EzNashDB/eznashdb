@@ -134,6 +134,11 @@ td.td-shrink {
   z-index: 2100
 }
 
+/* adjust margin so height doesn't change when selecting/deselecting */
+.ts-wrapper.multi .ts-control>div {
+  margin: 0 3px 2px 0;
+}
+
 /* TomSelect: Prevent hidden clear button from blocking dropdown clicks */
 .ts-wrapper .clear-button {
   pointer-events: none !important;
