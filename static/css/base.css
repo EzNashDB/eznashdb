@@ -129,6 +129,11 @@ td.td-shrink {
   align-items: center;
 }
 
+/* Show dropdowns over hx spinner overlay */
+.ts-dropdown {
+  z-index: 2100
+}
+
 /* TomSelect: Prevent hidden clear button from blocking dropdown clicks */
 .ts-wrapper .clear-button {
   pointer-events: none !important;
