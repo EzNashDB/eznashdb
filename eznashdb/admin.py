@@ -3,6 +3,8 @@ from django.apps import apps
 from django.contrib import admin
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
+from django.urls import reverse
+from django.utils.html import format_html
 from tinymce.widgets import TinyMCE
 
 from eznashdb.models import Shul
@@ -10,7 +12,34 @@ from eznashdb.models import Shul
 
 # Custom admin for Shul — only affects list page
 class ShulAdmin(admin.ModelAdmin):
-    list_display = ("name", "address", "created_at", "updated_at")
+    list_display = ("name", "short_address", "view_on_map", "created_at", "updated_at")
+
+    def view_on_map(self, obj):
+        """Generate a link to view the shul on the map"""
+        if obj.pk:
+            lat = obj.display_lat
+            lon = obj.display_lon
+            url = reverse("eznashdb:shuls")
+            url += f"?lat={lat}&lon={lon}&selectedShul={obj.pk}"
+            if lat and lon:
+                url += "&zoom=17"
+            return format_html('<a href="{}" target="_blank">View on Map</a>', url)
+        return "-"
+
+    view_on_map.short_description = "Map"
+
+    def short_address(self, obj):
+        """Truncate long addresses but show full address on hover"""
+        if obj.address:
+            max_length = 50
+            if len(obj.address) > max_length:
+                truncated = obj.address[:max_length] + "..."
+                return format_html('<span title="{}">{}</span>', obj.address, truncated)
+            return obj.address
+        return "-"
+
+    short_address.short_description = "Address"
+    short_address.admin_order_field = "address"
 
 
 # Register Shul with custom admin
