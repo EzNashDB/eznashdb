@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     help = "Backup database to Google Drive with retention policy"
+    backups_path = settings.DB_BACKUPS_PATH
 
     def handle(self, *args, **options):
         self.stdout.write("Starting database backup...")
@@ -90,7 +91,7 @@ class Command(BaseCommand):
     def _upload_to_gdrive(self, local_path):
         """Upload backup to Google Drive using rclone"""
         result = subprocess.run(
-            ["rclone", "copy", local_path, "gdrive:backups/"], capture_output=True, text=True
+            ["rclone", "copy", local_path, self.backups_path], capture_output=True, text=True
         )
 
         if result.returncode != 0:
@@ -109,7 +110,7 @@ class Command(BaseCommand):
 
     def _list_remote_backups(self):
         """List all backup files from Google Drive"""
-        result = subprocess.run(["rclone", "lsf", "gdrive:backups/"], capture_output=True, text=True)
+        result = subprocess.run(["rclone", "lsf", self.backups_path], capture_output=True, text=True)
 
         if result.returncode != 0:
             self.stdout.write(self.style.WARNING("Could not list backups for retention"))
@@ -178,7 +179,9 @@ class Command(BaseCommand):
         for filename, _backup_date in backups:
             if filename not in keep_backups:
                 self.stdout.write(f"Deleting old backup: {filename}")
-                subprocess.run(["rclone", "delete", f"gdrive:backups/{filename}"], capture_output=True)
+                subprocess.run(
+                    ["rclone", "delete", f"{self.backups_path}{filename}"], capture_output=True
+                )
 
     def _cleanup_old_local_backups(self, days=7):
         """Remove local backup files older than N days"""
