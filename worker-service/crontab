@@ -1,0 +1,2 @@
+# Run daily backup at 2 AM Israel time
+0 2 * * * cd /django && python manage.py backup_database >> /var/log/cron.log 2>&1

@@ -7,9 +7,12 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs:
   deploy:
-      name: Deploy app
+      name: Deploy apps
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
         - uses: superfly/flyctl-actions/setup-flyctl@master
-        - run: flyctl deploy --remote-only
+        - name: Deploy main app
+          run: flyctl deploy --remote-only
+        - name: Deploy worker service
+          run: flyctl deploy --remote-only --config worker-service/fly.toml
