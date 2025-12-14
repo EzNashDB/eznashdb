@@ -45,7 +45,7 @@ class ShulAdmin(admin.ModelAdmin):
     def short_address(self, obj):
         """Truncate long addresses but show full address on hover"""
         if obj.address:
-            max_length = 50
+            max_length = 40
             if len(obj.address) > max_length:
                 truncated = obj.address[:max_length] + "..."
                 return format_html('<span title="{}">{}</span>', obj.address, truncated)
