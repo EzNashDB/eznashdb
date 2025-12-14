@@ -1,0 +1,13 @@
+app = "eznashdb-worker"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  TZ = "Asia/Jerusalem"
+  DJANGO_SETTINGS_MODULE = "app.settings"
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
