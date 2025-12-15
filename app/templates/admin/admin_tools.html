@@ -23,7 +23,7 @@
                         <div class="card h-100 shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-gear-fill text-success me-3" style="font-size: 2.5rem;"></i>
+                                    <i class="fa-solid fa-gear text-success me-3" style="font-size: 2.5rem;"></i>
                                     <div>
                                         <h5 class="card-title mb-1">Django Admin</h5>
                                         <p class="card-text text-muted mb-0">Manage models, users, and site content.</p>
@@ -32,7 +32,7 @@
                                 <a href="{% url 'admin:index' %}"
                                    target="_blank"
                                    class="btn btn-success">
-                                    <i class="bi bi-box-arrow-up-right me-2"></i>Open Admin
+                                    <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Admin
                                 </a>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                         <div class="card h-100 shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-database-fill-up text-primary me-3"
+                                    <i class="fa-solid fa-database text-primary me-3"
                                        style="font-size: 2.5rem"></i>
                                     <div>
                                         <h5 class="card-title mb-1">Database Backup</h5>
@@ -53,7 +53,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="backup_db">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-cloud-arrow-up me-2"></i>Run Backup
+                                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Run Backup
                                     </button>
                                 </form>
                             </div>
