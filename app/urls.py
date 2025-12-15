@@ -4,8 +4,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from app.views import AdminToolsView
+
 urlpatterns = [
     path("", include("eznashdb.urls")),
+    path("admin/tools/", AdminToolsView.as_view(), name="admin_tools"),
     path("admin/", admin.site.urls),
 ]
 

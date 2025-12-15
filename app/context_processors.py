@@ -19,6 +19,10 @@ def navbar(request):
         NavbarItem("Contact", reverse("eznashdb:contact_us")),
     ]
 
+    # Add admin link for staff users
+    if request.user.is_staff:
+        navbar_items.append(NavbarItem("Admin", reverse("admin_tools")))
+
     # Mark which item is active
     current_path = request.path
     for item in navbar_items:
