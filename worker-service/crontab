@@ -1,2 +1,4 @@
 PATH=/usr/local/bin:/usr/bin:/bin
-41 22 * * * source /etc/backup.env && cd /django && python3 manage.py backup_db
+SHELL=/bin/bash
+
+56 22 * * * source /etc/backup.env && cd /django && python3 manage.py backup_db >> /var/log/cron.log 2>&1
