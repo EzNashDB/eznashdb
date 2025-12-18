@@ -31,12 +31,15 @@ COPY . ./
 
 # Copy worker-specific files
 COPY worker-service/crontab /etc/cron.d/worker-cron
-RUN chmod 0644 /etc/cron.d/worker-cron && \
-    crontab /etc/cron.d/worker-cron
+RUN chmod 0644 /etc/cron.d/worker-cron
 
 # Create log file
 RUN touch /var/log/cron.log
 
 # Run cron in foreground
-# CMD cron && tail -f /var/log/cron.log
-CMD python3 -c "import os; f=open('/etc/backup.env','w'); [f.write(f'export {k}=\"{v.replace(chr(34), chr(92)+chr(34))}\"\n') for k,v in os.environ.items()]; f.close()" && cron && sleep 2 && crontab /etc/cron.d/worker-cron && tail -f /var/log/cron.log
+CMD python3 -c "import os; f=open('/etc/backup.env','w'); [f.write(f'export {k}=\"{v.replace(chr(34), chr(92)+chr(34))}\"\n') for k,v in os.environ.items()]; f.close()" && \
+    crontab /etc/cron.d/worker-cron && \
+    cron && \
+    echo "Cron started. Current crontab:" && \
+    crontab -l && \
+    tail -f /var/log/cron.log
