@@ -88,6 +88,10 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 RUN apt-get update
 RUN apt-get install nodejs -y
 
+# Install rclone
+RUN apt-get install -y unzip && \
+    curl https://rclone.org/install.sh | bash && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install poetry
 USER docker

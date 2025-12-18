@@ -7,7 +7,9 @@ RUN apt-get update && \
     cron \
     curl \
     unzip \
+    nano \
     && curl https://rclone.org/install.sh | bash \
+    && ln -s /usr/bin/python3 /usr/bin/python \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,17 +20,17 @@ RUN pip install poetry
 WORKDIR /django
 
 # Copy Poetry files from parent directory
-COPY ../pyproject.toml ../poetry.lock ./
+COPY pyproject.toml poetry.lock ./
 
 # Install dependencies (without dev dependencies)
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-dev --no-interaction --no-ansi
+    poetry install --only main --no-root --no-interaction --no-ansi
 
 # Copy the entire Django project
-COPY ../ ./
+COPY . ./
 
 # Copy worker-specific files
-COPY crontab /etc/cron.d/worker-cron
+COPY worker-service/crontab /etc/cron.d/worker-cron
 RUN chmod 0644 /etc/cron.d/worker-cron && \
     crontab /etc/cron.d/worker-cron
 
@@ -36,12 +38,5 @@ RUN chmod 0644 /etc/cron.d/worker-cron && \
 RUN touch /var/log/cron.log
 
 # Run cron in foreground
-CMD cron && tail -f /var/log/cron.log
-```
-
-## 2. `worker-service/crontab`
-```
-# Run daily backup at 2 AM
-0 2 * * * cd /django && python manage.py backup_database >> /var/log/cron.log 2>&1
-
-# Add more cron jobs as needed
+# CMD cron && tail -f /var/log/cron.log
+CMD python3 -c "import os; f=open('/etc/backup.env','w'); [f.write(f'export {k}=\"{v.replace(chr(34), chr(92)+chr(34))}\"\n') for k,v in os.environ.items()]; f.close()" && cron && sleep 2 && crontab /etc/cron.d/worker-cron && tail -f /var/log/cron.log
