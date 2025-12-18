@@ -33,6 +33,7 @@ services:
     volumes:
       - .:/app:rw
       - $HOME/.cache/devcontainer:/home/docker/.cache/devcontainer
+      - $HOME/.config/rclone:/home/docker/.config/rclone:ro
     environment:
       - DJANGO_WATCHMAN_TIMEOUT=20
       - VIRTUAL_HOST=eznashdb.localhost
