@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
+from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
 
@@ -13,6 +14,7 @@ def mock_backup_success(mocker):
     """Setup mocks for successful backup creation and upload"""
     mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
     mock_os = mocker.patch("app.management.commands.backup_db.os")
+    mock_os.getenv.return_value = None  # Skip rclone config setup
     mock_path = mocker.patch("app.management.commands.backup_db.Path")
     mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
 
@@ -105,6 +107,7 @@ def describe_backup_creation():
     def creates_compressed_backup(mocker):
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
         mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
@@ -148,7 +151,8 @@ def describe_backup_creation():
 
     def handles_pg_dump_failure(mocker):
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mocker.patch("app.management.commands.backup_db.os")
+        mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
@@ -184,11 +188,12 @@ def describe_upload():
             if call[0][0][0] == "rclone" and call[0][0][1] == "copy"
         ]
         assert len(rclone_calls) == 1
-        assert "gdrive:backups/" in rclone_calls[0][0][0]
+        assert settings.DB_BACKUPS_PATH in rclone_calls[0][0][0]
 
     def handles_upload_failure(mocker):
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mocker.patch("app.management.commands.backup_db.os")
+        mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
@@ -370,6 +375,7 @@ def describe_error_handling():
     def cleans_up_current_backup_file_on_success(mocker):
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
         mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
 
@@ -407,6 +413,7 @@ def describe_error_handling():
     def does_not_clean_up_on_failure(mocker):
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
         mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
@@ -441,7 +448,8 @@ def describe_error_handling():
     def cleans_up_old_local_backups_before_creating_new_one(mocker):
         """Old local backup files (>7 days) should be deleted before creating new backup"""
         mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mocker.patch("app.management.commands.backup_db.os")
+        mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
 
@@ -481,7 +489,8 @@ def describe_error_handling():
     def fails_if_cleanup_has_permission_error(mocker):
         """If old file cleanup fails due to permissions, should fail the backup (indicates system issue)"""
         mocker.patch("app.management.commands.backup_db.subprocess")
-        mocker.patch("app.management.commands.backup_db.os")
+        mock_os = mocker.patch("app.management.commands.backup_db.os")
+        mock_os.getenv.return_value = None  # Skip rclone config setup
         mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
         mock_path = mocker.patch("app.management.commands.backup_db.Path")
 
