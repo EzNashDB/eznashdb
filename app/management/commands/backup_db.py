@@ -63,31 +63,8 @@ class Command(BaseCommand):
 
     def _create_backup(self, db_config, backup_path):
         """Create compressed PostgreSQL backup"""
-        # Debug the original environ
-        orig_none = [k for k, v in os.environ.items() if v is None]
-        if orig_none:
-            self.stdout.write(f"os.environ has None: {orig_none}")
-
         env = os.environ.copy()
-
-        # Debug db_config
-        self.stdout.write(
-            f"DB Config: HOST={db_config.get('HOST')}, USER={db_config.get('USER')}, PASSWORD={'SET' if db_config.get('PASSWORD') else 'NONE'}"
-        )
-
         env["PGPASSWORD"] = db_config["PASSWORD"]
-
-        database_url = os.getenv("DATABASE_URL")
-        self.stdout.write(
-            f"DATABASE_URL: {database_url[:50] if database_url else 'None'}..."
-        )  # First 50 chars to avoid logging full password
-
-        # Check after adding PGPASSWORD
-        none_keys = [k for k, v in env.items() if v is None]
-        if none_keys:
-            self.stdout.write(f"Env has None after PGPASSWORD: {none_keys}")
-            for k in none_keys:
-                del env[k]
 
         pg_dump_cmd = [
             "pg_dump",
