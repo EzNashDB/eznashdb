@@ -1,0 +1,56 @@
+# Ezrat Nashim Database - Project Instructions
+
+## What This Is
+Crowdsourced database tracking women's seating in synagogues worldwide. Two metrics:
+1. Size of ezrat nashim relative to men's section (L/M/S/X/&)
+2. Visibility/audibility quality (1-5 star rating)
+
+Goal: Simple, observable data that correlates with women's broader experience in the synagogue.
+
+**Philosophy**: Rather than attempting comprehensive evaluations, we intentionally limit ourselves to a small set of measurable indicators in order to keep the site easy to use and contribute to.
+
+## Tech Stack
+- **Backend**: Django
+- **Frontend**: Bootstrap 5.3
+- **Database**: PostgreSQL
+- **Hosting**: Fly.io
+- **Maps**: Leaflet
+- **Package Management**: Poetry
+- **Testing**: Run tests with `poetry run ptw -- -- --testmon --disable-warnings /app/app/tests/`
+
+## Core Design Decisions
+
+### Data Model
+- Multi-room support (main sanctuary, chapel, etc.)
+- Coordinate-based location storage
+- Anyone can edit (Wikipedia model - no formal review)
+- Letter codes: L (equal/larger), M (half size), S (less than half), X (no women's section), & (mixed seating)
+
+### Geographic Privacy
+- Public map: approximate location (~1km radius)
+- Exact address: available via "Open in Maps" and edit page
+- Duplicate prevention: coordinate-based matching
+
+### Site Structure
+- Homepage = map (not explanation page)
+- Navigation: Browse Shuls | Add a Shul | About | Contact
+- Map-first because tool is self-explanatory
+
+## Key Policies
+
+### Content Philosophy
+- Document observable facts about public spaces
+- Synagogues can't request removal just because they dislike being documented
+- Security-based delisting considered case-by-case (not yet implemented)
+- Accept imperfect data over no data
+
+### Privacy & Security
+- Address hiding for security requests (design in progress)
+- Full delisting only for extreme cases
+- Corrections always welcome for inaccurate data
+
+## Known Trade-offs
+- **Subjectivity**: Visibility/audibility ratings vary by person
+- **No verification**: Trusting crowdsourced data
+- **Limited scope**: Only tracking two metrics, not comprehensive evaluation
+- **Simplicity over precision**: Intentional choice to keep it usable
