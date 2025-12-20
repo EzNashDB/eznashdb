@@ -20,7 +20,7 @@ def navbar(request):
     ]
 
     # Add admin link for staff users
-    if request.user.is_staff:
+    if hasattr(request, "user") and request.user.is_staff:
         navbar_items.append(NavbarItem("Admin", reverse("admin_tools")))
 
     # Mark which item is active
