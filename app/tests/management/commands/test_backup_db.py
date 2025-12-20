@@ -60,7 +60,15 @@ def get_deleted_backup_filenames(mock_subprocess):
         for call in mock_subprocess.run.call_args_list
         if len(call[0][0]) > 1 and call[0][0][1] == "delete"
     ]
-    return [call[0][0][2].split("/")[-1] for call in delete_calls]
+    # Extract filename from path like "gdrive:db-backups/backup_20241205_020000.sql.gz"
+    # The path may have quotes, strip them all and take the last part after splitting by '/'
+    filenames = []
+    for call in delete_calls:
+        path = call[0][0][2]
+        # Remove all quotes from the path, then split by '/' and take the last part
+        filename = path.replace('"', "").split("/")[-1]
+        filenames.append(filename)
+    return filenames
 
 
 def parse_backup_date(filename):
