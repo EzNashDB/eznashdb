@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 /.pytest_cache
 .vscode/
+.claude/
 
 # flakeheaven
 .flakeheaven_cache
