@@ -157,7 +157,7 @@ def describe_backup_creation():
 
 
 def describe_upload():
-    def uploads_to_google_drive(mock_backup_success):
+    def uploads_to_DB_BACKUPS_PATH(mock_backup_success):
         mock_subprocess, _ = mock_backup_success
 
         call_command("backup_db")
