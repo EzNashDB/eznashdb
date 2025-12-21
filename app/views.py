@@ -21,14 +21,4 @@ class AdminDashboardView(TemplateView):
             except Exception as e:
                 messages.error(request, f"Backup failed: {str(e)}")
 
-        # Easy to add more actions later:
-        # elif action == 'clear_cache':
-        #     cache.clear()
-        #     messages.success(request, 'Cache cleared!')
-
         return redirect("admin_dashboard")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Could add context here later (last backup time, system stats, etc.)
-        return context
