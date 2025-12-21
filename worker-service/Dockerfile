@@ -37,7 +37,9 @@ RUN chmod 0644 /etc/cron.d/worker-cron
 RUN touch /var/log/cron.log
 
 # Run cron in foreground
-CMD python3 -c "import os; f=open('/etc/backup.env','w'); [f.write(f'export {k}=\"{v.replace(chr(34), chr(92)+chr(34))}\"\n') for k,v in os.environ.items()]; f.close()" && \
+CMD printenv > /etc/environment && \
+    mkdir -p /root/.config/rclone && \
+    echo "$RCLONE_CONFIG_CONTENT" > /root/.config/rclone/rclone.conf && \
     crontab /etc/cron.d/worker-cron && \
     cron && \
     echo "Cron started. Current crontab:" && \

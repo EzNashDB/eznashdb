@@ -12,13 +12,6 @@ class Command(BaseCommand):
     backups_path = settings.DB_BACKUPS_PATH
 
     def handle(self, *args, **options):
-        # Set up rclone config from environment
-        if os.getenv("RCLONE_CONFIG_CONTENT"):
-            config_dir = os.path.expanduser("~/.config/rclone")
-            os.makedirs(config_dir, exist_ok=True)
-            with open(f"{config_dir}/rclone.conf", "w") as f:
-                f.write(os.getenv("RCLONE_CONFIG_CONTENT"))
-
         self.stdout.write("Starting database backup...")
 
         # Step 0: Clean up old local backup files
