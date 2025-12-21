@@ -8,8 +8,8 @@ from django.views.generic import TemplateView
 
 
 @method_decorator(staff_member_required, name="dispatch")
-class AdminToolsView(TemplateView):
-    template_name = "admin/admin_tools.html"
+class AdminDashboardView(TemplateView):
+    template_name = "admin/admin_dashboard.html"
 
     def post(self, request, *args, **kwargs):
         action = request.POST.get("action")
@@ -26,7 +26,7 @@ class AdminToolsView(TemplateView):
         #     cache.clear()
         #     messages.success(request, 'Cache cleared!')
 
-        return redirect("admin_tools")
+        return redirect("admin_dashboard")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
