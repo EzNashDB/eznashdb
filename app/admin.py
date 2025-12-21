@@ -29,6 +29,3 @@ def custom_get_urls():
 
 
 admin.site.get_urls = custom_get_urls
-
-# Your existing model registrations stay the same
-# admin.site.register(YourModel, YourModelAdmin)
