@@ -121,7 +121,8 @@ class Command(BaseCommand):
             return None
 
         backups = []
-        for filename in result.stdout.strip().split("\n") if result.stdout.strip() else []:
+        filenames = result.stdout.strip().split("\n") if result.stdout.strip() else []
+        for filename in filenames:
             if not filename or not filename.startswith("backup_"):
                 continue
 
