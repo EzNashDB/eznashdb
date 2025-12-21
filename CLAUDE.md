@@ -17,6 +17,7 @@ Goal: Simple, observable data that correlates with women's broader experience in
 - **Maps**: Leaflet
 - **Package Management**: Poetry
 - **Testing**: Run tests with `poetry run ptw -- -- --testmon --disable-warnings /app/app/tests/`
+- **Commits**: Use [conventional commits](https://www.conventionalcommits.org/) (e.g., `fix:`, `feat:`, `refactor:`)
 
 ## Core Design Decisions
 
