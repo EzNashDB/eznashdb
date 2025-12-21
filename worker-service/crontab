@@ -1,4 +1,4 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 SHELL=/bin/bash
 
-34 14 * * * cd /django && python3 manage.py backup_db >> /var/log/cron.log 2>&1
+42 14 * * * cd /django && python manage.py backup_db >> /var/log/cron.log 2>&1
