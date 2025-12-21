@@ -6,15 +6,14 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
 
-# Fixtures for common setup
+# Helper to setup mocks - returns all mocks so tests can modify them
 
 
-@pytest.fixture
-def mock_backup_success(mocker):
-    """Setup mocks for successful backup creation and upload"""
+def setup_backup_mocks(mocker):
+    """Setup mocks for backup command. Returns dict of all mocks for modification."""
     mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
     mock_os = mocker.patch("app.management.commands.backup_db.os")
-    mock_os.getenv.return_value = None  # Skip rclone config setup
+    mock_os.getenv.return_value = None
     mock_path = mocker.patch("app.management.commands.backup_db.Path")
     mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
 
@@ -22,10 +21,8 @@ def mock_backup_success(mocker):
     mock_datetime.strptime = datetime.strptime
     mock_datetime.fromtimestamp = datetime.fromtimestamp
 
-    # Mock os.environ.copy() to return a dict
     mock_os.environ.copy.return_value = {}
 
-    # Mock Path('/tmp').glob() to return empty list by default
     mock_tmp_path = Mock()
     mock_tmp_path.glob.return_value = []
     mock_path.return_value = mock_tmp_path
@@ -33,13 +30,14 @@ def mock_backup_success(mocker):
     # Mock successful pg_dump and gzip
     dump_process = Mock()
     dump_process.stdout = Mock()
+    dump_process.returncode = 0
+    dump_process.stderr.read.return_value = b""
     gzip_process = Mock()
     gzip_process.returncode = 0
     gzip_process.communicate.return_value = (b"", b"")
 
     mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
 
-    # Mock rclone operations to return empty backup list
     def run_side_effect(cmd, **kwargs):
         if cmd[0] == "rclone" and cmd[1] == "lsf":
             return Mock(returncode=0, stdout="")
@@ -47,7 +45,22 @@ def mock_backup_success(mocker):
 
     mock_subprocess.run.side_effect = run_side_effect
 
-    return mock_subprocess, mock_datetime
+    return {
+        "subprocess": mock_subprocess,
+        "os": mock_os,
+        "path": mock_path,
+        "tmp_path": mock_tmp_path,
+        "datetime": mock_datetime,
+        "dump_process": dump_process,
+        "gzip_process": gzip_process,
+    }
+
+
+@pytest.fixture
+def mock_backup_success(mocker):
+    """Fixture for tests that just need successful backup without modifications."""
+    mocks = setup_backup_mocks(mocker)
+    return mocks["subprocess"], mocks["datetime"]
 
 
 # Helper functions for clearer assertions
@@ -113,42 +126,11 @@ def describe_backup_creation():
         }
     )
     def creates_compressed_backup(mocker):
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.strptime = datetime.strptime
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
-
-        # Mock os.environ.copy() to return a dict
-        mock_os.environ.copy.return_value = {}
-
-        # Mock Path to return empty list for cleanup
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = []
-        mock_path.return_value = mock_tmp_path
-
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 0
-        gzip_process.communicate.return_value = (b"", b"")
-
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
-
-        def run_side_effect(cmd, **kwargs):
-            if cmd[0] == "rclone" and cmd[1] == "lsf":
-                return Mock(returncode=0, stdout="")
-            return Mock(returncode=0, stderr="", stdout="")
-
-        mock_subprocess.run.side_effect = run_side_effect
+        mocks = setup_backup_mocks(mocker)
 
         call_command("backup_db")
 
-        # Verify pg_dump was called correctly
-        pg_dump_call = mock_subprocess.Popen.call_args_list[0]
+        pg_dump_call = mocks["subprocess"].Popen.call_args_list[0]
         cmd = pg_dump_call[0][0]
 
         assert "pg_dump" in cmd
@@ -158,28 +140,19 @@ def describe_backup_creation():
         assert pg_dump_call[1]["env"]["PGPASSWORD"] == "testpass"
 
     def handles_pg_dump_failure(mocker):
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
+        mocks = setup_backup_mocks(mocker)
+        mocks["dump_process"].returncode = 1
+        mocks["dump_process"].stderr.read.return_value = b"connection refused"
 
-        # Mock Path to return empty list for cleanup
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = []
-        mock_path.return_value = mock_tmp_path
+        with pytest.raises(Exception, match="pg_dump failed: connection refused"):
+            call_command("backup_db")
 
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 1
-        gzip_process.communicate.return_value = (b"", b"Error")
+    def handles_gzip_failure(mocker):
+        mocks = setup_backup_mocks(mocker)
+        mocks["gzip_process"].returncode = 1
+        mocks["gzip_process"].communicate.return_value = (b"", b"gzip: error")
 
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
-
-        with pytest.raises(Exception, match="Failed to create compressed backup"):
+        with pytest.raises(Exception, match="gzip failed: gzip: error"):
             call_command("backup_db")
 
 
@@ -189,7 +162,6 @@ def describe_upload():
 
         call_command("backup_db")
 
-        # Verify rclone copy was called
         rclone_calls = [
             call
             for call in mock_subprocess.run.call_args_list
@@ -199,32 +171,14 @@ def describe_upload():
         assert settings.DB_BACKUPS_PATH in rclone_calls[0][0][0]
 
     def handles_upload_failure(mocker):
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
-
-        # Mock Path to return empty list for cleanup
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = []
-        mock_path.return_value = mock_tmp_path
-
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 0
-        gzip_process.communicate.return_value = (b"", b"")
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
+        mocks = setup_backup_mocks(mocker)
 
         def run_side_effect(cmd, **kwargs):
             if cmd[0] == "rclone" and cmd[1] == "copy":
                 return Mock(returncode=1, stderr="Upload failed")
             return Mock(returncode=0, stderr="", stdout="")
 
-        mock_subprocess.run.side_effect = run_side_effect
+        mocks["subprocess"].run.side_effect = run_side_effect
 
         with pytest.raises(Exception, match="Upload failed"):
             call_command("backup_db")
@@ -381,92 +335,35 @@ def describe_retention_policy():
 
 def describe_error_handling():
     def cleans_up_current_backup_file_on_success(mocker):
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-
-        mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.strptime = datetime.strptime
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
-
-        # Mock Path to return empty list for cleanup
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = []
-        mock_path.return_value = mock_tmp_path
-
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 0
-        gzip_process.communicate.return_value = (b"", b"")
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
-
-        def run_side_effect(cmd, **kwargs):
-            if cmd[0] == "rclone" and cmd[1] == "lsf":
-                return Mock(returncode=0, stdout="")
-            return Mock(returncode=0, stderr="", stdout="")
-
-        mock_subprocess.run.side_effect = run_side_effect
+        mocks = setup_backup_mocks(mocker)
 
         call_command("backup_db")
 
-        # Verify current backup file was removed
-        assert mock_os.remove.called
-        removed_file = mock_os.remove.call_args[0][0]
+        assert mocks["os"].remove.called
+        removed_file = mocks["os"].remove.call_args[0][0]
         assert "backup_" in removed_file
         assert ".sql.gz" in removed_file
 
     def does_not_clean_up_on_failure(mocker):
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_datetime.now.return_value = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
+        mocks = setup_backup_mocks(mocker)
 
-        # Mock Path to return empty list for cleanup
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = []
-        mock_path.return_value = mock_tmp_path
-
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 0
-        gzip_process.communicate.return_value = (b"", b"")
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
-
-        # Fail on upload
         def run_side_effect(cmd, **kwargs):
             if cmd[0] == "rclone" and cmd[1] == "copy":
                 return Mock(returncode=1, stderr="Upload failed")
             return Mock(returncode=0, stderr="", stdout="")
 
-        mock_subprocess.run.side_effect = run_side_effect
+        mocks["subprocess"].run.side_effect = run_side_effect
 
         with pytest.raises(Exception, match="Upload failed"):
             call_command("backup_db")
 
-        # Verify NO cleanup happened
-        assert not mock_os.remove.called
+        assert not mocks["os"].remove.called
 
     def cleans_up_old_local_backups_before_creating_new_one(mocker):
         """Old local backup files (>7 days) should be deleted before creating new backup"""
-        mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
+        mocks = setup_backup_mocks(mocker)
+        now = mocks["datetime"].now.return_value
 
-        now = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.now.return_value = now
-        mock_datetime.strptime = datetime.strptime
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
-
-        # Mock old backup files in /tmp
         old_file = Mock()
         old_file.stat.return_value.st_mtime = (now - timedelta(days=10)).timestamp()
         old_file.name = "backup_20241204_020000.sql.gz"
@@ -475,48 +372,24 @@ def describe_error_handling():
         recent_file.stat.return_value.st_mtime = (now - timedelta(days=3)).timestamp()
         recent_file.name = "backup_20241211_020000.sql.gz"
 
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = [old_file, recent_file]
-        mock_path.return_value = mock_tmp_path
-
-        # Mock successful backup
-        dump_process = Mock()
-        dump_process.stdout = Mock()
-        gzip_process = Mock()
-        gzip_process.returncode = 0
-        gzip_process.communicate.return_value = (b"", b"")
-        mock_subprocess.Popen.side_effect = [dump_process, gzip_process]
-        mock_subprocess.run.return_value = Mock(returncode=0, stderr="", stdout="")
+        mocks["tmp_path"].glob.return_value = [old_file, recent_file]
 
         call_command("backup_db")
 
-        # Verify old file was deleted but recent file was not
         assert old_file.unlink.called
         assert not recent_file.unlink.called
 
     def fails_if_cleanup_has_permission_error(mocker):
-        """If old file cleanup fails due to permissions, should fail the backup (indicates system issue)"""
-        mocker.patch("app.management.commands.backup_db.subprocess")
-        mock_os = mocker.patch("app.management.commands.backup_db.os")
-        mock_os.getenv.return_value = None  # Skip rclone config setup
-        mock_datetime = mocker.patch("app.management.commands.backup_db.datetime")
-        mock_path = mocker.patch("app.management.commands.backup_db.Path")
+        """If old file cleanup fails due to permissions, should fail the backup"""
+        mocks = setup_backup_mocks(mocker)
+        now = mocks["datetime"].now.return_value
 
-        now = datetime(2024, 12, 14, 2, 0, 0)
-        mock_datetime.now.return_value = now
-        mock_datetime.strptime = datetime.strptime
-        mock_datetime.fromtimestamp = datetime.fromtimestamp
-
-        # Mock old file that raises error on unlink
         old_file = Mock()
         old_file.stat.return_value.st_mtime = (now - timedelta(days=10)).timestamp()
         old_file.name = "backup_20241204_020000.sql.gz"
         old_file.unlink.side_effect = OSError("Permission denied")
 
-        mock_tmp_path = Mock()
-        mock_tmp_path.glob.return_value = [old_file]
-        mock_path.return_value = mock_tmp_path
+        mocks["tmp_path"].glob.return_value = [old_file]
 
-        # Should raise exception - don't continue with backup if cleanup fails
         with pytest.raises(OSError, match="Permission denied"):
             call_command("backup_db")
