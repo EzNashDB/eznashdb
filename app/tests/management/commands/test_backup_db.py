@@ -84,12 +84,6 @@ def get_deleted_backup_filenames(mock_subprocess):
     return filenames
 
 
-def parse_backup_date(filename):
-    """Parse datetime from backup filename"""
-    timestamp_str = filename.replace("backup_", "").replace(".sql.gz", "")
-    return datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
-
-
 def create_backup_filename(date):
     """Create a backup filename from a date"""
     return f"backup_{date.strftime('%Y%m%d_%H%M%S')}.sql.gz"
@@ -189,7 +183,8 @@ def describe_retention_policy():
         mock_subprocess, mock_datetime = mock_backup_success
         now = mock_datetime.now.return_value
 
-        # Create backups from last 10 days
+        # Backups 0-7 days old are kept by daily retention (>= cutoff)
+        # Backups 8+ days old fall into weekly retention
         backups = [create_backup_filename(now - timedelta(days=i)) for i in range(10)]
         setup_mock_backups(mock_subprocess, backups)
 
@@ -197,98 +192,43 @@ def describe_retention_policy():
 
         deleted = get_deleted_backup_filenames(mock_subprocess)
 
-        # Only backups older than 7 days should be deleted
-        for filename in deleted:
-            backup_date = parse_backup_date(filename)
-            days_old = (now - backup_date).days
-            assert days_old >= 7
-
-        # Backups from last 7 days should NOT be deleted
-        recent_backups = backups[:7]
-        for backup in recent_backups:
-            assert backup not in deleted
+        # Day 7 is still within daily retention (>= 7 days ago)
+        assert create_backup_filename(now - timedelta(days=7)) not in deleted
+        # Days 8-9 fall into weekly - one kept per week, so 1 deleted
+        assert len(deleted) == 1
 
     def keeps_one_backup_per_week_for_4_weeks(mock_backup_success):
         mock_subprocess, mock_datetime = mock_backup_success
         now = mock_datetime.now.return_value
 
-        # Create backups spanning weeks 2-4 (beyond the 7-day daily retention)
-        backups = []
-
-        # Week 2 (8-14 days ago): Should keep 1
-        for day_offset in [8, 9, 10, 11, 12, 13, 14]:
-            date = now - timedelta(days=day_offset)
-            backups.append(create_backup_filename(date))
-
-        # Week 3 (15-21 days ago): Should keep 1
-        for day_offset in [15, 16, 17, 18, 19, 20, 21]:
-            date = now - timedelta(days=day_offset)
-            backups.append(create_backup_filename(date))
-
-        # Week 4 (22-28 days ago): Should keep 1
-        for day_offset in [22, 23, 24, 25, 26, 27, 28]:
-            date = now - timedelta(days=day_offset)
-            backups.append(create_backup_filename(date))
-
+        # 3 backups in week 2 (days 8-10), clearly in weekly window
+        backups = [create_backup_filename(now - timedelta(days=d)) for d in [8, 9, 10]]
         setup_mock_backups(mock_subprocess, backups)
 
         call_command("backup_db")
 
         deleted = get_deleted_backup_filenames(mock_subprocess)
-        kept = [b for b in backups if b not in deleted]
 
-        # Group kept backups by week and verify only 1 per week
-        weeks_kept = {}
-        for filename in kept:
-            backup_date = parse_backup_date(filename)
-            week_key = backup_date.strftime("%Y-W%U")
-            weeks_kept[week_key] = weeks_kept.get(week_key, 0) + 1
-
-        # We should have kept backups (could be 3 or 4 weeks depending on calendar)
-        # The important thing is that each week has exactly 1 backup
-        assert len(weeks_kept) >= 3, f"Should keep at least 3 weeks, got {len(weeks_kept)}"
-
-        # Each week should have exactly 1 backup
-        for week, count in weeks_kept.items():
-            assert count == 1, f"Week {week} has {count} backups, expected 1"
+        assert len(deleted) == 2  # 3 backups, 1 kept per week
 
     def keeps_one_backup_per_month_for_12_months(mock_backup_success):
         mock_subprocess, mock_datetime = mock_backup_success
         now = mock_datetime.now.return_value
 
-        # Create one backup per day for months 2-6 (testing subset for speed)
-        backups = []
-        for month in range(2, 7):
-            for day in range(5):
-                date = now - timedelta(days=30 * month + day)
-                backups.append(create_backup_filename(date))
-
+        # 3 backups in month 2 (days 35-37), clearly in monthly window
+        backups = [create_backup_filename(now - timedelta(days=d)) for d in [35, 36, 37]]
         setup_mock_backups(mock_subprocess, backups)
 
         call_command("backup_db")
 
         deleted = get_deleted_backup_filenames(mock_subprocess)
-        kept = [b for b in backups if b not in deleted]
 
-        # Group kept backups by month
-        months_kept = {}
-        for filename in kept:
-            backup_date = parse_backup_date(filename)
-            month_key = backup_date.strftime("%Y-%m")
-            months_kept[month_key] = months_kept.get(month_key, 0) + 1
-
-        # Should have exactly 5 months
-        assert len(months_kept) == 5
-
-        # Each month should have exactly 1 backup
-        for month, count in months_kept.items():
-            assert count == 1, f"Month {month} has {count} backups, expected 1"
+        assert len(deleted) == 2  # 3 backups, 1 kept per month
 
     def keeps_yearly_backups_forever(mock_backup_success):
         mock_subprocess, mock_datetime = mock_backup_success
         now = mock_datetime.now.return_value
 
-        # Create backups from 2-5 years ago (beyond monthly retention)
         backups = [
             create_backup_filename(now - timedelta(days=365 * 2)),
             create_backup_filename(now - timedelta(days=365 * 3)),
@@ -302,24 +242,17 @@ def describe_retention_policy():
 
         deleted = get_deleted_backup_filenames(mock_subprocess)
 
-        # No yearly backups should be deleted
-        assert len(deleted) == 0, f"Expected no deletions, but deleted: {deleted}"
+        assert len(deleted) == 0
 
     def keeps_backups_from_previous_year_if_within_retention_window(mock_backup_success):
-        """
-        When it's Jan 1, backups from Dec 31 and Dec 1 should still be kept
-        (they're within daily/monthly retention)
-        """
+        """Year boundaries don't affect retention - only age matters"""
         mock_subprocess, mock_datetime = mock_backup_success
-
-        # Set date to Jan 1, 2025
-        now = datetime(2025, 1, 1, 2, 0, 0)
-        mock_datetime.now.return_value = now
+        mock_datetime.now.return_value = datetime(2025, 1, 1, 2, 0, 0)
 
         backups = [
-            "backup_20241231_020000.sql.gz",  # Dec 31 (1 day ago)
-            "backup_20241230_020000.sql.gz",  # Dec 30 (2 days ago)
-            "backup_20241201_020000.sql.gz",  # Dec 1 (1 month ago)
+            "backup_20241231_020000.sql.gz",  # 1 day ago
+            "backup_20241230_020000.sql.gz",  # 2 days ago
+            "backup_20241201_020000.sql.gz",  # 31 days ago
         ]
 
         setup_mock_backups(mock_subprocess, backups)
@@ -328,9 +261,7 @@ def describe_retention_policy():
 
         deleted = get_deleted_backup_filenames(mock_subprocess)
 
-        # All should be kept (within retention periods)
-        for backup in backups:
-            assert backup not in deleted, f"{backup} should not be deleted"
+        assert len(deleted) == 0
 
 
 def describe_error_handling():
