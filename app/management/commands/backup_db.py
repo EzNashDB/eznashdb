@@ -83,10 +83,14 @@ class Command(BaseCommand):
                 ["gzip"], stdin=dump_process.stdout, stdout=f, stderr=subprocess.PIPE
             )
             dump_process.stdout.close()
-            gzip_process.communicate()
+            _, gzip_stderr = gzip_process.communicate()
+            dump_process.wait()
 
+            if dump_process.returncode != 0:
+                stderr_output = dump_process.stderr.read().decode()
+                raise Exception(f"pg_dump failed: {stderr_output}")
             if gzip_process.returncode != 0:
-                raise Exception("Failed to create compressed backup")
+                raise Exception(f"gzip failed: {gzip_stderr.decode()}")
 
     def _upload_to_gdrive(self, local_path):
         """Upload backup to Google Drive using rclone"""
