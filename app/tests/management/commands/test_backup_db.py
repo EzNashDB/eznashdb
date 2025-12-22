@@ -12,6 +12,8 @@ from django.test import override_settings
 def setup_backup_mocks(mocker):
     """Setup mocks for backup command. Returns dict of all mocks for modification."""
     mock_subprocess = mocker.patch("app.management.commands.backup_db.subprocess")
+    # Also patch subprocess in app.backups since list_remote_backups is now there
+    mock_backups_subprocess = mocker.patch("app.backups.subprocess")
     mock_os = mocker.patch("app.management.commands.backup_db.os")
     mock_os.getenv.return_value = None
     mock_path = mocker.patch("app.management.commands.backup_db.Path")
@@ -44,9 +46,12 @@ def setup_backup_mocks(mocker):
         return Mock(returncode=0, stderr="", stdout="")
 
     mock_subprocess.run.side_effect = run_side_effect
+    # Mirror the same behavior for backups subprocess
+    mock_backups_subprocess.run.side_effect = run_side_effect
 
     return {
         "subprocess": mock_subprocess,
+        "backups_subprocess": mock_backups_subprocess,
         "os": mock_os,
         "path": mock_path,
         "tmp_path": mock_tmp_path,
@@ -60,7 +65,7 @@ def setup_backup_mocks(mocker):
 def mock_backup_success(mocker):
     """Fixture for tests that just need successful backup without modifications."""
     mocks = setup_backup_mocks(mocker)
-    return mocks["subprocess"], mocks["datetime"]
+    return mocks["subprocess"], mocks["datetime"], mocks["backups_subprocess"]
 
 
 # Helper functions for clearer assertions
@@ -89,7 +94,7 @@ def create_backup_filename(date):
     return f"backup_{date.strftime('%Y%m%d_%H%M%S')}.sql.gz"
 
 
-def setup_mock_backups(mock_subprocess, backup_list):
+def setup_mock_backups(mock_subprocess, backup_list, mock_backups_subprocess=None):
     """Configure mock to return a specific list of backups"""
     backups_output = "\n".join(backup_list)
 
@@ -101,6 +106,9 @@ def setup_mock_backups(mock_subprocess, backup_list):
         return Mock(returncode=0, stderr="", stdout="")
 
     mock_subprocess.run.side_effect = run_side_effect
+    # Also set up backups subprocess mock if provided
+    if mock_backups_subprocess:
+        mock_backups_subprocess.run.side_effect = run_side_effect
 
 
 # Tests
@@ -152,7 +160,7 @@ def describe_backup_creation():
 
 def describe_upload():
     def uploads_to_DB_BACKUPS_PATH(mock_backup_success):
-        mock_subprocess, _ = mock_backup_success
+        mock_subprocess, _, _ = mock_backup_success
 
         call_command("backup_db")
 
@@ -180,13 +188,13 @@ def describe_upload():
 
 def describe_retention_policy():
     def keeps_all_daily_backups_for_7_days(mock_backup_success):
-        mock_subprocess, mock_datetime = mock_backup_success
+        mock_subprocess, mock_datetime, mock_backups_subprocess = mock_backup_success
         now = mock_datetime.now.return_value
 
         # Backups 0-7 days old are kept by daily retention (>= cutoff)
         # Backups 8+ days old fall into weekly retention
         backups = [create_backup_filename(now - timedelta(days=i)) for i in range(10)]
-        setup_mock_backups(mock_subprocess, backups)
+        setup_mock_backups(mock_subprocess, backups, mock_backups_subprocess)
 
         call_command("backup_db")
 
@@ -198,12 +206,12 @@ def describe_retention_policy():
         assert len(deleted) == 1
 
     def keeps_one_backup_per_week_for_4_weeks(mock_backup_success):
-        mock_subprocess, mock_datetime = mock_backup_success
+        mock_subprocess, mock_datetime, mock_backups_subprocess = mock_backup_success
         now = mock_datetime.now.return_value
 
         # 3 backups in week 2 (days 8-10), clearly in weekly window
         backups = [create_backup_filename(now - timedelta(days=d)) for d in [8, 9, 10]]
-        setup_mock_backups(mock_subprocess, backups)
+        setup_mock_backups(mock_subprocess, backups, mock_backups_subprocess)
 
         call_command("backup_db")
 
@@ -212,12 +220,12 @@ def describe_retention_policy():
         assert len(deleted) == 2  # 3 backups, 1 kept per week
 
     def keeps_one_backup_per_month_for_12_months(mock_backup_success):
-        mock_subprocess, mock_datetime = mock_backup_success
+        mock_subprocess, mock_datetime, mock_backups_subprocess = mock_backup_success
         now = mock_datetime.now.return_value
 
         # 3 backups in month 2 (days 35-37), clearly in monthly window
         backups = [create_backup_filename(now - timedelta(days=d)) for d in [35, 36, 37]]
-        setup_mock_backups(mock_subprocess, backups)
+        setup_mock_backups(mock_subprocess, backups, mock_backups_subprocess)
 
         call_command("backup_db")
 
@@ -226,7 +234,7 @@ def describe_retention_policy():
         assert len(deleted) == 2  # 3 backups, 1 kept per month
 
     def keeps_yearly_backups_forever(mock_backup_success):
-        mock_subprocess, mock_datetime = mock_backup_success
+        mock_subprocess, mock_datetime, mock_backups_subprocess = mock_backup_success
         now = mock_datetime.now.return_value
 
         backups = [
@@ -236,7 +244,7 @@ def describe_retention_policy():
             create_backup_filename(now - timedelta(days=365 * 5)),
         ]
 
-        setup_mock_backups(mock_subprocess, backups)
+        setup_mock_backups(mock_subprocess, backups, mock_backups_subprocess)
 
         call_command("backup_db")
 
@@ -246,7 +254,7 @@ def describe_retention_policy():
 
     def keeps_backups_from_previous_year_if_within_retention_window(mock_backup_success):
         """Year boundaries don't affect retention - only age matters"""
-        mock_subprocess, mock_datetime = mock_backup_success
+        mock_subprocess, mock_datetime, mock_backups_subprocess = mock_backup_success
         mock_datetime.now.return_value = datetime(2025, 1, 1, 2, 0, 0)
 
         backups = [
@@ -255,7 +263,7 @@ def describe_retention_policy():
             "backup_20241201_020000.sql.gz",  # 31 days ago
         ]
 
-        setup_mock_backups(mock_subprocess, backups)
+        setup_mock_backups(mock_subprocess, backups, mock_backups_subprocess)
 
         call_command("backup_db")
 

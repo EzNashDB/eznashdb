@@ -11,10 +11,16 @@ ENV NODE_OPTIONS="--max-old-space-size=128"
 
 RUN pip install "poetry==$POETRY_VERSION"
 
-# Install system dependencies
+# Install system dependencies and PostgreSQL 15 client
 RUN apt-get update && \
-    apt-get install -y ca-certificates curl gnupg postgresql-client unzip && \
+    apt-get install -y ca-certificates curl gnupg unzip && \
     curl https://rclone.org/install.sh | bash && \
+    # Add PostgreSQL apt repository for version 15
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    apt-get update && \
+    apt-get remove -y postgresql-client-* || true && \
+    apt-get install -y postgresql-client-15 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

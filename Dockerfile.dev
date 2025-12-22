@@ -43,8 +43,6 @@ RUN apt-get update && \
     make \
     sudo \
     openssh-server \
-    postgresql \
-    libpq-dev \
     binutils \
     build-essential \
     binfmt-support \
@@ -81,15 +79,30 @@ RUN sed -i /etc/ssl/openssl.cnf -e 's/MinProtocol.=.TLSv1.[0-9]/MinProtocol = TL
 
 # Install node
 RUN apt-get update
-RUN apt-get install -y ca-certificates curl gnupg
 RUN mkdir -p /etc/apt/keyrings
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_VERSION}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update
 RUN apt-get install nodejs -y
 
+
+# Add PostgreSQL apt repository for version 15
+RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] \
+    http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" \
+    > /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update && \
+    apt-get remove -y postgresql-client-* || true && \
+    apt-get install --no-install-recommends -y \
+    postgresql-client-15 \
+    postgresql-15 \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install rclone
-RUN apt-get install -y unzip && \
+RUN apt-get update && \
+    apt-get install -y unzip && \
     curl https://rclone.org/install.sh | bash && \
     rm -rf /var/lib/apt/lists/*
 
@@ -102,7 +115,7 @@ RUN pip install --no-cache-dir \
     pre-commit==3.3.2
 
 # Install Claude Code CLI
-RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh | sh
+RUN curl -fsSL https://claude.ai/install.sh | bash
 
 USER root
 RUN ln -s ${HOME}/.local/bin/poetry /usr/local/bin
