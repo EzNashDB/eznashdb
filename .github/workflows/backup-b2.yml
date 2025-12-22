@@ -48,16 +48,20 @@ jobs:
           echo "=== Finding Latest Backup in Google Drive ==="
 
           # List all backups and find the most recent one
-          LATEST_BACKUP=$(rclone lsf ${{ env.GDRIVE_REMOTE }}/prod/ --files-only | grep '^backup_' | sort -r | head -1)
+          LATEST_BACKUP=$(rclone lsf ${{ env.GDRIVE_REMOTE }}/prod/ --files-only | grep '^backup_' | sort -r | head -1 || true)
 
           if [ -z "$LATEST_BACKUP" ]; then
-            echo "::warning::No backups found in Google Drive"
+            echo "::error::No backups found in Google Drive at ${{ env.GDRIVE_REMOTE }}/prod/"
+            echo "This could mean:"
+            echo "1. The GDRIVE_REMOTE path is incorrect"
+            echo "2. The RCLONE_CONFIG_CONTENT is invalid or missing [gdrive] section"
+            echo "3. The primary backup hasn't run yet"
             echo "latest_backup=" >> $GITHUB_OUTPUT
             echo "has_backup=false" >> $GITHUB_OUTPUT
-            exit 0
+            exit 1
           fi
 
-          echo "Latest backup: $LATEST_BACKUP"
+          echo "✓ Latest backup: $LATEST_BACKUP"
           echo "latest_backup=$LATEST_BACKUP" >> $GITHUB_OUTPUT
           echo "has_backup=true" >> $GITHUB_OUTPUT
 
