@@ -38,7 +38,7 @@ jobs:
           provider = Other
           access_key_id = ${{ secrets.B2_APPLICATION_KEY_ID }}
           secret_access_key = ${{ secrets.B2_APPLICATION_KEY }}
-          endpoint = s3.us-west-004.backblazeb2.com
+          endpoint = ${{ secrets.B2_ENDPOINT }}
           acl = private
           EOF
 
