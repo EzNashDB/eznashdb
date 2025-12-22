@@ -2,7 +2,7 @@
 """
 Apply retention policy to Backblaze B2 backups.
 
-This script mirrors the retention policy from backup_db.py:
+This script uses the shared retention policy from app.backups:
 - Daily: Keep all backups from last 7 days
 - Weekly: Keep 1 backup per week for last 4 weeks
 - Monthly: Keep 1 backup per month for last 12 months
@@ -15,10 +15,14 @@ Example:
     python b2_retention.py b2:ezrat-nashim-db-backups/prod/
 """
 
-import re
 import subprocess
 import sys
-from datetime import datetime, timedelta
+from pathlib import Path
+
+# Add parent directory to path so we can import from app
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from app.backups import determine_backups_to_keep, parse_backup_filename
 
 
 def list_b2_backups(bucket_path):
@@ -34,71 +38,11 @@ def list_b2_backups(bucket_path):
         if not line or not line.startswith("backup_"):
             continue
 
-        # Extract timestamp from filename: backup_YYYYMMDD_HHMMSS.sql.gz
-        match = re.search(r"backup_(\d{8})_(\d{6})\.sql\.gz", line)
-        if match:
-            date_str = match.group(1)
-            time_str = match.group(2)
-            try:
-                backup_date = datetime.strptime(f"{date_str}_{time_str}", "%Y%m%d_%H%M%S")
-                backups.append((line.strip(), backup_date))
-            except ValueError:
-                print(f"Warning: Could not parse date from {line}", file=sys.stderr)
-                continue
+        backup_date = parse_backup_filename(line.strip())
+        if backup_date:
+            backups.append((line.strip(), backup_date))
 
     return backups
-
-
-def determine_backups_to_keep(backups, now):
-    """
-    Determine which backups to keep based on retention policy.
-
-    Policy mirrors backup_db.py:
-    - Daily: All backups from last 7 days
-    - Weekly: 1 per week for last 4 weeks
-    - Monthly: 1 per month for last 12 months
-    - Yearly: 1 per year forever
-    """
-    keep_backups = set()
-
-    # Retention cutoffs
-    daily_cutoff = now - timedelta(days=7)
-    weekly_cutoff = now - timedelta(weeks=4)
-    monthly_cutoff = now - timedelta(days=30 * 12)
-
-    # Daily: Keep all backups from the last 7 days
-    for filename, backup_date in backups:
-        if backup_date >= daily_cutoff:
-            keep_backups.add(filename)
-
-    # Weekly: Keep one backup per week for the last 4 weeks
-    weekly_backups = {}
-    for filename, backup_date in backups:
-        if daily_cutoff > backup_date >= weekly_cutoff:
-            week_key = backup_date.strftime("%Y-W%U")
-            if week_key not in weekly_backups:
-                weekly_backups[week_key] = filename
-                keep_backups.add(filename)
-
-    # Monthly: Keep one backup per month for the last 12 months
-    monthly_backups = {}
-    for filename, backup_date in backups:
-        if weekly_cutoff > backup_date >= monthly_cutoff:
-            month_key = backup_date.strftime("%Y-%m")
-            if month_key not in monthly_backups:
-                monthly_backups[month_key] = filename
-                keep_backups.add(filename)
-
-    # Yearly: Keep one backup per year forever
-    yearly_backups = {}
-    for filename, backup_date in backups:
-        if backup_date < monthly_cutoff:
-            year_key = backup_date.strftime("%Y")
-            if year_key not in yearly_backups:
-                yearly_backups[year_key] = filename
-                keep_backups.add(filename)
-
-    return keep_backups
 
 
 def delete_old_backups(backups, keep_backups, bucket_path):
@@ -132,7 +76,6 @@ def main():
 
     print(f"Applying retention policy to: {bucket_path}")
 
-    now = datetime.now()
     backups = list_b2_backups(bucket_path)
 
     if not backups:
@@ -141,7 +84,7 @@ def main():
 
     print(f"Found {len(backups)} backups in B2")
 
-    keep_backups = determine_backups_to_keep(backups, now)
+    keep_backups = determine_backups_to_keep(backups)
     print(f"Retention policy: keeping {len(keep_backups)} backups")
 
     deleted_count = delete_old_backups(backups, keep_backups, bucket_path)
