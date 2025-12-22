@@ -36,6 +36,10 @@ jobs:
           echo "Config line count:"
           wc -l ~/.config/rclone/rclone.conf
 
+          # Test if token JSON is valid
+          echo "Testing token JSON validity:"
+          grep "^token = " ~/.config/rclone/rclone.conf | sed 's/token = //' | python3 -m json.tool > /dev/null && echo "✓ Token JSON is valid" || echo "✗ Token JSON is INVALID"
+
       - name: Configure rclone for Backblaze B2
         run: |
           cat >> ~/.config/rclone/rclone.conf <<EOF
