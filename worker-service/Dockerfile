@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
 # Install system dependencies and PostgreSQL 15 client
 RUN apt-get update && \
@@ -9,6 +9,7 @@ RUN apt-get update && \
     curl \
     unzip \
     nano \
+    libldap-2.5-0 \
     && curl https://rclone.org/install.sh | bash \
     && ln -s /usr/bin/python3 /usr/bin/python \
     # Add PostgreSQL apt repository for version 15
