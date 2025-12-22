@@ -1,10 +1,14 @@
-"""Shared utilities for database backup and restore operations."""
+"""Core backup utilities shared across all storage backends."""
 
 import re
 import subprocess
 from datetime import datetime, timedelta
 
-from django.conf import settings
+try:
+    from django.conf import settings
+except ImportError:
+    settings = None
+
 
 # Default retention policy configuration
 DEFAULT_RETENTION = {
@@ -34,39 +38,6 @@ def parse_backup_filename(filename):
         except ValueError:
             return None
     return None
-
-
-def list_remote_backups():
-    """
-    List all backup files from Google Drive.
-
-    Returns:
-        list: List of tuples (filename, backup_date) sorted by date (newest first),
-              or None if the rclone command fails.
-    """
-    result = subprocess.run(
-        ["rclone", "lsf", settings.DB_BACKUPS_PATH],
-        capture_output=True,
-        text=True,
-    )
-
-    if result.returncode != 0:
-        return None
-
-    backups = []
-    filenames = result.stdout.strip().split("\n") if result.stdout.strip() else []
-
-    for filename in filenames:
-        if not filename or not filename.startswith("backup_"):
-            continue
-
-        backup_date = parse_backup_filename(filename)
-        if backup_date:
-            backups.append((filename, backup_date))
-
-    # Sort by date (newest first)
-    backups.sort(key=lambda x: x[1], reverse=True)
-    return backups
 
 
 def determine_backups_to_keep(backups, retention_config=None, now=None):
@@ -128,3 +99,40 @@ def determine_backups_to_keep(backups, retention_config=None, now=None):
                 keep_backups.add(filename)
 
     return keep_backups
+
+
+def list_remote_backups(remote_path):
+    """List all backup files from a remote path."""
+    result = subprocess_run(
+        ["rclone", "lsf", remote_path],
+        capture_output=True,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        return None
+
+    backups = []
+    for line in result.stdout.strip().split("\n"):
+        if not line or not line.startswith("backup_"):
+            continue
+
+        backup_date = parse_backup_filename(line.strip())
+        if backup_date:
+            backups.append((line.strip(), backup_date))
+
+    # Sort by date (newest first)
+    backups.sort(key=lambda x: x[1], reverse=True)
+    return backups
+
+
+def list_gdrive_backups():
+    return list_remote_backups(settings.DB_BACKUPS_PATH)
+
+
+def subprocess_run(cmd, **kwargs):
+    return subprocess.run(cmd, **kwargs)
+
+
+def subprocess_Popen(cmd, **kwargs):
+    return subprocess.Popen(cmd, **kwargs)

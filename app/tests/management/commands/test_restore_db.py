@@ -8,7 +8,7 @@ from django.test import override_settings
 
 def setup_restore_mocks(mocker):
     """Setup mocks for restore command. Returns dict of all mocks for modification."""
-    mock_subprocess = mocker.patch("app.management.commands.restore_db.subprocess")
+    mock_subprocess = mocker.patch("app.backups.core.subprocess")
     mock_os = mocker.patch("app.management.commands.restore_db.os")
     mock_gzip = mocker.patch("app.management.commands.restore_db.gzip")
     mock_shutil = mocker.patch("app.management.commands.restore_db.shutil")
