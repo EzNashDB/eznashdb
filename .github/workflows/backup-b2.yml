@@ -27,7 +27,14 @@ jobs:
       - name: Configure rclone for Google Drive
         run: |
           mkdir -p ~/.config/rclone
-          echo "${{ secrets.RCLONE_CONFIG_CONTENT }}" > ~/.config/rclone/rclone.conf
+          printf '%s\n' "${{ secrets.RCLONE_CONFIG_CONTENT }}" > ~/.config/rclone/rclone.conf
+
+          # Debug: Show config structure (without sensitive data)
+          echo "Config sections found:"
+          grep "^\[" ~/.config/rclone/rclone.conf || echo "No sections found!"
+
+          echo "Config line count:"
+          wc -l ~/.config/rclone/rclone.conf
 
       - name: Configure rclone for Backblaze B2
         run: |
