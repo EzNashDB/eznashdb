@@ -57,12 +57,10 @@ jobs:
           cat >> ~/.config/rclone/rclone.conf <<EOF
 
           [b2]
-          type = s3
-          provider = Other
-          access_key_id = ${{ secrets.B2_APPLICATION_KEY_ID }}
-          secret_access_key = ${{ secrets.B2_APPLICATION_KEY }}
-          endpoint = ${{ secrets.B2_ENDPOINT }}
-          acl = private
+          type = b2
+          account = ${{ secrets.B2_APPLICATION_KEY_ID }}
+          key = ${{ secrets.B2_APPLICATION_KEY }}
+          hard_delete = false
           EOF
 
       - name: Find latest backup in Google Drive
