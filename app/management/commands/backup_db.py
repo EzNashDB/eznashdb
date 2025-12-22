@@ -6,6 +6,8 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from app.backups import list_remote_backups
+
 
 class Command(BaseCommand):
     help = "Backup database to Google Drive with retention policy"
@@ -68,6 +70,8 @@ class Command(BaseCommand):
             "-d",
             db_config["NAME"],
             "--format=plain",
+            "--clean",
+            "--if-exists",
         ]
 
         # Add port if specified
@@ -105,38 +109,13 @@ class Command(BaseCommand):
         """Delete old backups based on retention policy"""
         now = datetime.now()
 
-        backups = self._list_remote_backups()
+        backups = list_remote_backups()
         if backups is None:
+            self.stdout.write(self.style.WARNING("Could not list backups for retention"))
             return
 
         keep_backups = self._determine_backups_to_keep(backups, retention_config, now)
         self._delete_old_backups(backups, keep_backups)
-
-    def _list_remote_backups(self):
-        """List all backup files from Google Drive"""
-        result = subprocess.run(["rclone", "lsf", self.backups_path], capture_output=True, text=True)
-
-        if result.returncode != 0:
-            self.stdout.write(self.style.WARNING("Could not list backups for retention"))
-            return None
-
-        backups = []
-        filenames = result.stdout.strip().split("\n") if result.stdout.strip() else []
-        for filename in filenames:
-            if not filename or not filename.startswith("backup_"):
-                continue
-
-            try:
-                # Parse timestamp from filename: backup_20241214_020000.sql.gz
-                timestamp_str = filename.replace("backup_", "").replace(".sql.gz", "")
-                backup_date = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
-                backups.append((filename, backup_date))
-            except ValueError:
-                continue
-
-        # Sort by date (newest first)
-        backups.sort(key=lambda x: x[1], reverse=True)
-        return backups
 
     def _determine_backups_to_keep(self, backups, retention_config, now):
         """Determine which backups should be kept based on retention policy"""

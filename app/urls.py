@@ -4,11 +4,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from app.views import AdminDashboardView
+from app.views import AdminDashboardView, RestoreDBView
 
 urlpatterns = [
     path("", include("eznashdb.urls")),
     path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
+    path("admin/restore/", RestoreDBView.as_view(), name="restore_db"),
     path("admin/", admin.site.urls),
 ]
 

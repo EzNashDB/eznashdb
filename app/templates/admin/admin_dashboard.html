@@ -1,62 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-10 offset-lg-1">
-                <h1 class="mb-4">Admin Dashboard</h1>
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
-                             role="alert">
-                            {{ message }}
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                <div class="row mb-4">
-                    <!-- Django Admin -->
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="fa-solid fa-gear text-success me-3" style="font-size: 2.5rem;"></i>
-                                    <div>
-                                        <h5 class="card-title mb-1">Django Admin</h5>
-                                        <p class="card-text text-muted mb-0">Manage models, users, and site content.</p>
-                                    </div>
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <h1 class="mb-4">Admin Dashboard</h1>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                         role="alert">
+                        {{ message }}
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="row mb-4">
+                <!-- Django Admin -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-gear text-success me-3" style="font-size: 2.5rem;"></i>
+                                <div>
+                                    <h5 class="card-title mb-1">Django Admin</h5>
+                                    <p class="card-text text-muted mb-0">Manage models, users, and site content.</p>
                                 </div>
-                                <a href="{% url 'admin:index' %}"
-                                   target="_blank"
-                                   class="btn btn-success">
-                                    <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Admin
-                                </a>
                             </div>
+                            <a href="{% url 'admin:index' %}"
+                               target="_blank"
+                               class="btn btn-success">
+                                <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Admin
+                            </a>
                         </div>
                     </div>
-                    <!-- Database Backup -->
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="fa-solid fa-database text-primary me-3"
-                                       style="font-size: 2.5rem"></i>
-                                    <div>
-                                        <h5 class="card-title mb-1">Database Backup</h5>
-                                        <p class="card-text text-muted mb-0">Create and upload backup to Google Drive.</p>
-                                    </div>
+                </div>
+                <!-- Database Backup -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-database text-primary me-3"
+                                   style="font-size: 2.5rem"></i>
+                                <div>
+                                    <h5 class="card-title mb-1">Database Backup</h5>
+                                    <p class="card-text text-muted mb-0">Create and upload backup to Google Drive.</p>
                                 </div>
-                                <form method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="backup_db">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Run Backup
-                                    </button>
-                                </form>
                             </div>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="backup_db">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Run Backup
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Database Restore -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-clock-rotate-left text-warning me-3"
+                                   style="font-size: 2.5rem"></i>
+                                <div>
+                                    <h5 class="card-title mb-1">Database Restore</h5>
+                                    <p class="card-text text-muted mb-0">Restore database from a Google Drive backup.</p>
+                                </div>
+                            </div>
+                            <a href="{% url 'restore_db' %}" class="btn btn-warning">
+                                <i class="fa-solid fa-clock-rotate-left me-2"></i>Restore Backup
+                            </a>
                         </div>
                     </div>
                 </div>
