@@ -6,7 +6,7 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from app.backups import list_remote_backups
+from app.backups import determine_backups_to_keep, list_remote_backups
 
 
 class Command(BaseCommand):
@@ -26,14 +26,6 @@ class Command(BaseCommand):
         backup_filename = f"backup_{timestamp}.sql.gz"
         backup_path = f"/tmp/{backup_filename}"
 
-        # Retention windows (keep backups for these periods)
-        retention_config = {
-            "daily": 7,  # Keep daily backups for 7 days
-            "weekly": 4,  # Keep weekly backups for 4 weeks
-            "monthly": 12,  # Keep monthly backups for 12 months
-            "yearly": True,  # Keep yearly backups forever
-        }
-
         try:
             # Step 1: Create backup using pg_dump
             self.stdout.write("Creating database dump...")
@@ -45,7 +37,7 @@ class Command(BaseCommand):
 
             # Step 3: Apply retention policy
             self.stdout.write("Applying retention policy...")
-            self._apply_retention(retention_config)
+            self._apply_retention()
 
             # Step 4: Cleanup local file
             os.remove(backup_path)
@@ -105,58 +97,15 @@ class Command(BaseCommand):
         if result.returncode != 0:
             raise Exception(f"Upload failed: {result.stderr}")
 
-    def _apply_retention(self, retention_config):
+    def _apply_retention(self):
         """Delete old backups based on retention policy"""
-        now = datetime.now()
-
         backups = list_remote_backups()
         if backups is None:
             self.stdout.write(self.style.WARNING("Could not list backups for retention"))
             return
 
-        keep_backups = self._determine_backups_to_keep(backups, retention_config, now)
+        keep_backups = determine_backups_to_keep(backups)
         self._delete_old_backups(backups, keep_backups)
-
-    def _determine_backups_to_keep(self, backups, retention_config, now):
-        """Determine which backups should be kept based on retention policy"""
-        keep_backups = set()
-
-        # Keep all backups from the last N days (daily retention)
-        daily_cutoff = now - timedelta(days=retention_config["daily"])
-        for filename, backup_date in backups:
-            if backup_date >= daily_cutoff:
-                keep_backups.add(filename)
-
-        # Keep one backup per week for the weekly retention period
-        weekly_cutoff = now - timedelta(weeks=retention_config["weekly"])
-        weekly_backups = {}
-        for filename, backup_date in backups:
-            if daily_cutoff > backup_date >= weekly_cutoff:
-                week_key = backup_date.strftime("%Y-W%U")
-                if week_key not in weekly_backups:
-                    weekly_backups[week_key] = filename
-                    keep_backups.add(filename)
-
-        # Keep one backup per month for the monthly retention period
-        monthly_cutoff = now - timedelta(days=30 * retention_config["monthly"])
-        monthly_backups = {}
-        for filename, backup_date in backups:
-            if weekly_cutoff > backup_date >= monthly_cutoff:
-                month_key = backup_date.strftime("%Y-%m")
-                if month_key not in monthly_backups:
-                    monthly_backups[month_key] = filename
-                    keep_backups.add(filename)
-
-        # Keep one backup per year forever
-        yearly_backups = {}
-        for filename, backup_date in backups:
-            if backup_date < monthly_cutoff:
-                year_key = backup_date.strftime("%Y")
-                if year_key not in yearly_backups:
-                    yearly_backups[year_key] = filename
-                    keep_backups.add(filename)
-
-        return keep_backups
 
     def _delete_old_backups(self, backups, keep_backups):
         """Delete backups that are not in the keep list"""
