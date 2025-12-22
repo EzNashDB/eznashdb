@@ -6,7 +6,12 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from app.backups import determine_backups_to_keep, list_remote_backups
+from app.backups.core import (
+    determine_backups_to_keep,
+    list_gdrive_backups,
+    subprocess_Popen,
+    subprocess_run,
+)
 
 
 class Command(BaseCommand):
@@ -72,10 +77,10 @@ class Command(BaseCommand):
 
         # Dump and compress
         with open(backup_path, "wb") as f:
-            dump_process = subprocess.Popen(
+            dump_process = subprocess_Popen(
                 pg_dump_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
             )
-            gzip_process = subprocess.Popen(
+            gzip_process = subprocess_Popen(
                 ["gzip"], stdin=dump_process.stdout, stdout=f, stderr=subprocess.PIPE
             )
             dump_process.stdout.close()
@@ -90,7 +95,7 @@ class Command(BaseCommand):
 
     def _upload_to_gdrive(self, local_path):
         """Upload backup to Google Drive using rclone"""
-        result = subprocess.run(
+        result = subprocess_run(
             ["rclone", "copy", local_path, self.backups_path], capture_output=True, text=True
         )
 
@@ -99,7 +104,7 @@ class Command(BaseCommand):
 
     def _apply_retention(self):
         """Delete old backups based on retention policy"""
-        backups = list_remote_backups()
+        backups = list_gdrive_backups()
         if backups is None:
             self.stdout.write(self.style.WARNING("Could not list backups for retention"))
             return
@@ -112,7 +117,7 @@ class Command(BaseCommand):
         for filename, _backup_date in backups:
             if filename not in keep_backups:
                 self.stdout.write(f"Deleting old backup: {filename}")
-                subprocess.run(
+                subprocess_run(
                     ["rclone", "delete", f"{self.backups_path}{filename}"], capture_output=True
                 )
 

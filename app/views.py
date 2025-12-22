@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
-from app.backups import list_remote_backups
+from app.backups.core import list_gdrive_backups
 
 
 @method_decorator(staff_member_required, name="dispatch")
@@ -36,7 +36,7 @@ class RestoreDBView(TemplateView):
         return context
 
     def list_available_backups(self):
-        remote_backups = list_remote_backups()
+        remote_backups = list_gdrive_backups()
         if remote_backups:
             return [
                 {

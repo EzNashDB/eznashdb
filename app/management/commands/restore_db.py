@@ -1,10 +1,11 @@
 import gzip
 import os
 import shutil
-import subprocess
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+
+from app.backups.core import subprocess_run
 
 
 class Command(BaseCommand):
@@ -49,7 +50,7 @@ class Command(BaseCommand):
 
     def _backup_exists(self, filename):
         """Check if backup file exists on remote"""
-        result = subprocess.run(
+        result = subprocess_run(
             ["rclone", "lsf", f"{self.backups_path}{filename}"],
             capture_output=True,
             text=True,
@@ -58,7 +59,7 @@ class Command(BaseCommand):
 
     def _download_backup(self, filename, local_path):
         """Download backup from Google Drive using rclone"""
-        result = subprocess.run(
+        result = subprocess_run(
             ["rclone", "copy", f"{self.backups_path}{filename}", "/tmp/"],
             capture_output=True,
             text=True,
@@ -98,7 +99,7 @@ class Command(BaseCommand):
         if db_config.get("PORT"):
             psql_cmd.extend(["-p", str(db_config["PORT"])])
 
-        result = subprocess.run(psql_cmd, env=env, capture_output=True, text=True)
+        result = subprocess_run(psql_cmd, env=env, capture_output=True, text=True)
         if result.returncode != 0:
             raise CommandError(f"Restore failed: {result.stderr}")
 

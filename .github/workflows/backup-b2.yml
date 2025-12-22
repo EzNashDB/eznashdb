@@ -27,30 +27,12 @@ jobs:
       - name: Configure rclone for Google Drive
         run: |
           mkdir -p ~/.config/rclone
-
-          # Decode base64 rclone config
-          echo "Decoding base64 rclone config..."
           echo "${{ secrets.RCLONE_CONFIG_CONTENT }}" | base64 -d > ~/.config/rclone/rclone.conf
 
-          if [ $? -ne 0 ]; then
-            echo "::error::Failed to decode base64. Make sure RCLONE_CONFIG_CONTENT is base64 encoded."
-            exit 1
-          fi
-
-          # Debug: Show config structure
-          echo "Config sections found:"
-          grep "^\[" ~/.config/rclone/rclone.conf || echo "No sections found!"
-
-          echo "Config line count:"
-          wc -l ~/.config/rclone/rclone.conf
-
-          # Verify we have gdrive section
           if ! grep -q "^\[gdrive\]" ~/.config/rclone/rclone.conf; then
             echo "::error::Config missing [gdrive] section!"
             exit 1
           fi
-
-          echo "✓ Config looks good"
 
       - name: Configure rclone for Backblaze B2
         run: |
@@ -63,84 +45,28 @@ jobs:
           hard_delete = false
           EOF
 
-      - name: Find latest backup in Google Drive
-        id: find_latest
+      - name: Run backup sync to B2
+        id: sync
         run: |
-          echo "=== Finding Latest Backup in Google Drive ==="
+          python3 scripts/sync_to_b2.py "${{ env.GDRIVE_REMOTE }}/prod/" "b2:${{ env.B2_BUCKET }}/prod/"
 
-          # List all backups and find the most recent one
-          LATEST_BACKUP=$(rclone lsf ${{ env.GDRIVE_REMOTE }}/prod/ --files-only | grep '^backup_' | sort -r | head -1 || true)
-
-          if [ -z "$LATEST_BACKUP" ]; then
-            echo "::error::No backups found in Google Drive at ${{ env.GDRIVE_REMOTE }}/prod/"
-            echo "This could mean:"
-            echo "1. The GDRIVE_REMOTE path is incorrect"
-            echo "2. The RCLONE_CONFIG_CONTENT is invalid or missing [gdrive] section"
-            echo "3. The primary backup hasn't run yet"
-            echo "latest_backup=" >> $GITHUB_OUTPUT
-            echo "has_backup=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-
-          echo "✓ Latest backup: $LATEST_BACKUP"
-          echo "latest_backup=$LATEST_BACKUP" >> $GITHUB_OUTPUT
-          echo "has_backup=true" >> $GITHUB_OUTPUT
-
-      - name: Copy latest backup to B2
-        if: steps.find_latest.outputs.has_backup == 'true'
-        run: |
-          LATEST_BACKUP="${{ steps.find_latest.outputs.latest_backup }}"
-          echo "Copying latest backup to Backblaze B2: $LATEST_BACKUP"
-
-          # Copy only the latest backup from Google Drive to B2
-          rclone copy \
-            "${{ env.GDRIVE_REMOTE }}/prod/$LATEST_BACKUP" \
-            "b2:${{ env.B2_BUCKET }}/prod/" \
-            --progress \
-            --checksum \
-            --log-level INFO
-
-          echo "✓ Successfully copied: $LATEST_BACKUP"
-
-      - name: List backups in B2 (before retention)
-        id: list_b2_before
-        run: |
-          echo "=== Backups in B2 (before retention policy) ==="
-          B2_COUNT_BEFORE=$(rclone lsf b2:${{ env.B2_BUCKET }}/prod/ 2>/dev/null | wc -l)
-          echo "b2_count_before=$B2_COUNT_BEFORE" >> $GITHUB_OUTPUT
-          echo "Total: $B2_COUNT_BEFORE backups in B2"
-
-      - name: Apply retention policy to B2
-        run: |
-          python3 scripts/b2_retention.py "b2:${{ env.B2_BUCKET }}/prod/"
-
-      - name: Verify final backup counts
+      - name: Verify and report
         id: verify
         run: |
-          echo "=== Final Backup Counts ==="
+          B2_COUNT=$(rclone lsf b2:${{ env.B2_BUCKET }}/prod/ 2>/dev/null | grep '^backup_' | wc -l)
+          LATEST_BACKUP=$(rclone lsf ${{ env.GDRIVE_REMOTE }}/prod/ --files-only | grep '^backup_' | sort -r | head -1)
 
-          LATEST_BACKUP="${{ steps.find_latest.outputs.latest_backup }}"
-          B2_COUNT=$(rclone lsf b2:${{ env.B2_BUCKET }}/prod/ 2>/dev/null | wc -l)
-
-          echo "latest_backup=$LATEST_BACKUP" >> $GITHUB_OUTPUT
           echo "b2_count=$B2_COUNT" >> $GITHUB_OUTPUT
+          echo "latest_backup=$LATEST_BACKUP" >> $GITHUB_OUTPUT
 
-          echo "Latest from Google Drive: $LATEST_BACKUP"
           echo "Total backups in B2: $B2_COUNT"
 
-          # List a few recent B2 backups
-          echo ""
-          echo "=== Recent B2 Backups ==="
-          rclone lsf b2:${{ env.B2_BUCKET }}/prod/ --max-depth 1 | sort -r | head -5
-
-          # Calculate approximate storage size
           B2_SIZE=$(rclone size b2:${{ env.B2_BUCKET }}/prod/ --json | python3 -c "import sys, json; print(json.load(sys.stdin)['bytes'])")
           B2_SIZE_MB=$((B2_SIZE / 1024 / 1024))
-          echo ""
-          echo "B2 Storage Used: ~${B2_SIZE_MB} MB"
+          echo "B2 storage: ${B2_SIZE_MB} MB"
 
           if [ $B2_SIZE_MB -gt 1000 ]; then
-            echo "::warning::B2 storage is over 1GB (${B2_SIZE_MB} MB). Consider checking retention policy."
+            echo "::warning::B2 storage over 1GB (${B2_SIZE_MB} MB)"
           fi
 
       - name: Send notification on failure
@@ -189,16 +115,8 @@ jobs:
           | Item | Value |
           |------|-------|
           | Latest backup copied | \`${{ steps.verify.outputs.latest_backup }}\` |
-          | B2 backups (before retention) | ${{ steps.list_b2_before.outputs.b2_count_before }} |
-          | B2 backups (after retention) | ${{ steps.verify.outputs.b2_count }} |
+          | B2 backups (after sync) | ${{ steps.verify.outputs.b2_count }} |
 
           **Completed:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           ---
-
-          ### How It Works
-          - Copies ONLY the latest backup from Google Drive to B2 each day
-          - Applies retention policy to B2 independently (7 daily, 4 weekly, 12 monthly, yearly forever)
-          - Even if Google Drive is wiped, B2 keeps all existing backups
-          - Target: ~30 backups, ~1GB storage (under 10GB free tier)
-          EOF

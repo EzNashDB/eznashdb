@@ -113,11 +113,11 @@ python manage.py restore_db backup_20241222_110000.sql.gz
 2. Click "Backup to Backblaze B2"
 3. Click "Run workflow" → "Run workflow"
 
-### Test retention script locally
+### Test sync script locally
 
 ```bash
-# Configure rclone with B2 credentials first
-python scripts/b2_retention.py b2:ezrat-nashim-db-backups/prod/
+# Configure rclone with Google Drive and B2 credentials first
+python scripts/sync_to_b2.py gdrive:db-backups/prod/ b2:ezrat-nashim-db-backups/prod/
 ```
 
 ## GitHub Secrets Required
@@ -132,8 +132,9 @@ python scripts/b2_retention.py b2:ezrat-nashim-db-backups/prod/
 ## Files
 
 - `/.github/workflows/backup-b2.yml` - GitHub Actions workflow
-- `/app/scripts/b2_retention.py` - Retention policy script
+- `/app/scripts/sync_to_b2.py` - Backup sync script (with tests)
 - `/app/app/management/commands/backup_db.py` - Primary backup command
+- `/app/app/backups.py` - Shared backup utilities and retention policy
 
 ## Cost
 
