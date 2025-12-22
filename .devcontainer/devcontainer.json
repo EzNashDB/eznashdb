@@ -24,7 +24,8 @@
 				"batisteo.vscode-django",
 				"eamodio.gitlens",
 				"ms-python.vscode-pylance",
-				"charliermarsh.ruff"
+				"charliermarsh.ruff",
+				"anthropic.claude-code"
 			],
 			"settings": {
 				"python.venvPath": ".",

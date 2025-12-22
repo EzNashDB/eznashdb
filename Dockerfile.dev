@@ -101,6 +101,9 @@ RUN curl -sSL https://install.python-poetry.org | python -
 RUN pip install --no-cache-dir \
     pre-commit==3.3.2
 
+# Install Claude Code CLI
+RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh | sh
+
 USER root
 RUN ln -s ${HOME}/.local/bin/poetry /usr/local/bin
 USER docker
