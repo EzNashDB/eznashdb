@@ -27,18 +27,30 @@ jobs:
       - name: Configure rclone for Google Drive
         run: |
           mkdir -p ~/.config/rclone
-          printf '%s\n' "${{ secrets.RCLONE_CONFIG_CONTENT }}" > ~/.config/rclone/rclone.conf
 
-          # Debug: Show config structure (without sensitive data)
+          # Decode base64 rclone config
+          echo "Decoding base64 rclone config..."
+          echo "${{ secrets.RCLONE_CONFIG_CONTENT }}" | base64 -d > ~/.config/rclone/rclone.conf
+
+          if [ $? -ne 0 ]; then
+            echo "::error::Failed to decode base64. Make sure RCLONE_CONFIG_CONTENT is base64 encoded."
+            exit 1
+          fi
+
+          # Debug: Show config structure
           echo "Config sections found:"
           grep "^\[" ~/.config/rclone/rclone.conf || echo "No sections found!"
 
           echo "Config line count:"
           wc -l ~/.config/rclone/rclone.conf
 
-          # Test if token JSON is valid
-          echo "Testing token JSON validity:"
-          grep "^token = " ~/.config/rclone/rclone.conf | sed 's/token = //' | python3 -m json.tool > /dev/null && echo "✓ Token JSON is valid" || echo "✗ Token JSON is INVALID"
+          # Verify we have gdrive section
+          if ! grep -q "^\[gdrive\]" ~/.config/rclone/rclone.conf; then
+            echo "::error::Config missing [gdrive] section!"
+            exit 1
+          fi
+
+          echo "✓ Config looks good"
 
       - name: Configure rclone for Backblaze B2
         run: |
