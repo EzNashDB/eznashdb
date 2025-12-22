@@ -52,4 +52,7 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", ":8000", "--workers", "1", "--threads", "3", "app.wsgi"]
+# Set up rclone config from environment variable on startup, then start gunicorn
+CMD mkdir -p /root/.config/rclone && \
+    echo "$RCLONE_CONFIG_CONTENT" > /root/.config/rclone/rclone.conf && \
+    gunicorn --bind :8000 --workers 1 --threads 3 app.wsgi
