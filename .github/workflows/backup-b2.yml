@@ -1,9 +1,9 @@
 name: Backup to Backblaze B2
 
 on:
-  # schedule:
-  #   # Run daily at 9:00 UTC (12:00 PM Israel time, ~1 hour after primary backup)
-  #   - cron: '0 9 * * *'
+  schedule:
+    # Run daily at 9:00 UTC (12:00 PM Israel time, ~1 hour after primary backup)
+    - cron: '0 9 * * *'
   workflow_dispatch: # Allow manual triggering for testing
 
 env:
