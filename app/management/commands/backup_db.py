@@ -36,6 +36,10 @@ class Command(BaseCommand):
             self.stdout.write("Creating database dump...")
             self._create_backup(db_config, backup_path)
 
+            # Step 1.5: Validate backup size
+            self.stdout.write("Validating backup...")
+            self._validate_backup(backup_path)
+
             # Step 2: Upload to Google Drive
             self.stdout.write("Uploading to Google Drive...")
             self._upload_to_gdrive(backup_path)
@@ -92,6 +96,23 @@ class Command(BaseCommand):
                 raise Exception(f"pg_dump failed: {stderr_output}")
             if gzip_process.returncode != 0:
                 raise Exception(f"gzip failed: {gzip_stderr.decode()}")
+
+    def _validate_backup(self, backup_path, min_size_kb=15):
+        """Validate backup file meets minimum size requirements"""
+        if not os.path.exists(backup_path):
+            raise Exception(f"Backup file not found: {backup_path}")
+
+        file_size_bytes = os.path.getsize(backup_path)
+        file_size_kb = file_size_bytes / 1024
+
+        if file_size_kb < min_size_kb:
+            raise Exception(
+                f"Backup validation failed: file size ({file_size_kb:.1f}KB) is below "
+                f"minimum threshold ({min_size_kb}KB). This likely indicates an empty "
+                f"or incomplete backup."
+            )
+
+        self.stdout.write(f"Backup validation passed: {file_size_kb:.1f}KB")
 
     def _upload_to_gdrive(self, local_path):
         """Upload backup to Google Drive using rclone"""
