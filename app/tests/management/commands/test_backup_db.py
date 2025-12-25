@@ -18,6 +18,9 @@ def setup_backup_mocks(mocker):
     mock_path = mocker.patch("app.management.commands.backup_db.Path")
 
     mock_os.environ.copy.return_value = {}
+    # Mock file validation functions
+    mock_os.path.exists.return_value = True
+    mock_os.path.getsize.return_value = 20 * 1024  # 20KB by default (valid size)
 
     mock_tmp_path = Mock()
     mock_tmp_path.glob.return_value = []
@@ -324,4 +327,35 @@ def describe_error_handling():
         mocks["tmp_path"].glob.return_value = [old_file]
 
         with pytest.raises(OSError, match="Permission denied"):
+            call_command("backup_db")
+
+
+def describe_validation():
+    def fails_when_backup_too_small(mocker):
+        """Backup should fail if file is smaller than threshold"""
+        mocks = setup_backup_mocks(mocker)
+
+        # Override default: backup file is 5KB (too small)
+        mocks["os"].path.getsize.return_value = 5 * 1024
+
+        with pytest.raises(Exception, match="Backup validation failed.*5.0KB.*below minimum"):
+            call_command("backup_db")
+
+    def passes_when_backup_large_enough(mocker):
+        """Backup should succeed if file meets size threshold"""
+        mocks = setup_backup_mocks(mocker)
+
+        # Explicitly set backup file to be 20KB (above threshold)
+        mocks["os"].path.getsize.return_value = 20 * 1024
+
+        call_command("backup_db")
+
+    def fails_when_backup_file_missing(mocker):
+        """Backup should fail if file doesn't exist after creation"""
+        mocks = setup_backup_mocks(mocker)
+
+        # Override default: file doesn't exist
+        mocks["os"].path.exists.return_value = False
+
+        with pytest.raises(Exception, match="Backup file not found"):
             call_command("backup_db")
