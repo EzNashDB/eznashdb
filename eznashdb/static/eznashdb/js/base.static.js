@@ -11,10 +11,23 @@
 function scrollIntoViewWithinContainer(element, options = {}) {
   const { behavior = "smooth", block = "start", offset = 0 } = options;
 
-  // Find the nearest scrollable container
-  const scrollContainer = element.closest(
-    '.overflow-auto, [style*="overflow: auto"], [style*="overflow: scroll"]'
-  );
+  // Find the nearest scrollable container by checking computed styles
+  let scrollContainer = null;
+  let parent = element.parentElement;
+
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    if (
+      style.overflowY === "auto" ||
+      style.overflowY === "scroll" ||
+      style.overflow === "auto" ||
+      style.overflow === "scroll"
+    ) {
+      scrollContainer = parent;
+      break;
+    }
+    parent = parent.parentElement;
+  }
 
   if (!scrollContainer) {
     // No scrollable container found, fall back to regular scrollIntoView

@@ -216,7 +216,8 @@
             if (!roomCollapseEl || !header) return;
 
             const scrollToHeader = () => {
-                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start' })
+                // Add offset to account for sticky header height
+                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start', offset: 40 })
             };
 
             if (!roomCollapseEl.classList.contains('show')) {
