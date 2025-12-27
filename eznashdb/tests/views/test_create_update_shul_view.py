@@ -91,7 +91,7 @@ def describe_update():
             "address": test_shul.address,
             "latitude": test_shul.latitude,
             "longitude": test_shul.longitude,
-            "address_changed": "false",
+            "check_nearby_shuls": "false",
             **get_room_fields(room_index=0),
             **get_room_fields(room_index=1),
             **get_room_fs_metadata_fields(total_forms=2),
@@ -113,7 +113,7 @@ def describe_update():
                 "address": test_shul.address,
                 "latitude": test_shul.latitude,
                 "longitude": test_shul.longitude,
-                "address_changed": "false",
+                "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -154,7 +154,7 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
             "address": "123 Test St",
             "submit_type": "main_submit",
             "wizard_step": "step1",  # Wizard step 1
-            "address_changed": "true",
+            "check_nearby_shuls": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
@@ -192,7 +192,7 @@ def test_skips_duplicate_check_when_address_not_changed(client):
             "address": "123 Test St",
             "submit_type": "main_submit",
             "wizard_step": "step1",  # Wizard step 1
-            "address_changed": "false",  # Address not changed
+            "check_nearby_shuls": "false",  # Don't check for nearby shuls
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
@@ -225,7 +225,7 @@ def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
             "address": "123 Test St",
             "submit_type": "other_submit",  # Not main_submit
             "wizard_step": "step1",  # Wizard step 1
-            "address_changed": "true",
+            "check_nearby_shuls": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         },
@@ -253,7 +253,7 @@ def describe_wizard():
                 "longitude": "1.0",
                 "submit_type": "main_submit",
                 "wizard_step": "step1",
-                "address_changed": "true",
+                "check_nearby_shuls": "true",
             },
             headers={"HX-Request": "true"},
         )
@@ -282,7 +282,7 @@ def describe_wizard():
                 "place_id": "test_place_id",
                 "submit_type": "main_submit",
                 "wizard_step": "step2",
-                "address_changed": "false",
+                "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -314,7 +314,7 @@ def describe_wizard():
                 "place_id": "test_place_id",
                 "wizard_step": "step2",
                 "submit_type": "main_submit",
-                "address_changed": "false",
+                "check_nearby_shuls": "false",
                 **get_room_fs_metadata_fields(total_forms=1),
                 "rooms-0-name": "",
                 "rooms-0-relative_size": "",
@@ -344,7 +344,7 @@ def describe_wizard():
                 "place_id": "changed_place_id",
                 "submit_type": "main_submit",
                 "wizard_step": "step2",
-                "address_changed": "false",
+                "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -379,7 +379,7 @@ def describe_wizard():
                 "place_id": "new_place_id",
                 "submit_type": "main_submit",
                 "wizard_step": "step2",
-                "address_changed": "true",  # Trigger nearby check
+                "check_nearby_shuls": "true",  # Trigger nearby check
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -415,7 +415,7 @@ def describe_wizard():
                 "place_id": "new_place_id",
                 "submit_type": "main_submit",
                 "wizard_step": "step2",
-                "address_changed": "true",
+                "check_nearby_shuls": "true",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
@@ -436,8 +436,8 @@ def describe_wizard():
                 "longitude": "2.0",
                 "place_id": "new_place_id",
                 "submit_type": "main_submit",
-                "wizard_step": "step2",  # Same step, but address_changed: false to skip check
-                "address_changed": "false",
+                "wizard_step": "step2",  # Same step, but check_nearby_shuls: false to skip check
+                "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
             },
