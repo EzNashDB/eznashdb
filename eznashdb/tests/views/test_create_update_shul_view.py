@@ -152,7 +152,7 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "wizard_step": "step1",  # Wizard step 1
+            "wizard_step": "1",  # Wizard step 1
             "check_nearby_shuls": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -189,7 +189,7 @@ def test_skips_duplicate_check_when_address_not_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "wizard_step": "step1",  # Wizard step 1
+            "wizard_step": "1",  # Wizard step 1
             "check_nearby_shuls": "false",  # Don't check for nearby shuls
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -217,7 +217,7 @@ def describe_wizard():
                 "address": "123 Test St",
                 "latitude": "1.0",
                 "longitude": "1.0",
-                "wizard_step": "step1",
+                "wizard_step": "1",
                 "check_nearby_shuls": "true",
             },
             headers={"HX-Request": "true"},
@@ -228,7 +228,7 @@ def describe_wizard():
         # Check step 2 is shown
         wizard_step_input = soup.find("input", {"name": "wizard_step"})
         assert wizard_step_input is not None
-        assert wizard_step_input.get("value") == "step2", "Should transition to step 2"
+        assert wizard_step_input.get("value") == "2", "Should transition to step 2"
         assert "Rooms" in str(soup)
 
         # Shul should NOT be saved yet
@@ -245,7 +245,7 @@ def describe_wizard():
                 "latitude": "1.0",
                 "longitude": "1.0",
                 "place_id": "test_place_id",
-                "wizard_step": "step2",
+                "wizard_step": "2",
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
@@ -276,7 +276,7 @@ def describe_wizard():
                 "latitude": "1.0",
                 "longitude": "1.0",
                 "place_id": "test_place_id",
-                "wizard_step": "step2",
+                "wizard_step": "2",
                 "check_nearby_shuls": "false",
                 **get_room_fs_metadata_fields(total_forms=1),
                 "rooms-0-name": "",
@@ -305,7 +305,7 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "changed_place_id",
-                "wizard_step": "step2",
+                "wizard_step": "2",
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
@@ -339,7 +339,7 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "wizard_step": "step2",
+                "wizard_step": "2",
                 "check_nearby_shuls": "true",  # Trigger nearby check
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
@@ -374,7 +374,7 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "wizard_step": "step2",
+                "wizard_step": "2",
                 "check_nearby_shuls": "true",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
@@ -386,7 +386,7 @@ def describe_wizard():
         soup = BeautifulSoup(response.content, features="html.parser")
         assert nearby_shul.name in str(soup)
 
-        # Now simulate clicking "Add New Anyway" - should save with wizard_step: "step2"
+        # Now simulate clicking "Add New Anyway" - should save with wizard_step: "2"
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -395,7 +395,7 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "wizard_step": "step2",  # Same step, but check_nearby_shuls: false to skip check
+                "wizard_step": "2",  # Same step, but check_nearby_shuls: false to skip check
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
                 **get_room_fs_metadata_fields(total_forms=1),
