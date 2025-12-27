@@ -167,9 +167,13 @@
         }
     });
 
-    // Room formset initialization (update mode or step 2 of create mode)
+    const getWizardStep = () => {
+        const wizardStepInput = document.querySelector('input[name="wizard_step"]');
+        return wizardStepInput ? wizardStepInput.value : null;
+    };
+
     const initRoomFormSet = () => {
-        const isStep2 = '{{ wizard_step }}' === '2';
+        const isStep2 = getWizardStep() === '2';
         const isUpdateMode = {% if object %}true{% else %}false{% endif %};
 
         if (!isStep2 && !isUpdateMode) return;
@@ -204,11 +208,7 @@
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", () => {
-        // Check if we're in step 2 by looking at the actual DOM state
-        const wizardStepInput = document.querySelector('input[name="wizard_step"]');
-        const currentStep = wizardStepInput ? wizardStepInput.value : null;
-
-        if (currentStep === '2') {
+        if (getWizardStep() === '2') {
             const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
             const header = document.getElementById('rooms-form-header');
 
