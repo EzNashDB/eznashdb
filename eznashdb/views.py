@@ -84,9 +84,9 @@ class CreateUpdateShulView(UpdateView):
                 return self.render_to_response(self.get_context_data(form=form))
 
             submit_type = self.request.POST.get("submit_type")
-            address_changed = self.request.POST.get("address_changed") == "true"
+            check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-            if (submit_type == "main_submit") and address_changed:
+            if (submit_type == "main_submit") and check_nearby_shuls:
                 nearby_shuls = self.check_nearby_shuls(form)
                 if nearby_shuls.exists():
                     partial_template = "eznashdb/create_update_shul.html#shul_form"
@@ -112,10 +112,10 @@ class CreateUpdateShulView(UpdateView):
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
         submit_type = self.request.POST.get("submit_type")
-        address_changed = self.request.POST.get("address_changed") == "true"
+        check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-        # Check for nearby shuls if address changed
-        if (submit_type == "main_submit") and address_changed:
+        # Check for nearby shuls if requested
+        if (submit_type == "main_submit") and check_nearby_shuls:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
@@ -143,11 +143,11 @@ class CreateUpdateShulView(UpdateView):
                 context,
             )
 
-        # Check for nearby shuls if address changed in step 2
+        # Check for nearby shuls if requested in step 2
         submit_type = self.request.POST.get("submit_type")
-        address_changed = self.request.POST.get("address_changed") == "true"
+        check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-        if (submit_type == "main_submit") and address_changed:
+        if (submit_type == "main_submit") and check_nearby_shuls:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
