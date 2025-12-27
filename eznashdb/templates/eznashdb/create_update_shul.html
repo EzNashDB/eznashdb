@@ -17,12 +17,12 @@
 {% block content %}
     <div class="row" id="shul-form-state"
         {# djlint:off #}
-        x-data="{ dirtyFields: new Set(), wizardStep: '{{ wizard_step|default:"1" }}' }"
+        x-data="{ dirtyFields: new Set() }"
         x-init="
             window.onbeforeunload = (e) => {
                 if (window.htmxSubmitting) return;
                 // Trigger warning if dirty fields OR in step 2 OR has form errors
-                if (dirtyFields.size > 0 || wizardStep === '2' || !!'{{form.errors|escapejs}}') {
+                if (dirtyFields.size > 0 || '{{ wizard_step }}' === '2' || !!'{{form.errors|escapejs}}') {
                     return '';
                 }
             }
@@ -43,7 +43,7 @@
                 {% if not object %}
                     <input type="hidden"
                            name="wizard_step"
-                           value="{{ wizard_step|default:'step1' }}">
+                           value="{{ wizard_step|default:'1' }}">
                 {% endif %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row">
@@ -54,12 +54,7 @@
                                 {% else %}
                                     Add a Shul
                                     <span class="h5 m-0">
-                                        <span class="badge text-bg-info">
-                                            Step
-                                            <span x-show="wizardStep === '1'">1</span>
-                                            <span x-show="wizardStep === '2'" x-cloak>2</span>
-                                            of 2
-                                        </span>
+                                        <span class="badge text-bg-info">Step {{ wizard_step|default:"1" }} of 2</span>
                                     </span>
                                 {% endif %}
                             </h3>
@@ -103,27 +98,29 @@
                                             </div>
                                         {% else %}
                                             {# CREATE MODE: show rooms only in step 2 #}
-                                            <div class="col" x-show="wizardStep === '2'" x-cloak>
-                                                <div class="row">
-                                                    <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    {{ room_fs.management_form }}
-                                                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                                    <div class="room-formset accordion"
-                                                         id="roomsAccordion"
-                                                         x-data="{ openRoom: 'rooms-0-form' }">
-                                                        {% for form in room_fs %}
-                                                            {% crispy form %}
-                                                        {% endfor %}
+                                            {% if wizard_step == '2' %}
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="row justify-content-end">
-                                                            <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                    <div class="row mb-3">
+                                                        {{ room_fs.management_form }}
+                                                        {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                        <div class="room-formset accordion"
+                                                             id="roomsAccordion"
+                                                             x-data="{ openRoom: 'rooms-0-form' }">
+                                                            {% for form in room_fs %}
+                                                                {% crispy form %}
+                                                            {% endfor %}
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="row justify-content-end">
+                                                                <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>
@@ -138,7 +135,6 @@
                                         class="btn btn-primary w-100"
                                         {# djlint:off #}
                                             hx-vals='js:{
-                                                "wizard_step": Alpine.$data(document.getElementById("shul-form-state")).wizardStep,
                                                 "check_nearby_shuls": (() => {
                                                     const dirtyFields = Alpine.$data(document.getElementById("shul-form-state")).dirtyFields;
                                                     return dirtyFields.has("latitude") || dirtyFields.has("longitude");
@@ -151,12 +147,11 @@
                                         {# Button text changes based on mode and step #}
                                         {% if object %}
                                             Save
+                                        {% elif wizard_step == '2' %}
+                                            Save Shul
                                         {% else %}
-                                            <span x-show="wizardStep === '1'">
-                                                Next: Add Rooms
-                                                <i class="ms-2 fa-solid fa-arrow-right"></i>
-                                            </span>
-                                            <span x-show="wizardStep === '2'" x-cloak>Save Shul</span>
+                                            Next: Add Rooms
+                                            <i class="ms-2 fa-solid fa-arrow-right"></i>
                                         {% endif %}
                                     </button>
                                 </div>
@@ -196,20 +191,6 @@
     document.body.addEventListener("htmx:afterRequest", (e) => {
         window.htmxSubmitting = false;
     });
-    // Use afterSwap instead of afterSettle for immediate state sync
-    document.addEventListener("htmx:afterSwap", (e) =>{
-        // Sync Alpine wizardStep from hidden input immediately after HTMX swap
-        const hiddenInput = document.querySelector('input[name="wizard_step"]');
-        const alpineData = Alpine.$data(document.getElementById('shul-form-state'));
-        if (hiddenInput && alpineData) {
-            alpineData.wizardStep = hiddenInput.value;
-
-            // If transitioning to step 2, mark form as dirty to warn on navigation
-            if (hiddenInput.value === 'step2') {
-                alpineData.dirtyFields.add('wizard_step');
-            }
-        }
-    });
 
     // Show nearby shuls modal after settling (animations complete)
     document.addEventListener("htmx:afterSettle", (e) =>{
@@ -222,8 +203,7 @@
 
     // Room formset initialization (update mode or step 2 of create mode)
     const initRoomFormSet = () => {
-        const alpineData = Alpine.$data(document.getElementById('shul-form-state'));
-        const isStep2 = !alpineData || alpineData.wizardStep === '2';
+        const isStep2 = '{{ wizard_step }}' === '2';
         const isUpdateMode = {% if object %}true{% else %}false{% endif %};
 
         if (!isStep2 && !isUpdateMode) return;
