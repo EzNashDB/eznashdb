@@ -195,7 +195,7 @@ class CreateUpdateShulView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         # For create mode, determine current wizard step
-        if not self.is_update and self.request.method == "POST":
+        if not self.is_update:
             wizard_step = self.request.POST.get("wizard_step", "1")
             context["wizard_step"] = wizard_step
 
