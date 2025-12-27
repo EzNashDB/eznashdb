@@ -144,14 +144,11 @@
                                         hx-post='{{ request.path }}'
                                         hx-target='#shul_form'
                                         hx-swap='outerHTML'>
-                                        {# Button text changes based on mode and step #}
-                                        {% if object %}
-                                            Save
-                                        {% elif wizard_step == '2' %}
-                                            Save Shul
-                                        {% else %}
+                                        {% if wizard_step == '1' %}
                                             Next: Add Rooms
                                             <i class="ms-2 fa-solid fa-arrow-right"></i>
+                                        {% else %}
+                                            Save
                                         {% endif %}
                                     </button>
                                 </div>
