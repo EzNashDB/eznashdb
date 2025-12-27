@@ -173,7 +173,7 @@
         const isUpdateMode = {% if object %}true{% else %}false{% endif %};
 
         if (!isStep2 && !isUpdateMode) return;
-    {% if form.instance.pk %}{# endif for update mode only below #}
+
         $(function() {
             $('.room-form').formset({
                 modelName: "room",
@@ -200,34 +200,6 @@
                 },
             });
         });
-    {% else %}
-        $(function() {
-            $('.room-form').formset({
-                modelName: "room",
-                formCssClass: 'room-form',
-                formsParentCssClass: 'room-formset',
-                prefix: '{{ room_fs.prefix }}',
-                addCssClass:'btn btn-secondary form-text mt-2',
-                addText: '<i class="fa fa-plus"></i> Add another room',
-                addContainerClass: 'add-room-container',
-                deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
-                deleteText: '<i class="fa fa-times"></i> Delete room',
-                deleteContainerClass: 'delete-room-container',
-                hideLastAddForm: false,
-                prepareTemplate: (template) => {
-                    const collapseEl = template.find('.accordion-collapse');
-                    collapseEl.removeClass('show');
-                },
-                added: (row) => {
-                    const accordion = document.getElementById('roomsAccordion');
-                    const alpineData = Alpine.$data(accordion);
-                    alpineData.openRoom = row.attr('id');
-                    const collapseEl = row.find('.accordion-collapse')[0];
-                    new bootstrap.Collapse(collapseEl, {show: true});
-                },
-            });
-        });
-    {% endif %}
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
