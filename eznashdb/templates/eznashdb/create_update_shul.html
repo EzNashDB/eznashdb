@@ -56,7 +56,7 @@
                             </h3>
                         </div>
                     </div>
-                    <div class="row flex-grow-1 overflow-auto max-h-fit">
+                    <div class="row flex-grow-1 max-h-fit">
                         <div class="col-12 h-100">
                             <div class="row">
                                 <div class="col-12">
@@ -203,5 +203,32 @@
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
+    document.addEventListener("htmx:afterSettle", () => {
+        // Check if we're in step 2 by looking at the actual DOM state
+        const wizardStepInput = document.querySelector('input[name="wizard_step"]');
+        const currentStep = wizardStepInput ? wizardStepInput.value : null;
+
+        if (currentStep === '2') {
+            const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
+            const header = document.getElementById('rooms-form-header');
+
+            if (!roomCollapseEl || !header) return;
+
+            const scrollToHeader = () => {
+                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start' })
+            };
+
+            if (!roomCollapseEl.classList.contains('show')) {
+                const roomCollapse = new bootstrap.Collapse(roomCollapseEl, {show: false});
+                roomCollapseEl.addEventListener('shown.bs.collapse', scrollToHeader, { once: true });
+                roomCollapse.show();
+            } else {
+                // Already open - wait for layout to stabilize before scrolling
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(scrollToHeader);
+                });
+            }
+        }
+    })
     </script>
 {% endblock extra_media_bottom %}
