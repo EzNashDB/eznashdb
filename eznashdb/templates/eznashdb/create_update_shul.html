@@ -21,12 +21,8 @@
         x-init="
             window.onbeforeunload = (e) => {
                 if (window.htmxSubmitting) return;
-                // Dynamically get current Alpine state (don't use captured closure values)
-                const el = document.getElementById('shul-form-state');
-                if (!el) return;
-                const data = Alpine.$data(el);
                 // Trigger warning if dirty fields OR in step 2 OR has form errors
-                if (data.dirtyFields.size > 0 || data.wizardStep === '2' || !!'{{form.errors|escapejs}}') {
+                if (dirtyFields.size > 0 || wizardStep === '2' || !!'{{form.errors|escapejs}}') {
                     return '';
                 }
             }
