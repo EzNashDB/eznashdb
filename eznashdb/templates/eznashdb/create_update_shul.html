@@ -64,7 +64,6 @@
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <div class="mt-3">{% crispy form %}</div>
                                         </div>
-                                        {# Rooms section - visible in update mode OR step 2 of create mode #}
                                         {% if form.instance.pk or wizard_step == '2' %}
                                             <div class="col">
                                                 <div class="row">
