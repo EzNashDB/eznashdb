@@ -17,7 +17,7 @@
 {% block content %}
     <div class="row" id="shul-form-state"
         {# djlint:off #}
-        x-data="{ dirtyFields: new Set(), wizardStep: '{{ wizard_step|default:"step1" }}' }"
+        x-data="{ dirtyFields: new Set(), wizardStep: '{{ wizard_step|default:"1" }}' }"
         x-init="
             window.onbeforeunload = (e) => {
                 if (window.htmxSubmitting) return;
@@ -26,7 +26,7 @@
                 if (!el) return;
                 const data = Alpine.$data(el);
                 // Trigger warning if dirty fields OR in step 2 OR has form errors
-                if (data.dirtyFields.size > 0 || data.wizardStep === 'step2' || !!'{{form.errors|escapejs}}') {
+                if (data.dirtyFields.size > 0 || data.wizardStep === '2' || !!'{{form.errors|escapejs}}') {
                     return '';
                 }
             }
@@ -60,8 +60,8 @@
                                     <span class="h5 m-0">
                                         <span class="badge text-bg-info">
                                             Step
-                                            <span x-show="wizardStep === 'step1'">1</span>
-                                            <span x-show="wizardStep === 'step2'" x-cloak>2</span>
+                                            <span x-show="wizardStep === '1'">1</span>
+                                            <span x-show="wizardStep === '2'" x-cloak>2</span>
                                             of 2
                                         </span>
                                     </span>
@@ -107,7 +107,7 @@
                                             </div>
                                         {% else %}
                                             {# CREATE MODE: show rooms only in step 2 #}
-                                            <div class="col" x-show="wizardStep === 'step2'" x-cloak>
+                                            <div class="col" x-show="wizardStep === '2'" x-cloak>
                                                 <div class="row">
                                                     <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
                                                 </div>
@@ -156,11 +156,11 @@
                                         {% if object %}
                                             Save
                                         {% else %}
-                                            <span x-show="wizardStep === 'step1'">
+                                            <span x-show="wizardStep === '1'">
                                                 Next: Add Rooms
                                                 <i class="ms-2 fa-solid fa-arrow-right"></i>
                                             </span>
-                                            <span x-show="wizardStep === 'step2'" x-cloak>Save Shul</span>
+                                            <span x-show="wizardStep === '2'" x-cloak>Save Shul</span>
                                         {% endif %}
                                     </button>
                                 </div>
@@ -227,7 +227,7 @@
     // Room formset initialization (update mode or step 2 of create mode)
     const initRoomFormSet = () => {
         const alpineData = Alpine.$data(document.getElementById('shul-form-state'));
-        const isStep2 = !alpineData || alpineData.wizardStep === 'step2';
+        const isStep2 = !alpineData || alpineData.wizardStep === '2';
         const isUpdateMode = {% if object %}true{% else %}false{% endif %};
 
         if (!isStep2 && !isUpdateMode) return;

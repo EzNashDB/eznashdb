@@ -97,10 +97,10 @@ class CreateUpdateShulView(UpdateView):
 
         # CREATE MODE: wizard logic
         else:
-            wizard_step = self.request.POST.get("wizard_step", "step1")
-            if wizard_step == "step1":
+            wizard_step = self.request.POST.get("wizard_step", "1")
+            if wizard_step == "1":
                 return self.handle_step1_submit(form)
-            elif wizard_step == "step2":
+            elif wizard_step == "2":
                 return self.handle_step2_submit(form)
 
     def check_and_show_nearby_shuls(self, form, wizard_step=None):
@@ -130,14 +130,14 @@ class CreateUpdateShulView(UpdateView):
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
         # Check for nearby shuls and show modal if found
-        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="step1")
+        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="1")
         if nearby_response:
             return nearby_response
 
         # No nearby shuls or user clicked "Save Anyway" -> proceed to step 2
         partial_template = "eznashdb/create_update_shul.html#shul_form"
         context = self.get_context_data(form=form)
-        context["wizard_step"] = "step2"  # Override to step 2
+        context["wizard_step"] = "2"  # Override to step 2
         return TemplateResponse(self.request, partial_template, context)
 
     def handle_step2_submit(self, form):
@@ -146,11 +146,11 @@ class CreateUpdateShulView(UpdateView):
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
             context = self.get_context_data(form=form)
-            context["wizard_step"] = "step2"  # Stay on step 2 for validation errors
+            context["wizard_step"] = "2"  # Stay on step 2 for validation errors
             return TemplateResponse(self.request, "eznashdb/create_update_shul.html#shul_form", context)
 
         # Check for nearby shuls and show modal if found
-        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="step2")
+        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="2")
         if nearby_response:
             return nearby_response
 
@@ -196,7 +196,7 @@ class CreateUpdateShulView(UpdateView):
 
         # For create mode, determine current wizard step
         if not self.is_update and self.request.method == "POST":
-            wizard_step = self.request.POST.get("wizard_step", "step1")
+            wizard_step = self.request.POST.get("wizard_step", "1")
             context["wizard_step"] = wizard_step
 
         context["room_fs"] = self.get_room_fs()
@@ -221,7 +221,7 @@ class CreateUpdateShulView(UpdateView):
                 )
 
             # CREATE MODE - STEP 2: bind with POST data for validation
-            elif wizard_step == "step2":
+            elif wizard_step == "2":
                 # Create temporary shul instance from POST data for formset validation
                 temp_form = ShulForm(self.request.POST)
                 temp_instance = None
