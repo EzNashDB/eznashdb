@@ -152,7 +152,6 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "submit_type": "main_submit",
             "wizard_step": "step1",  # Wizard step 1
             "check_nearby_shuls": "true",
             **get_room_fields(room_index=0),
@@ -190,7 +189,6 @@ def test_skips_duplicate_check_when_address_not_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "submit_type": "main_submit",
             "wizard_step": "step1",  # Wizard step 1
             "check_nearby_shuls": "false",  # Don't check for nearby shuls
             **get_room_fields(room_index=0),
@@ -207,38 +205,6 @@ def test_skips_duplicate_check_when_address_not_changed(client):
     assert "Rooms" in str(soup)
 
 
-def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
-    # Create some nearby shuls
-    nearby_shul_1 = Shul.objects.create(
-        name="Nearby Shul 1",
-        address="456 Nearby St",
-        latitude=0.0005,
-        longitude=0.0005,
-    )
-
-    response = client.post(
-        reverse("eznashdb:create_shul"),
-        data={
-            "name": "New Test Shul",
-            "latitude": "0.0",
-            "longitude": "0.0",
-            "address": "123 Test St",
-            "submit_type": "other_submit",  # Not main_submit
-            "wizard_step": "step1",  # Wizard step 1
-            "check_nearby_shuls": "true",
-            **get_room_fields(room_index=0),
-            **get_room_fs_metadata_fields(total_forms=1),
-        },
-        headers={"HX-Request": "true"},
-    )
-
-    # Should proceed to step 2 without showing modal (duplicate check skipped)
-    soup = BeautifulSoup(response.content, features="html.parser")
-    assert nearby_shul_1.name not in str(soup)
-    # Should show rooms section (step 2)
-    assert "Rooms" in str(soup)
-
-
 def describe_wizard():
     """Tests for the two-step wizard flow for creating shuls"""
 
@@ -251,7 +217,6 @@ def describe_wizard():
                 "address": "123 Test St",
                 "latitude": "1.0",
                 "longitude": "1.0",
-                "submit_type": "main_submit",
                 "wizard_step": "step1",
                 "check_nearby_shuls": "true",
             },
@@ -280,7 +245,6 @@ def describe_wizard():
                 "latitude": "1.0",
                 "longitude": "1.0",
                 "place_id": "test_place_id",
-                "submit_type": "main_submit",
                 "wizard_step": "step2",
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
@@ -313,7 +277,6 @@ def describe_wizard():
                 "longitude": "1.0",
                 "place_id": "test_place_id",
                 "wizard_step": "step2",
-                "submit_type": "main_submit",
                 "check_nearby_shuls": "false",
                 **get_room_fs_metadata_fields(total_forms=1),
                 "rooms-0-name": "",
@@ -342,7 +305,6 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "changed_place_id",
-                "submit_type": "main_submit",
                 "wizard_step": "step2",
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),
@@ -377,7 +339,6 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "submit_type": "main_submit",
                 "wizard_step": "step2",
                 "check_nearby_shuls": "true",  # Trigger nearby check
                 **get_room_fields(room_index=0),
@@ -413,7 +374,6 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "submit_type": "main_submit",
                 "wizard_step": "step2",
                 "check_nearby_shuls": "true",
                 **get_room_fields(room_index=0),
@@ -435,7 +395,6 @@ def describe_wizard():
                 "latitude": "2.0",
                 "longitude": "2.0",
                 "place_id": "new_place_id",
-                "submit_type": "main_submit",
                 "wizard_step": "step2",  # Same step, but check_nearby_shuls: false to skip check
                 "check_nearby_shuls": "false",
                 **get_room_fields(room_index=0),

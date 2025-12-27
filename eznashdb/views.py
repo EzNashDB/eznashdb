@@ -83,10 +83,9 @@ class CreateUpdateShulView(UpdateView):
             if not room_fs.is_valid():
                 return self.render_to_response(self.get_context_data(form=form))
 
-            submit_type = self.request.POST.get("submit_type")
             check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-            if (submit_type == "main_submit") and check_nearby_shuls:
+            if check_nearby_shuls:
                 nearby_shuls = self.check_nearby_shuls(form)
                 if nearby_shuls.exists():
                     partial_template = "eznashdb/create_update_shul.html#shul_form"
@@ -111,11 +110,10 @@ class CreateUpdateShulView(UpdateView):
 
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
-        submit_type = self.request.POST.get("submit_type")
         check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
         # Check for nearby shuls if requested
-        if (submit_type == "main_submit") and check_nearby_shuls:
+        if check_nearby_shuls:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
@@ -144,10 +142,9 @@ class CreateUpdateShulView(UpdateView):
             )
 
         # Check for nearby shuls if requested in step 2
-        submit_type = self.request.POST.get("submit_type")
         check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-        if (submit_type == "main_submit") and check_nearby_shuls:
+        if check_nearby_shuls:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
