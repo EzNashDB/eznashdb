@@ -40,11 +40,7 @@
                   @change="dirtyFields.add($event.target.name)">
                 {% csrf_token %}
                 {# Hidden field to track wizard step - server controls the value #}
-                {% if not object %}
-                    <input type="hidden"
-                           name="wizard_step"
-                           value="{{ wizard_step|default:'1' }}">
-                {% endif %}
+                {% if not object %}<input type="hidden" name="wizard_step" value="{{ wizard_step }}">{% endif %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row">
                         <div class="col-12">
@@ -54,7 +50,7 @@
                                 {% else %}
                                     Add a Shul
                                     <span class="h5 m-0">
-                                        <span class="badge text-bg-info">Step {{ wizard_step|default:"1" }} of 2</span>
+                                        <span class="badge text-bg-info">Step {{ wizard_step }} of 2</span>
                                     </span>
                                 {% endif %}
                             </h3>
