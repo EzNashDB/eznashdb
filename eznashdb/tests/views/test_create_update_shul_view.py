@@ -70,39 +70,6 @@ def describe_create():
 
         assert soup.find("form")
 
-    def creates_shul(client):
-        data = {
-            "name": "test shul",
-            "address": "123 Sesame Street",
-            "latitude": "1",
-            "longitude": "1",
-            "address_changed": "true",
-        }
-
-        client.post(
-            reverse("eznashdb:create_shul"),
-            data=data,
-        )
-        assert Shul.objects.count() == 1
-
-    def redirects_to_update_view(client):
-        response = client.post(
-            reverse("eznashdb:create_shul"),
-            data={
-                "name": "test shul",
-                "latitude": "1",
-                "longitude": "1",
-                "address": "some address",
-                "submit_type": "main_submit",
-                "address_changed": "true",
-                **get_room_fields(room_index=0),
-                **get_room_fs_metadata_fields(total_forms=1),
-            },
-        )
-        redirect_url = response.headers.get("HX-Redirect")
-        final_dest = client.get(redirect_url)
-        assert final_dest.resolver_match.view_name == "eznashdb:update_shul"
-
 
 def describe_update():
     def initializes_with_shul_and_room_data(GET_request_update, test_shul):
@@ -186,6 +153,7 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
             "longitude": "0.0",
             "address": "123 Test St",
             "submit_type": "main_submit",
+            "wizard_step": "step1",  # Wizard step 1
             "address_changed": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -223,6 +191,7 @@ def test_skips_duplicate_check_when_address_not_changed(client):
             "longitude": "0.0",
             "address": "123 Test St",
             "submit_type": "main_submit",
+            "wizard_step": "step1",  # Wizard step 1
             "address_changed": "false",  # Address not changed
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -230,14 +199,12 @@ def test_skips_duplicate_check_when_address_not_changed(client):
         headers={"HX-Request": "true"},
     )
 
-    # Should redirect without showing modal
-    redirect_url = response.headers.get("HX-Redirect")
-    assert redirect_url is not None
-
-    # Modal should not be shown
+    # Should proceed to step 2 without showing modal
     soup = BeautifulSoup(response.content, features="html.parser")
     assert nearby_shul_1.name not in str(soup)
     assert nearby_shul_2.name not in str(soup)
+    # Should show rooms section (step 2)
+    assert "Rooms" in str(soup)
 
 
 def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
@@ -257,6 +224,7 @@ def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
             "longitude": "0.0",
             "address": "123 Test St",
             "submit_type": "other_submit",  # Not main_submit
+            "wizard_step": "step1",  # Wizard step 1
             "address_changed": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -264,10 +232,224 @@ def test_skips_duplicate_check_when_submit_type_not_main_submit(client):
         headers={"HX-Request": "true"},
     )
 
-    # Should redirect without showing modal
-    redirect_url = response.headers.get("HX-Redirect")
-    assert redirect_url is not None
-
-    # Modal should not be shown
+    # Should proceed to step 2 without showing modal (duplicate check skipped)
     soup = BeautifulSoup(response.content, features="html.parser")
     assert nearby_shul_1.name not in str(soup)
+    # Should show rooms section (step 2)
+    assert "Rooms" in str(soup)
+
+
+def describe_wizard():
+    """Tests for the two-step wizard flow for creating shuls"""
+
+    def test_wizard_step1_transitions_to_step2(client):
+        """Step 1 submission proceeds to step 2 without saving"""
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "123 Test St",
+                "latitude": "1.0",
+                "longitude": "1.0",
+                "submit_type": "main_submit",
+                "wizard_step": "step1",
+                "address_changed": "true",
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        # Check step 2 is shown
+        wizard_step_input = soup.find("input", {"name": "wizard_step"})
+        assert wizard_step_input is not None
+        assert wizard_step_input.get("value") == "step2", "Should transition to step 2"
+        assert "Rooms" in str(soup)
+
+        # Shul should NOT be saved yet
+        assert Shul.objects.count() == 0
+
+    def test_wizard_step2_saves_shul_and_rooms(client):
+        """Step 2 submission saves shul and rooms in transaction"""
+        # Submit step 2 directly (no session needed - all data in POST)
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "123 Test St",
+                "latitude": "1.0",
+                "longitude": "1.0",
+                "place_id": "test_place_id",
+                "submit_type": "main_submit",
+                "wizard_step": "step2",
+                "address_changed": "false",
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Shul should be saved
+        assert Shul.objects.count() == 1
+        shul = Shul.objects.first()
+        assert shul.name == "Test Shul"
+
+        # Room should be saved
+        assert shul.rooms.count() == 1
+
+        # Should redirect to map
+        redirect_url = response.headers.get("HX-Redirect")
+        assert redirect_url is not None
+        assert "newShul" in redirect_url
+
+    def test_wizard_step2_requires_at_least_one_room(client):
+        """Step 2 validation enforces minimum 1 room for new shuls"""
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "123 Test St",
+                "latitude": "1.0",
+                "longitude": "1.0",
+                "place_id": "test_place_id",
+                "wizard_step": "step2",
+                "submit_type": "main_submit",
+                "address_changed": "false",
+                **get_room_fs_metadata_fields(total_forms=1),
+                "rooms-0-name": "",
+                "rooms-0-relative_size": "",
+                "rooms-0-see_hear_score": "",
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        # Should show validation error
+        assert "Please add at least one room" in str(soup)
+
+        # Shul should NOT be saved
+        assert Shul.objects.count() == 0
+
+    def test_wizard_step2_saves_address_changes(client):
+        """Step 2 should save address changes made in step 2"""
+        # Submit step 2 with address data
+        client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "Changed Address",
+                "latitude": "2.0",
+                "longitude": "2.0",
+                "place_id": "changed_place_id",
+                "submit_type": "main_submit",
+                "wizard_step": "step2",
+                "address_changed": "false",
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Shul should be saved with the submitted address
+        shul = Shul.objects.first()
+        assert shul.address == "Changed Address"
+        assert float(shul.latitude) == 2.0
+        assert float(shul.longitude) == 2.0
+        assert shul.place_id == "changed_place_id"
+
+    def test_wizard_step2_checks_nearby_if_address_changed(client):
+        """Step 2 should check for nearby shuls if address changed"""
+        # Create a nearby shul
+        nearby_shul = Shul.objects.create(
+            name="Nearby Shul",
+            address="Close Address",
+            latitude=2.0005,  # Within 0.001 degrees of (2.0, 2.0)
+            longitude=2.0005,
+        )
+
+        # Submit step 2 with address near the existing shul
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "NEW ADDRESS",
+                "latitude": "2.0",
+                "longitude": "2.0",
+                "place_id": "new_place_id",
+                "submit_type": "main_submit",
+                "wizard_step": "step2",
+                "address_changed": "true",  # Trigger nearby check
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Should show nearby shuls modal
+        soup = BeautifulSoup(response.content, features="html.parser")
+        assert nearby_shul.name in str(soup)
+        assert "Nearby Shuls Found" in str(soup)
+
+        # Shul should NOT be saved yet
+        assert Shul.objects.filter(name="Test Shul").count() == 0
+
+    def test_wizard_step2_nearby_modal_saves_when_user_continues(client):
+        """Step 2 nearby shuls modal should save when user clicks 'Add New Anyway'"""
+        # Create a nearby shul
+        nearby_shul = Shul.objects.create(
+            name="Nearby Shul",
+            address="Close Address",
+            latitude=2.0005,
+            longitude=2.0005,
+        )
+
+        # First submit to get the modal
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "NEW ADDRESS",
+                "latitude": "2.0",
+                "longitude": "2.0",
+                "place_id": "new_place_id",
+                "submit_type": "main_submit",
+                "wizard_step": "step2",
+                "address_changed": "true",
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Modal should appear
+        soup = BeautifulSoup(response.content, features="html.parser")
+        assert nearby_shul.name in str(soup)
+
+        # Now simulate clicking "Add New Anyway" - should save with wizard_step: "step2"
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "NEW ADDRESS",
+                "latitude": "2.0",
+                "longitude": "2.0",
+                "place_id": "new_place_id",
+                "submit_type": "main_submit",
+                "wizard_step": "step2",  # Same step, but address_changed: false to skip check
+                "address_changed": "false",
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Shul SHOULD be saved now
+        assert Shul.objects.filter(name="Test Shul").count() == 1
+        shul = Shul.objects.get(name="Test Shul")
+        assert float(shul.latitude) == 2.0
+
+        # Should redirect to map
+        redirect_url = response.headers.get("HX-Redirect")
+        assert redirect_url is not None
+        assert "newShul" in redirect_url

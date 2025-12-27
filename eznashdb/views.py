@@ -51,16 +51,13 @@ class CreateUpdateShulView(UpdateView):
     template_name = "eznashdb/create_update_shul.html"
 
     def get_success_url(self) -> str:
-        if self.is_update:
-            url = reverse_lazy("eznashdb:shuls")
-            lat = self.object.display_lat
-            lon = self.object.display_lon
-            url += f"?lat={lat}&lon={lon}&selectedShul={self.object.pk}"
-            if lat and lon:
-                url += "&zoom=17"
-            return url
-        else:
-            return reverse_lazy("eznashdb:update_shul", kwargs={"pk": self.object.pk})
+        url = reverse_lazy("eznashdb:shuls")
+        lat = self.object.display_lat
+        lon = self.object.display_lon
+        url += f"?lat={lat}&lon={lon}&selectedShul={self.object.pk}"
+        if lat and lon:
+            url += "&zoom=17"
+        return url
 
     def get_object(self, queryset=None):
         try:
@@ -80,31 +77,94 @@ class CreateUpdateShulView(UpdateView):
         )
 
     def form_valid(self, form):
+        # UPDATE MODE: existing logic unchanged
         if self.is_update:
             room_fs = self.get_room_fs()
             if not room_fs.is_valid():
                 return self.render_to_response(self.get_context_data(form=form))
+
+            submit_type = self.request.POST.get("submit_type")
+            address_changed = self.request.POST.get("address_changed") == "true"
+
+            if (submit_type == "main_submit") and address_changed:
+                nearby_shuls = self.check_nearby_shuls(form)
+                if nearby_shuls.exists():
+                    partial_template = "eznashdb/create_update_shul.html#shul_form"
+                    context = {"nearby_shuls": nearby_shuls, **self.get_context_data(form=form)}
+                    return TemplateResponse(self.request, partial_template, context)
+
+            self.object = form.save()
+            self.room_fs_valid(room_fs)
+
+            success_url = self.get_success_url()
+            messages.success(self.request, "Success! Your shul has been updated.")
+            success_url += f"&updatedShul={self.object.pk}"
+            return HttpResponseClientRedirect(success_url)
+
+        # CREATE MODE: wizard logic
+        else:
+            wizard_step = self.request.POST.get("wizard_step", "step1")
+            if wizard_step == "step1":
+                return self.handle_step1_submit(form)
+            elif wizard_step == "step2":
+                return self.handle_step2_submit(form)
+
+    def handle_step1_submit(self, form):
+        """Handle step 1 submission - validate and check nearby shuls"""
         submit_type = self.request.POST.get("submit_type")
         address_changed = self.request.POST.get("address_changed") == "true"
+
+        # Check for nearby shuls if address changed
         if (submit_type == "main_submit") and address_changed:
             nearby_shuls = self.check_nearby_shuls(form)
             if nearby_shuls.exists():
                 partial_template = "eznashdb/create_update_shul.html#shul_form"
-                context = {"nearby_shuls": nearby_shuls, **self.get_context_data(form=form)}
+                context = self.get_context_data(form=form)
+                context["nearby_shuls"] = nearby_shuls
+                context["wizard_step"] = "step1"  # Stay on step 1 to show modal
                 return TemplateResponse(self.request, partial_template, context)
-        self.object = form.save()
-        if self.is_update:
+
+        # No nearby shuls or user clicked "Save Anyway" -> proceed to step 2
+        partial_template = "eznashdb/create_update_shul.html#shul_form"
+        context = self.get_context_data(form=form)
+        context["wizard_step"] = "step2"  # Override to step 2
+        return TemplateResponse(self.request, partial_template, context)
+
+    def handle_step2_submit(self, form):
+        """Handle step 2 submission - save shul and rooms together"""
+        # Validate room formset
+        room_fs = self.get_room_fs()
+        if not room_fs.is_valid():
+            context = self.get_context_data(form=form)
+            context["wizard_step"] = "step2"  # Stay on step 2 for validation errors
+            return TemplateResponse(
+                self.request,
+                "eznashdb/create_update_shul.html#shul_form",
+                context,
+            )
+
+        # Check for nearby shuls if address changed in step 2
+        submit_type = self.request.POST.get("submit_type")
+        address_changed = self.request.POST.get("address_changed") == "true"
+
+        if (submit_type == "main_submit") and address_changed:
+            nearby_shuls = self.check_nearby_shuls(form)
+            if nearby_shuls.exists():
+                partial_template = "eznashdb/create_update_shul.html#shul_form"
+                context = self.get_context_data(form=form)
+                context["nearby_shuls"] = nearby_shuls
+                context["wizard_step"] = "step2"
+                return TemplateResponse(self.request, partial_template, context)
+
+        # Save shul and rooms in transaction
+        with transaction.atomic():
+            self.object = form.save()  # Use the validated form from POST
             self.room_fs_valid(room_fs)
+
+        # Success!
         success_url = self.get_success_url()
-        if not self.is_update:
-            success_url += "?from=create_new_shul"
-        else:
-            if self.request.POST.get("from") == "create_new_shul":
-                messages.success(self.request, "Success! Your shul has been added to the map.")
-                success_url += f"&newShul={self.object.pk}"
-            else:
-                messages.success(self.request, "Success! Your shul has been updated.")
-                success_url += f"&updatedShul={self.object.pk}"
+        messages.success(self.request, "Success! Your shul has been added to the map.")
+        success_url += f"&newShul={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 
     def check_nearby_shuls(self, form):
@@ -135,6 +195,12 @@ class CreateUpdateShulView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # For create mode, determine current wizard step
+        if not self.is_update and self.request.method == "POST":
+            wizard_step = self.request.POST.get("wizard_step", "step1")
+            context["wizard_step"] = wizard_step
+
         context["room_fs"] = self.get_room_fs()
         return context
 
@@ -145,12 +211,34 @@ class CreateUpdateShulView(UpdateView):
         if self.request.method == "GET":
             return formset_class(prefix=prefix, instance=self.object)
         else:
-            return formset_class(
-                self.request.POST or None,
-                self.request.FILES or None,
-                prefix=prefix,
-                instance=self.object,
-            )
+            wizard_step = self.request.POST.get("wizard_step")
+
+            # UPDATE MODE: always bind with POST data
+            if self.is_update:
+                return formset_class(
+                    self.request.POST or None,
+                    self.request.FILES or None,
+                    prefix=prefix,
+                    instance=self.object,
+                )
+
+            # CREATE MODE - STEP 2: bind with POST data for validation
+            elif wizard_step == "step2":
+                # Create temporary shul instance from POST data for formset validation
+                temp_form = ShulForm(self.request.POST)
+                temp_instance = None
+                if temp_form.is_valid():
+                    temp_instance = Shul(**temp_form.cleaned_data)
+                return formset_class(
+                    self.request.POST or None,
+                    self.request.FILES or None,
+                    prefix=prefix,
+                    instance=temp_instance,
+                )
+
+            # CREATE MODE - STEP 1: return unbound formset (no validation)
+            else:
+                return formset_class(prefix=prefix, instance=None)
 
 
 class DeleteShulView(DeleteView):
