@@ -77,20 +77,15 @@ class CreateUpdateShulView(UpdateView):
         )
 
     def form_valid(self, form):
-        # UPDATE MODE: existing logic unchanged
         if self.is_update:
             room_fs = self.get_room_fs()
             if not room_fs.is_valid():
                 return self.render_to_response(self.get_context_data(form=form))
 
-            check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
-
-            if check_nearby_shuls:
-                nearby_shuls = self.check_nearby_shuls(form)
-                if nearby_shuls.exists():
-                    partial_template = "eznashdb/create_update_shul.html#shul_form"
-                    context = {"nearby_shuls": nearby_shuls, **self.get_context_data(form=form)}
-                    return TemplateResponse(self.request, partial_template, context)
+            # Check for nearby shuls and show modal if found
+            nearby_response = self.check_and_show_nearby_shuls(form)
+            if nearby_response:
+                return nearby_response
 
             self.object = form.save()
             self.room_fs_valid(room_fs)
@@ -108,19 +103,36 @@ class CreateUpdateShulView(UpdateView):
             elif wizard_step == "step2":
                 return self.handle_step2_submit(form)
 
-    def handle_step1_submit(self, form):
-        """Handle step 1 submission - validate and check nearby shuls"""
+    def check_and_show_nearby_shuls(self, form, wizard_step=None):
+        """
+        Check for nearby shuls and return modal response if found.
+        Returns None if no check requested or no nearby shuls found.
+        """
         check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
 
-        # Check for nearby shuls if requested
-        if check_nearby_shuls:
-            nearby_shuls = self.check_nearby_shuls(form)
-            if nearby_shuls.exists():
-                partial_template = "eznashdb/create_update_shul.html#shul_form"
-                context = self.get_context_data(form=form)
-                context["nearby_shuls"] = nearby_shuls
-                context["wizard_step"] = "step1"  # Stay on step 1 to show modal
-                return TemplateResponse(self.request, partial_template, context)
+        if not check_nearby_shuls:
+            return None
+
+        nearby_shuls = self.get_nearby_shuls(form)
+        if not nearby_shuls.exists():
+            return None
+
+        # Show nearby shuls modal
+        partial_template = "eznashdb/create_update_shul.html#shul_form"
+        context = self.get_context_data(form=form)
+        context["nearby_shuls"] = nearby_shuls
+
+        if wizard_step:
+            context["wizard_step"] = wizard_step
+
+        return TemplateResponse(self.request, partial_template, context)
+
+    def handle_step1_submit(self, form):
+        """Handle step 1 submission - validate and check nearby shuls"""
+        # Check for nearby shuls and show modal if found
+        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="step1")
+        if nearby_response:
+            return nearby_response
 
         # No nearby shuls or user clicked "Save Anyway" -> proceed to step 2
         partial_template = "eznashdb/create_update_shul.html#shul_form"
@@ -135,23 +147,12 @@ class CreateUpdateShulView(UpdateView):
         if not room_fs.is_valid():
             context = self.get_context_data(form=form)
             context["wizard_step"] = "step2"  # Stay on step 2 for validation errors
-            return TemplateResponse(
-                self.request,
-                "eznashdb/create_update_shul.html#shul_form",
-                context,
-            )
+            return TemplateResponse(self.request, "eznashdb/create_update_shul.html#shul_form", context)
 
-        # Check for nearby shuls if requested in step 2
-        check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
-
-        if check_nearby_shuls:
-            nearby_shuls = self.check_nearby_shuls(form)
-            if nearby_shuls.exists():
-                partial_template = "eznashdb/create_update_shul.html#shul_form"
-                context = self.get_context_data(form=form)
-                context["nearby_shuls"] = nearby_shuls
-                context["wizard_step"] = "step2"
-                return TemplateResponse(self.request, partial_template, context)
+        # Check for nearby shuls and show modal if found
+        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="step2")
+        if nearby_response:
+            return nearby_response
 
         # Save shul and rooms in transaction
         with transaction.atomic():
@@ -164,7 +165,7 @@ class CreateUpdateShulView(UpdateView):
         success_url += f"&newShul={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 
-    def check_nearby_shuls(self, form):
+    def get_nearby_shuls(self, form):
         lat = form.cleaned_data.get("latitude")
         lon = form.cleaned_data.get("longitude")
 
