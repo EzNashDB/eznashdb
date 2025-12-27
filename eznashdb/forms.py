@@ -1,6 +1,8 @@
 from crispy_forms.helper import FormHelper
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
+from django.forms.models import BaseInlineFormSet
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import RelativeSize, SeeHearScore
@@ -77,10 +79,25 @@ class RoomForm(ModelForm):
         self.fields["see_hear_score"].choices = SeeHearScore.get_display_choices(include_blank=True)
 
 
+class BaseRoomFormSet(BaseInlineFormSet):
+    """Custom formset that requires at least 1 room for new shuls only"""
+
+    def clean(self):
+        super().clean()
+        # Only enforce minimum for new shuls (no pk yet)
+        if not self.instance or not self.instance.pk:
+            has_room = any(
+                form.has_changed() and not form.cleaned_data.get("DELETE", False) for form in self.forms
+            )
+            if not has_room:
+                raise ValidationError("Please add at least one room for this shul.")
+
+
 RoomFormSet = inlineformset_factory(
     Shul,
     Room,
     form=RoomForm,
+    formset=BaseRoomFormSet,
     extra=1,
     can_delete=True,
     can_delete_extra=False,

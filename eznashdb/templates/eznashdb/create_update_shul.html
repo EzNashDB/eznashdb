@@ -17,12 +17,16 @@
 {% block content %}
     <div class="row" id="shul-form-state"
         {# djlint:off #}
-        x-data="{ dirtyFields: new Set() }"
+        x-data="{ dirtyFields: new Set(), wizardStep: '{{ wizard_step|default:"step1" }}' }"
         x-init="
             window.onbeforeunload = (e) => {
                 if (window.htmxSubmitting) return;
-                // Trigger built-in browser warning if any fields are dirty.
-                if (dirtyFields.size > 0 || !!'{{form.errors|escapejs}}') {
+                // Dynamically get current Alpine state (don't use captured closure values)
+                const el = document.getElementById('shul-form-state');
+                if (!el) return;
+                const data = Alpine.$data(el);
+                // Trigger warning if dirty fields OR in step 2 OR has form errors
+                if (data.dirtyFields.size > 0 || data.wizardStep === 'step2' || !!'{{form.errors|escapejs}}') {
                     return '';
                 }
             }
@@ -39,17 +43,29 @@
                   @input="dirtyFields.add($event.target.name)"
                   @change="dirtyFields.add($event.target.name)">
                 {% csrf_token %}
+                {# Hidden field to track wizard step - server controls the value #}
+                {% if not object %}
+                    <input type="hidden"
+                           name="wizard_step"
+                           value="{{ wizard_step|default:'step1' }}">
+                {% endif %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row">
                         <div class="col-12">
-                            <h3 class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {% if object %}
-                                        Edit Shul: {{ object.name }}
-                                    {% else %}
-                                        Add a Shul
-                                    {% endif %}
-                                </div>
+                            <h3 class="d-flex gap-3 align-items-center">
+                                {% if object %}
+                                    Edit Shul: {{ object.name }}
+                                {% else %}
+                                    Add a Shul
+                                    <span class="h5 m-0">
+                                        <span class="badge text-bg-info">
+                                            Step
+                                            <span x-show="wizardStep === 'step1'">1</span>
+                                            <span x-show="wizardStep === 'step2'" x-cloak>2</span>
+                                            of 2
+                                        </span>
+                                    </span>
+                                {% endif %}
                             </h3>
                         </div>
                     </div>
@@ -58,9 +74,11 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="row">
+                                        {# Shul form (name + address + map) - always visible #}
                                         <div class="col-12 col-md-5 col-lg-4">
                                             <div class="mt-3">{% crispy form %}</div>
                                         </div>
+                                        {# Rooms section - visible in update mode OR step 2 of create mode #}
                                         {% if form.instance.pk %}
                                             <div class="col">
                                                 <div class="row">
@@ -87,6 +105,29 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        {% else %}
+                                            {# CREATE MODE: show rooms only in step 2 #}
+                                            <div class="col" x-show="wizardStep === 'step2'" x-cloak>
+                                                <div class="row">
+                                                    <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    {{ room_fs.management_form }}
+                                                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                    <div class="room-formset accordion"
+                                                         id="roomsAccordion"
+                                                         x-data="{ openRoom: 'rooms-0-form' }">
+                                                        {% for form in room_fs %}
+                                                            {% crispy form %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="row justify-content-end">
+                                                            <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -102,7 +143,7 @@
                                         {# djlint:off #}
                                             hx-vals='js:{
                                                 "submit_type": "main_submit",
-                                                "from": "{{ request.GET.from|default:"" }}",
+                                                "wizard_step": Alpine.$data(document.getElementById("shul-form-state")).wizardStep,
                                                 "address_changed": (() => {
                                                     const dirtyFields = Alpine.$data(document.getElementById("shul-form-state")).dirtyFields;
                                                     return dirtyFields.has("latitude") || dirtyFields.has("longitude");
@@ -112,10 +153,15 @@
                                         hx-post='{{ request.path }}'
                                         hx-target='#shul_form'
                                         hx-swap='outerHTML'>
-                                        Save
-                                        {% if not form.instance.pk %}
-                                            and Add Rooms
-                                            <i class="ms-2 fa-solid fa-arrow-right"></i>
+                                        {# Button text changes based on mode and step #}
+                                        {% if object %}
+                                            Save
+                                        {% else %}
+                                            <span x-show="wizardStep === 'step1'">
+                                                Next: Add Rooms
+                                                <i class="ms-2 fa-solid fa-arrow-right"></i>
+                                            </span>
+                                            <span x-show="wizardStep === 'step2'" x-cloak>Save Shul</span>
                                         {% endif %}
                                     </button>
                                 </div>
@@ -151,6 +197,26 @@
     document.body.addEventListener("htmx:beforeRequest", (e) => {
         if (e.target?.type === 'submit') window.htmxSubmitting = true;
     });
+    // Reset htmxSubmitting after request completes
+    document.body.addEventListener("htmx:afterRequest", (e) => {
+        window.htmxSubmitting = false;
+    });
+    // Use afterSwap instead of afterSettle for immediate state sync
+    document.addEventListener("htmx:afterSwap", (e) =>{
+        // Sync Alpine wizardStep from hidden input immediately after HTMX swap
+        const hiddenInput = document.querySelector('input[name="wizard_step"]');
+        const alpineData = Alpine.$data(document.getElementById('shul-form-state'));
+        if (hiddenInput && alpineData) {
+            alpineData.wizardStep = hiddenInput.value;
+
+            // If transitioning to step 2, mark form as dirty to warn on navigation
+            if (hiddenInput.value === 'step2') {
+                alpineData.dirtyFields.add('wizard_step');
+            }
+        }
+    });
+
+    // Show nearby shuls modal after settling (animations complete)
     document.addEventListener("htmx:afterSettle", (e) =>{
         const modalEl = document.getElementById('nearby-shuls-modal');
         if (modalEl) {
@@ -158,8 +224,15 @@
             modal.show();
         }
     });
-    {% if form.instance.pk %}
+
+    // Room formset initialization (update mode or step 2 of create mode)
     const initRoomFormSet = () => {
+        const alpineData = Alpine.$data(document.getElementById('shul-form-state'));
+        const isStep2 = !alpineData || alpineData.wizardStep === 'step2';
+        const isUpdateMode = {% if object %}true{% else %}false{% endif %};
+
+        if (!isStep2 && !isUpdateMode) return;
+    {% if form.instance.pk %}{# endif for update mode only below #}
         $(function() {
             $('.room-form').formset({
                 modelName: "room",
@@ -186,34 +259,36 @@
                 },
             });
         });
+    {% else %}
+        $(function() {
+            $('.room-form').formset({
+                modelName: "room",
+                formCssClass: 'room-form',
+                formsParentCssClass: 'room-formset',
+                prefix: '{{ room_fs.prefix }}',
+                addCssClass:'btn btn-secondary form-text mt-2',
+                addText: '<i class="fa fa-plus"></i> Add another room',
+                addContainerClass: 'add-room-container',
+                deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
+                deleteText: '<i class="fa fa-times"></i> Delete room',
+                deleteContainerClass: 'delete-room-container',
+                hideLastAddForm: false,
+                prepareTemplate: (template) => {
+                    const collapseEl = template.find('.accordion-collapse');
+                    collapseEl.removeClass('show');
+                },
+                added: (row) => {
+                    const accordion = document.getElementById('roomsAccordion');
+                    const alpineData = Alpine.$data(accordion);
+                    alpineData.openRoom = row.attr('id');
+                    const collapseEl = row.find('.accordion-collapse')[0];
+                    new bootstrap.Collapse(collapseEl, {show: true});
+                },
+            });
+        });
+    {% endif %}
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
-    document.addEventListener("DOMContentLoaded", () => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('from') === 'create_new_shul') {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('from') !== 'create_new_shul') return;
-
-            const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
-            const header = document.getElementById('rooms-form-header');
-
-            if (!roomCollapseEl || !header) return;
-            const scrollToHeader = () => {
-                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start' })
-            };
-
-            if (!roomCollapseEl.classList.contains('show')) {
-                roomCollapseEl.addEventListener('shown.bs.collapse', scrollToHeader, { once: true });
-                roomCollapse.show();
-            } else {
-                // Already open - wait for layout to stabilize before scrolling
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(scrollToHeader);
-                });
-            }
-        }
-    })
-    {% endif %}
     </script>
 {% endblock extra_media_bottom %}
