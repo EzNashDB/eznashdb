@@ -73,10 +73,10 @@
                                                     {{ room_fs.management_form }}
                                                     {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                                                     <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
-                                                        {% if form.instance.pk and shul.rooms.exists %}
-                                                            null
-                                                        {% else %}
+                                                        {% if not shul.rooms.exists %}
                                                             'rooms-0-form'
+                                                        {% else %}
+                                                            null
                                                         {% endif %}
                                                         }">
                                                         {% for form in room_fs %}
