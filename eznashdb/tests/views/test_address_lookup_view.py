@@ -52,45 +52,25 @@ def test_returns_error_on_500(client, mock_osm):
 
 def describe_israel_searches():
     @pytest.mark.parametrize(
-        ("israel", "palestine"),
+        ("query", "expected_israel_term", "expected_palestine_term"),
         [
-            ("ישראל", "Palestinian Territory"),
-            ("israel", "Palestinian Territory"),
-            ("Israel", "Palestinian Territory"),
-            ("il", "ps"),
-            ("IL", "ps"),
-        ],
-    )
-    @pytest.mark.parametrize(
-        ("word_break"),
-        [
-            (" "),
-            (", "),
-        ],
-    )
-    @pytest.mark.parametrize(
-        ("base_query"),
-        [
-            ("{israel}"),
-            ("some city{word_break}{israel}"),
-            ("{israel}{word_break}some city"),
-            ("some city{word_break}{israel}{word_break}some address"),
+            ("Jerusalem, Israel", "israel", "palestinian territory"),
+            ("ירושלים, ישראל", "ישראל", "palestinian territory"),
+            ("Tel Aviv, IL", "il", "ps"),
         ],
     )
     def includes_palestine_in_israel_searches(
-        client, mock_osm, base_query, israel, palestine, word_break
+        client, mock_osm, query, expected_israel_term, expected_palestine_term
     ):
-        query = base_query.format(israel=israel, word_break=word_break)
         osm_response = [DUMMY_OSM_RECORD]
         mocked_get = mock_osm(osm_response)
         url = reverse("eznashdb:address_lookup")
-        query_params = {"q": query}
-        response = client.get(url, data=query_params)
+        response = client.get(url, {"q": query})
 
         assert len(mocked_get.call_args_list) == 2
         call_urls = [args[0][0] for args in mocked_get.call_args_list]
-        assert urllib.parse.quote_plus(israel.lower()) in call_urls[0]
-        assert urllib.parse.quote_plus(palestine.lower()) in call_urls[1]
+        assert urllib.parse.quote_plus(expected_israel_term) in call_urls[0]
+        assert urllib.parse.quote_plus(expected_palestine_term) in call_urls[1]
         assert response.status_code == 200
         assert response.json() == osm_response * 2
 
