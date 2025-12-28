@@ -350,7 +350,7 @@ def describe_wizard():
 
         # Should include messages via middleware OOB swap
         assert "messages-container" in str(response.content)
-        assert "Please fix the form errors to continue" in str(response.content)
+        assert "Fix the form errors to continue" in str(response.content)
 
     def test_wizard_step2_shows_error_message_on_validation_failure(client):
         """Step 2 validation shows error message when formset is invalid"""

@@ -85,9 +85,9 @@ class CreateUpdateShulView(UpdateView):
         # Different messages based on context
         wizard_step = self.request.POST.get("wizard_step", "1")
         if self.is_update or wizard_step == "2":
-            messages.error(self.request, "Unable to save. Please check the form for errors.")
+            messages.error(self.request, "Unable to save. Check the form for errors.")
         else:
-            messages.error(self.request, "Please fix the form errors to continue.")
+            messages.error(self.request, "Fix the form errors to continue.")
         return self.reload_shul_form(form)
 
     def handle_update_submit(self, form):
@@ -119,7 +119,7 @@ class CreateUpdateShulView(UpdateView):
         """Validate rooms, check nearby shuls, and save atomically"""
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
-            messages.error(self.request, "Unable to save. Please check the form for errors.")
+            messages.error(self.request, "Unable to save. Check the form for errors.")
             return self.reload_shul_form(form, wizard_step=wizard_step)
 
         nearby_response = self.check_and_show_nearby_shuls(form, wizard_step=wizard_step)
