@@ -130,7 +130,7 @@ def describe_update():
         assert final_dest.resolver_match.view_name == "eznashdb:shuls"
 
 
-def test_lists_duplicates_if_any_found_and_address_changed(client):
+def test_shows_nearby_modal_when_check_nearby_shuls_true(client):
     # Create some nearby shuls
     nearby_shul_1 = Shul.objects.create(
         name="Nearby Shul 1",
@@ -173,7 +173,7 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
     assert nearby_shul_2.name in str(soup)
 
 
-def test_skips_duplicate_check_when_address_not_changed(client):
+def test_skips_nearby_modal_when_check_nearby_shuls_false(client):
     # Create some nearby shuls
     nearby_shul_1 = Shul.objects.create(
         name="Nearby Shul 1",
