@@ -19,6 +19,20 @@ Goal: Simple, observable data that correlates with women's broader experience in
 - **Testing**: Run tests with `poetry run ptw -- -- --testmon --disable-warnings /app/app/tests/`
 - **Commits**: Use [conventional commits](https://www.conventionalcommits.org/) (e.g., `fix:`, `feat:`, `refactor:`)
 
+## Code Quality & Testing Philosophy
+
+### Testing
+- **Tool**: pytest with pytest-describe for test organization
+- **Quality over quantity**: Aggressively remove redundant tests - each test should verify unique behavior
+- **Naming**: Test names must accurately describe what they test, not what you wish they tested
+- **Simplicity**: Prefer inline setup over fixtures unless the abstraction adds clear value
+- **Review stance**: When reviewing code, be critical and suggest improvements - "looks fine" isn't helpful
+
+### Code Review Approach
+- When asked "what do you think?", provide honest critique and concrete suggestions
+- Proactively identify redundancy, misleading names, and unnecessary complexity
+- Suggest removals, not just additions
+
 ## Core Design Decisions
 
 ### Data Model
