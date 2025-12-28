@@ -212,10 +212,8 @@
 
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
 
-    // Use htmx:load instead of afterSettle to avoid multiple event triggers
-    // htmx:load fires when new content is loaded, including OOB swaps
-    document.body.addEventListener("htmx:load", initRoomFormSet);
     document.addEventListener("htmx:load", () => {
+        initRoomFormSet();
         if (getWizardStep() === '2') {
             const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
             const header = document.getElementById('rooms-form-header');
