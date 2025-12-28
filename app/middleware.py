@@ -14,11 +14,14 @@ class HTMXMessagesMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        # Only process HTMX requests with HTML responses
+        # Only process HTMX requests with HTML responses (not redirects)
+        # Skip both regular redirects (3xx) and HTMX client-side redirects (HX-Redirect header)
         if (
             hasattr(request, "htmx")
             and request.htmx
             and response.get("Content-Type", "").startswith("text/html")
+            and not (300 <= response.status_code < 400)
+            and "HX-Redirect" not in response
         ):
             # Render messages template (template iteration will consume messages)
             # Always render to ensure messages are consumed, even if empty
