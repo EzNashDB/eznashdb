@@ -69,39 +69,21 @@ class CreateUpdateShulView(UpdateView):
     def is_update(self):
         return self.get_object() is not None
 
-    def form_invalid(self, form):
-        return TemplateResponse(
-            self.request,
-            "eznashdb/create_update_shul.html#shul_form",
-            self.get_context_data(form=form),
-        )
-
     def form_valid(self, form):
         if self.is_update:
-            room_fs = self.get_room_fs()
-            if not room_fs.is_valid():
-                return self.render_to_response(self.get_context_data(form=form))
-
-            # Check for nearby shuls and show modal if found
-            nearby_response = self.check_and_show_nearby_shuls(form)
-            if nearby_response:
-                return nearby_response
-
-            self.object = form.save()
-            self.room_fs_valid(room_fs)
-
-            success_url = self.get_success_url()
-            messages.success(self.request, "Success! Your shul has been updated.")
-            success_url += f"&updatedShul={self.object.pk}"
-            return HttpResponseClientRedirect(success_url)
-
-        # CREATE MODE: wizard logic
+            return self.handle_update_submit(form)
         else:
             wizard_step = self.request.POST.get("wizard_step", "1")
             if wizard_step == "1":
                 return self.handle_step1_submit(form)
             elif wizard_step == "2":
                 return self.handle_step2_submit(form)
+
+    def handle_update_submit(self, form):
+        """Handle update submission"""
+        return self.save_shul_with_rooms(
+            form, success_message="Success! Your shul has been updated.", url_param_name="updatedShul"
+        )
 
     def check_and_show_nearby_shuls(self, form, wizard_step=None):
         """
@@ -141,29 +123,39 @@ class CreateUpdateShulView(UpdateView):
         return TemplateResponse(self.request, partial_template, context)
 
     def handle_step2_submit(self, form):
-        """Handle step 2 submission - save shul and rooms together"""
-        # Validate room formset
+        """Handle step 2 submission"""
+        return self.save_shul_with_rooms(
+            form,
+            wizard_step="2",
+            success_message="Success! Your shul has been added to the map.",
+            url_param_name="newShul",
+        )
+
+    def save_shul_with_rooms(self, form, wizard_step=None, success_message=None, url_param_name=None):
+        """Validate rooms, check nearby shuls, and save atomically"""
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
-            context = self.get_context_data(form=form)
-            context["wizard_step"] = "2"  # Stay on step 2 for validation errors
-            return TemplateResponse(self.request, "eznashdb/create_update_shul.html#shul_form", context)
+            return self.handle_invalid_room_formset(form, wizard_step=wizard_step)
 
-        # Check for nearby shuls and show modal if found
-        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step="2")
+        nearby_response = self.check_and_show_nearby_shuls(form, wizard_step=wizard_step)
         if nearby_response:
             return nearby_response
 
-        # Save shul and rooms in transaction
         with transaction.atomic():
-            self.object = form.save()  # Use the validated form from POST
+            self.object = form.save()
             self.room_fs_valid(room_fs)
 
-        # Success!
         success_url = self.get_success_url()
-        messages.success(self.request, "Success! Your shul has been added to the map.")
-        success_url += f"&newShul={self.object.pk}"
+        messages.success(self.request, success_message)
+        success_url += f"&{url_param_name}={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
+
+    def handle_invalid_room_formset(self, form, wizard_step=None):
+        """Unified error response for invalid room formsets"""
+        context = self.get_context_data(form=form)
+        if wizard_step:
+            context["wizard_step"] = wizard_step
+        return TemplateResponse(self.request, "eznashdb/create_update_shul.html#shul_form", context)
 
     def get_nearby_shuls(self, form):
         lat = form.cleaned_data.get("latitude")
