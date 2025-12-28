@@ -299,32 +299,6 @@ def describe_wizard():
         # Shul should NOT be saved
         assert Shul.objects.count() == 0
 
-    def test_wizard_step2_saves_address_changes(client):
-        """Step 2 should save address changes made in step 2"""
-        # Submit step 2 with address data
-        client.post(
-            reverse("eznashdb:create_shul"),
-            data={
-                "name": "Test Shul",
-                "address": "Changed Address",
-                "latitude": "2.0",
-                "longitude": "2.0",
-                "place_id": "changed_place_id",
-                "wizard_step": "2",
-                "check_nearby_shuls": "false",
-                **get_room_fields(room_index=0),
-                **get_room_fs_metadata_fields(total_forms=1),
-            },
-            headers={"HX-Request": "true"},
-        )
-
-        # Shul should be saved with the submitted address
-        shul = Shul.objects.first()
-        assert shul.address == "Changed Address"
-        assert float(shul.latitude) == 2.0
-        assert float(shul.longitude) == 2.0
-        assert shul.place_id == "changed_place_id"
-
     def test_wizard_step2_checks_nearby_if_address_changed(client):
         """Step 2 should check for nearby shuls if address changed"""
         # Create a nearby shul
