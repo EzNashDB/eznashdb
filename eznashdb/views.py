@@ -49,6 +49,7 @@ class CreateUpdateShulView(UpdateView):
     model = Shul
     form_class = ShulForm
     template_name = "eznashdb/create_update_shul.html"
+    NEARBY_SEARCH_RADIUS = Decimal("0.001")  # ~111 meters at the equator
 
     def get_success_url(self) -> str:
         url = reverse_lazy("eznashdb:shuls")
@@ -125,7 +126,7 @@ class CreateUpdateShulView(UpdateView):
         """Validate rooms, check nearby shuls, and save atomically"""
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
-            return self.handle_invalid_room_formset(form, wizard_step=wizard_step)
+            return self.reload_shul_form(form, wizard_step=wizard_step)
 
         nearby_response = self.check_and_show_nearby_shuls(form, wizard_step=wizard_step)
         if nearby_response:
@@ -140,10 +141,6 @@ class CreateUpdateShulView(UpdateView):
         success_url += f"&{url_param_name}={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 
-    def handle_invalid_room_formset(self, form, wizard_step=None):
-        """Unified error response for invalid room formsets"""
-        return self.reload_shul_form(form, wizard_step=wizard_step)
-
     def reload_shul_form(self, form, **context_overrides):
         """Reload the shul form partial with updated context"""
         context = self.get_context_data(form=form)
@@ -157,15 +154,11 @@ class CreateUpdateShulView(UpdateView):
         if lat is None or lon is None:
             return Shul.objects.none()
 
-        # Define the search box (±0.001 degrees)
-        lat_delta = Decimal("0.001")
-        lon_delta = Decimal("0.001")
-
         return Shul.objects.filter(
-            latitude__gte=lat - lat_delta,
-            latitude__lte=lat + lat_delta,
-            longitude__gte=lon - lon_delta,
-            longitude__lte=lon + lon_delta,
+            latitude__gte=lat - self.NEARBY_SEARCH_RADIUS,
+            latitude__lte=lat + self.NEARBY_SEARCH_RADIUS,
+            longitude__gte=lon - self.NEARBY_SEARCH_RADIUS,
+            longitude__lte=lon + self.NEARBY_SEARCH_RADIUS,
         ).exclude(pk=self.object.pk if self.object else None)
 
     def room_fs_valid(self, room_fs):
@@ -199,10 +192,7 @@ class CreateUpdateShulView(UpdateView):
             # UPDATE MODE: always bind with POST data
             if self.is_update:
                 return formset_class(
-                    self.request.POST or None,
-                    self.request.FILES or None,
-                    prefix=prefix,
-                    instance=self.object,
+                    self.request.POST, self.request.FILES, prefix=prefix, instance=self.object
                 )
 
             # CREATE MODE - STEP 2: bind with POST data for validation
@@ -213,10 +203,7 @@ class CreateUpdateShulView(UpdateView):
                 if temp_form.is_valid():
                     temp_instance = Shul(**temp_form.cleaned_data)
                 return formset_class(
-                    self.request.POST or None,
-                    self.request.FILES or None,
-                    prefix=prefix,
-                    instance=temp_instance,
+                    self.request.POST, self.request.FILES, prefix=prefix, instance=temp_instance
                 )
 
             # CREATE MODE - STEP 1: return unbound formset (no validation)
