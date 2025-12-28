@@ -209,10 +209,12 @@
             },
         });
     }
+
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
 
-    // Only reinitialize formset when the form itself is swapped by HTMX
-    document.body.addEventListener("htmx:afterSettle", initRoomFormSet);
+    // Use htmx:load instead of afterSettle to avoid multiple event triggers
+    // htmx:load fires when new content is loaded, including OOB swaps
+    document.body.addEventListener("htmx:load", initRoomFormSet);
     document.addEventListener("htmx:load", () => {
         if (getWizardStep() === '2') {
             const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
