@@ -132,15 +132,15 @@
                         </div>
                     </div>
                 </div>
-                {% if nearby_shuls %}
-                    {% include "eznashdb/includes/nearby_shuls_modal.html" %}
-                {% endif %}
                 <script>
                     window.shulForm = {
                         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
                     }
                 </script>
                 <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
+                {% if nearby_shuls %}
+                    {% include "eznashdb/includes/nearby_shuls_modal.html" %}
+                {% endif %}
             </form>
         {% endpartialdef %}
     </div>
@@ -165,6 +165,20 @@
         if (modalEl) {
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
+
+            // Handle "Add New Anyway" button - hide modal before HTMX swap
+            // Using htmx:confirm (not just for user confirmations - it's for any async request gating)
+            const addNewButton = modalEl.querySelector('[hx-post]');
+            if (addNewButton) {
+                addNewButton.addEventListener('htmx:confirm', (confirmEvent) => {
+                    confirmEvent.preventDefault();
+                    // Wait for modal to fully hide before allowing HTMX request
+                    modal.hide();
+                    modalEl.addEventListener('hidden.bs.modal', () => {
+                        confirmEvent.detail.issueRequest(true);
+                    }, { once: true });
+                });
+            }
         }
     });
 
