@@ -141,7 +141,6 @@ def test_lists_duplicates_if_any_found_and_address_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "wizard_step": "1",  # Wizard step 1
             "check_nearby_shuls": "true",
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
@@ -178,7 +177,6 @@ def test_skips_duplicate_check_when_address_not_changed(client):
             "latitude": "0.0",
             "longitude": "0.0",
             "address": "123 Test St",
-            "wizard_step": "1",  # Wizard step 1
             "check_nearby_shuls": "false",  # Don't check for nearby shuls
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
