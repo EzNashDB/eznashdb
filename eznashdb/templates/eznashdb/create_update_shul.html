@@ -43,7 +43,7 @@
                 {% if not object %}<input type="hidden" name="wizard_step" value="{{ wizard_step }}">{% endif %}
                 <div class="col h-100 d-flex flex-column">
                     <div class="row sticky-top bg-body py-2 border-bottom"
-                         style="z-index: 2000">
+                         style="{# Below bootstrap modal + navbar, above map inputs #} z-index: 1025">
                         <div class="col-12">
                             <h3 class="d-flex gap-3 align-items-center mb-0">
                                 {% if object %}
