@@ -299,8 +299,8 @@ def describe_wizard():
         # Shul should NOT be saved
         assert Shul.objects.count() == 0
 
-    def test_wizard_step2_checks_nearby_if_address_changed(client):
-        """Step 2 should check for nearby shuls if address changed"""
+    def test_wizard_step2_shows_nearby_modal_when_check_nearby_shuls_true(client):
+        """Step 2 should show nearby shuls modal when check_nearby_shuls is true"""
         # Create a nearby shul
         nearby_shul = Shul.objects.create(
             name="Nearby Shul",
