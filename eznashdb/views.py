@@ -100,14 +100,7 @@ class CreateUpdateShulView(UpdateView):
             return None
 
         # Show nearby shuls modal
-        partial_template = "eznashdb/create_update_shul.html#shul_form"
-        context = self.get_context_data(form=form)
-        context["nearby_shuls"] = nearby_shuls
-
-        if wizard_step:
-            context["wizard_step"] = wizard_step
-
-        return TemplateResponse(self.request, partial_template, context)
+        return self.reload_shul_form(form, nearby_shuls=nearby_shuls, wizard_step=wizard_step)
 
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
@@ -117,10 +110,7 @@ class CreateUpdateShulView(UpdateView):
             return nearby_response
 
         # No nearby shuls or user clicked "Save Anyway" -> proceed to step 2
-        partial_template = "eznashdb/create_update_shul.html#shul_form"
-        context = self.get_context_data(form=form)
-        context["wizard_step"] = "2"  # Override to step 2
-        return TemplateResponse(self.request, partial_template, context)
+        return self.reload_shul_form(form, wizard_step="2")
 
     def handle_step2_submit(self, form):
         """Handle step 2 submission"""
@@ -152,9 +142,12 @@ class CreateUpdateShulView(UpdateView):
 
     def handle_invalid_room_formset(self, form, wizard_step=None):
         """Unified error response for invalid room formsets"""
+        return self.reload_shul_form(form, wizard_step=wizard_step)
+
+    def reload_shul_form(self, form, **context_overrides):
+        """Reload the shul form partial with updated context"""
         context = self.get_context_data(form=form)
-        if wizard_step:
-            context["wizard_step"] = wizard_step
+        context.update(context_overrides)
         return TemplateResponse(self.request, "eznashdb/create_update_shul.html#shul_form", context)
 
     def get_nearby_shuls(self, form):
