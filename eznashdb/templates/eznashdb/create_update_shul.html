@@ -163,7 +163,7 @@
     document.addEventListener("htmx:afterSettle", (e) =>{
         const modalEl = document.getElementById('nearby-shuls-modal');
         if (modalEl) {
-            const modal = new bootstrap.Modal(modalEl);
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
 
             // Handle "Add New Anyway" button - hide modal before HTMX swap
