@@ -208,7 +208,7 @@
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
     document.addEventListener("htmx:afterSettle", initRoomFormSet);
-    document.addEventListener("htmx:afterSettle", () => {
+    document.addEventListener("htmx:load", () => {
         if (getWizardStep() === '2') {
             const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
             const header = document.getElementById('rooms-form-header');
