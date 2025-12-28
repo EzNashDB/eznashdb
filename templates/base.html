@@ -77,27 +77,7 @@
     </head>
     <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
         <div class="fixed-top">{% include 'includes/navbar.html' %}</div>
-        <!-- Messages Container -->
-        {% if messages %}
-            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1060">
-                {% for message in messages %}
-                    <div class="toast align-items-center text-bg-{{ message.tags }}"
-                         role="alert"
-                         aria-live="assertive"
-                         aria-atomic="true"
-                         data-bs-autohide="true"
-                         data-bs-delay="5000">
-                        <div class="d-flex">
-                            <div class="toast-body">{{ message }}</div>
-                            <button type="button"
-                                    class="btn-close btn-close-white me-2 m-auto"
-                                    data-bs-dismiss="toast"
-                                    aria-label="Close"></button>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include 'includes/messages.html' %}
         <div
             {# djlint:off #}
             class="main-scroll-container
@@ -156,14 +136,17 @@
         <link rel="stylesheet"
               href="https://unpkg.com/react-bootstrap-typeahead/css/Typeahead.bs5.css" />
         <script>
-        // Auto-show all toasts on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        // Auto-show all toasts on page load and after HTMX swaps
+        function showToasts() {
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
             var toastList = toastElList.map(function(toastEl) {
                 return new bootstrap.Toast(toastEl);
             });
             toastList.forEach(toast => toast.show());
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', showToasts);
+        document.body.addEventListener('htmx:afterSwap', showToasts);
         </script>
 
         {% block extra_media_bottom %}

@@ -179,35 +179,40 @@
 
         if (!isStep2 && !isUpdateMode) return;
 
-        $(function() {
-            $('.room-form').formset({
-                modelName: "room",
-                formCssClass: 'room-form',
-                formsParentCssClass: 'room-formset',
-                prefix: '{{ room_fs.prefix }}',
-                addCssClass:'btn btn-secondary form-text mt-2',
-                addText: '<i class="fa fa-plus"></i> Add another room',
-                addContainerClass: 'add-room-container',
-                deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
-                deleteText: '<i class="fa fa-times"></i> Delete room',
-                deleteContainerClass: 'delete-room-container',
-                hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
-                prepareTemplate: (template) => {
-                    const collapseEl = template.find('.accordion-collapse');
-                    collapseEl.removeClass('show');
-                },
-                added: (row) => {
-                    const accordion = document.getElementById('roomsAccordion');
-                    const alpineData = Alpine.$data(accordion);
-                    alpineData.openRoom = row.attr('id');
-                    const collapseEl = row.find('.accordion-collapse')[0];
-                    new bootstrap.Collapse(collapseEl, {show: true});
-                },
-            });
+        // Clean up any existing formset buttons before initializing
+        // This handles the case where initRoomFormSet is called multiple times
+        $('.add-room-container').empty();
+        $('.delete-room-container .delete-room').remove();
+
+        $('.room-form').formset({
+            modelName: "room",
+            formCssClass: 'room-form',
+            formsParentCssClass: 'room-formset',
+            prefix: '{{ room_fs.prefix }}',
+            addCssClass:'btn btn-secondary form-text mt-2',
+            addText: '<i class="fa fa-plus"></i> Add another room',
+            addContainerClass: 'add-room-container',
+            deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
+            deleteText: '<i class="fa fa-times"></i> Delete room',
+            deleteContainerClass: 'delete-room-container',
+            hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
+            prepareTemplate: (template) => {
+                const collapseEl = template.find('.accordion-collapse');
+                collapseEl.removeClass('show');
+            },
+            added: (row) => {
+                const accordion = document.getElementById('roomsAccordion');
+                const alpineData = Alpine.$data(accordion);
+                alpineData.openRoom = row.attr('id');
+                const collapseEl = row.find('.accordion-collapse')[0];
+                new bootstrap.Collapse(collapseEl, {show: true});
+            },
         });
     }
     document.addEventListener("DOMContentLoaded", initRoomFormSet);
-    document.addEventListener("htmx:afterSettle", initRoomFormSet);
+
+    // Only reinitialize formset when the form itself is swapped by HTMX
+    document.body.addEventListener("htmx:afterSettle", initRoomFormSet);
     document.addEventListener("htmx:load", () => {
         if (getWizardStep() === '2') {
             const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');

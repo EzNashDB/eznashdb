@@ -333,3 +333,46 @@ def describe_wizard():
 
         # Shul should NOT be saved yet
         assert Shul.objects.filter(name="Test Shul").count() == 0
+
+    def test_wizard_step1_shows_error_message_on_validation_failure(client):
+        """Step 1 validation shows error message when form is invalid"""
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "",  # Missing required field
+                "address": "123 Test St",
+                "latitude": "1.0",
+                "longitude": "1.0",
+                "wizard_step": "1",
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Should include messages via middleware OOB swap
+        assert "messages-container" in str(response.content)
+        assert "Please fix the form errors to continue" in str(response.content)
+
+    def test_wizard_step2_shows_error_message_on_validation_failure(client):
+        """Step 2 validation shows error message when formset is invalid"""
+        response = client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "Test Shul",
+                "address": "123 Test St",
+                "latitude": "1.0",
+                "longitude": "1.0",
+                "place_id": "test_place_id",
+                "wizard_step": "2",
+                "check_nearby_shuls": "false",
+                **get_room_fs_metadata_fields(total_forms=1),
+                # Empty room - will fail validation
+                "rooms-0-name": "",
+                "rooms-0-relative_size": "",
+                "rooms-0-see_hear_score": "",
+            },
+            headers={"HX-Request": "true"},
+        )
+
+        # Should include messages via middleware OOB swap
+        assert "messages-container" in str(response.content)
+        assert "Unable to save" in str(response.content)
