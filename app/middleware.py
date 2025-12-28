@@ -20,17 +20,16 @@ class HTMXMessagesMiddleware:
             and request.htmx
             and response.get("Content-Type", "").startswith("text/html")
         ):
-            # Get messages from storage and convert to list (which consumes them)
-            message_list = list(django_messages.get_messages(request))
+            # Render messages template (template iteration will consume messages)
+            # Always render to ensure messages are consumed, even if empty
+            messages_html = render_to_string(
+                "includes/messages.html",
+                {"messages": django_messages.get_messages(request)},
+                request=request,
+            )
 
-            # Only append if there are messages
-            if message_list:
-                messages_html = render_to_string(
-                    "includes/messages.html", {"messages": message_list}, request=request
-                )
-
-                # Append messages HTML to response content
-                if hasattr(response, "content"):
-                    response.content = response.content + messages_html.encode("utf-8")
+            # Append messages HTML to response content
+            if hasattr(response, "content"):
+                response.content = response.content + messages_html.encode("utf-8")
 
         return response
