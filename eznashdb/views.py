@@ -86,23 +86,6 @@ class CreateUpdateShulView(UpdateView):
             form, success_message="Success! Your shul has been updated.", url_param_name="updatedShul"
         )
 
-    def check_and_show_nearby_shuls(self, form, wizard_step=None):
-        """
-        Check for nearby shuls and return modal response if found.
-        Returns None if no check requested or no nearby shuls found.
-        """
-        check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
-
-        if not check_nearby_shuls:
-            return None
-
-        nearby_shuls = self.get_nearby_shuls(form)
-        if not nearby_shuls.exists():
-            return None
-
-        # Show nearby shuls modal
-        return self.reload_shul_form(form, nearby_shuls=nearby_shuls, wizard_step=wizard_step)
-
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
         # Check for nearby shuls and show modal if found
@@ -140,6 +123,23 @@ class CreateUpdateShulView(UpdateView):
         messages.success(self.request, success_message)
         success_url += f"&{url_param_name}={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
+
+    def check_and_show_nearby_shuls(self, form, wizard_step=None):
+        """
+        Check for nearby shuls and return modal response if found.
+        Returns None if no check requested or no nearby shuls found.
+        """
+        check_nearby_shuls = self.request.POST.get("check_nearby_shuls") == "true"
+
+        if not check_nearby_shuls:
+            return None
+
+        nearby_shuls = self.get_nearby_shuls(form)
+        if not nearby_shuls.exists():
+            return None
+
+        # Show nearby shuls modal
+        return self.reload_shul_form(form, nearby_shuls=nearby_shuls, wizard_step=wizard_step)
 
     def reload_shul_form(self, form, **context_overrides):
         """Reload the shul form partial with updated context"""
