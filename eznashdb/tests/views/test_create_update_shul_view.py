@@ -1,6 +1,5 @@
 from functools import partial
 
-import pytest
 from bs4 import BeautifulSoup
 from django.urls import reverse
 
@@ -41,42 +40,32 @@ def get_room_fields(room_index: int):
     }
 
 
-@pytest.fixture
-def GET_request_create(rf_GET):
-    return rf_GET("eznashdb:create_shul")
-
-
-@pytest.fixture
-def GET_request_update(rf_GET):
-    def _generate_request(**params):
-        return rf_GET("eznashdb:update_shul", params)
-
-    return _generate_request
-
-
 # Tests
 
 
 def describe_create():
-    def shows_page_title(GET_request_create):
-        response = CreateUpdateShulView.as_view()(GET_request_create)
+    def shows_page_title(rf_GET):
+        request = rf_GET("eznashdb:create_shul")
+        response = CreateUpdateShulView.as_view()(request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "add a shul" in soup.get_text().lower()
 
-    def shows_form(GET_request_create):
-        response = CreateUpdateShulView.as_view()(GET_request_create)
+    def shows_form(rf_GET):
+        request = rf_GET("eznashdb:create_shul")
+        response = CreateUpdateShulView.as_view()(request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert soup.find("form")
 
 
 def describe_update():
-    def initializes_with_shul_and_room_data(GET_request_update, test_shul):
+    def initializes_with_shul_and_room_data(rf_GET, test_shul):
         room1 = test_shul.rooms.create(name="test room 1")
         room2 = test_shul.rooms.create(name="test room 2")
 
-        response = CreateUpdateShulView.as_view()(GET_request_update(pk=test_shul.pk), pk=test_shul.pk)
+        request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
+        response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         inputs = soup.find_all("input")
