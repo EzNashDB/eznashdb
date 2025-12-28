@@ -58,6 +58,24 @@ def describe_create():
 
         assert soup.find("form")
 
+    def creates_shul(client):
+        data = {
+            "name": "test shul",
+            "address": "123 Sesame Street",
+            "latitude": "1",
+            "longitude": "1",
+            "wizard_step": "2",
+            "check_nearby_shuls": "false",
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+        }
+
+        client.post(
+            reverse("eznashdb:create_shul"),
+            data=data,
+        )
+        assert Shul.objects.count() == 1
+
 
 def describe_update():
     def initializes_with_shul_and_room_data(rf_GET, test_shul):
