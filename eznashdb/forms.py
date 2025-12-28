@@ -87,8 +87,11 @@ class BaseRoomFormSet(BaseInlineFormSet):
 
         # Require at least 1 room for new shuls or existing shuls that already have rooms
         if not self.instance or not self.instance.pk or self.instance.rooms.exists():
+            # Check if there's at least one room that either already exists or is being added
+            # (as long as it's not marked for deletion)
             has_room = any(
-                form.has_changed() and not form.cleaned_data.get("DELETE", False) for form in self.forms
+                (form.instance.pk or form.has_changed()) and not form.cleaned_data.get("DELETE", False)
+                for form in self.forms
             )
             if not has_room:
                 raise ValidationError("At least one room is required.")
