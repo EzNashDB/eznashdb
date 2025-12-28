@@ -289,7 +289,7 @@ def describe_wizard():
         soup = BeautifulSoup(response.content, "html.parser")
 
         # Should show validation error
-        assert "Please add at least one room" in str(soup)
+        assert "At least one room is required" in str(soup)
 
         # Shul should NOT be saved
         assert Shul.objects.count() == 0

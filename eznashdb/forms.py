@@ -80,17 +80,18 @@ class RoomForm(ModelForm):
 
 
 class BaseRoomFormSet(BaseInlineFormSet):
-    """Custom formset that requires at least 1 room for new shuls only"""
+    """Custom formset that requires at least 1 room for new shuls and existing shuls with rooms"""
 
     def clean(self):
         super().clean()
-        # Only enforce minimum for new shuls (no pk yet)
-        if not self.instance or not self.instance.pk:
+
+        # Require at least 1 room for new shuls or existing shuls that already have rooms
+        if not self.instance or not self.instance.pk or self.instance.rooms.exists():
             has_room = any(
                 form.has_changed() and not form.cleaned_data.get("DELETE", False) for form in self.forms
             )
             if not has_room:
-                raise ValidationError("Please add at least one room for this shul.")
+                raise ValidationError("At least one room is required.")
 
 
 RoomFormSet = inlineformset_factory(

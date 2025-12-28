@@ -46,7 +46,7 @@ def test_room_formset_requires_minimum_for_new_shuls():
         instance=None,  # No instance = new shul
     )
     assert not formset.is_valid()
-    assert "Please add at least one room" in str(formset.non_form_errors())
+    assert "At least one room is required" in str(formset.non_form_errors())
 
 
 def test_room_formset_accepts_valid_room_for_new_shul():
@@ -78,3 +78,32 @@ def test_room_formset_allows_zero_rooms_for_existing_shuls(test_shul):
         instance=test_shul,  # Has instance = existing shul
     )
     assert formset.is_valid()
+
+
+def test_room_formset_prevents_deleting_all_rooms_from_existing_shul(test_shul):
+    """Existing shuls with rooms cannot delete all rooms"""
+    # Create a room in the test shul
+    room = test_shul.rooms.create(
+        name="Main Sanctuary",
+        relative_size=RelativeSize.M,
+        see_hear_score=SeeHearScore._3,
+    )
+
+    # Try to delete it via formset
+    formset = RoomFormSet(
+        data={
+            "rooms-TOTAL_FORMS": "1",
+            "rooms-INITIAL_FORMS": "1",
+            "rooms-MIN_NUM_FORMS": "0",
+            "rooms-MAX_NUM_FORMS": "1000",
+            "rooms-0-id": str(room.id),
+            "rooms-0-shul": str(test_shul.id),
+            "rooms-0-name": "Main Sanctuary",
+            "rooms-0-relative_size": RelativeSize.M,
+            "rooms-0-see_hear_score": SeeHearScore._3,
+            "rooms-0-DELETE": "on",  # Attempting to delete
+        },
+        instance=test_shul,
+    )
+    assert not formset.is_valid()
+    assert "At least one room is required" in str(formset.non_form_errors())
