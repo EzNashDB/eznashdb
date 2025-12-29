@@ -13,7 +13,7 @@ class NavbarItem:
 def navbar(request):
     # Define your navbar items here
     navbar_items = [
-        NavbarItem("Browse Shuls", reverse("eznashdb:shuls")),
+        NavbarItem("Browse", reverse("eznashdb:shuls")),
         NavbarItem("Add a Shul", reverse("eznashdb:create_shul")),
         NavbarItem("About", "/about/"),
         NavbarItem("Contact", reverse("eznashdb:contact_us")),
