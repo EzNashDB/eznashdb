@@ -24,21 +24,15 @@ class AccountAdapter(DefaultAccountAdapter):
         user.username = user.email
         return user.username
 
-    def is_email_taken(self, email):
+    def clean_email(self, email, signup=False):
         """
-        Check if email is already registered.
-        Override to provide better UX for duplicate emails.
-        """
-        # Check if email exists (verified or unverified)
-        return EmailAddress.objects.filter(email__iexact=email).exists()
-
-    def clean_email(self, email):
-        """
-        Validate email and check for duplicates with clear error message.
+        Validate email and check for duplicates with clear error message during signup.
+        The signup parameter is passed by allauth's signup form.
         """
         email = super().clean_email(email)
 
-        if self.is_email_taken(email):
+        # Only check for duplicates during signup, not password reset
+        if signup and EmailAddress.objects.filter(email__iexact=email).exists():
             # Provide helpful error with clickable links
             from django.core.exceptions import ValidationError
             from django.urls import reverse
