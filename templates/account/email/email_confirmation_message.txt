@@ -1,0 +1,13 @@
+Hello,
+
+You're receiving this email because you created an account at The Ezrat Nashim Database.
+
+To confirm your email address and activate your account, please click the link below:
+
+{{ activate_url }}
+
+If you didn't create this account, you can safely ignore this email.
+
+Thank you,
+The Ezrat Nashim Database Team
+ezratnashimdb@gmail.com

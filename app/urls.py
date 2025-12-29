@@ -8,6 +8,7 @@ from app.views import AdminDashboardView, RestoreDBView
 
 urlpatterns = [
     path("", include("eznashdb.urls")),
+    path("accounts/", include("allauth.urls")),
     path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
     path("admin/restore/", RestoreDBView.as_view(), name="restore_db"),
     path("admin/", admin.site.urls),

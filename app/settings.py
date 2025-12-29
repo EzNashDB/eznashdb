@@ -96,6 +96,9 @@ INSTALLED_APPS = [
     "template_partials",
     "app",
     "eznashdb",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "users",
 ]
 
@@ -110,6 +113,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "app.middleware.HTMXMessagesMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -192,6 +196,47 @@ else:
 DATABASES = {"default": database}
 
 AUTH_USER_MODEL = "users.User"
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# django-allauth configuration
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_USERNAME_REQUIRED = False
+# Don't set ACCOUNT_USER_MODEL_USERNAME_FIELD to None - let it default to 'username'
+# The adapter will auto-populate username from email
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
+
+# Social account settings (for future Google OAuth)
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Trust provider's email verification
+# This allows auto-connect: if user has password account with verified email,
+# then later logs in with Google using same email, accounts auto-connect.
+# Safe because both methods verify email ownership.
+
+# Redirects
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+# Email backend
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "ezratnashimdb@gmail.com")
+
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+    EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

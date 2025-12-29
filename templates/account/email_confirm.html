@@ -1,0 +1,29 @@
+{% extends "account/base.html" %}
+
+{% block title %}Confirm Email - The Ezrat Nashim Database{% endblock %}
+
+{% block account_content %}
+    <h2 class="mb-4">Confirm Email Address</h2>
+    {% if confirmation %}
+        <p>
+            Please confirm your email address: <strong>{{ confirmation.email_address.email }}</strong>
+        </p>
+        <form method="POST"
+              action="{% url 'account_confirm_email' confirmation.key %}">
+            {% csrf_token %}
+            <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+        </form>
+    {% else %}
+        <p>This email confirmation link has expired or is invalid.</p>
+        <p>
+            Please try signing up again, or if you already have an account, you can request a password reset to verify your email.
+        </p>
+        <div class="mt-3">
+            <a href="{% url 'account_signup' %}" class="btn btn-primary">Sign Up</a>
+            <a href="{% url 'account_reset_password' %}"
+               class="btn btn-outline-secondary">Reset Password</a>
+        </div>
+    {% endif %}
+{% endblock %}
