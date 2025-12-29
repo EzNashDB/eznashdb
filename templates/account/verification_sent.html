@@ -9,7 +9,13 @@
     </p>
     <div class="alert alert-info mt-3">
         <i class="fa-solid fa-circle-info me-2"></i>
-        Didn't receive the email? Check your spam folder.
+        <strong>Didn't receive the email?</strong>
+        <ol class="mb-0 mt-2">
+            <li>Check your spam folder</li>
+            <li>
+                <a href="{% url 'eznashdb:contact_us' %}" class="alert-link">Contact us</a> if you still need help
+            </li>
+        </ol>
     </div>
     <div class="mt-3">
         <a href="/" class="btn btn-outline-secondary">Back to Home</a>
