@@ -10,7 +10,7 @@
 	"workspaceFolder": "/app",
 	"shutdownAction": "none",
 	"remoteUser": "docker",
-	"postCreateCommand": "sudo chown -R docker:docker /home/docker",
+	"postCreateCommand": "sudo chown -R docker:docker /home/docker && pre-commit install --install-hooks",
 	"forwardPorts": [
 		8000,
 		5432
