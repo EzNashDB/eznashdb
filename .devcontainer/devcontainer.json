@@ -16,7 +16,8 @@
 		5432
 	],
 	"mounts": [
-		"source=${localEnv:HOME}/.config/rclone,target=/home/docker/.config/rclone,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.config/rclone,target=/home/docker/.config/rclone,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.config/gh,target=/home/docker/.config/gh,type=bind,consistency=cached"
 	],
 	"customizations": {
 		"vscode": {
