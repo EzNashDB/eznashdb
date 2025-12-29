@@ -2,6 +2,7 @@ import logging
 from smtplib import SMTPException
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.models import EmailAddress
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,41 @@ class AccountAdapter(DefaultAccountAdapter):
         """
         user.username = user.email
         return user.username
+
+    def is_email_taken(self, email):
+        """
+        Check if email is already registered.
+        Override to provide better UX for duplicate emails.
+        """
+        # Check if email exists (verified or unverified)
+        return EmailAddress.objects.filter(email__iexact=email).exists()
+
+    def clean_email(self, email):
+        """
+        Validate email and check for duplicates with clear error message.
+        """
+        email = super().clean_email(email)
+
+        if self.is_email_taken(email):
+            # Provide helpful error with clickable links
+            from django.core.exceptions import ValidationError
+            from django.urls import reverse
+            from django.utils.html import format_html
+
+            login_url = reverse("account_login")
+            reset_url = reverse("account_reset_password")
+
+            message = format_html(
+                "An account with this email address already exists. "
+                'Please <a href="{}" class="text-danger"><u>log in</u></a> or '
+                '<a href="{}" class="text-danger"><u>reset your password</u></a> if you\'ve forgotten it.',
+                login_url,
+                reset_url,
+            )
+
+            raise ValidationError(message)
+
+        return email
 
     def send_mail(self, template_prefix, email, context):
         """
