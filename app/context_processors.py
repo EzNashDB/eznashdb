@@ -19,6 +19,11 @@ def navbar(request):
         NavbarItem("Contact", reverse("eznashdb:contact_us")),
     ]
 
+    # Authentication links - dropdown for authenticated users handled in template
+    if not (hasattr(request, "user") and request.user.is_authenticated):
+        navbar_items.append(NavbarItem("Login", reverse("account_login")))
+        navbar_items.append(NavbarItem("Sign Up", reverse("account_signup")))
+
     # Add admin link for staff users
     if hasattr(request, "user") and request.user.is_staff:
         navbar_items.append(NavbarItem("Admin", reverse("admin_dashboard")))
