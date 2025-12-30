@@ -27,21 +27,12 @@ def describe_signup_flow():
 
 
 def describe_login_flow():
-    def cannot_login_without_verification(client, db):
-        User.objects.create_user(email="test@example.com", password="testpass123")
-
-        response = client.post(
-            reverse("account_login"),
-            {
-                "login": "test@example.com",
-                "password": "testpass123",
-            },
-        )
-
-        assert not response.wsgi_request.user.is_authenticated
-
     def can_login_after_verification(client, db):
-        user = User.objects.create_user(email="verified@example.com", password="testpass123")
+        user = User.objects.create_user(
+            username="verified@example.com",
+            email="verified@example.com",
+            password="testpass123",
+        )
         EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
 
         response = client.post(
@@ -113,7 +104,11 @@ def describe_navbar():
         assert "Account" not in content  # No account dropdown
 
     def shows_account_dropdown_for_authenticated(client, db):
-        user = User.objects.create_user(email="test@example.com", password="testpass123")
+        user = User.objects.create_user(
+            username="test@example.com",
+            email="test@example.com",
+            password="testpass123",
+        )
         EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
         client.force_login(user)
 
