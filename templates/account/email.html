@@ -5,33 +5,43 @@
 {% block title %}Manage Email - The Ezrat Nashim Database{% endblock %}
 
 {% block account_content %}
-    <h2 class="mb-4">Email Address</h2>
     {% if user.is_authenticated %}
-        <p>
-            Your email address: <strong>{{ user.email }}</strong>
-        </p>
-        {% if emailaddress_set %}
-            {% for emailaddress in emailaddress_set %}
+        {% if emailaddresses %}
+            {% for emailaddress in emailaddresses %}
                 {% if not emailaddress.verified %}
-                    <div class="alert alert-warning mt-3">
+                    <h2 class="mb-4">Verify Your Email</h2>
+                    <div class="alert alert-warning">
                         <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                        Your email address is not verified.
-                        <form method="post" action="{% url 'account_email' %}" class="d-inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="action_send" value="{{ emailaddress.id }}">
-                            <button type="submit" class="btn btn-sm btn-warning">Resend Verification Email</button>
-                        </form>
+                        <strong>Your email address is not verified.</strong>
                     </div>
+                    <p>
+                        Email address: <strong>{{ user.email }}</strong>
+                    </p>
+                    <p>
+                        To enable password reset, please verify your email address.
+                        We'll send you a verification link - just click it to confirm.
+                    </p>
+                    <form method="post" action="{% url 'account_email' %}" class="mt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="email" value="{{ emailaddress.email }}">
+                        <button type="submit" name="action_send" class="btn btn-primary">
+                            <i class="fa-solid fa-envelope me-2"></i>Send Verification Email
+                        </button>
+                    </form>
                 {% else %}
-                    <div class="alert alert-success mt-3">
+                    <h2 class="mb-4">Email Address</h2>
+                    <div class="alert alert-success">
                         <i class="fa-solid fa-circle-check me-2"></i>
-                        Your email address is verified.
+                        <strong>Your email address is verified.</strong>
                     </div>
+                    <p>
+                        Email address: <strong>{{ user.email }}</strong>
+                    </p>
                 {% endif %}
             {% endfor %}
         {% endif %}
         <div class="mt-3">
-            <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+            <a href="{% url 'account_settings' %}" class="btn btn-outline-secondary">Back to Settings</a>
         </div>
     {% else %}
         <p>You must be logged in to manage your email addresses.</p>

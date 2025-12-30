@@ -4,6 +4,14 @@
 
 {% block account_content %}
     <h2 class="mb-4">Account Settings</h2>
+    {% if not email_verified %}
+        <div class="alert alert-warning mb-3">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <strong>Email not verified.</strong>
+            Please verify your email to enable password reset.
+            <a href="{% url 'account_email' %}" class="alert-link">Verify now</a>
+        </div>
+    {% endif %}
     <div class="list-group">
         <a href="{% url 'account_email' %}"
            class="list-group-item list-group-item-action">
