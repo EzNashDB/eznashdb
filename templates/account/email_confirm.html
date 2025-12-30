@@ -5,16 +5,15 @@
 {% block account_content %}
     <h2 class="mb-4">Confirm Email Address</h2>
     {% if confirmation %}
-        <p>
-            Please confirm your email address: <strong>{{ confirmation.email_address.email }}</strong>
-        </p>
-        <form method="POST"
-              action="{% url 'account_confirm_email' confirmation.key %}">
-            {% csrf_token %}
-            <div class="d-grid gap-2 mt-3">
-                <button type="submit" class="btn btn-primary">Confirm</button>
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-        </form>
+            <p>
+                Confirming your email address: <strong>{{ confirmation.email_address.email }}</strong>
+            </p>
+            <p class="text-muted">Please wait...</p>
+        </div>
     {% else %}
         <p>This email confirmation link has expired or is invalid.</p>
         <p>
