@@ -5,9 +5,11 @@ from django.contrib import admin
 from django.urls import include, path
 
 from app.views import AdminDashboardView, RestoreDBView
+from users.views import AccountSettingsView
 
 urlpatterns = [
     path("", include("eznashdb.urls")),
+    path("accounts/settings/", AccountSettingsView.as_view(), name="account_settings"),
     path("accounts/", include("allauth.urls")),
     path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
     path("admin/restore/", RestoreDBView.as_view(), name="restore_db"),
