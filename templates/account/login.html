@@ -1,11 +1,26 @@
 {% extends "account/base.html" %}
 
 {% load crispy_forms_tags %}
+{% load socialaccount %}
 
 {% block title %}Log In - The Ezrat Nashim Database{% endblock %}
 
 {% block account_content %}
     <h2 class="mb-4">Log In</h2>
+    <div class="d-grid gap-2 mb-4">
+        <form method="post" action="{% provider_login_url 'google' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-dark w-100">
+                <i class="fa-brands fa-google me-2"></i>
+                Continue with Google
+            </button>
+        </form>
+    </div>
+    <div class="d-flex align-items-center mb-4">
+        <hr class="flex-grow-1">
+        <span class="px-3 text-muted">OR</span>
+        <hr class="flex-grow-1">
+    </div>
     <form method="POST" action="{% url 'account_login' %}">
         {% csrf_token %}
         {{ form|crispy }}
