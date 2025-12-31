@@ -1,16 +1,13 @@
 import re
 
 from allauth.account.models import EmailAddress
-from django.core import mail
 from django.urls import reverse
 
 from users.models import User
 
 
 def describe_signup_flow():
-    def creates_user_and_sends_email(client):
-        mail.outbox = []
-
+    def creates_user_and_sends_email(client, mailoutbox):
         response = client.post(
             reverse("account_signup"),
             {
@@ -22,8 +19,8 @@ def describe_signup_flow():
 
         assert response.status_code == 302
         assert User.objects.filter(email="test@example.com").exists()
-        assert len(mail.outbox) == 1
-        assert "Confirm Your Email" in mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        assert "Confirm Your Email" in mailoutbox[0].subject
 
 
 def describe_login_flow():
@@ -48,10 +45,8 @@ def describe_login_flow():
 
 
 def describe_email_confirmation():
-    def auto_confirms_on_link_click(client, db):
+    def auto_confirms_on_link_click(client, db, mailoutbox):
         """Test that clicking confirmation link auto-confirms and logs in user"""
-        mail.outbox = []
-
         # Signup user
         client.post(
             reverse("account_signup"),
@@ -63,7 +58,7 @@ def describe_email_confirmation():
         )
 
         # Extract confirmation URL from email
-        email_body = mail.outbox[0].body
+        email_body = mailoutbox[0].body
         url_match = re.search(r"/accounts/confirm-email/[\w:-]+/", email_body)
         assert url_match, "Confirmation URL not found in email"
         confirmation_url = url_match.group(0)
