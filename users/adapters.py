@@ -17,10 +17,6 @@ class AccountAdapter(DefaultAccountAdapter):
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     """Custom adapter for social account integration."""
 
-    def is_auto_signup_allowed(self, request, sociallogin):
-        """Always allow auto signup for social accounts."""
-        return True
-
     def pre_social_login(self, request, sociallogin):
         """
         Auto-connect social accounts to existing users with matching verified email.
