@@ -1,0 +1,14 @@
+{% extends "account/base.html" %}
+
+{% block title %}Login Error - The Ezrat Nashim Database{% endblock %}
+
+{% block account_content %}
+    <h2 class="mb-4">Login Error</h2>
+    <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
+        An error occurred while attempting to login with Google. Please try again or use email/password login.
+    </div>
+    <div class="d-grid gap-2 mt-4">
+        <a href="{% url 'account_login' %}" class="btn btn-primary">Back to Login</a>
+    </div>
+{% endblock %}

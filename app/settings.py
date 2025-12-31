@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "users",
 ]
 
@@ -210,13 +211,30 @@ ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
+SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 
-# Social account settings (for future Google OAuth)
+# Social account settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Trust provider's email verification
+SOCIALACCOUNT_EMAIL_REQUIRED = False  # Don't require email confirmation for social accounts
+SOCIALACCOUNT_QUERY_EMAIL = True  # Ask provider for email
 # This allows auto-connect: if user has password account with verified email,
 # then later logs in with Google using same email, accounts auto-connect.
 # Safe because both methods verify email ownership.
+
+# Google OAuth configuration
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "FETCH_USERINFO": True,
+    }
+}
 
 # Redirects
 LOGIN_REDIRECT_URL = "/"
