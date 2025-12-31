@@ -46,6 +46,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://eznashdb.fly.dev",
 ]
 
+# Trust X-Forwarded-Proto header from proxy for HTTPS detection
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INTERNAL_IPS = [
     "127.0.0.1",
