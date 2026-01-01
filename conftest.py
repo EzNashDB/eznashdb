@@ -1,6 +1,8 @@
 from typing import Callable
 
 import pytest
+from allauth.socialaccount.models import SocialApp
+from django.contrib.sites.models import Site
 from django.core.handlers.wsgi import WSGIRequest
 from django.urls import resolve, reverse
 
@@ -18,12 +20,30 @@ def _enable_db_access_for_all_tests(db):
     pass
 
 
+@pytest.fixture(autouse=True)
+def google_social_app(db):
+    """Set up Google OAuth SocialApp for tests that render auth templates"""
+    site = Site.objects.get_current()
+    google_app, _ = SocialApp.objects.get_or_create(
+        provider="google",
+        name="Google",
+        defaults={
+            "client_id": "test-client-id",
+            "secret": "test-secret",
+        },
+    )
+    google_app.sites.add(site)
+    return google_app
+
+
 @pytest.fixture
 def test_user(django_user_model):
     user = django_user_model.objects.create(
         username="test_user",
+        email="test@example.com",
     )
     user.set_password("password")
+    user.save()
     return user
 
 

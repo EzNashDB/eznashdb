@@ -19,6 +19,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulForm
+from eznashdb.mixins import LoginRequiredMixin
 from eznashdb.models import Shul
 
 
@@ -45,7 +46,8 @@ class ShulsFilterView(FilterView):
         return super().get_template_names()
 
 
-class CreateUpdateShulView(UpdateView):
+class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
+    login_required_message = "Please log in to add or edit shuls."
     model = Shul
     form_class = ShulForm
     template_name = "eznashdb/create_update_shul.html"
