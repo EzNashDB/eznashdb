@@ -1,5 +1,15 @@
 # Ezrat Nashim Database - Project Instructions
 
+**Note:** This is a **dynamic document** that describes the **current state** of the repository. As Claude Code, you should **proactively update this file** when you:
+- Discover new information about how the codebase works
+- Learn about architectural decisions made during our work
+- Reach important conclusions during discussions
+- Find other significant details about the project
+
+Focus on documenting how things work **NOW**, not historical changes (that's what git history is for). Keep it concise and useful for understanding the codebase in future sessions.
+
+---
+
 ## What This Is
 Crowdsourced database tracking women's seating in synagogues worldwide. Two metrics:
 1. Size of ezrat nashim relative to men's section (L/M/S/X/&)
