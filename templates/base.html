@@ -77,7 +77,11 @@
     </head>
     <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
         <div class="fixed-top">{% include 'includes/navbar.html' %}</div>
-        {% include 'includes/messages.html' %}
+
+        {% block messages_toasts %}
+            {% include 'includes/messages.html' %}
+        {% endblock messages_toasts %}
+
         <div
             {# djlint:off #}
             class="main-scroll-container

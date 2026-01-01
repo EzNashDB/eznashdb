@@ -38,7 +38,8 @@
             <a href="{% url 'account_reset_password' %}">Forgot your password?</a>
         </p>
         <p>
-            Don't have an account? <a href="{% url 'account_signup' %}">Sign up</a>
+            Don't have an account?
+            <a href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">Sign up</a>
         </p>
     </div>
 {% endblock %}

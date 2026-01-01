@@ -44,21 +44,24 @@ def get_room_fields(room_index: int):
 
 
 def describe_create():
-    def shows_page_title(rf_GET):
+    def shows_page_title(rf_GET, test_user):
         request = rf_GET("eznashdb:create_shul")
+        request.user = test_user
         response = CreateUpdateShulView.as_view()(request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "add a shul" in soup.get_text().lower()
 
-    def shows_form(rf_GET):
+    def shows_form(rf_GET, test_user):
         request = rf_GET("eznashdb:create_shul")
+        request.user = test_user
         response = CreateUpdateShulView.as_view()(request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert soup.find("form")
 
-    def creates_shul(client):
+    def creates_shul(client, test_user):
+        client.force_login(test_user)
         data = {
             "name": "test shul",
             "address": "123 Sesame Street",
@@ -78,11 +81,12 @@ def describe_create():
 
 
 def describe_update():
-    def initializes_with_shul_and_room_data(rf_GET, test_shul):
+    def initializes_with_shul_and_room_data(rf_GET, test_shul, test_user):
         room1 = test_shul.rooms.create(name="test room 1")
         room2 = test_shul.rooms.create(name="test room 2")
 
         request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
+        request.user = test_user
         response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
@@ -92,7 +96,8 @@ def describe_update():
         assert room1.name in input_values
         assert room2.name in input_values
 
-    def adds_rooms_to_shul(client, test_shul):
+    def adds_rooms_to_shul(client, test_shul, test_user):
+        client.force_login(test_user)
         data = {
             "name": test_shul.name,
             "address": test_shul.address,
@@ -112,7 +117,8 @@ def describe_update():
         test_shul.refresh_from_db()
         assert test_shul.rooms.count() == 2
 
-    def redirects_to_shuls_view(client, test_shul):
+    def redirects_to_shuls_view(client, test_shul, test_user):
+        client.force_login(test_user)
         response = client.post(
             reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
             data={
@@ -130,7 +136,8 @@ def describe_update():
         assert final_dest.resolver_match.view_name == "eznashdb:shuls"
 
 
-def test_shows_nearby_modal_when_check_nearby_shuls_true(client):
+def test_shows_nearby_modal_when_check_nearby_shuls_true(client, test_user):
+    client.force_login(test_user)
     # Create some nearby shuls
     nearby_shul_1 = Shul.objects.create(
         name="Nearby Shul 1",
@@ -173,7 +180,8 @@ def test_shows_nearby_modal_when_check_nearby_shuls_true(client):
     assert nearby_shul_2.name in str(soup)
 
 
-def test_skips_nearby_modal_when_check_nearby_shuls_false(client):
+def test_skips_nearby_modal_when_check_nearby_shuls_false(client, test_user):
+    client.force_login(test_user)
     # Create some nearby shuls
     nearby_shul_1 = Shul.objects.create(
         name="Nearby Shul 1",
@@ -213,8 +221,9 @@ def test_skips_nearby_modal_when_check_nearby_shuls_false(client):
 def describe_wizard():
     """Tests for the two-step wizard flow for creating shuls"""
 
-    def test_wizard_step1_transitions_to_step2(client):
+    def test_wizard_step1_transitions_to_step2(client, test_user):
         """Step 1 submission proceeds to step 2 without saving"""
+        client.force_login(test_user)
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -239,8 +248,9 @@ def describe_wizard():
         # Shul should NOT be saved yet
         assert Shul.objects.count() == 0
 
-    def test_wizard_step2_saves_shul_and_rooms(client):
+    def test_wizard_step2_saves_shul_and_rooms(client, test_user):
         """Step 2 submission saves shul and rooms in transaction"""
+        client.force_login(test_user)
         # Submit step 2 directly (no session needed - all data in POST)
         response = client.post(
             reverse("eznashdb:create_shul"),
@@ -271,8 +281,9 @@ def describe_wizard():
         assert redirect_url is not None
         assert "newShul" in redirect_url
 
-    def test_wizard_step2_requires_at_least_one_room(client):
+    def test_wizard_step2_requires_at_least_one_room(client, test_user):
         """Step 2 validation enforces minimum 1 room for new shuls"""
+        client.force_login(test_user)
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -299,8 +310,9 @@ def describe_wizard():
         # Shul should NOT be saved
         assert Shul.objects.count() == 0
 
-    def test_wizard_step2_shows_nearby_modal_when_check_nearby_shuls_true(client):
+    def test_wizard_step2_shows_nearby_modal_when_check_nearby_shuls_true(client, test_user):
         """Step 2 should show nearby shuls modal when check_nearby_shuls is true"""
+        client.force_login(test_user)
         # Create a nearby shul
         nearby_shul = Shul.objects.create(
             name="Nearby Shul",
@@ -334,8 +346,9 @@ def describe_wizard():
         # Shul should NOT be saved yet
         assert Shul.objects.filter(name="Test Shul").count() == 0
 
-    def test_wizard_step1_shows_error_message_on_validation_failure(client):
+    def test_wizard_step1_shows_error_message_on_validation_failure(client, test_user):
         """Step 1 validation shows error message when form is invalid"""
+        client.force_login(test_user)
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -352,8 +365,9 @@ def describe_wizard():
         assert "messages-container" in str(response.content)
         assert "Fix the form errors to continue" in str(response.content)
 
-    def test_wizard_step2_shows_error_message_on_validation_failure(client):
+    def test_wizard_step2_shows_error_message_on_validation_failure(client, test_user):
         """Step 2 validation shows error message when formset is invalid"""
+        client.force_login(test_user)
         response = client.post(
             reverse("eznashdb:create_shul"),
             data={
@@ -376,3 +390,10 @@ def describe_wizard():
         # Should include messages via middleware OOB swap
         assert "messages-container" in str(response.content)
         assert "Unable to save" in str(response.content)
+
+
+def test_requires_authentication(client):
+    """View requires login to access"""
+    response = client.get(reverse("eznashdb:create_shul"))
+    assert response.status_code == 302
+    assert "/accounts/login/" in response.url
