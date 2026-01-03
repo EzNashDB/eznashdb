@@ -47,7 +47,7 @@ class ShulsFilterView(FilterView):
 
 
 class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
-    login_required_message = "Please log in to add or edit shuls."
+    login_required_message = "Log in to add or edit shuls."
     model = Shul
     form_class = ShulForm
     template_name = "eznashdb/create_update_shul.html"
