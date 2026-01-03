@@ -11,18 +11,22 @@
     <div class="row h-100">
         <div class="col h-100 d-flex flex-column">
             <div class="row mb-1">
-                <div class="col-6">
-                    <h4>Browse Shuls</h4>
+                <!-- Filter toggle button (small screens only) -->
+                <div class="col-6 d-md-none">
+                    <button id="filter-toggle-btn" class="btn btn-outline-secondary w-100">
+                        Filters (<span id="filter-count">0</span>)
+                    </button>
                 </div>
-                <div class="col-6 d-flex flex-column align-items-end">
-                    <span class="text-nowrap">
-                        <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary">
-                            <i class="fa fa-plus"></i> Add a Shul
-                        </a>
-                    </span>
+                <!-- Add Shul button (always on the right) -->
+                <div class="col-6 col-md-auto ms-md-auto mt-auto mb-3">
+                    <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary w-100">
+                        <i class="fa fa-plus"></i> Add a Shul
+                    </a>
                 </div>
+                <!-- Filters (wraps to new line on small, inline on large) -->
+                <div class="col-12 col-md order-md-first collapse d-md-block"
+                     id="filter-container">{% include "eznashdb/includes/shul_filters.html" %}</div>
             </div>
-            <div class="row">{% include "eznashdb/includes/shul_filters.html" %}</div>
             <div class="row flex-grow-1">
                 <div class="col-12">
                     <div class="border rounded h-100 position-relative">
@@ -80,6 +84,105 @@
                     update: updateURLParams,
                     delete: deleteURLParams,
                     get: getURLParam,
+                };
+            })();
+
+            // ============================================================================
+            // FILTER TOGGLE MANAGEMENT
+            // ============================================================================
+
+            window.FILTER_TOGGLE_API = (() => {
+                const BREAKPOINT_MD = 768; // Bootstrap md breakpoint
+
+                const isSmallScreen = () => window.innerWidth < BREAKPOINT_MD;
+
+                const updateFilterCount = () => {
+                    const form = document.querySelector('#filter-container form');
+                    const countSpan = document.getElementById('filter-count');
+                    if (!form || !countSpan) return;
+
+                    let count = 0;
+                    const inputs = form.querySelectorAll('select, input[type="text"], input[type="number"]');
+                    inputs.forEach(input => {
+                        if (input.value && input.value.trim() !== '') {
+                            count++;
+                        }
+                    });
+
+                    countSpan.textContent = count;
+                };
+
+                const initFilterToggle = () => {
+                    const filterContainer = document.getElementById('filter-container');
+                    const toggleBtn = document.getElementById('filter-toggle-btn');
+
+                    if (!filterContainer || !toggleBtn) return;
+
+                    const bsCollapse = new bootstrap.Collapse(filterContainer, { toggle: false });
+
+                    // Handle button click
+                    toggleBtn.addEventListener('click', () => {
+                        if (!isSmallScreen()) return; // Safety check
+
+                        const isExpanded = filterContainer.classList.contains('show');
+
+                        if (isExpanded) {
+                            bsCollapse.hide();
+                            URL_PARAMS_API.delete(['filters']);
+                        } else {
+                            bsCollapse.show();
+                            URL_PARAMS_API.update({ filters: 'show' });
+                        }
+                    });
+
+                    // Handle resize - manage state transitions
+                    const handleResize = () => {
+                        if (isSmallScreen()) {
+                            // Small screen - respect collapse state (managed by Bootstrap)
+                            // Button is visible via CSS (d-md-none)
+                        } else {
+                            // Large screen - always show filters and clean up URL param
+                            if (!filterContainer.classList.contains('show')) {
+                                filterContainer.classList.add('show');
+                            }
+                            URL_PARAMS_API.delete(['filters']);
+                        }
+                    };
+
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(handleResize, 100);
+                    });
+
+                    // Initial state on page load
+                    if (isSmallScreen()) {
+                        const filterParam = URL_PARAMS_API.get('filters');
+                        if (filterParam === 'show') {
+                            bsCollapse.show();
+                        } else {
+                            // Default to hidden on small screen
+                            // Collapse already has 'collapse' class, so it's hidden by default
+                        }
+                    } else {
+                        // Large screen - always show (d-md-block handles this via CSS)
+                        filterContainer.classList.add('show');
+                    }
+
+                    // Update count on filter change
+                    const form = filterContainer.querySelector('form');
+                    if (form) {
+                        form.addEventListener('change', updateFilterCount);
+                        form.addEventListener('input', updateFilterCount);
+                    }
+
+                    // Initial count
+                    updateFilterCount();
+                };
+
+                return {
+                    init: initFilterToggle,
+                    updateCount: updateFilterCount,
                 };
             })();
 
@@ -401,9 +504,10 @@
                 };
             };
 
-            // Initialize map when DOM is ready
+            // Initialize map and filter toggle when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
+                FILTER_TOGGLE_API.init();
             });
         })();
     </script>
