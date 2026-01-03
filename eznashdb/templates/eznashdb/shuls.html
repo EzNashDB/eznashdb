@@ -13,8 +13,10 @@
             <div class="row mb-1">
                 <!-- Filter toggle button (small screens only) -->
                 <div class="col-6 d-md-none">
-                    <button id="filter-toggle-btn" class="btn btn-outline-secondary w-100">
-                        Filters (<span id="filter-count">0</span>)
+                    <button id="filter-toggle-btn"
+                            class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                        <span class="flex-grow-1">Filters (<span id="filter-count">0</span>)</span>
+                        <i class="fa fa-chevron-up" id="filter-chevron"></i>
                     </button>
                 </div>
                 <!-- Add Shul button (always on the right) -->
@@ -115,10 +117,26 @@
                 const initFilterToggle = () => {
                     const filterContainer = document.getElementById('filter-container');
                     const toggleBtn = document.getElementById('filter-toggle-btn');
+                    const chevronIcon = document.getElementById('filter-chevron');
 
                     if (!filterContainer || !toggleBtn) return;
 
                     const bsCollapse = new bootstrap.Collapse(filterContainer, { toggle: false });
+
+                    // Toggle chevron icon on collapse events
+                    filterContainer.addEventListener('show.bs.collapse', () => {
+                        if (chevronIcon) {
+                            chevronIcon.classList.remove('fa-chevron-down');
+                            chevronIcon.classList.add('fa-chevron-up');
+                        }
+                    });
+
+                    filterContainer.addEventListener('hide.bs.collapse', () => {
+                        if (chevronIcon) {
+                            chevronIcon.classList.remove('fa-chevron-up');
+                            chevronIcon.classList.add('fa-chevron-down');
+                        }
+                    });
 
                     // Handle button click
                     toggleBtn.addEventListener('click', () => {
@@ -128,10 +146,10 @@
 
                         if (isExpanded) {
                             bsCollapse.hide();
-                            URL_PARAMS_API.delete(['filters']);
+                            URL_PARAMS_API.update({ filters: 'hide' });
                         } else {
                             bsCollapse.show();
-                            URL_PARAMS_API.update({ filters: 'show' });
+                            URL_PARAMS_API.delete(['filters']);
                         }
                     });
 
@@ -158,11 +176,12 @@
                     // Initial state on page load
                     if (isSmallScreen()) {
                         const filterParam = URL_PARAMS_API.get('filters');
-                        if (filterParam === 'show') {
-                            bsCollapse.show();
-                        } else {
-                            // Default to hidden on small screen
+                        if (filterParam === 'hide') {
+                            // User explicitly hid filters - keep them hidden
                             // Collapse already has 'collapse' class, so it's hidden by default
+                        } else {
+                            // Default to shown on small screen
+                            bsCollapse.show();
                         }
                     } else {
                         // Large screen - always show (d-md-block handles this via CSS)
