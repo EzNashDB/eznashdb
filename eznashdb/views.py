@@ -296,7 +296,9 @@ class AddressLookupView(View):
         return results
 
 
-class GoogleMapsProxyView(View):
+class GoogleMapsProxyView(LoginRequiredMixin, View):
+    login_required_message = "Log in to open in Google Maps."
+
     def get(self, request, *args, **kwargs):
         shul_id = request.GET.get("id")
         if not shul_id:
