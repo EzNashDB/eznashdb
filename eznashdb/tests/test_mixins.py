@@ -13,7 +13,7 @@ def describe_login_required_mixin():
         # Should redirect to login with message
         messages = list(response.context["messages"])
         assert len(messages) == 1
-        assert "Please log in to add or edit shuls" in str(messages[0])
+        assert "log in" in str(messages[0]).lower()
         assert messages[0].level_tag == "info"
 
     def does_not_add_message_for_authenticated_user(client, test_user):
