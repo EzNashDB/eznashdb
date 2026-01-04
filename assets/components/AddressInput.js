@@ -5,22 +5,17 @@ import { AddressTypeAhead } from "./AddressTypeAhead";
 import { isRoundedEqual } from "../utils/math";
 
 export const AddressInput = ({
-  display_name,
-  lat,
-  lon,
-  place_id,
+  // Controlled props from parent (new controlled mode)
+  initialLocation,
+  currLocation,
+  setCurrLocation,
+  inputValue,
+  setInputValue,
   initialIsValid,
+  // Optional props
+  onExpand, // callback to open modal
+  isModal = false, // whether rendering in modal
 }) => {
-  const hasCoordsInProps = !!String(lat) && !!String(lon);
-  const [inputValue, setInputValue] = useState({ display_name });
-  const initialLocation = useRef({
-    display_name,
-    lat,
-    lon,
-    place_id,
-    zoom: hasCoordsInProps ? 16 : 1,
-  }).current;
-  const [currLocation, setCurrLocation] = useState(initialLocation);
   const isValid = initialIsValid;
   const isFirstRender = useRef(true);
 
@@ -94,21 +89,22 @@ export const AddressInput = ({
   };
 
   return (
-    <>
+    <div className={isModal ? "d-flex flex-column h-100" : ""}>
       <div className="text-muted small mb-2">
         Try: "Young Israel, Teaneck" or street address
       </div>
       <div
-        className={`h-100 d-inline-block w-100 position-relative ${
-          !isValid && "is-invalid"
+        className={`w-100 position-relative ${!isValid && "is-invalid"} ${
+          isModal ? "flex-grow-1" : "d-inline-block"
         }`}
-        style={{ minHeight: "250px" }}
+        style={{ minHeight: isModal ? "0" : "250px" }}
       >
         <AddressMap
           lat={currLocation.lat}
           lon={currLocation.lon}
           zoom={currLocation.zoom}
           onMoveEnd={handleMapMoveEnd}
+          isModal={isModal}
         />
         <div
           className="position-absolute w-100 p-2 pb-0"
@@ -117,13 +113,7 @@ export const AddressInput = ({
           }}
         >
           <div className="d-flex flex-row">
-            <AddressTypeAhead
-              inputValue={inputValue}
-              onInput={handleOnInput}
-              onAddressSelected={handleAddressSelected}
-              isValid={isValid}
-            />
-            <ButtonGroup className="ms-1 shadow-sm">
+            <ButtonGroup className="me-1 shadow-sm">
               <Button
                 variant="light"
                 disabled={currLocation == initialLocation}
@@ -132,6 +122,22 @@ export const AddressInput = ({
                 <i className="fa-solid fa-rotate-left"></i>
               </Button>
             </ButtonGroup>
+            <AddressTypeAhead
+              inputValue={inputValue}
+              onInput={handleOnInput}
+              onAddressSelected={handleAddressSelected}
+              isValid={isValid}
+            />
+            {!isModal && onExpand && (
+              <Button
+                variant="light"
+                className="ms-1 shadow-sm"
+                onClick={onExpand}
+                title="Expand map"
+              >
+                <i className="fa-solid fa-expand"></i>
+              </Button>
+            )}
           </div>
         </div>
         <input
@@ -153,9 +159,11 @@ export const AddressInput = ({
           value={`${currLocation?.place_id || ""}`}
         ></input>
       </div>
-      <span className="invalid-feedback">
-        <strong>Please select a valid address.</strong>
-      </span>
-    </>
+      {!isModal && (
+        <span className="invalid-feedback">
+          <strong>Please select a valid address.</strong>
+        </span>
+      )}
+    </div>
   );
 };
