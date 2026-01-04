@@ -13,11 +13,7 @@ import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 const InvalidateSizeOnMount = () => {
   const map = useMap();
   useEffect(() => {
-    // Delay to ensure modal animation completes
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 150);
-    return () => clearTimeout(timer);
+    map.invalidateSize();
   }, [map]);
   return null;
 };
