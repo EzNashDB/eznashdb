@@ -154,3 +154,15 @@ td.td-shrink {
 .ts-wrapper.plugin-clear_button.has-items .clear-button {
   opacity: 1;
 }
+
+/*
+ * Fix Bootstrap modal scrollbar compensation for fullscreen modals
+ * Bootstrap adds padding-left/right to modals for scrollbar compensation,
+ * but fullscreen modals shouldn't have this padding as they fill the viewport.
+ * This affects desktop browsers at small widths (which still have scrollbars).
+ * Mobile devices work correctly without this fix.
+ */
+.modal:has([class*="modal-fullscreen"]) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
