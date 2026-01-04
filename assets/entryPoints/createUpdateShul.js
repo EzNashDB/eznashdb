@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { AddressInput } from "../components/AddressInput";
+import { AddressInputWithModal } from "../components/AddressInputWithModal";
 
 const initAddressInput = () => {
   const addressInput = document.querySelector("input[name=address]");
@@ -25,7 +25,9 @@ const initAddressInput = () => {
     values["initialIsValid"] = !("address" in shulForm.errors);
     return values;
   };
-  createRoot(addressContainer).render(<AddressInput {...getProps()} />);
+  createRoot(addressContainer).render(
+    <AddressInputWithModal {...getProps()} />
+  );
 };
 document.addEventListener("DOMContentLoaded", initAddressInput);
 document.addEventListener("htmx:afterSettle", initAddressInput);

@@ -10,7 +10,19 @@ import { useMap } from "react-leaflet/hooks";
 import { GestureHandling } from "leaflet-gesture-handling";
 import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 
-export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
+const InvalidateSizeOnMount = () => {
+  const map = useMap();
+  useEffect(() => {
+    // Delay to ensure modal animation completes
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+};
+
+export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isModal = false }) => {
   const MapEvents = useCallback(() => {
     useMapEvents({
       dragend: onMoveEnd,
@@ -85,9 +97,10 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd }) => {
           scrollWheelZoom={true}
           dragging={true}
           worldCopyJump={true}
-          gestureHandling={true}
+          gestureHandling={!isModal}
           className="position-relative rounded h-100"
         >
+          {isModal && <InvalidateSizeOnMount />}
           <ChangeMapState center={[lat, lon]} zoom={zoom} dragging={true} />
           <MapEvents />
           <TileLayer
