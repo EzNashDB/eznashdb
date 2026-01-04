@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { AddressMap } from "./AddressMap";
 import { AddressTypeAhead } from "./AddressTypeAhead";
 import { isRoundedEqual } from "../utils/math";
@@ -113,15 +113,14 @@ export const AddressInput = ({
           }}
         >
           <div className="d-flex flex-row">
-            <ButtonGroup className="me-1 shadow-sm">
-              <Button
-                variant="light"
-                disabled={currLocation == initialLocation}
-                onClick={resetLocation}
-              >
-                <i className="fa-solid fa-rotate-left"></i>
-              </Button>
-            </ButtonGroup>
+            <Button
+              className="me-1 shadow-sm"
+              variant="light"
+              disabled={currLocation == initialLocation}
+              onClick={resetLocation}
+            >
+              <i className="fa-solid fa-rotate-left"></i>
+            </Button>
             <AddressTypeAhead
               inputValue={inputValue}
               onInput={handleOnInput}
