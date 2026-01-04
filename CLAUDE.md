@@ -1,12 +1,24 @@
 # Ezrat Nashim Database - Project Instructions
 
-**Note:** This is a **dynamic document** that describes the **current state** of the repository. As Claude Code, you should **proactively update this file** when you:
-- Discover new information about how the codebase works
-- Learn about architectural decisions made during our work
-- Reach important conclusions during discussions
-- Find other significant details about the project
+**Purpose**: Help future Claude sessions understand **why** things are the way they are, not just **what** the code does.
 
-Focus on documenting how things work **NOW**, not historical changes (that's what git history is for). Keep it concise and useful for understanding the codebase in future sessions.
+## When to Update This File
+
+**✅ DO document:**
+- Design philosophy that drives code decisions (e.g., "map-first homepage because tool is self-explanatory")
+- Non-obvious architectural choices (e.g., "coordinate-based duplicate prevention")
+- Product decisions that affect implementation (e.g., "Wikipedia model - anyone can edit")
+- Cross-cutting patterns not evident from one file (e.g., how React integrates with Django templates)
+
+**❌ DON'T document:**
+- Implementation details already clear from code/comments
+- Standard framework patterns (React state lifting, Django views, etc.)
+- Bug fixes or optimizations (those belong in git commit messages)
+- Library-specific quirks already commented in the code
+
+**Decision heuristic**: If you could figure it out by reading the code for 5 minutes, don't add it. If it explains **why we chose this approach**, add it.
+
+**When to check**: After completing significant work or reaching conclusions about design/architecture, actively ask yourself: "Did we discover or decide something that explains why the codebase is the way it is?" If yes, ask the user if it should be documented here.
 
 ---
 
