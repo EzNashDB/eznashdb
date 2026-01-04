@@ -53,18 +53,18 @@ export const AddressInputWithModal = ({
         />
       )}
 
-      {/* Modal version - only render when expanded */}
-      {isExpanded && (
-        <Modal
-          show={isExpanded}
-          onHide={() => setIsExpanded(false)}
-          size="lg"
-          fullscreen="md-down"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Select Location</Modal.Title>
-          </Modal.Header>
-          <Modal.Body style={{ height: "70vh", maxHeight: "800px" }}>
+      {/* Modal version - always render for animations */}
+      <Modal
+        show={isExpanded}
+        onHide={() => setIsExpanded(false)}
+        size="lg"
+        fullscreen="md-down"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Select Location</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ height: "70vh", maxHeight: "800px" }}>
+          {isExpanded && (
             <AddressInput
               initialLocation={initialLocation}
               currLocation={currLocation}
@@ -74,9 +74,9 @@ export const AddressInputWithModal = ({
               initialIsValid={initialIsValid}
               isModal={true}
             />
-          </Modal.Body>
-        </Modal>
-      )}
+          )}
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
