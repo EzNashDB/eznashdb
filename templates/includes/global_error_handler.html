@@ -47,7 +47,6 @@ Catches unhandled errors and promise rejections for debugging
         console.groupEnd();
 
         // Send to server (only in production)
-        console.log("DEBUG? ", config.debug)
         if (!config.debug) {
             console.log
             fetch('{% url 'report_error' %}', {
