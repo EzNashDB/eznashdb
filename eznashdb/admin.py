@@ -12,7 +12,15 @@ from eznashdb.models import Room, Shul
 
 # Custom admin for Shul — only affects list page
 class ShulAdmin(admin.ModelAdmin):
-    list_display = ("name", "short_address", "view_on_map", "room_count", "created_at", "updated_at")
+    list_display = (
+        "name",
+        "short_address",
+        "view_on_map",
+        "room_count",
+        "rooms_links",
+        "created_at",
+        "updated_at",
+    )
 
     def view_on_map(self, obj):
         """Generate a link to view the shul on the map"""
@@ -35,12 +43,26 @@ class ShulAdmin(admin.ModelAdmin):
     room_count.short_description = "Rooms"
     room_count.admin_order_field = "rooms__count"
 
+    def rooms_links(self, obj):
+        """Show links to related Room admin pages"""
+        rooms = obj.rooms.all()
+        if not rooms:
+            return "-"
+
+        links = []
+        for room in rooms:
+            url = reverse("admin:eznashdb_room_change", args=[room.pk])
+            links.append(f'<a href="{url}">{room.name}</a>')
+
+        return format_html("<br>".join(links))
+
+    rooms_links.short_description = "Room Links"
+
     def get_queryset(self, request):
-        """Optimize queryset with annotation for sorting"""
         from django.db.models import Count
 
         qs = super().get_queryset(request)
-        return qs.annotate(rooms__count=Count("rooms"))
+        return qs.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
 
     def short_address(self, obj):
         """Truncate long addresses but show full address on hover"""
