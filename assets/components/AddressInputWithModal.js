@@ -10,6 +10,8 @@ export const AddressInputWithModal = ({
   initialIsValid,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [placeholderHeight, setPlaceholderHeight] = useState(null);
+  const inlineRef = useRef(null);
 
   // Lift state to parent so it persists across remounts
   const hasCoordsInProps = !!String(lat) && !!String(lon);
@@ -24,33 +26,30 @@ export const AddressInputWithModal = ({
   const [currLocation, setCurrLocation] = useState(initialLocation);
   const [inputValue, setInputValue] = useState({ display_name });
 
+  const handleExpand = () => {
+    if (inlineRef.current) {
+      setPlaceholderHeight(inlineRef.current.offsetHeight);
+    }
+    setIsExpanded(true);
+  };
+
   return (
     <>
       {/* Inline version with placeholder to prevent page jump */}
       {isExpanded ? (
-        // Placeholder matching exact structure of inline version
-        <div>
-          <div className="text-muted small mb-2">
-            Try: "Young Israel, Teaneck" or street address
-          </div>
-          <div
-            className="w-100 position-relative d-inline-block"
-            style={{ minHeight: "250px" }}
-          ></div>
-          <span className="invalid-feedback">
-            <strong>Please select a valid address.</strong>
-          </span>
-        </div>
+        <div style={{ height: placeholderHeight }}></div>
       ) : (
-        <AddressInput
-          initialLocation={initialLocation}
-          currLocation={currLocation}
-          setCurrLocation={setCurrLocation}
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-          initialIsValid={initialIsValid}
-          onExpand={() => setIsExpanded(true)}
-        />
+        <div ref={inlineRef}>
+          <AddressInput
+            initialLocation={initialLocation}
+            currLocation={currLocation}
+            setCurrLocation={setCurrLocation}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            initialIsValid={initialIsValid}
+            onExpand={handleExpand}
+          />
+        </div>
       )}
 
       {/* Modal version - always render for animations */}

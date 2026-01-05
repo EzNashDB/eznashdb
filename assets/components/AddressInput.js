@@ -91,7 +91,7 @@ export const AddressInput = ({
   return (
     <div className={isModal ? "d-flex flex-column h-100" : ""}>
       <div className="text-muted small mb-2">
-        Try: "Young Israel, Teaneck" or street address
+        Can't find your shul? Search city or street, then drag map
       </div>
       <div
         className={`w-100 position-relative ${!isValid && "is-invalid"} ${
