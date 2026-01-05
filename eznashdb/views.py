@@ -129,7 +129,11 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
             return nearby_response
 
         with transaction.atomic():
-            self.object = form.save()
+            shul = form.save(commit=False)
+            if not self.is_update:
+                shul.created_by = self.request.user
+            shul.save()
+            self.object = shul
             self.room_fs_valid(room_fs)
 
         success_url = self.get_success_url()
