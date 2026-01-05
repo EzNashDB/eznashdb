@@ -318,8 +318,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 CRISPY_CLASS_CONVERTERS = {"textinput": "textinput rounded", "select": "select rounded"}
 
 # Sentry
-
-if SENTRY_DSN := os.environ.get("SENTRY_DSN") and DEBUG is False:
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+if SENTRY_DSN and (DEBUG is False):
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         traces_sample_rate=0,
