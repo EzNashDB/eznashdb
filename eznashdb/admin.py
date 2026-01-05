@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from tinymce.widgets import TinyMCE
 
-from eznashdb.models import Shul
+from eznashdb.models import Room, Shul
 
 
 # Custom admin for Shul — only affects list page
@@ -59,10 +59,27 @@ class ShulAdmin(admin.ModelAdmin):
 # Register Shul with custom admin
 admin.site.register(Shul, ShulAdmin)
 
+
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ("name", "shul_link", "created_at", "updated_at")
+    list_select_related = ("shul",)
+
+    def shul_link(self, obj):
+        """Link to the related Shul admin page"""
+        if not obj.shul_id:
+            return "-"
+        url = reverse("admin:eznashdb_shul_change", args=[obj.shul_id])
+        return format_html('<a href="{}">{}</a>', url, obj.shul.name)
+
+    shul_link.short_description = "Shul"
+    shul_link.admin_order_field = "shul__name"
+
+
 # Dynamically register all other models
 eznashdb_models = apps.get_app_config("eznashdb").models
 for _model_name, model in eznashdb_models.items():
-    if model is not Shul:  # skip Shul since we already registered it
+    if model not in [Shul, Room]:  # skip Shul since we already registered it
         admin.site.register(model)
 
 
