@@ -1,0 +1,118 @@
+{% comment %}
+Global JavaScript error handler
+Catches unhandled errors and promise rejections for debugging
+{% endcomment %}
+<script>
+(function() {
+    'use strict';
+
+    // Configuration
+    const config = {
+        debug: {% if debug %}true{% else %}false{% endif %},
+        user: {
+            isAuthenticated: {% if user.is_authenticated %}true{% else %}false{% endif %},
+            {% if user.is_authenticated %}
+            id: {{ user.id }},
+            username: "{{ user.username|escapejs }}",
+            {% endif %}
+        },
+        page: {
+            url: "{{ request.path|escapejs }}",
+            fullUrl: window.location.href,
+        }
+    };
+
+    // Report error: log to console and send to server
+    function reportError(error, context, level, label) {
+        const errorInfo = {
+            message: error.message || String(error),
+            stack: error.stack,
+            context: context,
+            user: config.user,
+            page: config.page,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+        };
+
+        // Log to console
+        console.group(`%c🚨 ${label}`, 'color: #dc3545; font-weight: bold; font-size: 14px;');
+        console.error('Message:', errorInfo.message);
+        if (errorInfo.stack) console.error('Stack:', errorInfo.stack);
+        console.log('Context:', errorInfo.context);
+        console.log('Page:', errorInfo.page);
+        if (errorInfo.user.isAuthenticated) {
+            console.log('User:', errorInfo.user.username, `(ID: ${errorInfo.user.id})`);
+        }
+        console.log('Timestamp:', errorInfo.timestamp);
+        console.groupEnd();
+
+        // Send to server (only in production)
+        console.log("DEBUG? ", config.debug)
+        if (!config.debug) {
+            console.log
+            fetch('{% url 'report_error' %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    message: errorInfo.message,
+                    stack: errorInfo.stack,
+                    context: errorInfo.context,
+                    level: level,
+                }),
+            }).catch(err => {
+                console.error('Failed to report error:', err);
+            });
+        }
+    }
+
+    // Handle uncaught errors
+    window.addEventListener('error', function(event) {
+        reportError(
+            event.error || {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+            },
+            {
+                type: 'uncaught_error',
+                filename: event.filename,
+                line: event.lineno,
+                column: event.colno,
+            },
+            'error',
+            'Uncaught Error'
+        );
+        if (config.debug) return false;
+    });
+
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        reportError(
+            event.reason instanceof Error ? event.reason : { message: String(event.reason) },
+            { type: 'unhandled_promise_rejection' },
+            'error',
+            'Unhandled Promise Rejection'
+        );
+        if (!config.debug) event.preventDefault();
+    });
+
+    // Expose for manual error reporting
+    window.logError = function(error, context = {}) {
+        reportError(
+            error instanceof Error ? error : { message: String(error) },
+            { ...context, type: 'manual' },
+            'info',
+            'Manual Error Report'
+        );
+    };
+
+    if (config.debug) {
+        console.log('%c✅ Global error handler initialized', 'color: #28a745; font-weight: bold;');
+        console.log('Use window.logError(error, context) to manually report errors');
+    }
+})();
+</script>
