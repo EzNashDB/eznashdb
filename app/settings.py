@@ -50,6 +50,7 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INTERNAL_IPS = [
+    "172.18.0.1",
     "127.0.0.1",
     "localhost",
     "0.0.0.0",
