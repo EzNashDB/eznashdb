@@ -101,6 +101,9 @@ export const AddressTypeAhead = ({
       renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
         <Hint>
           <InputGroup>
+            <InputGroup.Text>
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </InputGroup.Text>
             <Form.Control
               {...inputProps}
               ref={(node) => {
