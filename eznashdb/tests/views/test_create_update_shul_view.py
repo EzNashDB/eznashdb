@@ -81,6 +81,7 @@ def describe_create():
         assert Shul.objects.count() == 1
         shul = Shul.objects.first()
         assert shul.created_by == test_user
+        assert shul.updated_by == []
 
 
 def describe_update():
@@ -99,9 +100,10 @@ def describe_update():
         assert room1.name in input_values
         assert room2.name in input_values
 
-    def does_not_update_created_by(client, test_shul, test_user):
+    def updates_updated_by_but_not_created_by(client, test_shul, test_user):
         created_by = User.objects.create()
         test_shul.created_by = created_by
+        test_shul.updated_by = []
         test_shul.save()
 
         client.force_login(test_user)
@@ -122,6 +124,7 @@ def describe_update():
 
         test_shul.refresh_from_db()
         assert test_shul.created_by == created_by
+        assert test_shul.updated_by == [test_user.pk]
 
     def adds_rooms_to_shul(client, test_shul, test_user):
         client.force_login(test_user)
