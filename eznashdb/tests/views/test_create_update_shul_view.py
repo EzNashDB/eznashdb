@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from eznashdb.models import Shul
 from eznashdb.views import CreateUpdateShulView
+from users.models import User
 
 # Helpers
 
@@ -78,6 +79,8 @@ def describe_create():
             data=data,
         )
         assert Shul.objects.count() == 1
+        shul = Shul.objects.first()
+        assert shul.created_by == test_user
 
 
 def describe_update():
@@ -95,6 +98,30 @@ def describe_update():
         assert test_shul.name in input_values
         assert room1.name in input_values
         assert room2.name in input_values
+
+    def does_not_update_created_by(client, test_shul, test_user):
+        created_by = User.objects.create()
+        test_shul.created_by = created_by
+        test_shul.save()
+
+        client.force_login(test_user)
+        data = {
+            "name": test_shul.name,
+            "address": test_shul.address,
+            "latitude": test_shul.latitude,
+            "longitude": test_shul.longitude,
+            "check_nearby_shuls": "false",
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+        }
+
+        client.post(
+            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
+            data=data,
+        )
+
+        test_shul.refresh_from_db()
+        assert test_shul.created_by == created_by
 
     def adds_rooms_to_shul(client, test_shul, test_user):
         client.force_login(test_user)
