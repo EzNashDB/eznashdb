@@ -22,6 +22,7 @@ class ShulAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
+    @admin.display(description="Map")
     def view_on_map(self, obj):
         """Generate a link to view the shul on the map"""
         if obj.pk:
@@ -34,15 +35,12 @@ class ShulAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank">View on Map</a>', url)
         return "-"
 
-    view_on_map.short_description = "Map"
-
+    @admin.display(description="Rooms", ordering="rooms__count")
     def room_count(self, obj):
         """Display the number of rooms for this shul"""
         return obj.rooms.count()
 
-    room_count.short_description = "Rooms"
-    room_count.admin_order_field = "rooms__count"
-
+    @admin.display(description="Room Links")
     def rooms_links(self, obj):
         """Show links to related Room admin pages"""
         rooms = obj.rooms.all()
@@ -56,14 +54,13 @@ class ShulAdmin(admin.ModelAdmin):
 
         return format_html("<br>".join(links))
 
-    rooms_links.short_description = "Room Links"
-
     def get_queryset(self, request):
         from django.db.models import Count
 
         qs = super().get_queryset(request)
         return qs.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
 
+    @admin.display(description="Address", ordering="address")
     def short_address(self, obj):
         """Truncate long addresses but show full address on hover"""
         if obj.address:
@@ -73,9 +70,6 @@ class ShulAdmin(admin.ModelAdmin):
                 return format_html('<span title="{}">{}</span>', obj.address, truncated)
             return obj.address
         return "-"
-
-    short_address.short_description = "Address"
-    short_address.admin_order_field = "address"
 
 
 # Register Shul with custom admin
@@ -87,15 +81,13 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = ("name", "shul_link", "created_at", "updated_at")
     list_select_related = ("shul",)
 
+    @admin.display(description="Shul", ordering="shul__name")
     def shul_link(self, obj):
         """Link to the related Shul admin page"""
         if not obj.shul_id:
             return "-"
         url = reverse("admin:eznashdb_shul_change", args=[obj.shul_id])
         return format_html('<a href="{}">{}</a>', url, obj.shul.name)
-
-    shul_link.short_description = "Shul"
-    shul_link.admin_order_field = "shul__name"
 
 
 # Dynamically register all other models
