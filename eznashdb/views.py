@@ -132,6 +132,8 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
             shul = form.save(commit=False)
             if not self.is_update:
                 shul.created_by = self.request.user
+            if self.is_update:
+                shul.updated_by = list(set(shul.updated_by + [self.request.user.pk]))
             shul.save()
             self.object = shul
             self.room_fs_valid(room_fs)
