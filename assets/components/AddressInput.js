@@ -110,31 +110,39 @@ export const AddressInput = ({
           className="position-absolute w-100 p-2 pb-0"
           style={{
             zIndex: 1021, // Over leaflet attribution, sticky headers, etc.
+            pointerEvents: "none",
           }}
         >
-          <div className="d-flex flex-row">
-            <Button
-              className="me-1 shadow-sm"
-              variant="light"
-              disabled={currLocation == initialLocation}
-              onClick={resetLocation}
-            >
-              <i className="fa-solid fa-rotate-left"></i>
-            </Button>
+          <div style={{ pointerEvents: "auto" }}>
             <AddressTypeAhead
               inputValue={inputValue}
               onInput={handleOnInput}
               onAddressSelected={handleAddressSelected}
               isValid={isValid}
             />
+          </div>
+          <div className="d-flex justify-content-between mt-2">
+            <Button
+              className="shadow-sm"
+              variant="light"
+              size="sm"
+              disabled={currLocation == initialLocation}
+              onClick={resetLocation}
+              style={{ pointerEvents: "auto" }}
+            >
+              <i className="fa-solid fa-rotate-left me-1"></i>
+              Reset
+            </Button>
             {!isModal && onExpand && (
               <Button
                 variant="light"
-                className="ms-1 shadow-sm"
+                size="sm"
+                className="shadow-sm"
                 onClick={onExpand}
-                title="Expand map"
+                style={{ pointerEvents: "auto" }}
               >
-                <i className="fa-solid fa-expand"></i>
+                <i className="fa-solid fa-expand me-1"></i>
+                Expand
               </Button>
             )}
           </div>
