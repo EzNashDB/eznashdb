@@ -42,7 +42,7 @@ class ShulsFilterView(FilterView):
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx:
-            return ["eznashdb/shuls.html#shul_markers_js"]
+            return ["eznashdb/shuls.html#map_updates"]
         return super().get_template_names()
 
 
