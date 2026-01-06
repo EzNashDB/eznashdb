@@ -224,45 +224,44 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", initRoomFormset);
+    const openStep2 = () => {
+        // Clear dirtyFields when transitioning to step 2 so we only check
+        // for nearby shuls if the address is changed ON step 2
+        const formState = document.getElementById('shul-form-state');
+        if (formState) {
+            const alpineData = Alpine.$data(formState);
+            alpineData.dirtyFields.clear();
+        }
 
+        const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
+        const header = document.getElementById('rooms-form-header');
+
+        if (!roomCollapseEl || !header) return;
+
+        const scrollToHeader = () => {
+            // Add offset to account for sticky header height
+            scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start', offset: 40 })
+        };
+
+        if (!roomCollapseEl.classList.contains('show')) {
+            const roomCollapse = new bootstrap.Collapse(roomCollapseEl, {show: false});
+            roomCollapseEl.addEventListener('shown.bs.collapse', scrollToHeader, { once: true });
+            roomCollapse.show();
+        } else {
+            // Already open - wait for layout to stabilize before scrolling
+            requestAnimationFrame(() => {
+                requestAnimationFrame(scrollToHeader);
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", initRoomFormset);
     document.addEventListener("htmx:afterSettle", (e) => {
         showNearbyShuls();
         initRoomFormset();
-    });
-
-    // Handle step 2 scrolling behavior after HTMX loads content
-    document.addEventListener("htmx:load", () => {
         if (getWizardStep() === '2') {
-            // Clear dirtyFields when transitioning to step 2 so we only check
-            // for nearby shuls if the address is changed ON step 2
-            const formState = document.getElementById('shul-form-state');
-            if (formState) {
-                const alpineData = Alpine.$data(formState);
-                alpineData.dirtyFields.clear();
-            }
-
-            const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
-            const header = document.getElementById('rooms-form-header');
-
-            if (!roomCollapseEl || !header) return;
-
-            const scrollToHeader = () => {
-                // Add offset to account for sticky header height
-                scrollIntoViewWithinContainer(header, { behavior: 'smooth', block: 'start', offset: 40 })
-            };
-
-            if (!roomCollapseEl.classList.contains('show')) {
-                const roomCollapse = new bootstrap.Collapse(roomCollapseEl, {show: false});
-                roomCollapseEl.addEventListener('shown.bs.collapse', scrollToHeader, { once: true });
-                roomCollapse.show();
-            } else {
-                // Already open - wait for layout to stabilize before scrolling
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(scrollToHeader);
-                });
-            }
+            openStep2();
         }
-    })
+    });
     </script>
 {% endblock extra_media_bottom %}
