@@ -159,35 +159,6 @@
         window.htmxSubmitting = false;
     });
 
-    // Handle HTMX content swaps
-    document.addEventListener("htmx:afterSettle", (e) => {
-        // Show nearby shuls modal if present
-        const modalEl = document.getElementById('nearby-shuls-modal');
-        if (modalEl) {
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-
-            // Handle "Add New Anyway" button - hide modal before HTMX swap
-            // Using htmx:confirm (not just for user confirmations - it's for any async request gating)
-            const addNewButton = modalEl.querySelector('[hx-post]');
-            if (addNewButton) {
-                addNewButton.addEventListener('htmx:confirm', (confirmEvent) => {
-                    confirmEvent.preventDefault();
-                    // Wait for modal to fully hide before allowing HTMX request
-                    modal.hide();
-                    modalEl.addEventListener('hidden.bs.modal', () => {
-                        confirmEvent.detail.issueRequest(true);
-                    }, { once: true });
-                });
-            }
-        }
-
-        // Reinitialize formset if we swapped the shul form
-        if (e.detail.target?.id === 'shul_form') {
-            initRoomFormset();
-        }
-    });
-
     const getWizardStep = () => {
         const wizardStepInput = document.querySelector('input[name="wizard_step"]');
         return wizardStepInput ? wizardStepInput.value : null;
@@ -229,10 +200,36 @@
                 new bootstrap.Collapse(collapseEl, {show: true});
             },
         });
-    };
+    }
 
-    // Initialize formset on initial page load
+    const showNearbyShuls = () => {
+        const modalEl = document.getElementById('nearby-shuls-modal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+
+            // Handle "Add New Anyway" button - hide modal before HTMX swap
+            // Using htmx:confirm (not just for user confirmations - it's for any async request gating)
+            const addNewButton = modalEl.querySelector('[hx-post]');
+            if (addNewButton) {
+                addNewButton.addEventListener('htmx:confirm', (confirmEvent) => {
+                    confirmEvent.preventDefault();
+                    // Wait for modal to fully hide before allowing HTMX request
+                    modal.hide();
+                    modalEl.addEventListener('hidden.bs.modal', () => {
+                        confirmEvent.detail.issueRequest(true);
+                    }, { once: true });
+                });
+            }
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", initRoomFormset);
+
+    document.addEventListener("htmx:afterSettle", (e) => {
+        showNearbyShuls();
+        initRoomFormset();
+    });
 
     // Handle step 2 scrolling behavior after HTMX loads content
     document.addEventListener("htmx:load", () => {
