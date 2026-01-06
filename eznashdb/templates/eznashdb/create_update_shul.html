@@ -184,7 +184,7 @@
 
         // Reinitialize formset if we swapped the shul form
         if (e.detail.target?.id === 'shul_form') {
-            window.initRoomFormset();
+            initRoomFormset();
         }
     });
 
@@ -193,8 +193,7 @@
         return wizardStepInput ? wizardStepInput.value : null;
     };
 
-    // Global formset initialization function
-    window.initRoomFormset = function() {
+    const initRoomFormset = function() {
         const formsetContainer = document.querySelector('.room-formset');
 
         // Only initialize if we have a formset and it hasn't been initialized yet
@@ -233,7 +232,7 @@
     };
 
     // Initialize formset on initial page load
-    document.addEventListener("DOMContentLoaded", window.initRoomFormset);
+    document.addEventListener("DOMContentLoaded", initRoomFormset);
 
     // Handle step 2 scrolling behavior after HTMX loads content
     document.addEventListener("htmx:load", () => {
