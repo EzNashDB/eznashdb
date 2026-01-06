@@ -137,6 +137,21 @@
                         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
                     }
                 </script>
+                <script>
+                    // Initialize room formset on initial page load
+                    // (HTMX swaps are handled by htmx:afterSettle listener in extra_media_bottom)
+                    (function() {
+                        if (document.readyState === 'loading') {
+                            // Still loading - wait for DOMContentLoaded
+                            document.addEventListener('DOMContentLoaded', function() {
+                                if (window.initRoomFormset) window.initRoomFormset();
+                            });
+                        } else {
+                            // DOM already loaded - initialize immediately
+                            if (window.initRoomFormset) window.initRoomFormset();
+                        }
+                    })();
+                </script>
                 <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
                 {% if nearby_shuls %}
                     {% include "eznashdb/includes/nearby_shuls_modal.html" %}
@@ -187,17 +202,19 @@
         return wizardStepInput ? wizardStepInput.value : null;
     };
 
-    const initRoomFormSet = () => {
-        const isStep2 = getWizardStep() === '2';
-        const isUpdateMode = {% if object %}true{% else %}false{% endif %};
+    // Global formset initialization function
+    window.initRoomFormset = function() {
+        const formsetContainer = document.querySelector('.room-formset');
 
-        if (!isStep2 && !isUpdateMode) return;
+        // Only initialize if we have a formset and it hasn't been initialized yet
+        if (!formsetContainer || formsetContainer.classList.contains('formset-initialized')) {
+            return;
+        }
 
-        // Clean up any existing formset buttons before initializing
-        // This handles the case where initRoomFormSet is called multiple times
-        $('.add-room-container').empty();
-        $('.delete-room-container .delete-room').remove();
+        // Mark as initialized to prevent double init
+        formsetContainer.classList.add('formset-initialized');
 
+        // Initialize the formset
         $('.room-form').formset({
             modelName: "room",
             formCssClass: 'room-form',
@@ -222,12 +239,18 @@
                 new bootstrap.Collapse(collapseEl, {show: true});
             },
         });
-    }
+    };
 
-    document.addEventListener("DOMContentLoaded", initRoomFormSet);
+    // Initialize formset after HTMX swaps
+    document.addEventListener("htmx:afterSettle", (e) => {
+        // Only init if we're swapping the shul form
+        if (e.detail.target?.id === 'shul_form') {
+            window.initRoomFormset();
+        }
+    });
 
+    // Handle step 2 scrolling behavior after HTMX loads content
     document.addEventListener("htmx:load", () => {
-        initRoomFormSet();
         if (getWizardStep() === '2') {
             // Clear dirtyFields when transitioning to step 2 so we only check
             // for nearby shuls if the address is changed ON step 2
