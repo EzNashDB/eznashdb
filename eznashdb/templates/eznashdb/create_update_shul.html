@@ -137,21 +137,6 @@
                         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
                     }
                 </script>
-                <script>
-                    // Initialize room formset on initial page load
-                    // (HTMX swaps are handled by htmx:afterSettle listener in extra_media_bottom)
-                    (function() {
-                        if (document.readyState === 'loading') {
-                            // Still loading - wait for DOMContentLoaded
-                            document.addEventListener('DOMContentLoaded', function() {
-                                if (window.initRoomFormset) window.initRoomFormset();
-                            });
-                        } else {
-                            // DOM already loaded - initialize immediately
-                            if (window.initRoomFormset) window.initRoomFormset();
-                        }
-                    })();
-                </script>
                 <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
                 {% if nearby_shuls %}
                     {% include "eznashdb/includes/nearby_shuls_modal.html" %}
@@ -240,6 +225,9 @@
             },
         });
     };
+
+    // Initialize formset on initial page load
+    document.addEventListener("DOMContentLoaded", window.initRoomFormset);
 
     // Initialize formset after HTMX swaps
     document.addEventListener("htmx:afterSettle", (e) => {
