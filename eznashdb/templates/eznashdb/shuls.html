@@ -42,7 +42,21 @@
                                 </span>
                             </div>
                         </span>
-                        <div id="shuls-map" class="h-100"></div>
+                        <div id="shuls-map" class="h-100">
+                            <div class="w-100 p-2 position-absolute top-0 start-50"
+                                 style="transform: translateX(-50%);
+                                        z-index: 1000;
+                                        pointer-events: none">
+                                <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1"
+                                     style="pointer-events: auto">
+                                    <div class="badge text-bg-warning text-wrap">
+                                        <i class="fa-solid fa-lock"></i>
+                                        Exact locations hidden for security reasons
+                                    </div>
+                                    <div class="badge text-bg-dark">{% include "eznashdb/includes/shuls_count.html" %}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -530,44 +544,11 @@
             });
         })();
     </script>
-    {% partialdef shul_markers_js inline=True %}
+    {% partialdef map_updates inline=True %}
+    <div class="d-none">{% include "eznashdb/includes/shuls_count.html" %}</div>
     <script id="shul-markers-js" hx-swap-oob="true" defer>
         (() => {
             document.dispatchEvent(new Event("shulsDataLoaded"));
-
-            // ============================================================================
-            // UPDATE SHULS COUNT BADGE
-            // ============================================================================
-
-            const updateShulsFoundCount = () => {
-                if (window.SHUL_MAP_API.shulsFoundControl) {
-                    window.SHUL_MAP_API.shulsFoundControl.remove();
-                }
-
-                const map = window.SHUL_MAP_API.map;
-                const shulsFoundControl = L.control({ position: "topright" });
-
-                shulsFoundControl.onAdd = function () {
-                    const container = L.DomUtil.create("div", "shuls-found-control");
-                    const shulCount = {{ object_list.count }};
-                    const shulCountMsg = `${shulCount} ${shulCount === 1 ? "shul" : "shuls"} found`;
-                    container.innerHTML = `
-                        <div class="fs-5 opacity-75">
-                            <div class="badge text-bg-dark text-end">
-                                <div class="d-flex flex-column gap-1">
-                                    <div class="fw-normal">Exact locations not shown</div>
-                                    <div>${shulCountMsg}</div>
-                                </div>
-                            </div>
-                        </div>`;
-                    L.DomEvent.disableClickPropagation(container);
-                    L.DomEvent.disableScrollPropagation(container);
-                    return container;
-                };
-
-                shulsFoundControl.addTo(map);
-                window.SHUL_MAP_API.shulsFoundControl = shulsFoundControl;
-            };
 
             // ============================================================================
             // ADD SHUL MARKERS TO MAP
@@ -610,7 +591,6 @@
             const replaceMapShuls = () => {
                 const mapApi = window.SHUL_MAP_API;
                 mapApi.clearMarkers();
-                updateShulsFoundCount();
                 addShulMarkers();
                 mapApi.openSelectedMarker();
             };
@@ -621,7 +601,6 @@
 
             window.SHUL_MAP_API = {
                 ...window.SHUL_MAP_API,
-                updateShulsFoundCount,
                 addShulMarkers,
                 replaceMapShuls,
             };
@@ -635,6 +614,6 @@
             }
         })();
     </script>
-{% endpartialdef shul_markers_js %}
+{% endpartialdef map_updates %}
 <script defer src="{% static 'eznashdb/js/map_spinner.js' %}"></script>
 {% endblock extra_media_bottom %}
