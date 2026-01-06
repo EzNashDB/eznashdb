@@ -159,8 +159,9 @@
         window.htmxSubmitting = false;
     });
 
-    // Show nearby shuls modal after settling (animations complete)
-    document.addEventListener("htmx:afterSettle", (e) =>{
+    // Handle HTMX content swaps
+    document.addEventListener("htmx:afterSettle", (e) => {
+        // Show nearby shuls modal if present
         const modalEl = document.getElementById('nearby-shuls-modal');
         if (modalEl) {
             const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -179,6 +180,11 @@
                     }, { once: true });
                 });
             }
+        }
+
+        // Reinitialize formset if we swapped the shul form
+        if (e.detail.target?.id === 'shul_form') {
+            window.initRoomFormset();
         }
     });
 
@@ -228,14 +234,6 @@
 
     // Initialize formset on initial page load
     document.addEventListener("DOMContentLoaded", window.initRoomFormset);
-
-    // Initialize formset after HTMX swaps
-    document.addEventListener("htmx:afterSettle", (e) => {
-        // Only init if we're swapping the shul form
-        if (e.detail.target?.id === 'shul_form') {
-            window.initRoomFormset();
-        }
-    });
 
     // Handle step 2 scrolling behavior after HTMX loads content
     document.addEventListener("htmx:load", () => {
