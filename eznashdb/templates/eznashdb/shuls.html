@@ -355,7 +355,6 @@
                     zoomToBoundsOnClick: false,
                     spiderfyDistanceMultiplier: 0,
                     disableClusteringAtZoom: null,
-                    {% comment %} maxClusterRadius: 80, {% endcomment %}
                 });
 
                 markersLayer.on('spiderfied', (e) => {
@@ -407,37 +406,9 @@
                 markersLayer.on('click', (e) => {
                     const marker = e.layer;
 
-                    // Handle exact pin clicks
-                    if (marker.options.isExactPin && marker._exactPopupHtml) {
-                        if (isSmallScreen()) {
-                            // Small screen - use offcanvas
-                            const offcanvasEl = document.getElementById("shulOffcanvas");
-                            offcanvasEl.querySelector(".offcanvas-body").innerHTML = marker._exactPopupHtml;
-
-                            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
-                            offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                                URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
-                            }, { once: true });
-                            bsOffcanvas.show();
-
-                            const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
-                            if (closeBtn) {
-                                closeBtn.addEventListener("click", (ev) => {
-                                    ev.preventDefault();
-                                    bsOffcanvas.hide();
-                                });
-                            }
-                        } else {
-                            // Large screen - open popup
-                            if (!marker.getPopup()) {
-                                marker.bindPopup(marker._exactPopupHtml, {
-                                    className: "shul-cluster-popup",
-                                    closeButton: false,
-                                    offset: [0, -7],
-                                });
-                            }
-                            marker.openPopup();
-                        }
+                    // Exact pin clicks are handled by individual marker click handler
+                    // Skip them here to avoid double-firing
+                    if (marker.options.isExactPin) {
                         return;
                     }
 
@@ -514,20 +485,21 @@
                         // Store popup HTML for later use
                         marker._exactPopupHtml = popupHtml;
 
-                        // Bind popup for large screens
-                        if (!isSmallScreen()) {
-                            marker.bindPopup(popupHtml, {
-                                className: "shul-cluster-popup",
-                                closeButton: false,
-                                offset: [0, -7],
-                            });
-                        }
-
-                        // Add click handler
+                        // Add click handler that dynamically handles screen size
                         marker.on('click', (e) => {
                             if (isSmallScreen()) {
+                                // Prevent popup from opening
+                                L.DomEvent.stop(e);
+
                                 // Small screen - use offcanvas
                                 const offcanvasEl = document.getElementById("shulOffcanvas");
+
+                                // Dispose any existing offcanvas instance
+                                const existingOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                                if (existingOffcanvas) {
+                                    existingOffcanvas.dispose();
+                                }
+
                                 offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
 
                                 const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
@@ -544,12 +516,17 @@
                                     });
                                 }
                             } else {
-                                // Large screen - open popup
-                                e.target.openPopup();
+                                // Large screen - bind popup and open
+                                marker.bindPopup(popupHtml, {
+                                    className: "shul-cluster-popup",
+                                    closeButton: false,
+                                    offset: [0, -7],
+                                });
+                                marker.openPopup();
                             }
                         });
 
-                        // Setup close button for popup (large screen)
+                        // Setup close button and unbind on close
                         marker.on('popupopen', () => {
                             setTimeout(() => {
                                 const popupEl = marker.getPopup().getElement();
@@ -563,6 +540,11 @@
                                     });
                                 }
                             }, 0);
+                        });
+
+                        // Unbind popup when it closes
+                        marker.on('popupclose', () => {
+                            marker.unbindPopup();
                         });
                     }
 
@@ -781,9 +763,9 @@
                     mapApi.openExactPin();
 
                     // Delete URL params immediately so pin disappears on refresh
-                    {% comment %} setTimeout(() => {
+                    setTimeout(() => {
                         URL_PARAMS_API.delete(["justSaved"]);
-}, 100); {% endcomment %}
+                    }, 100);
                 } else {
                     mapApi.openSelectedMarker();
                 }
