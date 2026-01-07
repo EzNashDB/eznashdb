@@ -69,7 +69,7 @@ class ShulsFilterView(FilterView):
         Returns dict with grid_key and offset values, or None if no offset needed.
         """
 
-        # Minimum separation distance (tuned for zoom level 14)
+        # Minimum separation distance
         # If cluster is closer than this, push it out to this distance
         MIN_SEPARATION = 0.005
 
