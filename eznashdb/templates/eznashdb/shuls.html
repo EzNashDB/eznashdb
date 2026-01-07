@@ -237,19 +237,19 @@
                 return window.innerWidth < 768 || window.innerHeight < 600;
             };
 
-            const getGridKey = (lat, lon) => {
+            const getClusterKey = (lat, lon) => {
                 return `${lat}_${lon}`;
             };
 
             // ============================================================================
             // POPUP SETUP HELPER
             // ============================================================================
-            let lastOpenedClusterGridKey = null;
+            let lastOpenedClusterKey = null;
 
-            function setupClusterPopup(targetElement, gridKey, popupContent) {
+            function setupClusterPopup(targetElement, clusterKey, popupContent) {
 
                 if (isSmallScreen()) {
-                    URL_PARAMS_API.update({ selectedCluster: gridKey });
+                    URL_PARAMS_API.update({ selectedCluster: clusterKey });
                     // Small screen - use offcanvas
                     const offcanvasEl = document.getElementById("shulOffcanvas");
                     offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupContent;
@@ -268,7 +268,7 @@
                         });
                     }
                 } else {
-                    lastOpenedClusterGridKey = gridKey;
+                    lastOpenedClusterKey = clusterKey;
                     // Large screen - use popup
                     targetElement.bindPopup(popupContent, {
                         className: "shul-cluster-popup",
@@ -331,8 +331,8 @@
                 map.on("moveend", () => updateURLLocationParams(map));
                 map.on("zoomend", () => updateURLLocationParams(map));
                 map.on("popupopen", (e) => {
-                    if (lastOpenedClusterGridKey) {
-                        URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterGridKey });
+                    if (lastOpenedClusterKey) {
+                        URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterKey });
                     }
                 });
                 map.on("popupclose", (e) => {
@@ -392,15 +392,15 @@
                     }
 
                     // Security cluster - show combined popup
-                    const gridKey = getGridKey(firstPos.lat, firstPos.lng);
-                    const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[gridKey];
+                    const clusterKey = getClusterKey(firstPos.lat, firstPos.lng);
+                    const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[clusterKey];
 
                     if (!popupContent) {
-                        console.error('No cluster popup found for grid key:', gridKey);
+                        console.error('No cluster popup found for cluster key:', clusterKey);
                         return;
                     }
 
-                    setupClusterPopup(cluster.layer, gridKey, popupContent);
+                    setupClusterPopup(cluster.layer, clusterKey, popupContent);
                 });
 
                 // Handle single marker clicks
@@ -417,15 +417,15 @@
                     const shulId = marker.options.shulId;
                     if (!shulId) return;
 
-                    const gridKey = window.SHUL_MAP_API.shulToGridKey[shulId];
-                    const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[gridKey];
+                    const clusterKey = window.SHUL_MAP_API.shulToClusterKey[shulId];
+                    const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[clusterKey];
 
                     if (!popupContent) {
-                        console.error('No popup found for grid key:', gridKey);
+                        console.error('No popup found for cluster key:', clusterKey);
                         return;
                     }
 
-                    setupClusterPopup(marker, gridKey, popupContent);
+                    setupClusterPopup(marker, clusterKey, popupContent);
                 });
 
                 // ============================================================================
@@ -582,8 +582,8 @@
                     const selectedCluster = urlParams.get("selectedCluster");
 
                     if (selectedShulId) {
-                        const gridKey = api.shulToGridKey[selectedShulId];
-                        if (!gridKey) return;
+                        const clusterKey = api.shulToClusterKey[selectedShulId];
+                        if (!clusterKey) return;
 
                         const target = api.markersByPopupId[String(selectedShulId)];
                         if (!target) return;
@@ -606,8 +606,8 @@
                         }
                     } else if (selectedCluster) {
                         // Open cluster without expanding any accordion
-                        const shulIdInCluster = Object.keys(api.shulToGridKey).find(
-                            id => api.shulToGridKey[id] === selectedCluster
+                        const shulIdInCluster = Object.keys(api.shulToClusterKey).find(
+                            id => api.shulToClusterKey[id] === selectedCluster
                         );
 
                         if (shulIdInCluster) {
@@ -692,12 +692,12 @@
 
             const addShulMarkers = () => {
                 const mapApi = window.SHUL_MAP_API;
-                const shulToGridKey = {};
+                const shulToClusterKey = {};
 
                 // Store cluster offset info
                 {% if cluster_offset %}
                     const clusterOffset = {
-                        gridKey: "{{ cluster_offset.grid_key }}",
+                        clusterKey: "{{ cluster_offset.cluster_key }}",
                         offsetLon: {{ cluster_offset.offset_lon }}
                     };
                 {% else %}
@@ -705,9 +705,9 @@
                 {% endif %}
 
                 // Add individual shul markers
-                {% for shul in object_list %}
-                    const gridKey_{{ shul.id }} = "{{ shul.display_lat }}_{{ shul.display_lon }}";
-                    shulToGridKey["{{ shul.id }}"] = gridKey_{{ shul.id }};
+                {% for shul in clustered_shuls_list %}
+                    const clusterKey_{{ shul.id }} = "{{ shul.display_lat }}_{{ shul.display_lon }}";
+                    shulToClusterKey["{{ shul.id }}"] = clusterKey_{{ shul.id }};
 
                     (() => {
                         const id = {{ shul.id }};
@@ -715,7 +715,7 @@
                         let lon = parseFloat({{ shul.display_lon }});
 
                         // Apply cluster offset if applicable (horizontal only)
-                        if (clusterOffset && gridKey_{{ shul.id }} === clusterOffset.gridKey) {
+                        if (clusterOffset && clusterKey_{{ shul.id }} === clusterOffset.clusterKey) {
                             lon += clusterOffset.offsetLon;
                         }
 
@@ -728,12 +728,12 @@
 
                 // Build cluster popups for ALL shuls (including singles)
                 const clusterPopupHtmlMap = {};
-                {% for grid_key, shuls in cluster_groups.items %}
-                    clusterPopupHtmlMap["{{ grid_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
+                {% for cluster_key, shuls in shul_clusters.items %}
+                    clusterPopupHtmlMap["{{ cluster_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
                 {% endfor %}
 
                 mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
-                mapApi.shulToGridKey = shulToGridKey;
+                mapApi.shulToClusterKey = shulToClusterKey;
 
                 // Add exact pin popup HTML if present
                 {% if exact_pin_shul %}
