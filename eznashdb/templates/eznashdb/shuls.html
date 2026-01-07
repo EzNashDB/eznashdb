@@ -367,6 +367,13 @@
 
                 // Create exact pin layer (separate from clusters)
                 const exactPinLayer = L.layerGroup().addTo(map);
+                map.on('zoomend', function() {
+                    if (map.getZoom() < 14){
+                        map.removeLayer(exactPinLayer);
+                    } else {
+                        map.addLayer(exactPinLayer);
+                    }
+                });
                 let exactPinMarker = null;
 
                 // ============================================================================
