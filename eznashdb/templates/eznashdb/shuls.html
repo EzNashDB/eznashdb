@@ -724,6 +724,11 @@
                 if (mapApi.exactPinPopupHtml && mapApi.exactPinLat && mapApi.exactPinLon) {
                     mapApi.addExactPin(mapApi.exactPinLat, mapApi.exactPinLon, mapApi.exactPinPopupHtml);
                     mapApi.openExactPin();
+
+                    // Delete URL params immediately so pin disappears on refresh
+                    setTimeout(() => {
+                        URL_PARAMS_API.delete(["justSaved"]);
+                    }, 100);
                 } else {
                     mapApi.openSelectedMarker();
                 }
