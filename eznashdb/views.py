@@ -68,23 +68,15 @@ class ShulsFilterView(FilterView):
         Calculate offset for cluster that would have contained the exact_pin_shul.
         Returns dict with grid_key and offset values, or None if no offset needed.
         """
-
-        # Minimum separation distance
-        # If cluster is closer than this, push it out to this distance
-        MIN_SEPARATION = 0.005
-
-        # Find the grid_key where exact_pin_shul would have appeared
-        target_grid_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
-
-        # Check if that cluster exists in our filtered results
-        if target_grid_key not in grid_groups:
-            # No cluster at that location (shul was the only one there)
+        MIN_SEPARATION_FROM_EXACT_PIN = 0.005
+        cluster_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
+        if cluster_key not in grid_groups:
             return None
 
         # Get cluster's position (use first shul's display coords as cluster centroid)
-        cluster_shuls = grid_groups[target_grid_key]
-        cluster_lat = cluster_shuls[0].display_lat
-        cluster_lon = cluster_shuls[0].display_lon
+        cluster_shul = grid_groups[cluster_key][0]
+        cluster_lat = cluster_shul.display_lat
+        cluster_lon = cluster_shul.display_lon
 
         # Calculate distance between exact pin and cluster
         exact_lat = float(exact_pin_shul.latitude)
@@ -94,24 +86,16 @@ class ShulsFilterView(FilterView):
         delta_lon = cluster_lon - exact_lon
         distance = math.sqrt(delta_lat**2 + delta_lon**2)
 
-        # If far enough apart, no offset needed
-        if distance >= MIN_SEPARATION:
+        if distance >= MIN_SEPARATION_FROM_EXACT_PIN:
             return None
 
-        # Calculate offset to push cluster to MIN_SEPARATION distance
-        # Push east or west (not north/south) to avoid marker icon overlap
-        if delta_lon >= 0:
-            # Cluster is east of (or at same longitude as) exact pin - push further east
-            offset_lat = 0
-            offset_lon = MIN_SEPARATION - distance
-        else:
-            # Cluster is west of exact pin - push further west
-            offset_lat = 0
-            offset_lon = -(MIN_SEPARATION - distance)
+        # Calculate offset to push cluster east/west to MIN_SEPARATION distance
+        offset_lon = MIN_SEPARATION_FROM_EXACT_PIN - distance
+        if delta_lon < 0:
+            offset_lon = -offset_lon
 
         return {
-            "grid_key": target_grid_key,
-            "offset_lat": offset_lat,
+            "grid_key": cluster_key,
             "offset_lon": offset_lon,
         }
 
