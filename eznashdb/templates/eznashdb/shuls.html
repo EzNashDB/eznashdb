@@ -486,18 +486,19 @@
                         // Store popup HTML for later use
                         marker._exactPopupHtml = popupHtml;
 
-                        // Always bind popup for large screens
-                        marker.bindPopup(popupHtml, {
-                            className: "shul-cluster-popup",
-                            closeButton: false,
-                            offset: [0, -7],
-                        });
+                        // Only bind popup for large screens
+                        if (!isSmallScreen()) {
+                            marker.bindPopup(popupHtml, {
+                                className: "shul-cluster-popup",
+                                closeButton: false,
+                                offset: [0, -7],
+                            });
+                        }
 
                         // Add click handler that checks screen size dynamically
                         marker.on('click', (e) => {
                             if (isSmallScreen()) {
-                                // Small screen - prevent default popup, use offcanvas
-                                e.target.closePopup();
+                                // Small screen - use offcanvas
                                 const offcanvasEl = document.getElementById("shulOffcanvas");
                                 offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
 
@@ -514,8 +515,10 @@
                                         bsOffcanvas.hide();
                                     });
                                 }
+                            } else {
+                                // Large screen - open popup
+                                e.target.openPopup();
                             }
-                            // Large screen - let Leaflet's popup open naturally (already bound)
                         });
 
                         // Setup close button for popup (large screen)
