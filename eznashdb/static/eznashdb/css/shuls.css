@@ -20,6 +20,7 @@
 .leaflet-popup-content {
     font-size: 1rem;
     margin: 0;
+    margin-top: 40px;
 }
 
 .leaflet-popup-content-wrapper {
