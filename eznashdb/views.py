@@ -1,4 +1,3 @@
-import contextlib
 import math
 import time
 import urllib
@@ -33,48 +32,41 @@ class ShulsFilterView(FilterView):
         context = super().get_context_data(**kwargs)
 
         # Get exact pin shul if justSaved param exists
-        exact_pin_shul = None
-        new_shul_id = self.request.GET.get("justSaved")
-        if new_shul_id:
-            with contextlib.suppress(Shul.DoesNotExist):
-                exact_pin_shul = Shul.objects.get(pk=new_shul_id)
+        saved_shul_id = self.request.GET.get("justSaved")
+        exact_pin_shul = Shul.objects.filter(pk=saved_shul_id).first()
+        clustered_shuls = self.object_list.exclude(pk=saved_shul_id)
 
-        # Filter exact_pin_shul out of object_list to prevent double-display
-        object_list = context["object_list"]
-        if exact_pin_shul:
-            object_list = object_list.exclude(pk=exact_pin_shul.pk)
-            context["object_list"] = object_list
+        # Group shuls by their display coordinates (excluding exact pin to prevent double-display)
+        clusters_dict = defaultdict(list)
+        for shul in clustered_shuls:
+            cluster_key = f"{shul.display_lat}_{shul.display_lon}"
+            clusters_dict[cluster_key].append(shul)
 
-        # Group shuls by their display coordinates
-        grid_groups = defaultdict(list)
-        for shul in object_list:
-            grid_key = f"{shul.display_lat}_{shul.display_lon}"
-            grid_groups[grid_key].append(shul)
-
-        context["cluster_groups"] = dict(grid_groups)
+        context["clustered_shuls_list"] = clustered_shuls
+        context["shul_clusters"] = dict(clusters_dict)
 
         # Calculate cluster offset if needed
         cluster_offset = None
         if exact_pin_shul:
-            cluster_offset = self._calculate_cluster_offset(exact_pin_shul, grid_groups)
+            cluster_offset = self._calculate_cluster_offset(exact_pin_shul, clusters_dict)
 
         context["cluster_offset"] = cluster_offset
         context["exact_pin_shul"] = exact_pin_shul
 
         return context
 
-    def _calculate_cluster_offset(self, exact_pin_shul, grid_groups):
+    def _calculate_cluster_offset(self, exact_pin_shul, clusters_dict):
         """
         Calculate offset for cluster that would have contained the exact_pin_shul.
-        Returns dict with grid_key and offset values, or None if no offset needed.
+        Returns dict with cluster_key and offset values, or None if no offset needed.
         """
         MIN_SEPARATION_FROM_EXACT_PIN = 0.005
         cluster_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
-        if cluster_key not in grid_groups:
+        if cluster_key not in clusters_dict:
             return None
 
         # Get cluster's position (use first shul's display coords as cluster centroid)
-        cluster_shul = grid_groups[cluster_key][0]
+        cluster_shul = clusters_dict[cluster_key][0]
         cluster_lat = cluster_shul.display_lat
         cluster_lon = cluster_shul.display_lon
 
@@ -95,7 +87,7 @@ class ShulsFilterView(FilterView):
             offset_lon = -offset_lon
 
         return {
-            "grid_key": cluster_key,
+            "cluster_key": cluster_key,
             "offset_lon": offset_lon,
         }
 

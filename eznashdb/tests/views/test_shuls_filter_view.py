@@ -104,8 +104,8 @@ def describe_filter():
 
 
 def describe_exact_pin_behavior():
-    def test_exact_pin_shul_excluded_from_object_list(rf_GET):
-        """When justSaved param is present, that shul should be excluded from object_list"""
+    def test_exact_pin_shul_excluded_from_clusters(rf_GET):
+        """When justSaved param is present, that shul should be excluded from shul_clusters"""
         shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
         request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(shul.id)})
 
@@ -114,8 +114,9 @@ def describe_exact_pin_behavior():
 
         # Shul should be in exact_pin_shul
         assert context["exact_pin_shul"] == shul
-        # But not in object_list
-        assert shul not in context["object_list"]
+        # But not in any cluster (shul_clusters values are lists of shuls per cluster)
+        all_clustered_shuls = [s for cluster in context["shul_clusters"].values() for s in cluster]
+        assert shul not in all_clustered_shuls
 
     def test_exact_pin_shul_in_context(rf_GET):
         """exact_pin_shul should be in context when justSaved param exists"""
@@ -173,7 +174,7 @@ def describe_exact_pin_behavior():
         assert context["cluster_offset"] is None
 
     def test_cluster_offset_has_correct_structure(rf_GET):
-        """When offset is calculated, it should have grid_key and offset values"""
+        """When offset is calculated, it should have cluster_key and offset values"""
         # Create exact pin shul
         exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.71285, longitude=-74.00605)
 
@@ -188,9 +189,9 @@ def describe_exact_pin_behavior():
         offset = context["cluster_offset"]
         if offset is not None:
             # Should have the expected keys
-            assert "grid_key" in offset
+            assert "cluster_key" in offset
             assert "offset_lon" in offset
-            # Grid key should be a string
-            assert isinstance(offset["grid_key"], str)
+            # Cluster key should be a string
+            assert isinstance(offset["cluster_key"], str)
             # Offset should be numeric
             assert isinstance(offset["offset_lon"], (int, float))
