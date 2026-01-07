@@ -47,13 +47,14 @@
                                  style="transform: translateX(-50%);
                                         z-index: 1000;
                                         pointer-events: none">
-                                <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1"
-                                     style="pointer-events: auto">
-                                    <div class="badge text-bg-warning text-wrap">
+                                <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
+                                    <div class="badge text-bg-warning text-wrap" style="pointer-events: auto">
                                         <i class="fa-solid fa-lock"></i>
                                         Map pins are approximate. Exact locations hidden for security reasons.
                                     </div>
-                                    <div class="badge text-bg-dark">{% include "eznashdb/includes/shuls_count.html" %}</div>
+                                    <div class="badge text-bg-dark" style="pointer-events: auto">
+                                        {% include "eznashdb/includes/shuls_count.html" %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
