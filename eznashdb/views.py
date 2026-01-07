@@ -169,9 +169,7 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
 
     def handle_update_submit(self, form):
         """Handle update submission"""
-        return self.save_shul_with_rooms(
-            form, success_message="Success! Your shul has been updated.", url_param_name="justSaved"
-        )
+        return self.save_shul_with_rooms(form)
 
     def handle_step1_submit(self, form):
         """Handle step 1 submission - validate and check nearby shuls"""
@@ -185,14 +183,9 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
 
     def handle_step2_submit(self, form):
         """Handle step 2 submission"""
-        return self.save_shul_with_rooms(
-            form,
-            wizard_step="2",
-            success_message="Success! Your shul has been added to the map.",
-            url_param_name="justSaved",
-        )
+        return self.save_shul_with_rooms(form, wizard_step="2")
 
-    def save_shul_with_rooms(self, form, wizard_step=None, success_message=None, url_param_name=None):
+    def save_shul_with_rooms(self, form, wizard_step=None):
         """Validate rooms, check nearby shuls, and save atomically"""
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
@@ -214,8 +207,9 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
             self.room_fs_valid(room_fs)
 
         success_url = self.get_success_url()
+        success_message = "Success! Your shul has been saved."
         messages.success(self.request, success_message)
-        success_url += f"&{url_param_name}={self.object.pk}"
+        success_url += f"&justSaved={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 
     def check_and_show_nearby_shuls(self, form, wizard_step=None):
