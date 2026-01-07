@@ -310,7 +310,7 @@
                     scrollWheelZoom: true,
                     worldCopyJump: true,
                     minZoom: 1,
-                    maxZoom: 14,
+                    maxZoom: 15,
                     zoomControl: false,
                 });
 
@@ -354,7 +354,8 @@
                     spiderfyOnMaxZoom: false,
                     zoomToBoundsOnClick: false,
                     spiderfyDistanceMultiplier: 0,
-                    disableClusteringAtZoom: null
+                    disableClusteringAtZoom: null,
+                    {% comment %} maxClusterRadius: 80, {% endcomment %}
                 });
 
                 markersLayer.on('spiderfied', (e) => {
@@ -365,16 +366,51 @@
 
                 map.addLayer(markersLayer);
 
-                // Create exact pin layer (separate from clusters)
+                // Create exact pin layer (separate from clusters when zoomed in)
                 const exactPinLayer = L.layerGroup().addTo(map);
-                map.on('zoomend', function() {
-                    if (map.getZoom() < 14){
-                        map.removeLayer(exactPinLayer);
-                    } else {
-                        map.addLayer(exactPinLayer);
-                    }
-                });
                 let exactPinMarker = null;
+                let exactPinInClusterLayer = false;
+                const ZOOM_THRESHOLD_FOR_CLUSTERING = 15; // Below this zoom, exact pin joins cluster
+
+                // Function to move exact pin between layers based on zoom
+                const updateExactPinLayer = () => {
+                    if (!exactPinMarker) return;
+
+                    const currentZoom = map.getZoom();
+                    const shouldBeInCluster = currentZoom < ZOOM_THRESHOLD_FOR_CLUSTERING;
+
+                    if (shouldBeInCluster && !exactPinInClusterLayer) {
+                        // Move from exactPinLayer to markersLayer
+                        exactPinLayer.clearLayers();
+                        markersLayer.addLayer(exactPinMarker);
+                        // Also add world wrap variants
+                        const lat = exactPinMarker.getLatLng().lat;
+                        const lon = exactPinMarker.getLatLng().lng;
+                        const icon = exactPinMarker.options.icon;
+                        markersLayer.addLayer(L.marker([lat, lon - 360], { icon: icon, isExactPin: true }));
+                        markersLayer.addLayer(L.marker([lat, lon + 360], { icon: icon, isExactPin: true }));
+                        exactPinInClusterLayer = true;
+                    } else if (!shouldBeInCluster && exactPinInClusterLayer) {
+                        // Move from markersLayer back to exactPinLayer
+                        markersLayer.removeLayer(exactPinMarker);
+                        // Remove world wrap variants
+                        markersLayer.eachLayer((layer) => {
+                            if (layer !== exactPinMarker && layer.options.isExactPin) {
+                                markersLayer.removeLayer(layer);
+                            }
+                        });
+                        const lat = exactPinMarker.getLatLng().lat;
+                        const lon = exactPinMarker.getLatLng().lng;
+                        const icon = exactPinMarker.options.icon;
+                        exactPinLayer.addLayer(exactPinMarker);
+                        exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: icon, isExactPin: true }));
+                        exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: icon, isExactPin: true }));
+                        exactPinInClusterLayer = false;
+                    }
+                };
+
+                // Handle zoom events to move exact pin between layers
+                map.on('zoomend', updateExactPinLayer);
 
                 // ============================================================================
                 // CLUSTER AND MARKER CLICK HANDLERS
@@ -413,8 +449,43 @@
                 // Handle single marker clicks
                 markersLayer.on('click', (e) => {
                     const marker = e.layer;
-                    const shulId = marker.options.shulId;
 
+                    // Handle exact pin clicks
+                    if (marker.options.isExactPin && marker._exactPopupHtml) {
+                        if (isSmallScreen()) {
+                            // Small screen - use offcanvas
+                            const offcanvasEl = document.getElementById("shulOffcanvas");
+                            offcanvasEl.querySelector(".offcanvas-body").innerHTML = marker._exactPopupHtml;
+
+                            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                            offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
+                                URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
+                            }, { once: true });
+                            bsOffcanvas.show();
+
+                            const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
+                            if (closeBtn) {
+                                closeBtn.addEventListener("click", (ev) => {
+                                    ev.preventDefault();
+                                    bsOffcanvas.hide();
+                                });
+                            }
+                        } else {
+                            // Large screen - open popup
+                            if (!marker.getPopup()) {
+                                marker.bindPopup(marker._exactPopupHtml, {
+                                    className: "shul-cluster-popup",
+                                    closeButton: false,
+                                    offset: [0, -7],
+                                });
+                            }
+                            marker.openPopup();
+                        }
+                        return;
+                    }
+
+                    // Handle regular shul marker clicks
+                    const shulId = marker.options.shulId;
                     if (!shulId) return;
 
                     const gridKey = window.SHUL_MAP_API.shulToGridKey[shulId];
@@ -473,20 +544,21 @@
                         shadowSize: [41, 41]
                     });
 
-                    const marker = L.marker([lat, lon], { icon: defaultIcon });
+                    const marker = L.marker([lat, lon], { icon: defaultIcon, isExactPin: true });
 
-                    // Add world wrap variants
+                    // Add to exactPinLayer (separate layer) to show as distinct marker
                     exactPinLayer.addLayer(marker);
-                    exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon }));
-                    exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon }));
+                    exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, isExactPin: true }));
+                    exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, isExactPin: true }));
 
                     exactPinMarker = marker;
+                    exactPinInClusterLayer = false;
 
                     if (popupHtml) {
                         // Store popup HTML for later use
                         marker._exactPopupHtml = popupHtml;
 
-                        // Only bind popup for large screens
+                        // Bind popup for large screens
                         if (!isSmallScreen()) {
                             marker.bindPopup(popupHtml, {
                                 className: "shul-cluster-popup",
@@ -495,7 +567,7 @@
                             });
                         }
 
-                        // Add click handler that checks screen size dynamically
+                        // Add click handler
                         marker.on('click', (e) => {
                             if (isSmallScreen()) {
                                 // Small screen - use offcanvas
@@ -538,12 +610,18 @@
                         });
                     }
 
+                    // Check zoom level and move to appropriate layer
+                    updateExactPinLayer();
+
                     return marker;
                 };
 
                 const clearExactPin = () => {
-                    exactPinLayer.clearLayers();
-                    exactPinMarker = null;
+                    if (exactPinMarker) {
+                        exactPinLayer.clearLayers();
+                        exactPinMarker = null;
+                        exactPinInClusterLayer = false;
+                    }
                 };
 
                 const openExactPin = () => {
@@ -643,7 +721,6 @@
                     ...(window.SHUL_MAP_API || {}),
                     map,
                     markersLayer,
-                    exactPinLayer,
                     markersByPopupId,
                     addMarker,
                     clearMarkers,
@@ -746,9 +823,9 @@
                     mapApi.openExactPin();
 
                     // Delete URL params immediately so pin disappears on refresh
-                    setTimeout(() => {
+                    {% comment %} setTimeout(() => {
                         URL_PARAMS_API.delete(["justSaved"]);
-                    }, 100);
+}, 100); {% endcomment %}
                 } else {
                     mapApi.openSelectedMarker();
                 }
