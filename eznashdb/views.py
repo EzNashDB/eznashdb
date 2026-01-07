@@ -38,6 +38,17 @@ class ShulsFilterView(FilterView):
 
         context["cluster_groups"] = dict(grid_groups)
 
+        # Add selected shul for exact pin display
+        new_shul_id = self.request.GET.get("newShul") or self.request.GET.get("updatedShul")
+        if new_shul_id:
+            try:
+                context["exact_pin_shul"] = Shul.objects.get(pk=new_shul_id)
+                context["exact_pin_badge"] = (
+                    "Just Added" if self.request.GET.get("newShul") else "Just Updated"
+                )
+            except Shul.DoesNotExist:
+                pass
+
         return context
 
     def get_template_names(self) -> list[str]:
@@ -55,8 +66,8 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self) -> str:
         url = reverse_lazy("eznashdb:shuls")
-        lat = self.object.display_lat
-        lon = self.object.display_lon
+        lat = self.object.latitude
+        lon = self.object.longitude
         url += f"?lat={lat}&lon={lon}&selectedShul={self.object.pk}"
         if lat and lon:
             url += "&zoom=17"
