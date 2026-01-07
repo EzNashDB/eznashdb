@@ -1,3 +1,4 @@
+import contextlib
 import time
 import urllib
 from collections import defaultdict
@@ -41,14 +42,8 @@ class ShulsFilterView(FilterView):
         # Add selected shul for exact pin display
         new_shul_id = self.request.GET.get("newShul") or self.request.GET.get("updatedShul")
         if new_shul_id:
-            try:
+            with contextlib.suppress(Shul.DoesNotExist):
                 context["exact_pin_shul"] = Shul.objects.get(pk=new_shul_id)
-                context["exact_pin_badge"] = (
-                    "Just Added" if self.request.GET.get("newShul") else "Just Updated"
-                )
-            except Shul.DoesNotExist:
-                pass
-
         return context
 
     def get_template_names(self) -> list[str]:
