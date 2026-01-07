@@ -309,7 +309,7 @@ def describe_wizard():
         # Should redirect to map
         redirect_url = response.headers.get("HX-Redirect")
         assert redirect_url is not None
-        assert "newShul" in redirect_url
+        assert "justSaved" in redirect_url
 
     def test_wizard_step2_requires_at_least_one_room(client, test_user):
         """Step 2 validation enforces minimum 1 room for new shuls"""

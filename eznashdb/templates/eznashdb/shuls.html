@@ -335,7 +335,7 @@
                     }
                 });
                 map.on("popupclose", (e) => {
-                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "newShul", "updatedShul"]);
+                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
 
                     const source = e.popup && e.popup._source;
 
@@ -504,7 +504,7 @@
 
                                 const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
                                 offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "newShul", "updatedShul"]);
+                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
                                 }, { once: true });
                                 bsOffcanvas.show();
 

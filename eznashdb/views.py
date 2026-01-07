@@ -40,7 +40,7 @@ class ShulsFilterView(FilterView):
         context["cluster_groups"] = dict(grid_groups)
 
         # Add selected shul for exact pin display
-        new_shul_id = self.request.GET.get("newShul") or self.request.GET.get("updatedShul")
+        new_shul_id = self.request.GET.get("justSaved")
         if new_shul_id:
             with contextlib.suppress(Shul.DoesNotExist):
                 context["exact_pin_shul"] = Shul.objects.get(pk=new_shul_id)
@@ -101,7 +101,7 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
     def handle_update_submit(self, form):
         """Handle update submission"""
         return self.save_shul_with_rooms(
-            form, success_message="Success! Your shul has been updated.", url_param_name="updatedShul"
+            form, success_message="Success! Your shul has been updated.", url_param_name="justSaved"
         )
 
     def handle_step1_submit(self, form):
@@ -120,7 +120,7 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
             form,
             wizard_step="2",
             success_message="Success! Your shul has been added to the map.",
-            url_param_name="newShul",
+            url_param_name="justSaved",
         )
 
     def save_shul_with_rooms(self, form, wizard_step=None, success_message=None, url_param_name=None):
