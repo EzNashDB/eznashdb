@@ -698,7 +698,6 @@
                 {% if cluster_offset %}
                     const clusterOffset = {
                         gridKey: "{{ cluster_offset.grid_key }}",
-                        offsetLat: {{ cluster_offset.offset_lat }},
                         offsetLon: {{ cluster_offset.offset_lon }}
                     };
                 {% else %}
@@ -715,9 +714,8 @@
                         let lat = parseFloat({{ shul.display_lat }});
                         let lon = parseFloat({{ shul.display_lon }});
 
-                        // Apply cluster offset if applicable
+                        // Apply cluster offset if applicable (horizontal only)
                         if (clusterOffset && gridKey_{{ shul.id }} === clusterOffset.gridKey) {
-                            lat += clusterOffset.offsetLat;
                             lon += clusterOffset.offsetLon;
                         }
 

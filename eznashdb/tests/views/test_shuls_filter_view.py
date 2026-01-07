@@ -189,10 +189,8 @@ def describe_exact_pin_behavior():
         if offset is not None:
             # Should have the expected keys
             assert "grid_key" in offset
-            assert "offset_lat" in offset
             assert "offset_lon" in offset
             # Grid key should be a string
             assert isinstance(offset["grid_key"], str)
-            # Offsets should be numeric
-            assert isinstance(offset["offset_lat"], (int, float))
+            # Offset should be numeric
             assert isinstance(offset["offset_lon"], (int, float))
