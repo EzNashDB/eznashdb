@@ -334,10 +334,15 @@
                     }
                 });
                 map.on("popupclose", (e) => {
-                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul"])
+                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "newShul", "updatedShul"]);
 
                     const source = e.popup && e.popup._source;
-                    if (source && typeof source.unbindPopup === "function") {
+
+                    // Don't clear exact pin, just clear URL params
+                    // Pin stays visible and clickable
+
+                    // Only unbind popup for cluster markers, not exact pin
+                    if (source && typeof source.unbindPopup === "function" && source !== exactPinMarker) {
                         source.unbindPopup();
                     }
                 });
@@ -358,6 +363,10 @@
                 });
 
                 map.addLayer(markersLayer);
+
+                // Create exact pin layer (separate from clusters)
+                const exactPinLayer = L.layerGroup().addTo(map);
+                let exactPinMarker = null;
 
                 // ============================================================================
                 // CLUSTER AND MARKER CLICK HANDLERS
@@ -437,6 +446,101 @@
                 const clearMarkers = () => {
                     markersLayer.clearLayers();
                     for (const k in markersByPopupId) delete markersByPopupId[k];
+                };
+
+                // ============================================================================
+                // EXACT PIN HANDLING
+                // ============================================================================
+
+                const addExactPin = (lat, lon, popupHtml) => {
+                    clearExactPin();
+
+                    // Create marker with explicit icon path
+                    const defaultIcon = L.icon({
+                        iconUrl: '{% static "eznashdb/images/marker-icon.png" %}',
+                        {% comment %} iconRetinaUrl: '{% static "eznashdb/images/marker-icon-2x.png" %}', {% endcomment %}
+                        shadowUrl: '{% static "eznashdb/images/marker-shadow.png" %}',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -27],
+                        shadowSize: [41, 41]
+                    });
+
+                    const marker = L.marker([lat, lon], { icon: defaultIcon });
+
+                    // Add world wrap variants
+                    exactPinLayer.addLayer(marker);
+                    exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon }));
+                    exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon }));
+
+                    exactPinMarker = marker;
+
+                    if (popupHtml) {
+                        // Store popup HTML for later use
+                        marker._exactPopupHtml = popupHtml;
+
+                        // Always bind popup for large screens
+                        marker.bindPopup(popupHtml, {
+                            className: "shul-cluster-popup",
+                            closeButton: false,
+                            offset: [0, -7],
+                        });
+
+                        // Add click handler that checks screen size dynamically
+                        marker.on('click', (e) => {
+                            if (isSmallScreen()) {
+                                // Small screen - prevent default popup, use offcanvas
+                                e.target.closePopup();
+                                const offcanvasEl = document.getElementById("shulOffcanvas");
+                                offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
+
+                                const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+                                offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
+                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "newShul", "updatedShul"]);
+                                }, { once: true });
+                                bsOffcanvas.show();
+
+                                const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
+                                if (closeBtn) {
+                                    closeBtn.addEventListener("click", (ev) => {
+                                        ev.preventDefault();
+                                        bsOffcanvas.hide();
+                                    });
+                                }
+                            }
+                            // Large screen - let Leaflet's popup open naturally (already bound)
+                        });
+
+                        // Setup close button for popup (large screen)
+                        marker.on('popupopen', () => {
+                            setTimeout(() => {
+                                const popupEl = marker.getPopup().getElement();
+                                if (!popupEl) return;
+
+                                const closeBtn = popupEl.querySelector(".shul-popup-close");
+                                if (closeBtn) {
+                                    closeBtn.addEventListener("click", (ev) => {
+                                        ev.preventDefault();
+                                        marker.closePopup();
+                                    });
+                                }
+                            }, 0);
+                        });
+                    }
+
+                    return marker;
+                };
+
+                const clearExactPin = () => {
+                    exactPinLayer.clearLayers();
+                    exactPinMarker = null;
+                };
+
+                const openExactPin = () => {
+                    if (!exactPinMarker) return;
+
+                    // Click the marker - this will trigger the dynamic screen size check
+                    exactPinMarker.fire('click');
                 };
 
                 // ============================================================================
@@ -529,9 +633,13 @@
                     ...(window.SHUL_MAP_API || {}),
                     map,
                     markersLayer,
+                    exactPinLayer,
                     markersByPopupId,
                     addMarker,
                     clearMarkers,
+                    addExactPin,
+                    clearExactPin,
+                    openExactPin,
                     openSelectedMarker,
                     initShulAccordion,
                 };
@@ -582,6 +690,16 @@
 
                 mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
                 mapApi.shulToGridKey = shulToGridKey;
+
+                // Add exact pin popup HTML if present
+                {% if exact_pin_shul %}
+                    mapApi.exactPinPopupHtml = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul badge_text=exact_pin_badge %}`;
+                    mapApi.exactPinShulId = {{ exact_pin_shul.id }};
+                    mapApi.exactPinLat = {{ exact_pin_shul.latitude }};
+                    mapApi.exactPinLon = {{ exact_pin_shul.longitude }};
+                {% else %}
+                    mapApi.exactPinPopupHtml = null;
+                {% endif %}
             };
 
             // ============================================================================
@@ -591,8 +709,16 @@
             const replaceMapShuls = () => {
                 const mapApi = window.SHUL_MAP_API;
                 mapApi.clearMarkers();
+                mapApi.clearExactPin();
                 addShulMarkers();
-                mapApi.openSelectedMarker();
+
+                // Add and open exact pin if present
+                if (mapApi.exactPinPopupHtml && mapApi.exactPinLat && mapApi.exactPinLon) {
+                    mapApi.addExactPin(mapApi.exactPinLat, mapApi.exactPinLon, mapApi.exactPinPopupHtml);
+                    mapApi.openExactPin();
+                } else {
+                    mapApi.openSelectedMarker();
+                }
             };
 
             // ============================================================================
