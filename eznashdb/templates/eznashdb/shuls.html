@@ -366,51 +366,8 @@
 
                 map.addLayer(markersLayer);
 
-                // Create exact pin layer (separate from clusters when zoomed in)
-                const exactPinLayer = L.layerGroup().addTo(map);
+                // Track exact pin marker (always in markersLayer for natural clustering)
                 let exactPinMarker = null;
-                let exactPinInClusterLayer = false;
-                const ZOOM_THRESHOLD_FOR_CLUSTERING = 15; // Below this zoom, exact pin joins cluster
-
-                // Function to move exact pin between layers based on zoom
-                const updateExactPinLayer = () => {
-                    if (!exactPinMarker) return;
-
-                    const currentZoom = map.getZoom();
-                    const shouldBeInCluster = currentZoom < ZOOM_THRESHOLD_FOR_CLUSTERING;
-
-                    if (shouldBeInCluster && !exactPinInClusterLayer) {
-                        // Move from exactPinLayer to markersLayer
-                        exactPinLayer.clearLayers();
-                        markersLayer.addLayer(exactPinMarker);
-                        // Also add world wrap variants
-                        const lat = exactPinMarker.getLatLng().lat;
-                        const lon = exactPinMarker.getLatLng().lng;
-                        const icon = exactPinMarker.options.icon;
-                        markersLayer.addLayer(L.marker([lat, lon - 360], { icon: icon, isExactPin: true }));
-                        markersLayer.addLayer(L.marker([lat, lon + 360], { icon: icon, isExactPin: true }));
-                        exactPinInClusterLayer = true;
-                    } else if (!shouldBeInCluster && exactPinInClusterLayer) {
-                        // Move from markersLayer back to exactPinLayer
-                        markersLayer.removeLayer(exactPinMarker);
-                        // Remove world wrap variants
-                        markersLayer.eachLayer((layer) => {
-                            if (layer !== exactPinMarker && layer.options.isExactPin) {
-                                markersLayer.removeLayer(layer);
-                            }
-                        });
-                        const lat = exactPinMarker.getLatLng().lat;
-                        const lon = exactPinMarker.getLatLng().lng;
-                        const icon = exactPinMarker.options.icon;
-                        exactPinLayer.addLayer(exactPinMarker);
-                        exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: icon, isExactPin: true }));
-                        exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: icon, isExactPin: true }));
-                        exactPinInClusterLayer = false;
-                    }
-                };
-
-                // Handle zoom events to move exact pin between layers
-                map.on('zoomend', updateExactPinLayer);
 
                 // ============================================================================
                 // CLUSTER AND MARKER CLICK HANDLERS
@@ -546,13 +503,12 @@
 
                     const marker = L.marker([lat, lon], { icon: defaultIcon, isExactPin: true });
 
-                    // Add to exactPinLayer (separate layer) to show as distinct marker
-                    exactPinLayer.addLayer(marker);
-                    exactPinLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, isExactPin: true }));
-                    exactPinLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, isExactPin: true }));
+                    // Add to markersLayer so it clusters naturally with nearby markers
+                    markersLayer.addLayer(marker);
+                    markersLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, isExactPin: true }));
+                    markersLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, isExactPin: true }));
 
                     exactPinMarker = marker;
-                    exactPinInClusterLayer = false;
 
                     if (popupHtml) {
                         // Store popup HTML for later use
@@ -610,17 +566,19 @@
                         });
                     }
 
-                    // Check zoom level and move to appropriate layer
-                    updateExactPinLayer();
-
                     return marker;
                 };
 
                 const clearExactPin = () => {
                     if (exactPinMarker) {
-                        exactPinLayer.clearLayers();
+                        markersLayer.removeLayer(exactPinMarker);
+                        // Also remove world wrap variants
+                        markersLayer.eachLayer((layer) => {
+                            if (layer !== exactPinMarker && layer.options.isExactPin) {
+                                markersLayer.removeLayer(layer);
+                            }
+                        });
                         exactPinMarker = null;
-                        exactPinInClusterLayer = false;
                     }
                 };
 
