@@ -694,7 +694,7 @@
 
                 // Add exact pin popup HTML if present
                 {% if exact_pin_shul %}
-                    mapApi.exactPinPopupHtml = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul badge_text=exact_pin_badge %}`;
+                    mapApi.exactPinPopupHtml = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul %}`;
                     mapApi.exactPinShulId = {{ exact_pin_shul.id }};
                     mapApi.exactPinLat = {{ exact_pin_shul.latitude }};
                     mapApi.exactPinLon = {{ exact_pin_shul.longitude }};
