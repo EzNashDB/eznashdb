@@ -1,4 +1,5 @@
 import contextlib
+import math
 import time
 import urllib
 from collections import defaultdict
@@ -31,20 +32,88 @@ class ShulsFilterView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Get exact pin shul if justSaved param exists
+        exact_pin_shul = None
+        new_shul_id = self.request.GET.get("justSaved")
+        if new_shul_id:
+            with contextlib.suppress(Shul.DoesNotExist):
+                exact_pin_shul = Shul.objects.get(pk=new_shul_id)
+
+        # Filter exact_pin_shul out of object_list to prevent double-display
+        object_list = context["object_list"]
+        if exact_pin_shul:
+            object_list = object_list.exclude(pk=exact_pin_shul.pk)
+            context["object_list"] = object_list
+
         # Group shuls by their display coordinates
         grid_groups = defaultdict(list)
-        for shul in context["object_list"]:
+        for shul in object_list:
             grid_key = f"{shul.display_lat}_{shul.display_lon}"
             grid_groups[grid_key].append(shul)
 
         context["cluster_groups"] = dict(grid_groups)
 
-        # Add selected shul for exact pin display
-        new_shul_id = self.request.GET.get("justSaved")
-        if new_shul_id:
-            with contextlib.suppress(Shul.DoesNotExist):
-                context["exact_pin_shul"] = Shul.objects.get(pk=new_shul_id)
+        # Calculate cluster offset if needed
+        cluster_offset = None
+        if exact_pin_shul:
+            cluster_offset = self._calculate_cluster_offset(exact_pin_shul, grid_groups)
+
+        context["cluster_offset"] = cluster_offset
+        context["exact_pin_shul"] = exact_pin_shul
+
         return context
+
+    def _calculate_cluster_offset(self, exact_pin_shul, grid_groups):
+        """
+        Calculate offset for cluster that would have contained the exact_pin_shul.
+        Returns dict with grid_key and offset values, or None if no offset needed.
+        """
+
+        # Minimum separation distance (tuned for zoom level 14)
+        # If cluster is closer than this, push it out to this distance
+        MIN_SEPARATION = 0.005
+
+        # Find the grid_key where exact_pin_shul would have appeared
+        target_grid_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
+
+        # Check if that cluster exists in our filtered results
+        if target_grid_key not in grid_groups:
+            # No cluster at that location (shul was the only one there)
+            return None
+
+        # Get cluster's position (use first shul's display coords as cluster centroid)
+        cluster_shuls = grid_groups[target_grid_key]
+        cluster_lat = cluster_shuls[0].display_lat
+        cluster_lon = cluster_shuls[0].display_lon
+
+        # Calculate distance between exact pin and cluster
+        exact_lat = float(exact_pin_shul.latitude)
+        exact_lon = float(exact_pin_shul.longitude)
+
+        delta_lat = cluster_lat - exact_lat
+        delta_lon = cluster_lon - exact_lon
+        distance = math.sqrt(delta_lat**2 + delta_lon**2)
+
+        # If far enough apart, no offset needed
+        if distance >= MIN_SEPARATION:
+            return None
+
+        # Calculate offset to push cluster to MIN_SEPARATION distance
+        # Push east or west (not north/south) to avoid marker icon overlap
+        if delta_lon >= 0:
+            # Cluster is east of (or at same longitude as) exact pin - push further east
+            offset_lat = 0
+            offset_lon = MIN_SEPARATION - distance
+        else:
+            # Cluster is west of exact pin - push further west
+            offset_lat = 0
+            offset_lon = -(MIN_SEPARATION - distance)
+
+        return {
+            "grid_key": target_grid_key,
+            "offset_lat": offset_lat,
+            "offset_lon": offset_lon,
+        }
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx:

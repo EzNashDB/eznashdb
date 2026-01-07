@@ -676,14 +676,32 @@
                 const mapApi = window.SHUL_MAP_API;
                 const shulToGridKey = {};
 
+                // Store cluster offset info
+                {% if cluster_offset %}
+                    const clusterOffset = {
+                        gridKey: "{{ cluster_offset.grid_key }}",
+                        offsetLat: {{ cluster_offset.offset_lat }},
+                        offsetLon: {{ cluster_offset.offset_lon }}
+                    };
+                {% else %}
+                    const clusterOffset = null;
+                {% endif %}
+
                 // Add individual shul markers
                 {% for shul in object_list %}
-                    shulToGridKey["{{ shul.id }}"] = "{{ shul.display_lat }}_{{ shul.display_lon }}";
+                    const gridKey_{{ shul.id }} = "{{ shul.display_lat }}_{{ shul.display_lon }}";
+                    shulToGridKey["{{ shul.id }}"] = gridKey_{{ shul.id }};
 
                     (() => {
                         const id = {{ shul.id }};
-                        const lat = parseFloat({{ shul.display_lat }});
-                        const lon = parseFloat({{ shul.display_lon }});
+                        let lat = parseFloat({{ shul.display_lat }});
+                        let lon = parseFloat({{ shul.display_lon }});
+
+                        // Apply cluster offset if applicable
+                        if (clusterOffset && gridKey_{{ shul.id }} === clusterOffset.gridKey) {
+                            lat += clusterOffset.offsetLat;
+                            lon += clusterOffset.offsetLon;
+                        }
 
                         // Add three variants for world wrap-around
                         mapApi.addMarker(id, lat, lon, String(id));
