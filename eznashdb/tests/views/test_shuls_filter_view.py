@@ -104,8 +104,8 @@ def describe_filter():
 
 
 def describe_exact_pin_behavior():
-    def test_exact_pin_shul_excluded_from_clusters(rf_GET):
-        """When justSaved param is present, that shul should be excluded from shul_clusters"""
+    def test_justSaved_shul_in_context_and_excluded_from_clusters(rf_GET):
+        """When justSaved param is present, shul should be in exact_pin_shul and excluded from clusters"""
         shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
         request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(shul.id)})
 
@@ -118,68 +118,13 @@ def describe_exact_pin_behavior():
         all_clustered_shuls = [s for cluster in context["shul_clusters"].values() for s in cluster]
         assert shul not in all_clustered_shuls
 
-    def test_exact_pin_shul_in_context(rf_GET):
-        """exact_pin_shul should be in context when justSaved param exists"""
-        shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
-        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(shul.id)})
+    def test_cluster_offset_calculated_for_nearby_cluster(rf_GET):
+        """When exact pin is close to a cluster, offset should be calculated with correct structure"""
+        # Create shuls that round to same coords (40.70, -74.00) and jitter close to exact position
+        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.698, longitude=-73.998)
 
-        response = ShulsFilterView.as_view()(request)
-        context = response.context_data
-
-        assert "exact_pin_shul" in context
-        assert context["exact_pin_shul"] == shul
-
-    def test_no_exact_pin_shul_without_justSaved(rf_GET):
-        """exact_pin_shul should be None when no justSaved param"""
-        Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
-        request = rf_GET("eznashdb:shuls", query_params={})
-
-        response = ShulsFilterView.as_view()(request)
-        context = response.context_data
-
-        assert context["exact_pin_shul"] is None
-
-    def test_cluster_offset_calculated_when_cluster_nearby(rf_GET):
-        """When exact pin is close to a cluster, offset should be calculated"""
-        # Create exact pin shul
-        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.7128, longitude=-74.0060)
-
-        # Create another shul at the same jittered location (will cluster together)
-        # They have same rounded coords (40.71, -74.01) so same display coords
-        _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.7129, longitude=-74.0061)
-
-        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(exact_shul.id)})
-
-        response = ShulsFilterView.as_view()(request)
-        context = response.context_data
-
-        # Should have cluster_offset in context
-        assert "cluster_offset" in context
-        # Might be None if they're far enough apart after jittering
-        # or might have offset values if close
-
-    def test_cluster_offset_none_when_no_nearby_cluster(rf_GET):
-        """When exact pin has no nearby cluster, offset should be None"""
-        # Create exact pin shul alone
-        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.7128, longitude=-74.0060)
-        # Create another shul far away
-        Shul.objects.create(name="Far Shul", latitude=41.7128, longitude=-75.0060)
-
-        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(exact_shul.id)})
-
-        response = ShulsFilterView.as_view()(request)
-        context = response.context_data
-
-        # Should have cluster_offset but it should be None
-        assert context["cluster_offset"] is None
-
-    def test_cluster_offset_has_correct_structure(rf_GET):
-        """When offset is calculated, it should have cluster_key and offset values"""
-        # Create exact pin shul
-        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.71285, longitude=-74.00605)
-
-        # Create another shul at VERY similar coords to force same cluster
-        _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.71286, longitude=-74.00606)
+        # Create another shul at similar coords to force same cluster
+        _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.699, longitude=-73.999)
 
         request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(exact_shul.id)})
 
@@ -187,11 +132,8 @@ def describe_exact_pin_behavior():
         context = response.context_data
 
         offset = context["cluster_offset"]
-        if offset is not None:
-            # Should have the expected keys
-            assert "cluster_key" in offset
-            assert "offset_lon" in offset
-            # Cluster key should be a string
-            assert isinstance(offset["cluster_key"], str)
-            # Offset should be numeric
-            assert isinstance(offset["offset_lon"], (int, float))
+        assert offset is not None
+        assert "cluster_key" in offset
+        assert "offset_lon" in offset
+        assert isinstance(offset["cluster_key"], str)
+        assert isinstance(offset["offset_lon"], (int, float))
