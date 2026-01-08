@@ -540,19 +540,26 @@
                     return marker;
                 };
 
-                const openExactPin = () => {
-                    if (!exactPinMarker) return;
-
-                    // Click the marker - this will trigger the dynamic screen size check
-                    exactPinMarker.fire('click');
-                };
-
                 // ============================================================================
-                // OPEN SELECTED MARKER ON PAGE LOAD
+                // OPEN MARKER FROM URL
                 // ============================================================================
 
-                const openSelectedMarker = () => {
+                const openMarkerFromURL = () => {
                     const api = window.SHUL_MAP_API;
+
+                    // Check for justSaved first (highest priority - newly saved shul)
+                    if (api.exactPinPopupHtml && api.exactPinLat && api.exactPinLon) {
+                        api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinPopupHtml);
+                        exactPinMarker.fire('click');
+
+                        // Delete URL params immediately so pin disappears on refresh
+                        setTimeout(() => {
+                            URL_PARAMS_API.delete(["justSaved"]);
+                        }, 100);
+                        return;
+                    }
+
+                    // Otherwise handle selectedShul/selectedCluster from URL params
                     const selectedShulId = urlParams.get("selectedShul");
                     const selectedCluster = urlParams.get("selectedCluster");
 
@@ -641,8 +648,7 @@
                     addMarker,
                     clearMarkers,
                     addExactPin,
-                    openExactPin,
-                    openSelectedMarker,
+                    openMarkerFromURL,
                     initShulAccordion,
                 };
             };
@@ -728,19 +734,7 @@
                 const mapApi = window.SHUL_MAP_API;
                 mapApi.clearMarkers();
                 addShulMarkers();
-
-                // Add and open exact pin if present
-                if (mapApi.exactPinPopupHtml && mapApi.exactPinLat && mapApi.exactPinLon) {
-                    mapApi.addExactPin(mapApi.exactPinLat, mapApi.exactPinLon, mapApi.exactPinPopupHtml);
-                    mapApi.openExactPin();
-
-                    // Delete URL params immediately so pin disappears on refresh
-                    setTimeout(() => {
-                        URL_PARAMS_API.delete(["justSaved"]);
-                    }, 100);
-                } else {
-                    mapApi.openSelectedMarker();
-                }
+                mapApi.openMarkerFromURL();
             };
 
             // ============================================================================
