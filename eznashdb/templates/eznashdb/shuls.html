@@ -338,12 +338,7 @@
                     URL_PARAMS_API.delete(["selectedCluster", "selectedShul"])
 
                     const source = e.popup && e.popup._source;
-
-                    // Don't clear exact pin, just clear URL params
-                    // Pin stays visible and clickable
-
-                    // Only unbind popup for cluster markers, not exact pin
-                    if (source && typeof source.unbindPopup === "function" && source !== exactPinMarker) {
+                    if (source && typeof source.unbindPopup === "function") {
                         source.unbindPopup();
                     }
                 });
@@ -540,11 +535,6 @@
                                     });
                                 }
                             }, 0);
-                        });
-
-                        // Unbind popup when it closes
-                        marker.on('popupclose', () => {
-                            marker.unbindPopup();
                         });
                     }
 
