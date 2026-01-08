@@ -360,9 +360,6 @@
 
                 map.addLayer(markersLayer);
 
-                // Track exact pin marker (always in markersLayer for natural clustering)
-                let exactPinMarker = null;
-
                 // ============================================================================
                 // CLUSTER AND MARKER CLICK HANDLERS
                 // ============================================================================
@@ -440,7 +437,6 @@
                 const clearMarkers = () => {
                     markersLayer.clearLayers();
                     for (const k in markersByPopupId) delete markersByPopupId[k];
-                    exactPinMarker = null;
                 };
 
                 // ============================================================================
@@ -470,7 +466,6 @@
                     markersLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, shulId: shulId }));
                     markersLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, shulId: shulId }));
 
-                    exactPinMarker = marker;
                     return marker;
                 };
 
@@ -483,7 +478,7 @@
 
                     // Check for justSaved first (highest priority - newly saved shul)
                     if (api.exactPinPopupHtml && api.exactPinLat && api.exactPinLon && api.exactPinShulId) {
-                        api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinShulId, api.exactPinPopupHtml);
+                        const exactPinMarker = api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinShulId, api.exactPinPopupHtml);
                         api.markersLayer.fire('click', { layer: exactPinMarker });
 
                         // Delete URL params immediately so pin disappears on refresh
