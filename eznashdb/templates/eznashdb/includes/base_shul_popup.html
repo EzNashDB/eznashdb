@@ -1,0 +1,24 @@
+<div class="card border">
+    <div class="card-header">
+        <div class="ps-1 w-100 d-flex align-items-center">
+
+            {% block header_content %}{% endblock %}
+
+            {# djlint:off #}
+            <button type="button" class="btn-close shul-popup-close{% block close_button_class %} ms-auto{% endblock %}" aria-label="Close"></button>
+            {# djlint:on #}
+        </div>
+    </div>
+    <div class="card-body p-0 overflow-auto d-flex flex-column"
+         style="max-height:300px">
+        <div class="flex-grow-1 overflow-auto">
+            {# djlint:off #}
+            <div class="accordion accordion-flush" id="{% block accordion_id %}{% endblock %}">
+            {# djlint:on #}
+
+            {% block accordion_content %}{% endblock %}
+
+        </div>
+    </div>
+</div>
+</div>
