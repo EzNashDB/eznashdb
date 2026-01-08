@@ -60,7 +60,7 @@ class ShulsFilterView(FilterView):
         Calculate offset for cluster that would have contained the exact_pin_shul.
         Returns dict with cluster_key and offset values, or None if no offset needed.
         """
-        MIN_SEPARATION_FROM_EXACT_PIN = 0.005
+        MIN_SEPARATION_FROM_EXACT_PIN = 0.004
         cluster_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
         if cluster_key not in clusters_dict:
             return None

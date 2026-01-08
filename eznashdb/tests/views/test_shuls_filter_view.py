@@ -121,10 +121,10 @@ def describe_exact_pin_behavior():
     def test_cluster_offset_calculated_for_nearby_cluster(rf_GET):
         """When exact pin is close to a cluster, offset should be calculated with correct structure"""
         # Create shuls that round to same coords (40.70, -74.00) and jitter close to exact position
-        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.698, longitude=-73.998)
+        exact_shul = Shul.objects.create(name="Exact Shul", latitude=40.699, longitude=-74.001)
 
         # Create another shul at similar coords to force same cluster
-        _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.699, longitude=-73.999)
+        _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.699, longitude=-74.001)
 
         request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(exact_shul.id)})
 
