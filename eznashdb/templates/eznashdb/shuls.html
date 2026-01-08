@@ -425,8 +425,8 @@
                     });
                 }
 
-                const addMarker = (shulId, lat, lon, popupId) => {
-                    const marker = L.marker([lat, lon], { icon: singleClusterIcon() });
+                const addMarker = (shulId, lat, lon, popupId, icon = null) => {
+                    const marker = L.marker([lat, lon], { icon: icon || singleClusterIcon() });
                     marker.options.shulId = shulId;
                     marker.options.popupId = popupId;
                     markersLayer.addLayer(marker);
@@ -434,39 +434,15 @@
                     return marker;
                 };
 
+                const addMarkerWithWorldWrap = (shulId, lat, lon, icon = null) => {
+                    addMarker(shulId, lat, lon, String(shulId), icon);
+                    addMarker(shulId, lat, lon - 360, "-" + String(shulId), icon);
+                    addMarker(shulId, lat, lon + 360, "+" + String(shulId), icon);
+                };
+
                 const clearMarkers = () => {
                     markersLayer.clearLayers();
                     for (const k in markersByPopupId) delete markersByPopupId[k];
-                };
-
-                // ============================================================================
-                // EXACT PIN HANDLING
-                // ============================================================================
-
-                const addExactPin = (lat, lon, shulId, popupHtml) => {
-                    // Create marker with explicit icon path (blue default marker)
-                    const defaultIcon = L.icon({
-                        iconUrl: '{% static "eznashdb/images/marker-icon.png" %}',
-                        shadowUrl: '{% static "eznashdb/images/marker-shadow.png" %}',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -27],
-                        shadowSize: [41, 41]
-                    });
-
-                    // Store exact pin popup in clusterPopupHtmlMap so unified click handler works
-                    const clusterKey = `exact_pin_${shulId}`;
-                    window.SHUL_MAP_API.clusterPopupHtmlMap[clusterKey] = popupHtml;
-                    window.SHUL_MAP_API.shulToClusterKey[shulId] = clusterKey;
-
-                    const marker = L.marker([lat, lon], { icon: defaultIcon, shulId: shulId });
-
-                    // Add to markersLayer so it clusters naturally with nearby markers
-                    markersLayer.addLayer(marker);
-                    markersLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, shulId: shulId }));
-                    markersLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, shulId: shulId }));
-
-                    return marker;
                 };
 
                 // ============================================================================
@@ -477,15 +453,18 @@
                     const api = window.SHUL_MAP_API;
 
                     // Check for justSaved first (highest priority - newly saved shul)
-                    if (api.exactPinPopupHtml && api.exactPinLat && api.exactPinLon && api.exactPinShulId) {
-                        const exactPinMarker = api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinShulId, api.exactPinPopupHtml);
-                        api.markersLayer.fire('click', { layer: exactPinMarker });
+                    const justSavedId = urlParams.get("justSaved");
+                    if (justSavedId) {
+                        const exactPinMarker = api.markersByPopupId[justSavedId];
+                        if (exactPinMarker) {
+                            api.markersLayer.fire('click', { layer: exactPinMarker });
 
-                        // Delete URL params immediately so pin disappears on refresh
-                        setTimeout(() => {
-                            URL_PARAMS_API.delete(["justSaved"]);
-                        }, 100);
-                        return;
+                            // Delete URL params immediately so pin disappears on refresh
+                            setTimeout(() => {
+                                URL_PARAMS_API.delete(["justSaved"]);
+                            }, 100);
+                            return;
+                        }
                     }
 
                     // Otherwise handle selectedShul/selectedCluster from URL params
@@ -575,8 +554,8 @@
                     markersLayer,
                     markersByPopupId,
                     addMarker,
+                    addMarkerWithWorldWrap,
                     clearMarkers,
-                    addExactPin,
                     openMarkerFromURL,
                     initShulAccordion,
                 };
@@ -622,16 +601,11 @@
                         const id = {{ shul.id }};
                         let lat = parseFloat({{ shul.display_lat }});
                         let lon = parseFloat({{ shul.display_lon }});
-
                         // Apply cluster offset if applicable (horizontal only)
                         if (clusterOffset && clusterKey_{{ shul.id }} === clusterOffset.clusterKey) {
                             lon += clusterOffset.offsetLon;
                         }
-
-                        // Add three variants for world wrap-around
-                        mapApi.addMarker(id, lat, lon, String(id));
-                        mapApi.addMarker(id, lat, lon - 360, "-" + String(id));
-                        mapApi.addMarker(id, lat, lon + 360, "+" + String(id));
+                        mapApi.addMarkerWithWorldWrap(id, lat, lon);
                     })();
                 {% endfor %}
 
@@ -641,18 +615,29 @@
                     clusterPopupHtmlMap["{{ cluster_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
                 {% endfor %}
 
+                // Add exact pin if present (blue icon at exact coordinates, not jittered)
+                {% if exact_pin_shul %}
+                    const exactPinIcon = L.icon({
+                        iconUrl: '{% static "eznashdb/images/marker-icon.png" %}',
+                        shadowUrl: '{% static "eznashdb/images/marker-shadow.png" %}',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -27],
+                        shadowSize: [41, 41]
+                    });
+                    const exactPinClusterKey = `exact_pin_{{ exact_pin_shul.id }}`;
+                    clusterPopupHtmlMap[exactPinClusterKey] = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul %}`;
+                    shulToClusterKey[{{ exact_pin_shul.id }}] = exactPinClusterKey;
+                    mapApi.addMarkerWithWorldWrap(
+                        {{ exact_pin_shul.id }},
+                        {{ exact_pin_shul.latitude }},
+                        {{ exact_pin_shul.longitude }},
+                        exactPinIcon
+                    );
+                {% endif %}
+
                 mapApi.clusterPopupHtmlMap = clusterPopupHtmlMap;
                 mapApi.shulToClusterKey = shulToClusterKey;
-
-                // Add exact pin popup HTML if present
-                {% if exact_pin_shul %}
-                    mapApi.exactPinPopupHtml = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul %}`;
-                    mapApi.exactPinShulId = {{ exact_pin_shul.id }};
-                    mapApi.exactPinLat = {{ exact_pin_shul.latitude }};
-                    mapApi.exactPinLon = {{ exact_pin_shul.longitude }};
-                {% else %}
-                    mapApi.exactPinPopupHtml = null;
-                {% endif %}
             };
 
             // ============================================================================
