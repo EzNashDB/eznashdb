@@ -448,6 +448,7 @@
                 const clearMarkers = () => {
                     markersLayer.clearLayers();
                     for (const k in markersByPopupId) delete markersByPopupId[k];
+                    exactPinMarker = null;
                 };
 
                 // ============================================================================
@@ -455,8 +456,6 @@
                 // ============================================================================
 
                 const addExactPin = (lat, lon, popupHtml) => {
-                    clearExactPin();
-
                     // Create marker with explicit icon path
                     const defaultIcon = L.icon({
                         iconUrl: '{% static "eznashdb/images/marker-icon.png" %}',
@@ -539,19 +538,6 @@
                     }
 
                     return marker;
-                };
-
-                const clearExactPin = () => {
-                    if (exactPinMarker) {
-                        markersLayer.removeLayer(exactPinMarker);
-                        // Also remove world wrap variants
-                        markersLayer.eachLayer((layer) => {
-                            if (layer !== exactPinMarker && layer.options.isExactPin) {
-                                markersLayer.removeLayer(layer);
-                            }
-                        });
-                        exactPinMarker = null;
-                    }
                 };
 
                 const openExactPin = () => {
@@ -655,7 +641,6 @@
                     addMarker,
                     clearMarkers,
                     addExactPin,
-                    clearExactPin,
                     openExactPin,
                     openSelectedMarker,
                     initShulAccordion,
@@ -742,7 +727,6 @@
             const replaceMapShuls = () => {
                 const mapApi = window.SHUL_MAP_API;
                 mapApi.clearMarkers();
-                mapApi.clearExactPin();
                 addShulMarkers();
 
                 // Add and open exact pin if present
