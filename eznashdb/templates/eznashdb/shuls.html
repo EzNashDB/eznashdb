@@ -331,11 +331,11 @@
                 map.on("zoomend", () => updateURLLocationParams(map));
                 map.on("popupopen", (e) => {
                     if (lastOpenedClusterKey) {
-                        URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterKey });
+                        URL_PARAMS_API.update({ selectedCluster: lastOpenedClusterKey })
                     }
                 });
                 map.on("popupclose", (e) => {
-                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
+                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul"])
 
                     const source = e.popup && e.popup._source;
 
@@ -354,7 +354,7 @@
                     spiderfyOnMaxZoom: false,
                     zoomToBoundsOnClick: false,
                     spiderfyDistanceMultiplier: 0,
-                    disableClusteringAtZoom: null,
+                    disableClusteringAtZoom: null
                 });
 
                 markersLayer.on('spiderfied', (e) => {
@@ -504,7 +504,7 @@
 
                                 const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
                                 offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul", "justSaved"]);
+                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
                                 }, { once: true });
                                 bsOffcanvas.show();
 
