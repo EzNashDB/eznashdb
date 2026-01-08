@@ -10,22 +10,22 @@
 {% block content %}
     <div class="row h-100">
         <div class="col h-100 d-flex flex-column">
-            <div class="row mb-1">
+            <div class="row mb-1"
+                {# djlint:off #}
+             x-data="{
+                 filtersCollapsed: localStorage.getItem('shulFiltersCollapsed') === 'true',
+                 toggleFilters() {
+                     this.filtersCollapsed = !this.filtersCollapsed;
+                     localStorage.setItem('shulFiltersCollapsed', this.filtersCollapsed)
+                     const filterContainer = document.getElementById('filter-container');
+                     const bsCollapse = bootstrap.Collapse.getInstance(filterContainer) || new bootstrap.Collapse(filterContainer, { toggle: false });
+                     this.filtersCollapsed ? bsCollapse.hide() : bsCollapse.show();
+                 }
+             }"
+                {# djlint:on #}
+                >
                 <!-- Filter toggle button (small screens only) -->
-                <div class="col-6 d-md-none"
-                    {# djlint:off #}
-                     x-data="{
-                         filtersCollapsed: localStorage.getItem('shulFiltersCollapsed') === 'true',
-                         toggleFilters() {
-                             this.filtersCollapsed = !this.filtersCollapsed;
-                             localStorage.setItem('shulFiltersCollapsed', this.filtersCollapsed)
-                             const filterContainer = document.getElementById('filter-container');
-                             const bsCollapse = bootstrap.Collapse.getInstance(filterContainer) || new bootstrap.Collapse(filterContainer, { toggle: false });
-                             this.filtersCollapsed ? bsCollapse.hide() : bsCollapse.show();
-                         }
-                     }"
-                    {# djlint:on #}
-                    >
+                <div class="col-6 d-md-none">
                     <button id="filter-toggle-btn"
                             @click="toggleFilters()"
                             class="btn btn-secondary w-100 d-flex align-items-center">
@@ -44,14 +44,12 @@
                 <div class="col-12 col-md order-md-first collapse d-md-block"
                     id="filter-container"
                     {# djlint:off #}
-                    x-init="(() => {
+                    x-init="() => {
                         const isSmallScreen = window.innerWidth < 768;
-                        const isFiltersCollapsed = localStorage.getItem('shulFiltersCollapsed') === 'true';
-                        // Initialize collapse state from localStorage
-                        if (isSmallScreen && !isFiltersCollapsed) {
+                        if (isSmallScreen && !filtersCollapsed) {
                             $el.classList.add('show');
                         }
-                    })()"
+                    }"
                     {# djlint:on #}
                     >{% include "eznashdb/includes/shul_filters.html" %}</div>
             </div>
