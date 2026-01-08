@@ -8,77 +8,85 @@
 {% endblock extra_media_top %}
 
 {% block content %}
-    <div class="row h-100">
-        <div class="col h-100 d-flex flex-column">
-            <div class="row mb-1"
-                {# djlint:off #}
-             x-data="{
-                 filtersCollapsed: localStorage.getItem('shulFiltersCollapsed') === 'true',
-                 toggleFilters() {
-                     this.filtersCollapsed = !this.filtersCollapsed;
-                     localStorage.setItem('shulFiltersCollapsed', this.filtersCollapsed)
-                     const filterContainer = document.getElementById('filter-container');
-                     const bsCollapse = bootstrap.Collapse.getInstance(filterContainer) || new bootstrap.Collapse(filterContainer, { toggle: false });
-                     this.filtersCollapsed ? bsCollapse.hide() : bsCollapse.show();
-                 }
-             }"
-                {# djlint:on #}
-                >
+    <div class="row h-100 d-flex flex-column flex-lg-row">
+        <!-- Filter sidebar: top on mobile, left on desktop -->
+        <div class="col-12 col-lg-3 d-md-flex flex-column"
+            {# djlint:off #}
+         x-data="{
+             filtersCollapsed: localStorage.getItem('shulFiltersCollapsed') === 'true',
+             toggleFilters() {
+                 this.filtersCollapsed = !this.filtersCollapsed;
+                 localStorage.setItem('shulFiltersCollapsed', this.filtersCollapsed)
+                 const filterContainer = document.getElementById('filter-container');
+                 const bsCollapse = bootstrap.Collapse.getInstance(filterContainer) || new bootstrap.Collapse(filterContainer, { toggle: false });
+                 this.filtersCollapsed ? bsCollapse.hide() : bsCollapse.show();
+             }
+         }"
+            {# djlint:on #}
+            >
+            <div class="d-flex justify-content-between gap-2 mb-2">
                 <!-- Filter toggle button (small screens only) -->
-                <div class="col-6 d-md-none">
+                <div class="btn-group  d-lg-none">
                     <button id="filter-toggle-btn"
                             @click="toggleFilters()"
-                            class="btn btn-secondary w-100 d-flex align-items-center">
-                        <span class="flex-grow-1">Filters (<span id="filter-count">0</span>)</span>
+                            class="btn btn-secondary">
+                        <span>Filters (<span id="filter-count">0</span>)</span>
                         <i class="fa"
                            :class="filtersCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
                     </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Reset
+                    </button>
                 </div>
-                <!-- Add Shul button (always on the right) -->
-                <div class="col-6 col-md-auto ms-md-auto mt-auto mb-3">
-                    <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary w-100">
-                        <i class="fa fa-plus"></i> Add a Shul
-                    </a>
-                </div>
-                <!-- Filters (wraps to new line on small, inline on large) -->
-                <div class="col-12 col-md order-md-first collapse d-md-block"
-                    id="filter-container"
-                    {# djlint:off #}
-                    x-init="() => {
-                        const isSmallScreen = window.innerWidth < 768;
-                        if (isSmallScreen && !filtersCollapsed) {
-                            $el.classList.add('show');
-                        }
-                    }"
-                    {# djlint:on #}
-                    >{% include "eznashdb/includes/shul_filters.html" %}</div>
+                <button class="d-none d-lg-block btn btn-outline-secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Reset Filters
+                </button>
+                <!-- Add Shul button -->
+                <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> Add Shul
+                </a>
             </div>
-            <div class="row flex-grow-1">
-                <div class="col-12">
-                    <div class="border rounded h-100 position-relative">
-                        <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
-                            <div class="flex-grow-1 text-center">
-                                <span class="spinner-border spinner-border-lg"
-                                      style="width: 3rem;
-                                             height: 3rem"
-                                      role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </span>
-                            </div>
-                        </span>
-                        <div id="shuls-map" class="h-100">
-                            <div class="w-100 p-2 position-absolute top-0 start-50"
-                                 style="transform: translateX(-50%);
-                                        z-index: 1000;
-                                        pointer-events: none">
-                                <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
-                                    <div class="badge text-bg-warning text-wrap" style="pointer-events: auto">
-                                        <i class="fa-solid fa-lock"></i>
-                                        Map pins are approximate. Exact locations hidden for security reasons.
-                                    </div>
-                                    <div class="badge text-bg-dark" style="pointer-events: auto">
-                                        {% include "eznashdb/includes/shuls_count.html" %}
-                                    </div>
+            <!-- Filters (collapsible on mobile, always visible on desktop) -->
+            <div class="collapse d-lg-block"
+                id="filter-container"
+                {# djlint:off #}
+                x-init="() => {
+                    const isSmallScreen = window.innerWidth < 1024;
+                    if (isSmallScreen && !filtersCollapsed) {
+                        $el.classList.add('show');
+                    }
+                }"
+                {# djlint:on #}
+                >{% include "eznashdb/includes/shul_filters.html" %}</div>
+        </div>
+        <!-- Map column: below filters on mobile, right side on desktop -->
+        <div class="col-12 col-lg-9 d-flex flex-column flex-grow-1">
+            <div class="flex-grow-1 w-100">
+                <div class="border rounded h-100 position-relative">
+                    <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
+                        <div class="flex-grow-1 text-center">
+                            <span class="spinner-border spinner-border-lg"
+                                  style="width: 3rem;
+                                         height: 3rem"
+                                  role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </div>
+                    </span>
+                    <div id="shuls-map" class="h-100">
+                        <div class="w-100 p-2 position-absolute top-0 start-50"
+                             style="transform: translateX(-50%);
+                                    z-index: 1000;
+                                    pointer-events: none">
+                            <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
+                                <div class="badge text-bg-warning text-wrap" style="pointer-events: auto">
+                                    <i class="fa-solid fa-lock"></i>
+                                    Map pins are approximate. Exact locations hidden for security reasons.
+                                </div>
+                                <div class="badge text-bg-dark" style="pointer-events: auto">
+                                    {% include "eznashdb/includes/shuls_count.html" %}
                                 </div>
                             </div>
                         </div>
@@ -178,7 +186,7 @@
             };
 
             const isSmallScreen = () => {
-                return window.innerWidth < 768 || window.innerHeight < 600;
+                return window.innerWidth < 1024 || window.innerHeight < 600;
             };
 
             const getClusterKey = (lat, lon) => {
