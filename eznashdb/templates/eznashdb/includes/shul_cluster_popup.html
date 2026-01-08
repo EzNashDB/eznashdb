@@ -1,89 +1,15 @@
-<div class="card border">
-    <div class="card-header">
-        <div class="ps-1 w-100 d-flex align-items-center">
-            <span class="flex-grow-1">{{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area</span>
-            <button type="button" class="btn-close shul-popup-close" aria-label="Close"></button>
-        </div>
-    </div>
-    <div class="card-body p-0 overflow-auto d-flex flex-column"
-         style="max-height:300px">
-        <div class="flex-grow-1 overflow-auto">
-            <div class="accordion accordion-flush" id="shuls-cluster-accordion">
-                {% for shul in shuls %}
-                    <div class="accordion-item border-0
-                                {% if not forloop.last %}border-bottom{% endif %}"
-                         x-init="SHUL_MAP_API.initShulAccordion($el, {{ shul.pk }})">
-                        <h2 class="accordion-header" style="scroll-margin-top: 15px">
-                            <button class="accordion-button
-                                           {% if shuls|length != 1 %}collapsed{% endif %}"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#shul-{{ shul.id }}"
-                                    aria-expanded="false"
-                                    aria-controls="shul-{{ shul.id }}">
-                                <div class="d-flex w-100 pe-3 align-items-center">
-                                    <span class="fw-bold d-inline-block flex-grow-1">
-                                        <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
-                                    </span>
-                                    <span>
-                                        <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
-                                    </span>
-                                </div>
-                            </button>
-                        </h2>
-                        <div id="shul-{{ shul.id }}"
-                             class="accordion-collapse collapse
-                                    {% if shuls|length == 1 %}show{% endif %}
-                                    {% if not forloop.last %}border-secondary-subtle border-bottom{% endif %}"
-                             data-bs-parent="#shuls-cluster-accordion">
-                            <div class="accordion-body">
-                                <div class="d-flex flex-column">
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <a class="btn btn-sm btn-outline-primary text-nowrap"
-                                           href="{% url 'eznashdb:update_shul' shul.id %}">
-                                            <i class="fa-solid fa-pen-to-square"></i> Edit
-                                        </a>
-                                        <a target="_blank"
-                                           rel="noopener noreferrer"
-                                           href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
-                                           class="btn btn-sm btn-primary">
-                                            <i class="fa-brands fa-google me-1"></i>
-                                            Find on Google Maps
-                                        </a>
-                                    </div>
-                                    {% if shul.rooms.exists %}
-                                        <ul class="list-group mt-3">
-                                            {% for room in shul.rooms.all %}
-                                                <li class="list-group-item">
-                                                    <div class="h6 fw-bold">{{ room.name }}</div>
-                                                    {% with not_set_display="<kbd class='fw-bold'>?</kbd> - Not set" %}
-                                                    <div class="ps-3 gap-2 d-flex flex-column">
-                                                        <div class="d-flex">
-                                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-3 mt-1"
-                                                               style="width:16px;
-                                                                      display:inline-block;
-                                                                      text-align:center"></i>
-                                                            <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <i class="fa-solid fa-eye me-3 mt-1"
-                                                               style="width:16px;
-                                                                      display:inline-block;
-                                                                      text-align:center"></i>
-                                                            <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
-                                                        </div>
-                                                    </div>
-                                                {% endwith %}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-</div>
+{% extends "eznashdb/includes/base_shul_popup.html" %}
+
+{% block header_content %}
+    <span class="flex-grow-1">{{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area</span>
+{% endblock %}
+
+{% block close_button_class %}{% endblock %}
+
+{% block accordion_id %}shuls-cluster-accordion{% endblock %}
+
+{% block accordion_content %}
+    {% for shul in shuls %}
+        {% include "eznashdb/includes/shul_accordion_item.html" with shul=shul accordion_id="shuls-cluster-accordion" item_id_prefix="shul" total_shuls=shuls|length is_last=forloop.last %}
+    {% endfor %}
+{% endblock %}
