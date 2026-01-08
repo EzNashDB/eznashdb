@@ -400,14 +400,6 @@
                 // Handle single marker clicks
                 markersLayer.on('click', (e) => {
                     const marker = e.layer;
-
-                    // Exact pin clicks are handled by individual marker click handler
-                    // Skip them here to avoid double-firing
-                    if (marker.options.isExactPin) {
-                        return;
-                    }
-
-                    // Handle regular shul marker clicks
                     const shulId = marker.options.shulId;
                     if (!shulId) return;
 
@@ -455,8 +447,8 @@
                 // EXACT PIN HANDLING
                 // ============================================================================
 
-                const addExactPin = (lat, lon, popupHtml) => {
-                    // Create marker with explicit icon path
+                const addExactPin = (lat, lon, shulId, popupHtml) => {
+                    // Create marker with explicit icon path (blue default marker)
                     const defaultIcon = L.icon({
                         iconUrl: '{% static "eznashdb/images/marker-icon.png" %}',
                         shadowUrl: '{% static "eznashdb/images/marker-shadow.png" %}',
@@ -466,77 +458,19 @@
                         shadowSize: [41, 41]
                     });
 
-                    const marker = L.marker([lat, lon], { icon: defaultIcon, isExactPin: true });
+                    // Store exact pin popup in clusterPopupHtmlMap so unified click handler works
+                    const clusterKey = `exact_pin_${shulId}`;
+                    window.SHUL_MAP_API.clusterPopupHtmlMap[clusterKey] = popupHtml;
+                    window.SHUL_MAP_API.shulToClusterKey[shulId] = clusterKey;
+
+                    const marker = L.marker([lat, lon], { icon: defaultIcon, shulId: shulId });
 
                     // Add to markersLayer so it clusters naturally with nearby markers
                     markersLayer.addLayer(marker);
-                    markersLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, isExactPin: true }));
-                    markersLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, isExactPin: true }));
+                    markersLayer.addLayer(L.marker([lat, lon - 360], { icon: defaultIcon, shulId: shulId }));
+                    markersLayer.addLayer(L.marker([lat, lon + 360], { icon: defaultIcon, shulId: shulId }));
 
                     exactPinMarker = marker;
-
-                    if (popupHtml) {
-                        // Store popup HTML for later use
-                        marker._exactPopupHtml = popupHtml;
-
-                        // Add click handler that dynamically handles screen size
-                        marker.on('click', (e) => {
-                            if (isSmallScreen()) {
-                                // Prevent popup from opening
-                                L.DomEvent.stop(e);
-
-                                // Small screen - use offcanvas
-                                const offcanvasEl = document.getElementById("shulOffcanvas");
-
-                                // Dispose any existing offcanvas instance
-                                const existingOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-                                if (existingOffcanvas) {
-                                    existingOffcanvas.dispose();
-                                }
-
-                                offcanvasEl.querySelector(".offcanvas-body").innerHTML = popupHtml;
-
-                                const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
-                                offcanvasEl.addEventListener('hidden.bs.offcanvas', () => {
-                                    URL_PARAMS_API.delete(["selectedCluster", "selectedShul"]);
-                                }, { once: true });
-                                bsOffcanvas.show();
-
-                                const closeBtn = offcanvasEl.querySelector(".shul-popup-close");
-                                if (closeBtn) {
-                                    closeBtn.addEventListener("click", (ev) => {
-                                        ev.preventDefault();
-                                        bsOffcanvas.hide();
-                                    });
-                                }
-                            } else {
-                                // Large screen - bind popup and open
-                                marker.bindPopup(popupHtml, {
-                                    className: "shul-cluster-popup",
-                                    closeButton: false,
-                                    offset: [0, -7],
-                                });
-                                marker.openPopup();
-                            }
-                        });
-
-                        // Setup close button and unbind on close
-                        marker.on('popupopen', () => {
-                            setTimeout(() => {
-                                const popupEl = marker.getPopup().getElement();
-                                if (!popupEl) return;
-
-                                const closeBtn = popupEl.querySelector(".shul-popup-close");
-                                if (closeBtn) {
-                                    closeBtn.addEventListener("click", (ev) => {
-                                        ev.preventDefault();
-                                        marker.closePopup();
-                                    });
-                                }
-                            }, 0);
-                        });
-                    }
-
                     return marker;
                 };
 
@@ -548,9 +482,9 @@
                     const api = window.SHUL_MAP_API;
 
                     // Check for justSaved first (highest priority - newly saved shul)
-                    if (api.exactPinPopupHtml && api.exactPinLat && api.exactPinLon) {
-                        api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinPopupHtml);
-                        exactPinMarker.fire('click');
+                    if (api.exactPinPopupHtml && api.exactPinLat && api.exactPinLon && api.exactPinShulId) {
+                        api.addExactPin(api.exactPinLat, api.exactPinLon, api.exactPinShulId, api.exactPinPopupHtml);
+                        api.markersLayer.fire('click', { layer: exactPinMarker });
 
                         // Delete URL params immediately so pin disappears on refresh
                         setTimeout(() => {
