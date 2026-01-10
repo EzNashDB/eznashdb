@@ -78,8 +78,9 @@ export default function initializeTomSelects() {
         divElement.setAttribute("id", "ts-placeholder");
         // Set content
         divElement.textContent = numSelected + " items selected";
-        // Append the div element to the second last position of the desired parent element
-        instance.control.insertBefore(divElement, instance.control.lastChild);
+        // Place the placeholder before the input so the text cursor appears after it when focused.
+        const input = instance.control.querySelector("input");
+        instance.control.insertBefore(divElement, input);
       } else {
         childElement = instance.control.querySelector("#ts-placeholder");
         childElement.textContent = numSelected + " items selected";
