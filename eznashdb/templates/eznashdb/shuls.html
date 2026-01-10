@@ -42,7 +42,8 @@
                         <i class="fa"
                            :class="filtersCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
                     </button>
-                    <button class="btn btn-outline-secondary rounded-lg">
+                    <button @click="FILTER_API.reset()"
+                            class="btn btn-outline-secondary rounded-lg">
                         <i class="fa-solid fa-rotate-left"></i>
                         Reset
                     </button>
@@ -141,18 +142,19 @@
             })();
 
             // ============================================================================
-            // FILTER TOGGLE MANAGEMENT
+            // FILTER MANAGEMENT
             // ============================================================================
 
-            window.FILTER_COUNT_API = (() => {
-                const updateFilterCount = () => {
-                    const form = document.querySelector('#filter-container form');
+            window.FILTER_API = (() => {
+                const getForm = () => document.querySelector('#filter-container form');
+
+                const updateCount = () => {
+                    const form = getForm();
                     const countSpan = document.getElementById('filter-count');
                     if (!form || !countSpan) return;
 
                     let count = 0;
-                    const inputs = form.querySelectorAll('select, input[type="text"], input[type="number"]');
-                    inputs.forEach(input => {
+                    form.querySelectorAll('select, input[type="text"], input[type="number"]').forEach(input => {
                         if (input.value && input.value.trim() !== '') {
                             count++;
                         }
@@ -161,19 +163,27 @@
                     countSpan.textContent = count;
                 };
 
-                const initFilterCount = () => {
-                    const form = document.querySelector('#filter-container form');
+                const init = () => {
+                    const form = getForm();
                     if (form) {
-                        form.addEventListener('change', updateFilterCount);
-                        form.addEventListener('input', updateFilterCount);
+                        form.addEventListener('change', updateCount);
+                        form.addEventListener('input', updateCount);
                     }
-                    updateFilterCount();
+                    updateCount();
                 };
 
-                return {
-                    init: initFilterCount,
-                    updateCount: updateFilterCount,
+                const reset = () => {
+                    const form = getForm();
+                    if (!form) return;
+                    form.querySelectorAll('select.tom-select').forEach(select => {
+                        if (select.tomselect) select.tomselect.clear();
+                    });
+                    form.querySelectorAll('input').forEach(input => input.value = '');
+                    updateCount();
+                    htmx.ajax('GET', form.getAttribute('hx-get'), {swap: 'none'});
                 };
+
+                return { init, updateCount, reset };
             })();
 
             // ============================================================================
@@ -521,7 +531,7 @@
             // Initialize map and filter count when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
                 initMap();
-                FILTER_COUNT_API.init();
+                FILTER_API.init();
             });
         })();
     </script>
