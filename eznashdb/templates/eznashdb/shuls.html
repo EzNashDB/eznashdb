@@ -1,7 +1,15 @@
-{% extends "base_full_height.html" %}
+{% extends "base.html" %}
 
 {% load static %}
 {% load partials %}
+
+{% block main_scroll_container_classes %}
+    shuls-scroll-container
+{% endblock main_scroll_container_classes %}
+
+{% block container_classes %}
+    h-100
+{% endblock container_classes %}
 
 {% block extra_media_top %}
     <link rel="stylesheet" href="{% static 'eznashdb/css/shuls.css' %}">
@@ -24,7 +32,7 @@
          }"
             {# djlint:on #}
             >
-            <div class="d-flex justify-content-between gap-2 mb-2">
+            <div class="d-flex justify-content-between gap-2 mb-3">
                 <!-- Filter toggle button (small screens only) -->
                 <div class="btn-group  d-lg-none">
                     <button id="filter-toggle-btn"
@@ -64,7 +72,7 @@
         <!-- Map column: below filters on mobile, right side on desktop -->
         <div class="col-12 col-lg-9 d-flex flex-column flex-grow-1">
             <div class="flex-grow-1 w-100">
-                <div class="border rounded h-100 position-relative">
+                <div class="border rounded h-100 position-relative map-container">
                     <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
                         <div class="flex-grow-1 text-center">
                             <span class="spinner-border spinner-border-lg"
@@ -94,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="offcanvas offcanvas-bottom p-0 rounded-top h-auto"
+        <div class="offcanvas offcanvas-bottom shuls-offcanvas p-0 rounded-top h-auto"
              tabindex="-1"
              id="shulOffcanvas"
              aria-labelledby="shulOffcanvasLabel">
