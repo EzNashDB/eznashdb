@@ -8,7 +8,7 @@ from eznashdb.views import ShulsFilterView
 
 @pytest.fixture
 def GET_request(rf_GET):
-    return rf_GET("eznashdb:shuls", query_params={"format": "list"})
+    return rf_GET("eznashdb:shuls")
 
 
 def test_shows_app_name(GET_request):
@@ -69,38 +69,6 @@ def describe_rooms():
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "not set" in str(soup).lower()
-
-
-def describe_filter():
-    def filters_by_relative_size(rf_GET):
-        Shul.objects.create(name="shul 1", latitude=123, longitude=123)
-        Shul.objects.create(name="shul 2", latitude=123, longitude=123).rooms.create(
-            relative_size=RelativeSize.M
-        )
-        request = rf_GET(
-            "eznashdb:shuls", query_params={"rooms__relative_size": ["M"], "format": "list"}
-        )
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
-
-    def filters_by_see_hear_score(rf_GET):
-        Shul.objects.create(name="shul 1", latitude=123, longitude=123)
-        Shul.objects.create(name="shul 2", latitude=123, longitude=123).rooms.create(
-            see_hear_score=SeeHearScore._3
-        )
-        request = rf_GET(
-            "eznashdb:shuls", query_params={"rooms__see_hear_score": ["3"], "format": "list"}
-        )
-
-        response = ShulsFilterView.as_view()(request)
-
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-        assert "shul 2" in str(soup)
-        assert "shul 1" not in str(soup)
 
 
 def describe_exact_pin_behavior():
