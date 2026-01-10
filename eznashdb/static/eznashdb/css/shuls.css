@@ -24,6 +24,10 @@
     }
 }
 
+/* Hide the input when the dropdown is NOT active */
+.multi.ts-wrapper:not(.dropdown-active)>.ts-control>input[type="text"] {
+    display: none !important;
+}
 
 .leaflet-container {
     font-family: unset;
