@@ -9,7 +9,7 @@ from eznashdb.widgets import SearchableMultiTomSelectWidget
 
 
 class ShulFilterSet(FilterSet):
-    name = MultipleChoiceFilter(label="Shul Name")
+    name = MultipleChoiceFilter(label=FieldsOptions.SHUL_NAME.label)
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.get_display_choices(include_blank=True),
