@@ -1,13 +1,15 @@
 from django.db.models import Prefetch, Q
-from django_filters import FilterSet
+from django_filters import FilterSet, MultipleChoiceFilter
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.filters import MultipleChoiceOrUnknownCharFilter, MultiSelectModelFieldFilter
 from eznashdb.models import Room, Shul
+from eznashdb.widgets import SearchableMultiTomSelectWidget
 
 
 class ShulFilterSet(FilterSet):
+    name = MultipleChoiceFilter(label="Shul Name")
     rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.get_display_choices(include_blank=True),
@@ -20,6 +22,14 @@ class ShulFilterSet(FilterSet):
         label=FieldsOptions.SEE_HEAR.label,
         method="filter_rooms__see_hear_score",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        names = Shul.objects.values_list("name", flat=True).distinct().order_by("name")
+        choices = [(name, name) for name in names]
+        self.filters["name"].extra["choices"] = choices
+        self.form.fields["name"].choices = choices
+        self.form.fields["name"].widget = SearchableMultiTomSelectWidget(choices=choices)
 
     def filter_rooms__relative_size(self, qs, name, value):
         value = [x if x != "--" else "" for x in value]

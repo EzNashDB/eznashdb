@@ -10,8 +10,8 @@ export default function initializeTomSelects() {
         data.html ?? data.$option?.innerHTML ?? escape(data.text ?? "");
       return `<div>${html}</div>`;
     };
+    const isSearchable = el.dataset.searchable === "true";
     let settings = {
-      controlInput: null,
       dropdownParent: "body",
       render: {
         option: renderUnescapedContent,
@@ -54,6 +54,10 @@ export default function initializeTomSelects() {
         no_backspace_delete: true,
       },
     };
+    // Disable search input for non-searchable dropdowns
+    if (!isSearchable) {
+      settings.controlInput = null;
+    }
     new TomSelect(el, settings);
   });
   function updateSelectedDisplay(instance) {
