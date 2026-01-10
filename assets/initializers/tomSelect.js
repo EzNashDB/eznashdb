@@ -13,6 +13,7 @@ export default function initializeTomSelects() {
     const isSearchable = el.dataset.searchable === "true";
     let settings = {
       dropdownParent: "body",
+      highlight: false,
       render: {
         option: renderUnescapedContent,
         item: renderUnescapedContent,
