@@ -17,7 +17,7 @@
     }
 }
 
-@media (min-height: 600px) {
+@media (min-height: 800px) {
     .shuls-scroll-container {
         display: flex;
         flex-direction: column;
