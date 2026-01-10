@@ -10,6 +10,20 @@
     }
 }
 
+/* Cap map height on very tall screens */
+@media (min-height: 800px) {
+    .map-container {
+        max-height: 700px;
+    }
+}
+
+@media (min-height: 600px) {
+    .shuls-scroll-container {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 
 .leaflet-container {
     font-family: unset;
@@ -28,6 +42,12 @@
     pointer-events: initial;
     max-width: 425px;
     width: calc(100vw - 40px) !important;
+}
+
+.shuls-offcanvas {
+    /* Same width as popups */
+    max-width: 425px;
+    margin: auto;
 }
 
 .leaflet-popup-content {
