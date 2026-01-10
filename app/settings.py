@@ -164,6 +164,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "app.context_processors.navbar",
+                "app.context_processors.honeypot",
             ],
         },
     },
@@ -210,6 +211,7 @@ AUTHENTICATION_BACKENDS = [
 # django-allauth configuration (using new v65+ settings)
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_FORMS = {"signup": "users.forms.HoneypotSignupForm"}
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True

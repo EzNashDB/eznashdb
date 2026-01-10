@@ -21,6 +21,9 @@
         <span class="px-3 text-muted">OR</span>
         <hr class="flex-grow-1">
     </div>
+    <style>
+        div:has(> .{{ HONEYPOT_FIELD_CLASS }}) { position: absolute !important; left: -9999px !important; }
+    </style>
     <form method="POST" action="{% url 'account_signup' %}">
         {% csrf_token %}
         {{ form|crispy }}

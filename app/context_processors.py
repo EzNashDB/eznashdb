@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from django.urls import reverse
 
+from users.forms import HONEYPOT_FIELD_CLASS
+
 
 @dataclass
 class NavbarItem:
@@ -35,4 +37,10 @@ def navbar(request):
 
     return {
         "navbar_items": navbar_items,
+    }
+
+
+def honeypot(request):
+    return {
+        "HONEYPOT_FIELD_CLASS": HONEYPOT_FIELD_CLASS,
     }
