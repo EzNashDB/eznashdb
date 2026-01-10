@@ -25,6 +25,7 @@ class Shul(models.Model):
     class Meta:
         verbose_name = "shul"
         verbose_name_plural = "shuls"
+        indexes = [models.Index(fields=["name"], name="shul_name_idx")]
 
     def __str__(self) -> str:
         return f"{self.name}"
