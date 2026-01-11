@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "django_htmx",
     "template_partials",
+    "django_recaptcha",
     "app",
     "eznashdb",
     "allauth",
@@ -117,6 +118,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "app.middleware.RateLimitViolationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "app.middleware.HTMXMessagesMiddleware",
@@ -199,6 +201,14 @@ else:
     }
 
 DATABASES = {"default": database}
+
+# Cache configuration (for rate limiting)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "rate_limit_cache",  # Table name
+    }
+}
 
 AUTH_USER_MODEL = "users.User"
 
@@ -344,3 +354,11 @@ TINYMCE_DEFAULT_CONFIG = {
     "width": "100%",
     "plugins": "lists code",
 }
+
+# reCAPTCHA configuration
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_SECRET_KEY")
+
+# Rate limiting configuration
+RATELIMIT_USE_CACHE = "default"
+RATELIMIT_IP_META_KEY = None  # We'll use custom IP extraction

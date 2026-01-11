@@ -1,5 +1,10 @@
 from django.contrib import messages as django_messages
+from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils import timezone
+
+from app.models import RateLimitViolation
+from app.rate_limiting import ENDPOINT_COORDINATE_ACCESS, get_client_ip
 
 
 class HTMXMessagesMiddleware:
@@ -36,3 +41,54 @@ class HTMXMessagesMiddleware:
                 response.content = response.content + messages_html.encode("utf-8")
 
         return response
+
+
+class RateLimitViolationMiddleware:
+    """Check for active cooldowns before processing requests."""
+
+    # Map URL paths to endpoint keys
+    COOLDOWN_PATHS = {
+        "/google-maps-proxy/": ENDPOINT_COORDINATE_ACCESS,
+        "/shuls/": ENDPOINT_COORDINATE_ACCESS,  # Covers update pages
+    }
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Check if path requires cooldown enforcement
+        endpoint_key = None
+        for path, key in self.COOLDOWN_PATHS.items():
+            if request.path.startswith(path):
+                endpoint_key = key
+                break
+
+        if endpoint_key:
+            ip = get_client_ip(request)
+            violation = RateLimitViolation.objects.filter(
+                ip_address=ip, endpoint=endpoint_key, cooldown_until__gt=timezone.now()
+            ).first()
+
+            if violation:
+                # Calculate remaining cooldown time
+                remaining_seconds = (violation.cooldown_until - timezone.now()).total_seconds()
+                remaining_days = remaining_seconds / (60 * 60 * 24)
+                cooldown_minutes = max(1, int(remaining_seconds / 60))
+
+                # Different context for 7-day block vs short cooldowns
+                if remaining_days > 2:  # More than 2 days = 7-day block
+                    context = {
+                        "is_long_block": True,
+                    }
+                else:
+                    # Short cooldowns - show exact time
+                    context = {
+                        "is_long_block": False,
+                        "retry_after": cooldown_minutes,
+                    }
+
+                response = render(request, "429.html", context)
+                response.status_code = 429
+                return response
+
+        return self.get_response(request)

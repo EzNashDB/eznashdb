@@ -5,14 +5,16 @@ import sentry_sdk
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.management import call_command
-from django.http import JsonResponse
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 from sentry_sdk import capture_message, set_context, set_tag
 
 from app.backups.core import list_gdrive_backups
+from app.forms import CaptchaVerificationForm
+from app.rate_limiting import generate_captcha_token
 
 
 @method_decorator(staff_member_required, name="dispatch")
@@ -123,3 +125,42 @@ class ClientErrorReportView(View):
         except Exception as e:
             # Don't fail if Sentry reporting fails
             return JsonResponse({"error": str(e)}, status=500)
+
+
+class CaptchaVerifyView(View):
+    """
+    Dedicated view for CAPTCHA verification.
+    After successful verification, generates a one-time token and redirects to 'next' URL.
+    """
+
+    def get(self, request):
+        form = CaptchaVerificationForm()
+        next_url = request.GET.get("next", "/")
+        return render(
+            request,
+            "eznashdb/captcha_verify.html",
+            {
+                "form": form,
+                "next_url": next_url,
+            },
+        )
+
+    def post(self, request):
+        form = CaptchaVerificationForm(request.POST)
+        next_url = request.POST.get("next", "/")
+
+        if form.is_valid():
+            # Generate one-time bypass token and redirect
+            generate_captcha_token(request)
+            return HttpResponseRedirect(next_url)
+
+        # Captcha failed - show form again with error
+        return render(
+            request,
+            "eznashdb/captcha_verify.html",
+            {
+                "form": form,
+                "next_url": next_url,
+                "message": "CAPTCHA verification failed. Please try again.",
+            },
+        )

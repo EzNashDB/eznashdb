@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from app.views import AdminDashboardView, ClientErrorReportView, RestoreDBView
+from app.views import AdminDashboardView, CaptchaVerifyView, ClientErrorReportView, RestoreDBView
 from users.views import AccountSettingsView
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path("admin/restore/", RestoreDBView.as_view(), name="restore_db"),
     path("admin/", admin.site.urls),
     path("report-error/", ClientErrorReportView.as_view(), name="report_error"),
+    path("verify-captcha/", CaptchaVerifyView.as_view(), name="captcha_verify"),
 ]
 
 if not settings.TESTING:

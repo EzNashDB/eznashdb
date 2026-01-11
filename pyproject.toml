@@ -111,6 +111,8 @@ django-tinymce = "^5.0.0"
 django-allauth = "^65.13.1"
 pyjwt = "^2.10.1"
 cryptography = "^46.0.3"
+django-ratelimit = "^4.1.0"
+django-recaptcha = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

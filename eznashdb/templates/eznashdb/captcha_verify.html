@@ -1,0 +1,14 @@
+{% extends "centered_card_base.html" %}
+
+{% block card_header %}<h4>Verification Required</h4>{% endblock %}
+
+{% block card_body %}
+    {% if message %}<div class="alert alert-danger">{{ message }}</div>{% endif %}
+    <p>To continue, please verify you're human.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        {{ form.captcha }}
+        <button type="submit" class="btn btn-primary mt-3">Verify and Continue</button>
+    </form>
+{% endblock %}
