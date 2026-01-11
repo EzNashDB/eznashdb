@@ -18,6 +18,7 @@ class RateLimitViolation(models.Model):
 
     # Cooldown durations by violation count (in minutes)
     COOLDOWN_MINUTES = {
+        1: 0,  # 1st violation: no cooldown, but captcha required
         2: 15,  # 2nd violation: 15 minutes
         3: 60,  # 3rd violation: 1 hour
         4: 60 * 24 * 7,  # 4th+ violation: 7 days
