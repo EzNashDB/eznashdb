@@ -75,6 +75,15 @@ export const AddressInputWithModal = ({
             />
           )}
         </Modal.Body>
+        <Modal.Footer className="justify-content-end">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setIsExpanded(false)}
+          >
+            Done Editing
+          </button>
+        </Modal.Footer>
       </Modal>
     </>
   );
