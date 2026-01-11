@@ -96,6 +96,7 @@ def describe_captcha_requirement():
         factory = RequestFactory()
         request = factory.post("/", HTTP_FLY_CLIENT_IP="1.2.3.4")
         request.user = test_user
+        request.session = {}  # Mock session
 
         # No violation yet
         assert check_captcha_required(request) is False
@@ -111,6 +112,7 @@ def describe_captcha_requirement():
         factory = RequestFactory()
         request = factory.post("/", HTTP_FLY_CLIENT_IP="1.2.3.4")
         request.user = test_user
+        request.session = {}  # Mock session
 
         # Create violation
         violation = record_violation(request)
