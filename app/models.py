@@ -16,12 +16,18 @@ class RateLimitViolation(models.Model):
         (ENDPOINT_COORDINATE_ACCESS, "Coordinate Access"),
     ]
 
+    # Cooldown durations by violation count (in minutes)
+    COOLDOWN_MINUTES = {
+        2: 15,  # 2nd violation: 15 minutes
+        3: 60,  # 3rd violation: 1 hour
+        4: 60 * 24 * 7,  # 4th+ violation: 7 days
+    }
+
     ip_address = models.GenericIPAddressField(db_index=True)
     endpoint = models.CharField(max_length=50, choices=ENDPOINT_CHOICES, db_index=True)
     violation_count = models.IntegerField(default=1)
     first_violation_at = models.DateTimeField(auto_now_add=True)
     last_violation_at = models.DateTimeField(auto_now=True)
-    cooldown_until = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -48,3 +54,36 @@ class RateLimitViolation(models.Model):
     def requires_captcha(self):
         """CAPTCHA required if violation is active."""
         return self.is_active()
+
+    @property
+    def cooldown_until(self):
+        """Calculate cooldown end time based on violation count."""
+        # For 4+ violations, use the 4th violation cooldown
+        count = min(self.violation_count, 4)
+        minutes = self.COOLDOWN_MINUTES.get(count, 0)
+        if minutes:
+            return self.last_violation_at + timedelta(minutes=minutes)
+        return None
+
+    def is_in_cooldown(self):
+        """Check if currently in a cooldown period."""
+        cooldown_end = self.cooldown_until
+        return cooldown_end is not None and cooldown_end > timezone.now()
+
+    def get_cooldown_context(self):
+        """Get context dict for 429 template."""
+        cooldown_end = self.cooldown_until
+        if not cooldown_end:
+            return {"is_long_block": False, "retry_after": 0}
+
+        remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
+        remaining_days = remaining_seconds / (60 * 60 * 24)
+
+        # Long block (7-day) vs short cooldowns
+        if remaining_days > 2:
+            return {"is_long_block": True}
+        else:
+            return {
+                "is_long_block": False,
+                "retry_after": max(1, int(remaining_seconds / 60)),
+            }

@@ -1,7 +1,6 @@
 from django.contrib import messages as django_messages
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.utils import timezone
 
 from app.models import RateLimitViolation
 from app.rate_limiting import ENDPOINT_COORDINATE_ACCESS, get_client_ip
@@ -65,28 +64,13 @@ class RateLimitViolationMiddleware:
 
         if endpoint_key:
             ip = get_client_ip(request)
-            violation = RateLimitViolation.objects.filter(
-                ip_address=ip, endpoint=endpoint_key, cooldown_until__gt=timezone.now()
-            ).first()
+            try:
+                violation = RateLimitViolation.objects.get(ip_address=ip, endpoint=endpoint_key)
+            except RateLimitViolation.DoesNotExist:
+                violation = None
 
-            if violation:
-                # Calculate remaining cooldown time
-                remaining_seconds = (violation.cooldown_until - timezone.now()).total_seconds()
-                remaining_days = remaining_seconds / (60 * 60 * 24)
-                cooldown_minutes = max(1, int(remaining_seconds / 60))
-
-                # Different context for 7-day block vs short cooldowns
-                if remaining_days > 2:  # More than 2 days = 7-day block
-                    context = {
-                        "is_long_block": True,
-                    }
-                else:
-                    # Short cooldowns - show exact time
-                    context = {
-                        "is_long_block": False,
-                        "retry_after": cooldown_minutes,
-                    }
-
+            if violation and violation.is_in_cooldown():
+                context = violation.get_cooldown_context()
                 response = render(request, "429.html", context)
                 response.status_code = 429
                 return response

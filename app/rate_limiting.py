@@ -1,7 +1,6 @@
 """Rate limiting and abuse prevention utilities."""
 
 import secrets
-from datetime import timedelta
 
 import sentry_sdk
 from django.utils import timezone
@@ -69,17 +68,6 @@ def record_violation(request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
             violation.violation_count = 1
             violation.first_violation_at = timezone.now()
             violation.last_violation_at = timezone.now()
-
-    # Apply cooldowns based on violation count
-    cooldowns = {
-        2: 15,  # 2nd violation: 15 minutes
-        3: 60,  # 3rd violation: 1 hour
-        4: 60 * 24 * 7,  # 4th violation: 7 days
-    }
-    cooldown_minutes = cooldowns.get(violation.violation_count, 0)
-
-    if cooldown_minutes > 0:
-        violation.cooldown_until = timezone.now() + timedelta(minutes=cooldown_minutes)
 
     violation.save()
 
