@@ -121,18 +121,7 @@ export const AddressInput = ({
               isValid={isValid}
             />
           </div>
-          <div className="d-flex justify-content-between mt-2">
-            <Button
-              className="shadow-sm"
-              variant="light"
-              size="sm"
-              disabled={currLocation == initialLocation}
-              onClick={resetLocation}
-              style={{ pointerEvents: "auto" }}
-            >
-              <i className="fa-solid fa-rotate-left me-1"></i>
-              Reset
-            </Button>
+          <div className="d-flex mt-2">
             {!isModal && onExpand && (
               <Button
                 variant="light"
@@ -145,6 +134,18 @@ export const AddressInput = ({
                 Expand
               </Button>
             )}
+
+            <Button
+              variant="light"
+              size="sm"
+              className="shadow-sm ms-auto"
+              onClick={resetLocation}
+              style={{ pointerEvents: "auto" }}
+              disabled={currLocation == initialLocation}
+            >
+              <i className="fa-solid fa-rotate-left me-1"></i>
+              Reset
+            </Button>
           </div>
         </div>
         <input
