@@ -4,7 +4,9 @@
 
 {% block card_body %}
     {% if message %}<div class="alert alert-danger">{{ message }}</div>{% endif %}
-    <p>To continue, please verify you're human.</p>
+    <p>
+        We've detected a high number of requests from this location. To continue, please verify you're human.
+    </p>
     <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next_url }}">

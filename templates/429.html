@@ -1,18 +1,32 @@
 {% extends "centered_card_base.html" %}
 
-{% block card_header %}<h4>Too Many Requests</h4>{% endblock %}
+{% block card_header %}
+    <h4>
+        {% if is_long_block %}
+            Access Restricted
+        {% else %}
+            Temporarily Blocked
+        {% endif %}
+    </h4>
+{% endblock %}
 
 {% block card_body %}
-    <div class="alert alert-warning mb-0">
+    <div class="alert alert-
+                {% if is_long_block %}
+                    danger
+                {% else %}
+                    warning
+                {% endif %}
+                mb-0">
         {% if is_long_block %}
-            <p>Your access has been restricted due to excessive requests.</p>
+            <p>We've detected unusual activity from this location and have restricted access.</p>
             <p class="mb-0">
                 If you believe this is a mistake, please
                 <a href="{% url 'eznashdb:contact_us' %}">contact us</a>.
             </p>
         {% else %}
             <p class="mb-0">
-                You've made too many requests. Please wait <strong>{{ retry_after }}</strong> minute{{ retry_after|pluralize }} before trying again.
+                We've detected too many requests from this location. Please wait <strong>{{ retry_after }}</strong> minute{{ retry_after|pluralize }} before trying again.
             </p>
         {% endif %}
     </div>
