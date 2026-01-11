@@ -2,15 +2,53 @@ import TomSelect from "tom-select";
 
 export default function initializeTomSelects() {
   document.querySelectorAll("select.tom-select").forEach((el) => {
-    if (!!el.tomselect) return;
+    if (el.tomselect) return;
+
     const isMultiSelect = el.hasAttribute("multiple");
+    const isSearchable = el.dataset.searchable === "true";
+    const expandOnFocus = el.dataset.expandOnFocus === "true";
+
     const renderUnescapedContent = (data, escape) => {
-      // prefer explicit data.html, then option.innerHTML, otherwise escape the text
       const html =
         data.html ?? data.$option?.innerHTML ?? escape(data.text ?? "");
       return `<div>${html}</div>`;
     };
-    const isSearchable = el.dataset.searchable === "true";
+
+    // Show "X items selected" when collapsed, individual items when expanded
+    function updateSelectionDisplay(instance, expanded) {
+      if (!isMultiSelect) return;
+
+      const selectedItems = instance.control.querySelectorAll(".item");
+      let placeholder = instance.control.querySelector("#ts-placeholder");
+      const numSelected = selectedItems.length;
+
+      if (numSelected > 1 && !expanded) {
+        // Collapsed: show placeholder
+        selectedItems.forEach((item) => (item.hidden = true));
+
+        if (!placeholder) {
+          placeholder = document.createElement("div");
+          placeholder.setAttribute("id", "ts-placeholder");
+          const input = instance.control.querySelector("input");
+          instance.control.insertBefore(placeholder, input);
+        }
+        placeholder.textContent = numSelected + " items selected";
+      } else {
+        // Expanded or single item: show individual items
+        selectedItems.forEach((item) => (item.hidden = false));
+        placeholder?.remove();
+      }
+
+      // Fix dropdown position
+      if (instance.isOpen) {
+        requestAnimationFrame(() => {
+          const rect = instance.control.getBoundingClientRect();
+          instance.dropdown.style.top = `${rect.bottom}px`;
+          instance.dropdown.style.left = `${rect.left}px`;
+        });
+      }
+    }
+
     let settings = {
       dropdownParent: "body",
       highlight: false,
@@ -19,17 +57,39 @@ export default function initializeTomSelects() {
         item: renderUnescapedContent,
       },
       onInitialize: function () {
-        updateSelectedDisplay(this);
+        if (!isMultiSelect) return;
+
+        const instance = this;
+        updateSelectionDisplay(instance, false);
+
+        if (expandOnFocus) {
+          // Toggle display on focus/blur
+          instance.control.addEventListener("focusin", () => {
+            updateSelectionDisplay(instance, true);
+          });
+          instance.control.addEventListener("focusout", (e) => {
+            // Only update if focus is leaving the control entirely
+            if (!instance.control.contains(e.relatedTarget)) {
+              updateSelectionDisplay(instance, false);
+            }
+          });
+        }
       },
       onItemAdd: function () {
-        updateSelectedDisplay(this);
+        if (!isMultiSelect) return;
+        const expanded =
+          expandOnFocus && this.control.contains(document.activeElement);
+        updateSelectionDisplay(this, expanded);
       },
       onItemRemove: function () {
-        updateSelectedDisplay(this);
+        if (!isMultiSelect) return;
+        const expanded =
+          expandOnFocus && this.control.contains(document.activeElement);
+        updateSelectionDisplay(this, expanded);
       },
       onChange: function (value) {
-        let option = this.options[value];
-        let html = option?.html || option?.text || value;
+        const option = this.options[value];
+        const html = option?.html || option?.text || value;
 
         window.dispatchEvent(
           new CustomEvent("tom-select-changed", {
@@ -49,62 +109,20 @@ export default function initializeTomSelects() {
             uncheckedClassNames: ["ts-unchecked"],
           },
         }),
+        remove_button: {
+          title: "Remove this item",
+        },
         clear_button: {
           title: (isMultiSelect && "Clear All") || "Clear",
         },
         no_backspace_delete: true,
       },
     };
-    // Disable search input for non-searchable dropdowns
+
     if (!isSearchable) {
       settings.controlInput = null;
     }
+
     new TomSelect(el, settings);
   });
-  function updateSelectedDisplay(instance) {
-    // Based on https://stackoverflow.com/a/76879570/11278892
-    const selectedItems = instance.control.querySelectorAll(".item");
-    let childElement = instance.control.querySelector("#ts-placeholder");
-    const numSelected = selectedItems.length;
-
-    if (numSelected > 1) {
-      // hide all existing
-      selectedItems.forEach(function (item) {
-        item.hidden = true;
-      });
-      if (!childElement) {
-        // add dummy
-        const divElement = document.createElement("div");
-        // Set attributes
-        divElement.setAttribute("id", "ts-placeholder");
-        // Set content
-        divElement.textContent = numSelected + " items selected";
-        // Place the placeholder before the input so the text cursor appears after it when focused.
-        const input = instance.control.querySelector("input");
-        instance.control.insertBefore(divElement, input);
-      } else {
-        childElement = instance.control.querySelector("#ts-placeholder");
-        childElement.textContent = numSelected + " items selected";
-      }
-    } else {
-      selectedItems.forEach(function (item) {
-        item.hidden = false;
-      });
-      childElement = instance.control.querySelector("#ts-placeholder");
-      if (childElement) {
-        instance.control.removeChild(childElement);
-      }
-    }
-
-    // Fix dropdown position after control height changes.
-    // Changing the control's content above can cause the dropdown to misalign.
-    // Wait for layout to complete, then recalculate the correct position.
-    if (instance.isOpen) {
-      requestAnimationFrame(() => {
-        const rect = instance.control.getBoundingClientRect();
-        instance.dropdown.style.top = `${rect.bottom}px`;
-        instance.dropdown.style.left = `${rect.left}px`;
-      });
-    }
-  }
 }

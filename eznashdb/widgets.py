@@ -31,6 +31,7 @@ class DataHtmlOptionMixin:
 
 class TomSelectMixin:
     searchable = False
+    expand_on_focus = False
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -38,6 +39,8 @@ class TomSelectMixin:
         attrs["class"] = attrs.get("class", "") + " tom-select"
         if self.searchable:
             attrs["data-searchable"] = "true"
+        if self.expand_on_focus:
+            attrs["data-expand-on-focus"] = "true"
         return context
 
 
@@ -46,7 +49,13 @@ class MultiTomSelectWidget(TomSelectMixin, DataHtmlOptionMixin, SelectMultiple):
 
 
 class SearchableMultiTomSelectWidget(MultiTomSelectWidget):
+    """
+    Adding expand_on_focus since searchable fields likely have more options
+    meaning they're not all immediately visible in the dropdown
+    """
+
     searchable = True
+    expand_on_focus = True
 
 
 class SingleTomSelectWidget(TomSelectMixin, DataHtmlOptionMixin, Select):
