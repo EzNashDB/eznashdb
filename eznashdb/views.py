@@ -18,6 +18,7 @@ from django.views.generic import DeleteView, TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
+from app.mixins import RateLimitCaptchaMixin
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulForm
 from eznashdb.mixins import LoginRequiredMixin
@@ -97,7 +98,7 @@ class ShulsFilterView(FilterView):
         return super().get_template_names()
 
 
-class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
+class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView):
     login_required_message = "Log in to add or edit shuls."
     model = Shul
     form_class = ShulForm
@@ -122,6 +123,20 @@ class CreateUpdateShulView(LoginRequiredMixin, UpdateView):
     @property
     def is_update(self):
         return self.get_object() is not None
+
+    def dispatch(self, request, *args, **kwargs):
+        # Only apply rate limiting for update mode
+        if self.is_update:
+            return RateLimitCaptchaMixin.dispatch(self, request, *args, **kwargs)
+        # Skip rate limiting for create mode
+        return super(RateLimitCaptchaMixin, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        # Check CAPTCHA only for update mode
+        if self.is_update and (redirect := self.redirect_if_captcha_required(request)):
+            return redirect
+
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         if self.is_update:
@@ -347,23 +362,25 @@ class AddressLookupView(View):
         return results
 
 
-class GoogleMapsProxyView(LoginRequiredMixin, View):
+class GoogleMapsProxyView(RateLimitCaptchaMixin, LoginRequiredMixin, View):
     login_required_message = "Log in to open in Google Maps."
 
     def get(self, request, *args, **kwargs):
+        # Check if CAPTCHA is required
+        if redirect := self.redirect_if_captcha_required(request):
+            return redirect
+
+        # Normal flow - redirect to Google Maps
         shul_id = request.GET.get("id")
         if not shul_id:
             return HttpResponseBadRequest("Missing 'id' parameter.")
 
         shul = get_object_or_404(Shul, pk=shul_id)
-
         lat = round(float(shul.latitude), 5)
         lon = round(float(shul.longitude), 5)
-
         maps_url = f"https://www.google.com/maps/place/{lat},{lon}/@{lat},{lon},17z"
 
         context = {"maps_url": maps_url, "shul": shul}
-
         return render(request, "maps_redirect.html", context)
 
 

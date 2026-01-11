@@ -1,0 +1,18 @@
+{% extends "centered_card_base.html" %}
+
+{% block card_content %}
+    <div class="alert alert-warning">
+        <h3>Too Many Requests</h3>
+        {% if is_long_block %}
+            <p>Your access has been restricted due to excessive requests.</p>
+            <p class="mt-3">
+                If you believe this is a mistake, please
+                <a href="{% url 'eznashdb:contact_us' %}">contact us</a>.
+            </p>
+        {% else %}
+            <p>
+                You've made too many requests. Please wait <strong>{{ retry_after }}</strong> minute{{ retry_after|pluralize }} before trying again.
+            </p>
+        {% endif %}
+    </div>
+{% endblock %}
