@@ -108,10 +108,10 @@ export default function initializeTomSelects() {
             checkedClassNames: ["ts-checked"],
             uncheckedClassNames: ["ts-unchecked"],
           },
+          remove_button: {
+            title: "Remove this item",
+          },
         }),
-        remove_button: {
-          title: "Remove this item",
-        },
         clear_button: {
           title: (isMultiSelect && "Clear All") || "Clear",
         },
