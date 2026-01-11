@@ -356,8 +356,8 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 # reCAPTCHA configuration
-RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
-RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_SECRET_KEY")
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
 
 # Rate limiting configuration
 RATELIMIT_USE_CACHE = "default"
