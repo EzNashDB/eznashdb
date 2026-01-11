@@ -18,7 +18,7 @@
 {% block content %}
     <div class="row h-100 d-flex flex-column flex-lg-row">
         <!-- Filter sidebar: top on mobile, left on desktop -->
-        <div class="col-12 col-lg-3 d-lg-flex flex-column overflow-auto h-lg-100 max-h-50"
+        <div class="col-12 col-lg-4 col-xl-3  d-lg-flex flex-column overflow-auto h-lg-100 max-h-50"
             {# djlint:off #}
          x-data="{
              filtersCollapsed: localStorage.getItem('shulFiltersCollapsed') === 'true',
@@ -70,7 +70,7 @@
                 >{% include "eznashdb/includes/shul_filters.html" %}</div>
         </div>
         <!-- Map column: below filters on mobile, right side on desktop -->
-        <div class="col-12 col-lg-9 d-flex flex-column flex-grow-1">
+        <div class="col-12 col-lg-8 col-xl-9 d-flex flex-column flex-grow-1">
             <div class="flex-grow-1 w-100">
                 <div class="border rounded h-100 position-relative map-container">
                     <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
