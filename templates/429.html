@@ -11,11 +11,11 @@
 {% endblock %}
 
 {% block card_body %}
-    <div class="alert alert-
+    <div class="alert
                 {% if is_long_block %}
-                    danger
+                    alert-danger
                 {% else %}
-                    warning
+                    alert-warning
                 {% endif %}
                 mb-0">
         {% if is_long_block %}
