@@ -19,7 +19,7 @@ class RateLimitCaptchaMixin:
 
     @method_decorator(
         ratelimit(
-            key=lambda g, r: get_client_ip(r),
+            key=lambda _group, request: get_client_ip(request),
             rate="30/h",
             method=["GET", "POST"],
             block=False,  # Don't auto-block, record violation instead
