@@ -26,7 +26,8 @@ class RateLimitCaptchaMixin:
         )
     )
     def dispatch(self, request, *args, **kwargs):
-        if getattr(request, "limited", False):
+        was_limited = getattr(request, "limited", False)
+        if was_limited:
             ViolationRecorder(request, self.endpoint_key).record()
         return super().dispatch(request, *args, **kwargs)
 
