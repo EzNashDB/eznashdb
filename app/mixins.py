@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 
+from app.enums import RateLimitedEndpoint
 from app.rate_limiting import (
-    ENDPOINT_COORDINATE_ACCESS,
     ViolationRecorder,
     check_captcha_required,
     get_client_ip,
@@ -22,7 +22,7 @@ class RateLimitCaptchaMixin:
     """Mixin to add rate limiting and CAPTCHA to views that expose coordinates."""
 
     rate_limit = "30/h"  # Can be overridden in view
-    endpoint_key = ENDPOINT_COORDINATE_ACCESS
+    endpoint_key = RateLimitedEndpoint.COORDINATE_ACCESS
 
     @method_decorator(
         ratelimit(

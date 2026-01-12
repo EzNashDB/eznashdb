@@ -2,8 +2,9 @@ from django.contrib import messages as django_messages
 from django.shortcuts import render
 from django.template.loader import render_to_string
 
+from app.enums import RateLimitedEndpoint
 from app.models import RateLimitViolation
-from app.rate_limiting import ENDPOINT_COORDINATE_ACCESS, get_client_ip
+from app.rate_limiting import get_client_ip
 
 
 class HTMXMessagesMiddleware:
@@ -47,8 +48,8 @@ class RateLimitViolationMiddleware:
 
     # Map URL paths to endpoint keys
     COOLDOWN_PATHS = {
-        "/google-maps-proxy/": ENDPOINT_COORDINATE_ACCESS,
-        "/shuls/": ENDPOINT_COORDINATE_ACCESS,  # Covers update pages
+        "/google-maps-proxy/": RateLimitedEndpoint.COORDINATE_ACCESS,
+        "/shuls/": RateLimitedEndpoint.COORDINATE_ACCESS,  # Covers update pages
     }
 
     def __init__(self, get_response):
