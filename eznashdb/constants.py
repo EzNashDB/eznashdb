@@ -62,4 +62,4 @@ class FieldsOptions:
     )
 
 
-JUST_SAVED_SESSION_KEY = "just_saved_shul_id"
+JUST_SAVED_SHUL_SESSION_KEY = "just_saved_shul_id"
