@@ -1,6 +1,5 @@
 """Mixins for views."""
 
-import logging
 from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
@@ -9,13 +8,7 @@ from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 
 from app.enums import RateLimitedEndpoint
-from app.rate_limiting import (
-    ViolationRecorder,
-    check_captcha_required,
-    get_client_ip,
-)
-
-logger = logging.getLogger(__name__)
+from app.rate_limiting import ViolationRecorder, check_captcha_required, get_client_ip
 
 
 class RateLimitCaptchaMixin:
@@ -33,14 +26,8 @@ class RateLimitCaptchaMixin:
         )
     )
     def dispatch(self, request, *args, **kwargs):
-        # Check if rate limited
         if getattr(request, "limited", False):
-            violation = ViolationRecorder(request, self.endpoint_key).record()
-            logger.warning(
-                f"Rate limit hit: {get_client_ip(request)} - {self.endpoint_key} "
-                f"(violation #{violation.violation_count})"
-            )
-
+            ViolationRecorder(request, self.endpoint_key).record()
         return super().dispatch(request, *args, **kwargs)
 
     def redirect_if_captcha_required(self, request):
