@@ -6,15 +6,11 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from app.rate_limiting import ENDPOINT_COORDINATE_ACCESS
+from app.enums import RateLimitedEndpoint
 
 
 class RateLimitViolation(models.Model):
     """Track rate limit violations for progressive enforcement."""
-
-    ENDPOINT_CHOICES = [
-        (ENDPOINT_COORDINATE_ACCESS, "Coordinate Access"),
-    ]
 
     # Cooldown durations by violation count (in minutes)
     COOLDOWN_MINUTES = {
@@ -25,7 +21,7 @@ class RateLimitViolation(models.Model):
     }
 
     ip_address = models.GenericIPAddressField(db_index=True)
-    endpoint = models.CharField(max_length=50, choices=ENDPOINT_CHOICES, db_index=True)
+    endpoint = models.CharField(max_length=50, choices=RateLimitedEndpoint.choices, db_index=True)
     violation_count = models.IntegerField(default=1)
     first_violation_at = models.DateTimeField(auto_now_add=True)
     last_violation_at = models.DateTimeField(auto_now=True)

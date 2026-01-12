@@ -5,10 +5,10 @@ import secrets
 import sentry_sdk
 from django.utils import timezone
 
-CAPTCHA_TOKEN_SESSION_KEY = "_captcha_bypass_token"
+from app.enums import RateLimitedEndpoint
+from app.models import RateLimitViolation
 
-# Constants
-ENDPOINT_COORDINATE_ACCESS = "coordinate_access"
+CAPTCHA_TOKEN_SESSION_KEY = "_captcha_bypass_token"
 
 
 def get_client_ip(request):
@@ -34,9 +34,7 @@ def get_client_ip(request):
 class ViolationRecorder:
     """Records rate limit violations and applies progressive escalation with CAPTCHA."""
 
-    def __init__(self, request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
-        from app.models import RateLimitViolation
-
+    def __init__(self, request, endpoint_key=RateLimitedEndpoint.COORDINATE_ACCESS):
         self.request = request
         self.endpoint_key = endpoint_key
         self.ip = get_client_ip(request)
@@ -87,7 +85,7 @@ class ViolationRecorder:
             )
 
 
-def check_captcha_required(request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
+def check_captcha_required(request, endpoint_key=RateLimitedEndpoint.COORDINATE_ACCESS):
     """
     Check if CAPTCHA is required for this IP on this endpoint.
     CAPTCHA is required if there are active violations (within 24h)
