@@ -57,6 +57,7 @@ class ViolationRecorder:
                 "user": user,
                 "violation_count": 0,
                 "first_violation_at": now,
+                "last_violation_at": now,
             },
         )
         violation.last_violation_at = now
