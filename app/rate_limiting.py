@@ -54,21 +54,13 @@ class ViolationRecorder:
         violation, created = self._model.objects.get_or_create(
             ip_address=self.ip,
             endpoint=self.endpoint_key,
-            defaults={"user": user},
+            defaults={"user": user, "violation_count": 0},
         )
-
-        # If not newly created, check if it's still within 24h window
-        if not created:
-            if violation.is_active():
-                # Still within window - increment count
-                violation.violation_count += 1
-                violation.last_violation_at = timezone.now()
-                violation.user = violation.user or user
-            else:
-                # Outside 24h window - reset
-                violation.violation_count = 1
-                violation.first_violation_at = timezone.now()
-                violation.last_violation_at = timezone.now()
+        violation.last_violation_at = timezone.now()
+        violation.violation_count += 1
+        violation.user = violation.user or user
+        if created or not violation.is_active():
+            violation.first_violation_at = timezone.now()
 
         violation.save()
 
