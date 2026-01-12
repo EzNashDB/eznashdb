@@ -9,9 +9,9 @@ from django.utils import timezone
 
 from app.models import RateLimitViolation
 from app.rate_limiting import (
+    ViolationRecorder,
     check_captcha_required,
     get_client_ip,
-    record_violation,
 )
 
 User = get_user_model()
@@ -43,7 +43,7 @@ def describe_violation_recording():
         request = factory.post("/", HTTP_FLY_CLIENT_IP="1.2.3.4")
         request.user = test_user
 
-        violation = record_violation(request)
+        violation = ViolationRecorder(request).record()
 
         assert violation.violation_count == 1
         assert violation.cooldown_until is None
@@ -56,9 +56,9 @@ def describe_violation_recording():
         request.user = test_user
 
         # First violation
-        record_violation(request)
+        ViolationRecorder(request).record()
         # Second violation
-        violation = record_violation(request)
+        violation = ViolationRecorder(request).record()
 
         assert violation.violation_count == 2
         assert violation.cooldown_until is not None
@@ -72,7 +72,7 @@ def describe_violation_recording():
         request.user = test_user
 
         # Create violation
-        violation = record_violation(request)
+        violation = ViolationRecorder(request).record()
         assert violation.violation_count == 1
 
         # Simulate 25 hours passing (use update to bypass auto_now)
@@ -102,7 +102,7 @@ def describe_captcha_requirement():
         assert check_captcha_required(request) is False
 
         # Create violation
-        record_violation(request)
+        ViolationRecorder(request).record()
 
         # CAPTCHA now required
         assert check_captcha_required(request) is True
@@ -115,7 +115,7 @@ def describe_captcha_requirement():
         request.session = {}  # Mock session
 
         # Create violation
-        violation = record_violation(request)
+        violation = ViolationRecorder(request).record()
 
         # Simulate 25 hours passing (use update to bypass auto_now)
         RateLimitViolation.objects.filter(pk=violation.pk).update(

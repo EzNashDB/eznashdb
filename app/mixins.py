@@ -10,9 +10,9 @@ from django_ratelimit.decorators import ratelimit
 
 from app.rate_limiting import (
     ENDPOINT_COORDINATE_ACCESS,
+    ViolationRecorder,
     check_captcha_required,
     get_client_ip,
-    record_violation,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class RateLimitCaptchaMixin:
     def dispatch(self, request, *args, **kwargs):
         # Check if rate limited
         if getattr(request, "limited", False):
-            violation = record_violation(request, self.endpoint_key)
+            violation = ViolationRecorder(request, self.endpoint_key).record()
             logger.warning(
                 f"Rate limit hit: {get_client_ip(request)} - {self.endpoint_key} "
                 f"(violation #{violation.violation_count})"
