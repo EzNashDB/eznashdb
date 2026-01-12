@@ -48,17 +48,22 @@ class ViolationRecorder:
             RateLimitViolation instance
         """
         # Get or create violation record (unique per IP+endpoint)
+        now = timezone.now()
         user = self._get_user()
         violation, created = self._model.objects.get_or_create(
             ip_address=self.ip,
             endpoint=self.endpoint_key,
-            defaults={"user": user, "violation_count": 0},
+            defaults={
+                "user": user,
+                "violation_count": 0,
+                "first_violation_at": now,
+            },
         )
-        violation.last_violation_at = timezone.now()
+        violation.last_violation_at = now
         violation.violation_count += 1
         violation.user = violation.user or user
-        if created or not violation.is_active():
-            violation.first_violation_at = timezone.now()
+        if not created and not violation.is_active():
+            violation.first_violation_at = now
 
         violation.save()
 
