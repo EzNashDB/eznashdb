@@ -415,23 +415,18 @@
                 };
 
                 // ============================================================================
-                // OPEN MARKER FROM URL
+                // AUTO OPEN MARKER
                 // ============================================================================
 
-                const openMarkerFromURL = () => {
+                const autoOpenMarker = () => {
                     const api = window.SHUL_MAP_API;
 
                     // Check for justSaved first (highest priority - newly saved shul)
-                    const justSavedId = urlParams.get("justSaved");
+                    const justSavedId = '{{exact_pin_shul.id}}';
                     if (justSavedId) {
                         const exactPinMarker = api.markersByPopupId[justSavedId];
                         if (exactPinMarker) {
                             api.markersLayer.fire('click', { layer: exactPinMarker });
-
-                            // Delete URL params immediately so pin disappears on refresh
-                            setTimeout(() => {
-                                URL_PARAMS_API.delete(["justSaved"]);
-                            }, 100);
                             return;
                         }
                     }
@@ -525,7 +520,7 @@
                     addMarker,
                     addMarkerWithWorldWrap,
                     clearMarkers,
-                    openMarkerFromURL,
+                    autoOpenMarker,
                     initShulAccordion,
                 };
             };
@@ -617,7 +612,7 @@
                 const mapApi = window.SHUL_MAP_API;
                 mapApi.clearMarkers();
                 addShulMarkers();
-                mapApi.openMarkerFromURL();
+                mapApi.autoOpenMarker();
             };
 
             // ============================================================================
