@@ -76,7 +76,7 @@ class ViolationRecorder:
         """Log to Sentry for violations >= 3."""
         if violation.violation_count >= 3:
             sentry_sdk.capture_message(
-                f"Rate limit abuse: {self.ip} hit {self.endpoint_key} {violation.violation_count}x",
+                f"Rate limit abuse: {self.ip} hit {self.endpoint_key} limit {violation.violation_count}x",
                 level="warning",
                 extra={
                     "ip": self.ip,
