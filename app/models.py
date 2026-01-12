@@ -29,13 +29,8 @@ class RateLimitViolation(models.Model):
     violation_count = models.IntegerField(default=1)
     first_violation_at = models.DateTimeField(auto_now_add=True)
     last_violation_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text="User if authenticated during violation",
-    )
+    # First authenticated user with this violation record
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = "Rate Limit Violation"
