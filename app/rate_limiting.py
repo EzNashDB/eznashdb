@@ -31,60 +31,68 @@ def get_client_ip(request):
     return request.META.get("REMOTE_ADDR", "")
 
 
-def record_violation(request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
-    """
-    Record rate limit violation and apply progressive escalation with CAPTCHA.
+class ViolationRecorder:
+    """Records rate limit violations and applies progressive escalation with CAPTCHA."""
 
-    Args:
-        request: Django request object
-        endpoint_key: One of ENDPOINT_* constants
+    def __init__(self, request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
+        from app.models import RateLimitViolation
 
-    Returns:
-        RateLimitViolation instance
-    """
-    from app.models import RateLimitViolation
+        self.request = request
+        self.endpoint_key = endpoint_key
+        self.ip = get_client_ip(request)
+        self._model = RateLimitViolation
 
-    ip = get_client_ip(request)
+    def record(self):
+        """
+        Record a rate limit violation.
 
-    # Get or create violation record (unique per IP+endpoint)
-    violation, created = RateLimitViolation.objects.get_or_create(
-        ip_address=ip,
-        endpoint=endpoint_key,
-        defaults={
-            "user": request.user if request.user.is_authenticated else None,
-        },
-    )
-
-    # If not newly created, check if it's still within 24h window
-    if not created:
-        if violation.is_active():
-            # Still within window - increment count
-            violation.violation_count += 1
-            violation.last_violation_at = timezone.now()
-            if request.user.is_authenticated and not violation.user:
-                violation.user = request.user
-        else:
-            # Outside 24h window - reset
-            violation.violation_count = 1
-            violation.first_violation_at = timezone.now()
-            violation.last_violation_at = timezone.now()
-
-    violation.save()
-
-    # Log to Sentry for violations >= 3
-    if violation.violation_count >= 3:
-        sentry_sdk.capture_message(
-            f"Rate limit abuse: {ip} hit {endpoint_key} {violation.violation_count}x",
-            level="warning",
-            extra={
-                "ip": ip,
-                "endpoint": endpoint_key,
-                "violation_count": violation.violation_count,
-                "user_id": request.user.id if request.user.is_authenticated else None,
-            },
+        Returns:
+            RateLimitViolation instance
+        """
+        # Get or create violation record (unique per IP+endpoint)
+        user = self._get_user()
+        violation, created = self._model.objects.get_or_create(
+            ip_address=self.ip,
+            endpoint=self.endpoint_key,
+            defaults={"user": user},
         )
 
-    return violation
+        # If not newly created, check if it's still within 24h window
+        if not created:
+            if violation.is_active():
+                # Still within window - increment count
+                violation.violation_count += 1
+                violation.last_violation_at = timezone.now()
+                violation.user = violation.user or user
+            else:
+                # Outside 24h window - reset
+                violation.violation_count = 1
+                violation.first_violation_at = timezone.now()
+                violation.last_violation_at = timezone.now()
+
+        violation.save()
+
+        self._log_to_sentry(violation)
+
+        return violation
+
+    def _get_user(self):
+        """Return the user if authenticated, None otherwise."""
+        return self.request.user if self.request.user.is_authenticated else None
+
+    def _log_to_sentry(self, violation):
+        """Log to Sentry for violations >= 3."""
+        if violation.violation_count >= 3:
+            sentry_sdk.capture_message(
+                f"Rate limit abuse: {self.ip} hit {self.endpoint_key} {violation.violation_count}x",
+                level="warning",
+                extra={
+                    "ip": self.ip,
+                    "endpoint": self.endpoint_key,
+                    "violation_count": violation.violation_count,
+                    "user_id": self.request.user.id if self.request.user.is_authenticated else None,
+                },
+            )
 
 
 def check_captcha_required(request, endpoint_key=ENDPOINT_COORDINATE_ACCESS):
