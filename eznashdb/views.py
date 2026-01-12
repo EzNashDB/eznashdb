@@ -19,6 +19,7 @@ from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
 from app.mixins import RateLimitCaptchaMixin
+from eznashdb.constants import JUST_SAVED_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulForm
 from eznashdb.mixins import LoginRequiredMixin
@@ -32,9 +33,16 @@ class ShulsFilterView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get exact pin shul if justSaved param exists
+        # Get exact pin shul if justSaved param exists AND matches session
+        # This prevents URL crafting to get exact coordinates
         saved_shul_id = self.request.GET.get("justSaved")
-        exact_pin_shul = Shul.objects.filter(pk=saved_shul_id).first()
+        exact_pin_shul = None
+        if saved_shul_id:
+            session_shul_id = self.request.session.pop(JUST_SAVED_SESSION_KEY, None)
+            if session_shul_id and str(session_shul_id) == saved_shul_id:
+                exact_pin_shul = Shul.objects.filter(pk=saved_shul_id).first()
+            else:
+                saved_shul_id = None  # Clear so we don't exclude from clusters
         clustered_shuls = self.object_list.exclude(pk=saved_shul_id)
 
         # Group shuls by their display coordinates (excluding exact pin to prevent double-display)
@@ -200,6 +208,8 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
         success_url = self.get_success_url()
         success_message = "Success! Your shul has been saved."
         messages.success(self.request, success_message)
+        # Store in session to prevent URL crafting to get exact coordinates
+        self.request.session[JUST_SAVED_SESSION_KEY] = self.object.pk
         success_url += f"&justSaved={self.object.pk}"
         return HttpResponseClientRedirect(success_url)
 

@@ -3,6 +3,7 @@ from functools import partial
 from bs4 import BeautifulSoup
 from django.urls import reverse
 
+from eznashdb.constants import JUST_SAVED_SESSION_KEY
 from eznashdb.models import Shul
 from eznashdb.views import CreateUpdateShulView
 from users.models import User
@@ -310,6 +311,9 @@ def describe_wizard():
         redirect_url = response.headers.get("HX-Redirect")
         assert redirect_url is not None
         assert "justSaved" in redirect_url
+
+        # Session should contain the saved shul ID for security validation
+        assert client.session.get(JUST_SAVED_SESSION_KEY) == shul.id
 
     def test_wizard_step2_requires_at_least_one_room(client, test_user):
         """Step 2 validation enforces minimum 1 room for new shuls"""

@@ -1,6 +1,7 @@
 import pytest
 from bs4 import BeautifulSoup
 
+from eznashdb.constants import JUST_SAVED_SESSION_KEY
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
@@ -73,9 +74,13 @@ def describe_rooms():
 
 def describe_exact_pin_behavior():
     def test_justSaved_shul_in_context_and_excluded_from_clusters(rf_GET):
-        """When justSaved param is present, shul should be in exact_pin_shul and excluded from clusters"""
+        """When justSaved param is present with valid session, shul should be in exact_pin_shul"""
         shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
-        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(shul.id)})
+        request = rf_GET(
+            "eznashdb:shuls",
+            query_params={"justSaved": str(shul.id)},
+            session={JUST_SAVED_SESSION_KEY: shul.id},
+        )
 
         response = ShulsFilterView.as_view()(request)
         context = response.context_data
@@ -86,6 +91,33 @@ def describe_exact_pin_behavior():
         all_clustered_shuls = [s for cluster in context["shul_clusters"].values() for s in cluster]
         assert shul not in all_clustered_shuls
 
+    def test_justSaved_without_session_does_not_show_exact_pin(rf_GET):
+        """When justSaved param is present but no matching session, exact_pin_shul should be None"""
+        shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
+        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(shul.id)})
+
+        response = ShulsFilterView.as_view()(request)
+        context = response.context_data
+
+        # Should NOT show exact pin without session validation
+        assert context["exact_pin_shul"] is None
+
+    def test_justSaved_with_mismatched_session_does_not_show_exact_pin(rf_GET):
+        """When justSaved param doesn't match session value, exact_pin_shul should be None"""
+        shul = Shul.objects.create(name="Test Shul", latitude=40.7128, longitude=-74.0060)
+        other_shul = Shul.objects.create(name="Other Shul", latitude=40.7, longitude=-74.0)
+        request = rf_GET(
+            "eznashdb:shuls",
+            query_params={"justSaved": str(shul.id)},
+            session={JUST_SAVED_SESSION_KEY: other_shul.id},
+        )
+
+        response = ShulsFilterView.as_view()(request)
+        context = response.context_data
+
+        # Should NOT show exact pin when IDs don't match
+        assert context["exact_pin_shul"] is None
+
     def test_cluster_offset_calculated_for_nearby_cluster(rf_GET):
         """When exact pin is close to a cluster, offset should be calculated with correct structure"""
         # Create shuls that round to same coords (40.70, -74.00) and jitter close to exact position
@@ -94,7 +126,11 @@ def describe_exact_pin_behavior():
         # Create another shul at similar coords to force same cluster
         _nearby_shul = Shul.objects.create(name="Nearby Shul", latitude=40.699, longitude=-74.001)
 
-        request = rf_GET("eznashdb:shuls", query_params={"justSaved": str(exact_shul.id)})
+        request = rf_GET(
+            "eznashdb:shuls",
+            query_params={"justSaved": str(exact_shul.id)},
+            session={JUST_SAVED_SESSION_KEY: exact_shul.id},
+        )
 
         response = ShulsFilterView.as_view()(request)
         context = response.context_data

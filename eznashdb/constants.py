@@ -60,3 +60,6 @@ class FieldsOptions:
             How well can women see and hear from the women's section?
         """,
     )
+
+
+JUST_SAVED_SESSION_KEY = "just_saved_shul_id"
