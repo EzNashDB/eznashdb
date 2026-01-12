@@ -23,8 +23,8 @@ class RateLimitViolation(models.Model):
     ip_address = models.GenericIPAddressField(db_index=True)
     endpoint = models.CharField(max_length=50, choices=RateLimitedEndpoint.choices, db_index=True)
     violation_count = models.IntegerField(default=1)
-    first_violation_at = models.DateTimeField(auto_now_add=True)
-    last_violation_at = models.DateTimeField(auto_now=True)
+    first_violation_at = models.DateTimeField()
+    last_violation_at = models.DateTimeField()
     # First authenticated user with this violation record
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
