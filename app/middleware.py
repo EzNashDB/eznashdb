@@ -1,6 +1,7 @@
 from django.contrib import messages as django_messages
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 from app.enums import RateLimitedEndpoint
 from app.models import RateLimitViolation
@@ -71,9 +72,27 @@ class RateLimitViolationMiddleware:
                 violation = None
 
             if violation and violation.is_in_cooldown():
-                context = violation.get_cooldown_context()
+                context = self._get_cooldown_context(violation)
                 response = render(request, "429.html", context)
                 response.status_code = 429
                 return response
 
         return self.get_response(request)
+
+    def _get_cooldown_context(self, violation):
+        """Build context dict for 429 template."""
+        cooldown_end = violation.cooldown_until
+        if not cooldown_end:
+            return {"is_long_block": False, "retry_after": 0}
+
+        remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
+        remaining_days = remaining_seconds / (60 * 60 * 24)
+
+        # Long block (>= 2.4 hours) vs short cooldowns
+        if remaining_days >= 1 / 10:
+            return {"is_long_block": True}
+        else:
+            return {
+                "is_long_block": False,
+                "retry_after": max(1, int(remaining_seconds / 60)),
+            }

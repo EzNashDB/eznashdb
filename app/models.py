@@ -61,21 +61,3 @@ class RateLimitViolation(models.Model):
         """Check if currently in a cooldown period."""
         cooldown_end = self.cooldown_until
         return cooldown_end is not None and cooldown_end > timezone.now()
-
-    def get_cooldown_context(self):
-        """Get context dict for 429 template."""
-        cooldown_end = self.cooldown_until
-        if not cooldown_end:
-            return {"is_long_block": False, "retry_after": 0}
-
-        remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
-        remaining_days = remaining_seconds / (60 * 60 * 24)
-
-        # Long block (7-day) vs short cooldowns
-        if remaining_days > 2:
-            return {"is_long_block": True}
-        else:
-            return {
-                "is_long_block": False,
-                "retry_after": max(1, int(remaining_seconds / 60)),
-            }
