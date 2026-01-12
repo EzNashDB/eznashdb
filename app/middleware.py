@@ -57,38 +57,41 @@ class RateLimitViolationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Check if path requires cooldown enforcement
+        violation = self.get_violation(request)
+        if violation and violation.is_in_cooldown():
+            return self.get_cooldown_response(request, violation)
+        return self.get_response(request)
+
+    def get_violation(self, request):
+        endpoint_key = self.get_endpoint_key(request)
+        if endpoint_key:
+            ip = get_client_ip(request)
+            try:
+                return RateLimitViolation.objects.get(ip_address=ip, endpoint=endpoint_key)
+            except RateLimitViolation.DoesNotExist:
+                return None
+
+    def get_endpoint_key(self, request):
         endpoint_key = None
         for path, key in self.COOLDOWN_PATHS.items():
             if request.path.startswith(path):
                 endpoint_key = key
                 break
+        return endpoint_key
 
-        if endpoint_key:
-            ip = get_client_ip(request)
-            try:
-                violation = RateLimitViolation.objects.get(ip_address=ip, endpoint=endpoint_key)
-            except RateLimitViolation.DoesNotExist:
-                violation = None
+    def get_cooldown_response(self, request, violation):
+        context = self.get_cooldown_context(violation)
+        response = render(request, "429.html", context)
+        response.status_code = 429
+        return response
 
-            if violation and violation.is_in_cooldown():
-                context = self._get_cooldown_context(violation)
-                response = render(request, "429.html", context)
-                response.status_code = 429
-                return response
-
-        return self.get_response(request)
-
-    def _get_cooldown_context(self, violation):
-        """Build context dict for 429 template."""
+    def get_cooldown_context(self, violation):
         cooldown_end = violation.cooldown_until
         if not cooldown_end:
             return {"is_long_block": False, "retry_after": 0}
 
         remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
         remaining_days = remaining_seconds / (60 * 60 * 24)
-
-        # Long block (>= 2.4 hours) vs short cooldowns
         if remaining_days >= 1 / 10:
             return {"is_long_block": True}
         else:
