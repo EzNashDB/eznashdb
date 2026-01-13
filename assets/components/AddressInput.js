@@ -88,6 +88,53 @@ export const AddressInput = ({
     setInputValue({ display_name: text });
   };
 
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    if (!window.isSecureContext) {
+      alert("Location requires a secure connection (HTTPS)");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrLocation({
+          lat: String(latitude),
+          lon: String(longitude),
+          place_id: null,
+          display_name: `${latitude}, ${longitude}`,
+          zoom: 14,
+        });
+        setInputValue({ display_name: `${latitude}, ${longitude}` });
+      },
+      (error) => {
+        let message;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message =
+              "Location access was denied. Check your browser's site settings to enable location.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = "Location information is unavailable. Please try again.";
+            break;
+          case error.TIMEOUT:
+            message = "Location request timed out. Please try again.";
+            break;
+          default:
+            message = "Unable to retrieve your location.";
+        }
+        alert(message);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000,
+      }
+    );
+  };
+
   return (
     <div className={isModal ? "d-flex flex-column h-100" : ""}>
       <div className="text-muted small mb-2" style={{ textWrap: "pretty" }}>
@@ -113,28 +160,42 @@ export const AddressInput = ({
             pointerEvents: "none",
           }}
         >
-          <div style={{ pointerEvents: "auto" }}>
-            <AddressTypeAhead
-              inputValue={inputValue}
-              onInput={handleOnInput}
-              onAddressSelected={handleAddressSelected}
-              isValid={isValid}
-            />
+          <div className="d-flex">
+            <div style={{ pointerEvents: "auto" }} className="flex-grow-1">
+              <AddressTypeAhead
+                inputValue={inputValue}
+                onInput={handleOnInput}
+                onAddressSelected={handleAddressSelected}
+                isValid={isValid}
+              />
+            </div>
+            <div style={{ pointerEvents: "auto" }}>
+              {!isModal && onExpand && (
+                <Button
+                  variant="light"
+                  className="shadow-sm ms-2"
+                  onClick={onExpand}
+                  style={{ pointerEvents: "auto" }}
+                >
+                  <i className="fa-solid fa-expand"></i>
+                </Button>
+              )}
+            </div>
           </div>
-          <div className="d-flex mt-2">
-            {!isModal && onExpand && (
+          <div className="d-flex flex-column gap-2 mt-2 w-fit-content">
+            <div>
               <Button
                 variant="light"
                 size="sm"
                 className="shadow-sm"
-                onClick={onExpand}
+                onClick={handleLocateMe}
                 style={{ pointerEvents: "auto" }}
               >
-                <i className="fa-solid fa-expand me-1"></i>
-                Expand
+                <i className="fa-solid fa-location-crosshairs me-1"></i>
+                Locate Me
               </Button>
-            )}
-            <div className="ms-auto" style={{ pointerEvents: "auto" }}>
+            </div>
+            <div className="w-fit-content" style={{ pointerEvents: "auto" }}>
               <Button
                 className="shadow-sm"
                 variant="light"
