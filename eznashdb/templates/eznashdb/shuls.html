@@ -98,6 +98,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="position-absolute d-flex flex-column gap-1"
+                             style="bottom: 95px;
+                                    left: 10px;
+                                    z-index: 1000">
+                            <button id="locate-me-btn" class="btn btn-light btn-sm shadow-sm">
+                                <i class="fa-solid fa-location-crosshairs me-1"></i>
+                                Locate Me
+                            </button>
+                            <button id="clear-location-btn"
+                                    class="btn btn-outline-secondary btn-sm shadow-sm d-none">
+                                <i class="fa-solid fa-xmark me-1"></i>
+                                Clear
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -289,6 +303,44 @@
                 }).addTo(map);
                 L.control.zoom({ position: "bottomleft" }).addTo(map);
                 document.getElementById(mapId).classList.add("rounded");
+
+                // Locate Me button
+                let locationCircle = null;
+                const locateMeBtn = document.getElementById("locate-me-btn");
+                const clearLocationBtn = document.getElementById("clear-location-btn");
+
+                const clearLocationCircle = () => {
+                    if (locationCircle) {
+                        map.removeLayer(locationCircle);
+                        locationCircle = null;
+                    }
+                    if (clearLocationBtn) {
+                        clearLocationBtn.classList.add("d-none");
+                    }
+                };
+
+                if (locateMeBtn) {
+                    // Prevent map drag when interacting with button
+                    L.DomEvent.disableClickPropagation(locateMeBtn);
+
+                    locateMeBtn.addEventListener("click", () => {
+                        window.GeolocationUtils.getCurrentPosition({
+                            onSuccess: ({ latitude, longitude }) => {
+                                map.setView([latitude, longitude], 16);
+                                clearLocationCircle();
+                                locationCircle = L.circle([latitude, longitude], { radius: 100 }).addTo(map);
+                                if (clearLocationBtn) {
+                                    clearLocationBtn.classList.remove("d-none");
+                                }
+                            },
+                        });
+                    });
+                }
+
+                if (clearLocationBtn) {
+                    L.DomEvent.disableClickPropagation(clearLocationBtn);
+                    clearLocationBtn.addEventListener("click", clearLocationCircle);
+                }
 
                 // small delay allows CSS/layout to finish
                 map.whenReady(() => {

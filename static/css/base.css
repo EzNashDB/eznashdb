@@ -38,6 +38,10 @@ body {
   width: fit-content;
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .striped> :nth-child(even of :not([style*="display: none;"])) {
   /* Based on bootstrap table-striped styling */
   --bs-table-color-type: var(--bs-table-color);
