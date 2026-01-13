@@ -314,13 +314,29 @@
                     }
                 };
 
+                const LOCATION_MARKER_MIN_ZOOM = 13;
+
                 const createCloseIcon = () => {
                     return L.divIcon({
-                        html: '<div class="btn btn-info rounded-circle opacity-75 shadow-sm d-flex align-items-center justify-content-center" style="width:40px; height:40px;"><i class="fa-solid fa-xmark"></i></div>',
+                        html: `
+                        <div class="d-flex flex-column align-items-center opacity-75">
+                            <div class="btn btn-info rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+                                <i class="fa-solid fa-xmark"></i>
+                            </div>
+                            <h6><span class="badge text-bg-dark">Your Location</span></h6>
+                        </div>
+                        `,
                         className: '',
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12],
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
                     });
+                };
+
+                const updateLocationMarkerVisibility = () => {
+                    if (!locationMarker) return;
+                    const markerEl = locationMarker.getElement();
+                    if (!markerEl) return;
+                    markerEl.style.display = map.getZoom() >= LOCATION_MARKER_MIN_ZOOM ? '' : 'none';
                 };
 
                 if (locateMeBtn) {
@@ -332,12 +348,14 @@
                             onSuccess: ({ latitude, longitude }) => {
                                 map.setView([latitude, longitude], 16);
                                 clearLocationCircle();
-                                {% comment %} locationCircle = L.circle([latitude, longitude], { radius: 100 }).addTo(map); {% endcomment %}
                                 locationMarker = L.marker([latitude, longitude], { icon: createCloseIcon() }).addTo(map);
                                 locationMarker.on("click", clearLocationCircle);
+                                updateLocationMarkerVisibility();
                             },
                         });
                     });
+
+                    map.on("zoomend", updateLocationMarkerVisibility);
                 }
 
                 // small delay allows CSS/layout to finish
