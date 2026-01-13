@@ -105,7 +105,7 @@ export const AddressInput = ({
           lon: String(longitude),
           place_id: null,
           display_name: `${latitude}, ${longitude}`,
-          zoom: 14,
+          zoom: 16,
         });
         setInputValue({ display_name: `${latitude}, ${longitude}` });
       },
