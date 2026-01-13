@@ -1,11 +1,7 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 
-import {
-  MapContainer,
-  TileLayer,
-  useMapEvents,
-  ZoomControl,
-} from "react-leaflet";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import { useMap } from "react-leaflet/hooks";
 import { GestureHandling } from "leaflet-gesture-handling";
 import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
@@ -16,6 +12,41 @@ const InvalidateSizeOnMount = () => {
     map.invalidateSize();
   }, [map]);
   return null;
+};
+
+const CustomZoomControl = () => {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+
+  useMapEvents({
+    zoomend: () => setZoom(map.getZoom()),
+  });
+
+  return (
+    <div
+      className="position-absolute d-flex flex-column shadow-sm"
+      style={{ bottom: "10px", left: "10px", zIndex: 1000 }}
+    >
+      <Button
+        variant="light"
+        size="sm"
+        className="border rounded-bottom-0"
+        onClick={() => map.zoomIn()}
+        disabled={zoom >= map.getMaxZoom()}
+      >
+        <i className="fa-solid fa-plus"></i>
+      </Button>
+      <Button
+        variant="light"
+        size="sm"
+        className="border rounded-top-0"
+        onClick={() => map.zoomOut()}
+        disabled={zoom <= map.getMinZoom()}
+      >
+        <i className="fa-solid fa-minus"></i>
+      </Button>
+    </div>
+  );
 };
 
 export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isModal = false }) => {
@@ -103,7 +134,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isModal = false }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <ZoomControl position="bottomleft" />
+          <CustomZoomControl />
         </MapContainer>
       </div>
     </div>
