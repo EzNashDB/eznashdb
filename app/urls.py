@@ -18,7 +18,7 @@ urlpatterns = [
     path("verify-captcha/", CaptchaVerifyView.as_view(), name="captcha_verify"),
 ]
 
-if not settings.TESTING:
+if settings.DJANGO_ENV != "test":
     urlpatterns = [
         *urlpatterns,
     ] + debug_toolbar_urls()
