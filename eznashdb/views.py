@@ -6,6 +6,7 @@ from decimal import Decimal
 from json.decoder import JSONDecodeError
 
 import requests
+import waffle
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
@@ -251,6 +252,9 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Call flag_is_active so flag gets created
+        waffle.flag_is_active(self.request, "locate_me")
 
         # For create mode, determine current wizard step
         if not self.is_update:
