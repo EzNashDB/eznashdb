@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import L from "leaflet";
 import { Button } from "react-bootstrap";
 
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
@@ -14,16 +15,22 @@ const InvalidateSizeOnMount = () => {
   return null;
 };
 
-const CustomZoomControl = () => {
+const CustomZoomControl = ({ zoom }) => {
   const map = useMap();
-  const [zoom, setZoom] = useState(map.getZoom());
+  const minZoom = map.getMinZoom();
+  const maxZoom = map.getMaxZoom();
+  const containerRef = useRef(null);
 
-  useMapEvents({
-    zoomend: () => setZoom(map.getZoom()),
-  });
+  useEffect(() => {
+    if (containerRef.current) {
+      L.DomEvent.disableClickPropagation(containerRef.current);
+      L.DomEvent.disableScrollPropagation(containerRef.current);
+    }
+  }, []);
 
   return (
     <div
+      ref={containerRef}
       className="position-absolute d-flex flex-column shadow-sm"
       style={{ bottom: "10px", left: "10px", zIndex: 1000 }}
     >
@@ -32,7 +39,7 @@ const CustomZoomControl = () => {
         size="sm"
         className="border rounded-bottom-0"
         onClick={() => map.zoomIn()}
-        disabled={zoom >= map.getMaxZoom()}
+        disabled={zoom >= maxZoom}
       >
         <i className="fa-solid fa-plus"></i>
       </Button>
@@ -41,7 +48,7 @@ const CustomZoomControl = () => {
         size="sm"
         className="border rounded-top-0"
         onClick={() => map.zoomOut()}
-        disabled={zoom <= map.getMinZoom()}
+        disabled={zoom <= minZoom}
       >
         <i className="fa-solid fa-minus"></i>
       </Button>
@@ -134,7 +141,7 @@ export const AddressMap = ({ lat, lon, zoom, onMoveEnd, isModal = false }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <CustomZoomControl />
+          <CustomZoomControl zoom={zoom} />
         </MapContainer>
       </div>
     </div>
