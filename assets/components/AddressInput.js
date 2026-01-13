@@ -89,17 +89,8 @@ export const AddressInput = ({
   };
 
   const handleLocateMe = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
-      return;
-    }
-    if (!window.isSecureContext) {
-      alert("Location requires a secure connection (HTTPS)");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
+    window.GeolocationUtils.getCurrentPosition({
+      onSuccess: ({ latitude, longitude }) => {
         setCurrLocation({
           lat: String(latitude),
           lon: String(longitude),
@@ -109,30 +100,7 @@ export const AddressInput = ({
         });
         setInputValue({ display_name: `${latitude}, ${longitude}` });
       },
-      (error) => {
-        let message;
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            message =
-              "Location access was denied. Check your browser's site settings to enable location.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            message = "Location information is unavailable. Please try again.";
-            break;
-          case error.TIMEOUT:
-            message = "Location request timed out. Please try again.";
-            break;
-          default:
-            message = "Unable to retrieve your location.";
-        }
-        alert(message);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 300000,
-      }
-    );
+    });
   };
 
   return (
