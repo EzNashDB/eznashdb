@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from waffle.admin import FlagAdmin as WaffleFlagAdmin
+from waffle.admin import SampleAdmin as WaffleSampleAdmin
+from waffle.admin import SwitchAdmin as WaffleSwitchAdmin
 
-from users.models import User
+from users.models import Flag, Sample, Switch, User
 
 
 @admin.register(User)
@@ -23,3 +26,18 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description="Name")
     def full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip()
+
+
+@admin.register(Flag)
+class FlagAdmin(WaffleFlagAdmin):
+    filter_horizontal = tuple(list(WaffleFlagAdmin.filter_horizontal) + ["user_permissions"])
+
+
+@admin.register(Switch)
+class SwitchAdmin(WaffleSwitchAdmin):
+    pass
+
+
+@admin.register(Sample)
+class SampleAdmin(WaffleSampleAdmin):
+    pass

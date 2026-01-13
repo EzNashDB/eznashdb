@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False) == "True"
-TESTING = os.environ.get("TESTING", "False").lower() == "true"
+DJANGO_ENV = os.environ.get("DJANGO_ENV", "production")
 
 ALLOWED_HOSTS = [
     "ezratnashim.com",
@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "template_partials",
     "django_recaptcha",
+    "waffle",
     "app",
     "eznashdb",
     "allauth",
@@ -123,6 +124,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "app.middleware.HTMXMessagesMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "waffle.middleware.WaffleMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
 ]
 
@@ -138,7 +140,7 @@ if DEBUG:
         "0.0.0.0",
         "localhost",
     ]
-if DEBUG and not TESTING:
+if DJANGO_ENV == "dev":
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
@@ -362,3 +364,10 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
 # Rate limiting configuration
 RATELIMIT_USE_CACHE = "default"
 RATELIMIT_IP_META_KEY = None  # We'll use custom IP extraction
+
+# Django Waffle
+WAFFLE_FLAG_MODEL = "users.Flag"
+WAFFLE_SWITCH_MODEL = "users.Switch"
+WAFFLE_SAMPLE_MODEL = "users.Sample"
+WAFFLE_CREATE_MISSING_FLAGS = WAFFLE_CREATE_MISSING_SWITCHES = WAFFLE_CREATE_MISSING_SAMPLES = True
+WAFFLE_FLAG_DEFAULT = WAFFLE_SWITCH_DEFAULT = WAFFLE_SAMPLE_DEFAULT = DJANGO_ENV == "dev"
