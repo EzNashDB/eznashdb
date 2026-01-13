@@ -183,20 +183,18 @@ export const AddressInput = ({
             </div>
           </div>
           <div className="d-flex flex-column gap-2 mt-2 w-fit-content">
-            {waffle.flag_is_active("locate_me") && (
-              <div>
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="shadow-sm"
-                  onClick={handleLocateMe}
-                  style={{ pointerEvents: "auto" }}
-                >
-                  <i className="fa-solid fa-location-crosshairs me-1"></i>
-                  Locate Me
-                </Button>
-              </div>
-            )}
+            <div>
+              <Button
+                variant="light"
+                size="sm"
+                className="shadow-sm"
+                onClick={handleLocateMe}
+                style={{ pointerEvents: "auto" }}
+              >
+                <i className="fa-solid fa-location-crosshairs me-1"></i>
+                Locate Me
+              </Button>
+            </div>
             <div className="w-fit-content" style={{ pointerEvents: "auto" }}>
               <Button
                 className="shadow-sm"
