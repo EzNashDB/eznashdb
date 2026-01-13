@@ -98,14 +98,17 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="locate-me-btn"
-                                class="btn btn-light btn-sm shadow-sm position-absolute"
-                                style="bottom: 95px;
-                                       left: 10px;
-                                       z-index: 1000">
-                            <i class="fa-solid fa-location-crosshairs me-1"></i>
-                            Locate Me
-                        </button>
+                        <div class="w-100 position-absolute bottom-0 start-50 p-2"
+                             style="transform: translateX(-50%);
+                                    z-index: 1000;
+                                    pointer-events: none">
+                            <div class="pointer-events-auto">
+                                <button id="locate-me-btn" class="btn btn-light btn-sm shadow-sm">
+                                    <i class="fa-solid fa-location-crosshairs me-1"></i>
+                                    Locate Me
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
