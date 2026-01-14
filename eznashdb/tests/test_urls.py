@@ -1,7 +1,7 @@
 import pytest
 from django.urls import resolve, reverse
 
-from eznashdb.views import AddressLookupView, CreateUpdateShulView, DeleteShulView, ShulsFilterView
+from eznashdb.views import AddressLookupView, CreateUpdateShulView, ShulsFilterView
 
 
 @pytest.mark.parametrize(
@@ -10,7 +10,6 @@ from eznashdb.views import AddressLookupView, CreateUpdateShulView, DeleteShulVi
         ("eznashdb:shuls", ShulsFilterView, [], {}),
         ("eznashdb:create_shul", CreateUpdateShulView, [], {}),
         ("eznashdb:update_shul", CreateUpdateShulView, [], {"pk": 1}),
-        ("eznashdb:delete_shul", DeleteShulView, [], {"pk": 1}),
         ("eznashdb:address_lookup", AddressLookupView, [], {}),
     ],
 )

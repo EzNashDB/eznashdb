@@ -145,6 +145,52 @@
         {% endpartialdef %}
     </div>
 </div>
+{% if delete_form %}
+    <div class="row mt-3">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
+            <div class="accordion" id="dangerZoneAccordion">
+                <div class="accordion-item border-danger">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-light text-danger fw-bold"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#dangerZoneCollapse"
+                                aria-expanded="false"
+                                aria-controls="dangerZoneCollapse">
+                            <i class="fa fa-exclamation-triangle me-2"></i>Danger Zone
+                        </button>
+                    </h2>
+                    <div id="dangerZoneCollapse"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#dangerZoneAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-danger mb-3">
+                                <h5 class="alert-heading">
+                                    <i class="fa fa-exclamation-triangle me-2"></i>Delete Shul
+                                </h5>
+                                <p>
+                                    <strong>This action takes effect immediately.</strong> The shul will be removed from public view right away, but may be restored after review.
+                                </p>
+                                <p>Please provide a detailed reason to help us monitor for abuse.</p>
+                            </div>
+                            <form method="post" class="mb-0">
+                                {% csrf_token %}
+                                {% crispy delete_form %}
+                                <button type="submit"
+                                        name="delete_shul"
+                                        value="true"
+                                        class="btn btn-danger w-100 mt-3">
+                                    <i class="fa fa-trash me-2"></i>
+                                    Delete Shul
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% endblock content %}
 
 {% block extra_media_bottom %}
