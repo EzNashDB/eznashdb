@@ -148,33 +148,22 @@
 {% if delete_form %}
     <div class="row">
         <div class="col-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
-            <hr>
-            <div class="accordion" id="dangerZoneAccordion">
-                <div class="accordion-item border-danger">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed bg-light text-danger"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#dangerZoneCollapse"
-                                aria-expanded="false"
-                                aria-controls="dangerZoneCollapse">
-                            <i class="fa fa-trash me-2"></i>Delete Shul
-                        </button>
-                    </h2>
-                    <div id="dangerZoneCollapse"
-                         class="accordion-collapse collapse"
-                         data-bs-parent="#dangerZoneAccordion">
-                        <div class="accordion-body">
-                            <form method="post" class="mb-0">
-                                {% csrf_token %}
-                                {% crispy delete_form %}
-                                <button type="submit"
-                                        name="delete_shul"
-                                        value="true"
-                                        class="btn btn-danger w-100 mt-3">Delete</button>
-                            </form>
-                        </div>
-                    </div>
+            <div class="mt-4 pt-3 border-top">
+                <a href="#"
+                   class="text-muted small"
+                   data-bs-toggle="collapse"
+                   data-bs-target="#deleteSection">
+                    <i class="fa-solid fa-trash"></i>
+                Delete this shul</a>
+                <div class="collapse mt-3" id="deleteSection">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% crispy delete_form %}
+                        <button type="submit"
+                                name="delete_shul"
+                                value="true"
+                                class="btn btn-outline-danger mt-2">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
