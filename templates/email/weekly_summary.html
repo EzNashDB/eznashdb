@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="font-family: sans-serif;">
+        <h2>Weekly Shul Updates</h2>
+        <p>{{ shuls|length }} shul(s) updated</p>
+        <table style="border-collapse:collapse;width:100%;">
+            <thead>
+                <tr style="background:#f0f0f0;">
+                    <th style="border:1px solid #ccc;padding:8px;text-align:left;">Shul</th>
+                    <th style="border:1px solid #ccc;padding:8px;text-align:left;">Room</th>
+                    <th style="border:1px solid #ccc;padding:8px;text-align:left;">Size</th>
+                    <th style="border:1px solid #ccc;padding:8px;text-align:left;">Vis/Aud</th>
+                    <th style="border:1px solid #ccc;padding:8px;text-align:left;">Country</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shul in shuls %}
+                    {% with room_count=shul.rooms|length|default:1 %}
+                        {% if shul.rooms %}
+                            {% for room in shul.rooms %}
+                                <tr>
+                                    {% if forloop.first %}
+                                        <td rowspan="{{ room_count }}"
+                                            style="vertical-align:top;
+                                                   border:1px solid #ccc;
+                                                   padding:8px">
+                                            <a href="{{ shul.map_url }}">{{ shul.name }}</a>
+                                        </td>
+                                    {% endif %}
+                                    <td style="border:1px solid #ccc;padding:8px;">{{ room.name }}</td>
+                                    <td style="border:1px solid #ccc;padding:8px;">{{ room.size }}</td>
+                                    <td style="border:1px solid #ccc;padding:8px;">{{ room.stars }}</td>
+                                    {% if forloop.first %}
+                                        <td rowspan="{{ room_count }}"
+                                            style="vertical-align:top;
+                                                   border:1px solid #ccc;
+                                                   padding:8px">{{ shul.country }}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td style="border:1px solid #ccc;padding:8px;">
+                                    <a href="{{ shul.map_url }}">{{ shul.name }}</a>
+                                </td>
+                                <td style="border:1px solid #ccc;padding:8px;">
+                                    <em>(no rooms)</em>
+                                </td>
+                                <td style="border:1px solid #ccc;padding:8px;">-</td>
+                                <td style="border:1px solid #ccc;padding:8px;">-</td>
+                                <td style="border:1px solid #ccc;padding:8px;">{{ shul.country }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <p style="color:#666;font-size:12px;margin-top:20px;">Automated message from ezratnashim.com</p>
+    </body>
+</html>
