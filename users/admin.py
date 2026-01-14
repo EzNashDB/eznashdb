@@ -16,6 +16,7 @@ class UserAdmin(BaseUserAdmin):
         "username",
         "full_name",
         "is_staff",
+        "is_superuser",
         "is_active",
         "date_joined",
     ]

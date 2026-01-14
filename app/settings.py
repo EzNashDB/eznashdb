@@ -270,6 +270,9 @@ else:
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
+# Site URL for generating absolute URLs (falls back to Sites framework if not set)
+SITE_URL = os.environ.get("SITE_URL")
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

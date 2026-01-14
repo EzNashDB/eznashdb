@@ -26,13 +26,7 @@ class ShulAdmin(admin.ModelAdmin):
     def view_on_map(self, obj):
         """Generate a link to view the shul on the map"""
         if obj.pk:
-            lat = obj.display_lat
-            lon = obj.display_lon
-            url = reverse("eznashdb:shuls")
-            url += f"?lat={lat}&lon={lon}&selectedShul={obj.pk}"
-            if lat and lon:
-                url += "&zoom=17"
-            return format_html('<a href="{}" target="_blank">View on Map</a>', url)
+            return format_html('<a href="{}" target="_blank">View on Map</a>', obj.get_map_url())
         return "-"
 
     @admin.display(description="Rooms", ordering="rooms__count")

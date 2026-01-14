@@ -2,7 +2,9 @@ import hashlib
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.sites.models import Site
 from django.db import models
+from django.urls import reverse
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 
@@ -54,6 +56,24 @@ class Shul(models.Model):
         hash_input = f"{self.rounded_lat}_{self.rounded_lon}_{coord_type}".encode()
         hash_value = int(hashlib.md5(hash_input).hexdigest(), 16)
         return ((hash_value % 6000) - 3000) / 1000000
+
+    def get_map_url(self, absolute=False):
+        """Generate URL to view this shul on the map."""
+        url = reverse("eznashdb:shuls")
+        lat = self.display_lat
+        lon = self.display_lon
+        url += f"?lat={lat}&lon={lon}&selectedShul={self.pk}"
+        if lat and lon:
+            url += "&zoom=17"
+
+        if absolute:
+            if settings.SITE_URL:
+                url = f"{settings.SITE_URL}{url}"
+            else:
+                site = Site.objects.get_current()
+                url = f"https://{site.domain}{url}"
+
+        return url
 
 
 class Room(models.Model):
