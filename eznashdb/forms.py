@@ -107,7 +107,7 @@ class ShulDeleteForm(forms.Form):
                 "placeholder": "Please explain why this shul should be deleted...",
             }
         ),
-        help_text="Please explain why this shul should be deleted. This helps us monitor deletions and decide whether to restore the shul.",
+        help_text="This helps us monitor deletions and decide whether to restore the shul.",
     )
 
     def __init__(self, *args, **kwargs):
