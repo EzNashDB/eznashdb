@@ -5,11 +5,12 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.sites.models import Site
 from django.db import models
 from django.urls import reverse
+from safedelete.models import SafeDeleteModel
 
 from eznashdb.enums import RelativeSize, SeeHearScore
 
 
-class Shul(models.Model):
+class Shul(SafeDeleteModel):
     id = models.BigAutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
