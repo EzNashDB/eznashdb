@@ -332,15 +332,10 @@
                 updateZoomButtons();
 
                 // Locate Me button
-                let locationCircle = null;
                 let locationMarker = null;
                 const locateMeBtn = document.getElementById("locate-me-btn");
 
-                const clearLocationCircle = () => {
-                    if (locationCircle) {
-                        map.removeLayer(locationCircle);
-                        locationCircle = null;
-                    }
+                const clearLocationMarker = () => {
                     if (locationMarker) {
                         map.removeLayer(locationMarker);
                         locationMarker = null;
@@ -380,9 +375,9 @@
                         window.GeolocationUtils.getCurrentPosition({
                             onSuccess: ({ latitude, longitude }) => {
                                 map.setView([latitude, longitude], 16);
-                                clearLocationCircle();
+                                clearLocationMarker();
                                 locationMarker = L.marker([latitude, longitude], { icon: createCloseIcon() }).addTo(map);
-                                locationMarker.on("click", clearLocationCircle);
+                                locationMarker.on("click", clearLocationMarker);
                                 updateLocationMarkerVisibility();
                             },
                         });
