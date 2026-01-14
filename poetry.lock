@@ -627,6 +627,21 @@ django = "*"
 testing = ["coveralls", "tox", "tox-gh-actions"]
 
 [[package]]
+name = "django-safedelete"
+version = "1.4.1"
+description = "Mask your objects instead of deleting them from your database."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django_safedelete-1.4.1-py3-none-any.whl", hash = "sha256:c4232445e4ec3a2b72ac9002130377088c8e541bba5a5af4cf8936ec3ff0afde"},
+    {file = "django_safedelete-1.4.1.tar.gz", hash = "sha256:f5919d627519fd6d766a3616ee15554a19e13edcb5f7fb9d86503cd71a6986d0"},
+]
+
+[package.dependencies]
+Django = "*"
+packaging = "*"
+
+[[package]]
 name = "django-template-partials"
 version = "25.3"
 description = "Reusable named inline-partials for the Django Template Language"
@@ -1856,4 +1871,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5135b65ef939d6cc8d181666b369aab51c85368223cd157ca832063fd8bbf7c0"
+content-hash = "952b68afec2be52e94c42362ce3ea5dc54af60a1ee5070e126f3799e2470ac73"
