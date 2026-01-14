@@ -30,7 +30,7 @@
          data-bs-parent="#{{ accordion_id }}">
         <div class="accordion-body">
             <div class="d-flex flex-column">
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex flex-wrap gap-2 align-items-end">
                     <a class="btn btn-sm btn-outline-primary text-nowrap"
                        href="{% url 'eznashdb:update_shul' shul.id %}">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
@@ -40,8 +40,12 @@
                        href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
                        class="btn btn-sm btn-primary">
                         <i class="fa-brands fa-google me-1"></i>
-                        Find on Google Maps
+                        Get Directions
                     </a>
+                    <div class="flex-grow-1 text-end ms-auto small fst-italic text-muted">
+                        Updated <span data-utc="{{ shul.updated_at|date:'c' }}"
+       x-init="$el.textContent = new Date($el.dataset.utc).toLocaleString(undefined, {dateStyle: 'medium'})"></span>
+                    </div>
                 </div>
                 {% if shul.rooms.exists %}
                     <ul class="list-group mt-3">
