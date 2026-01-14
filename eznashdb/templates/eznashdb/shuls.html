@@ -104,7 +104,8 @@
                                     <i class="fa-solid fa-location-crosshairs"></i>
                                 </button>
                             </div>
-                            <div class="btn-group-vertical shadow-sm pointer-events-auto">
+                            <div class="btn-group-vertical shadow-sm pointer-events-auto cursor-auto"
+                                 id="zoom-btn-wrapper">
                                 <button id="zoom-in-btn" class="btn btn-light border">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
@@ -307,6 +308,7 @@
                 // Custom zoom controls
                 const zoomInBtn = document.getElementById("zoom-in-btn");
                 const zoomOutBtn = document.getElementById("zoom-out-btn");
+                const zoomBtnWrapper = document.getElementById("zoom-btn-wrapper");
 
                 const updateZoomButtons = () => {
                     const zoom = map.getZoom();
@@ -321,6 +323,9 @@
                 if (zoomOutBtn) {
                     L.DomEvent.disableClickPropagation(zoomOutBtn);
                     zoomOutBtn.addEventListener("click", () => map.zoomOut());
+                }
+                if (zoomBtnWrapper) {
+                    L.DomEvent.disableClickPropagation(zoomBtnWrapper);
                 }
 
                 map.on("zoomend", updateZoomButtons);
