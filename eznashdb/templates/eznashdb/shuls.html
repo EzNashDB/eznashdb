@@ -344,7 +344,7 @@
 
                 const LOCATION_MARKER_MIN_ZOOM = 13;
 
-                const createCloseIcon = () => {
+                const createMyLocationIcon = () => {
                     return L.divIcon({
                         html: `
                         <div class="d-flex flex-column align-items-center opacity-75">
@@ -376,7 +376,7 @@
                             onSuccess: ({ latitude, longitude }) => {
                                 map.setView([latitude, longitude], 16);
                                 clearLocationMarker();
-                                locationMarker = L.marker([latitude, longitude], { icon: createCloseIcon() }).addTo(map);
+                                locationMarker = L.marker([latitude, longitude], { icon: createMyLocationIcon() }).addTo(map);
                                 locationMarker.on("click", clearLocationMarker);
                                 updateLocationMarkerVisibility();
                             },
