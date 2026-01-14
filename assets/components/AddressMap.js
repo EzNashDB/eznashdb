@@ -31,7 +31,7 @@ const CustomZoomControl = ({ zoom }) => {
   return (
     <div
       ref={containerRef}
-      className="position-absolute d-flex flex-column shadow-sm"
+      className="position-absolute d-flex flex-column shadow-sm cursor-auto"
       style={{ bottom: "10px", left: "10px", zIndex: 1000 }}
     >
       <Button
