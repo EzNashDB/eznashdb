@@ -18,12 +18,20 @@ class Shul(SafeDeleteModel):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="created_shuls", null=True
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="deleted_shuls",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=255, blank=True)
     latitude = models.DecimalField(max_digits=22, decimal_places=17)
     longitude = models.DecimalField(max_digits=22, decimal_places=17)
     place_id = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=255, blank=True)
+    deletion_reason = models.TextField(blank=True)
 
     class Meta:
         verbose_name = "shul"
@@ -75,6 +83,12 @@ class Shul(SafeDeleteModel):
                 url = f"https://{site.domain}{url}"
 
         return url
+
+    def clear_deletion(self):
+        """Clear deletion audit fields for undelete operations."""
+        self.deleted_by = None
+        self.deletion_reason = ""
+        self.save()
 
 
 class Room(models.Model):

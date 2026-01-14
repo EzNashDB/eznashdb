@@ -14,14 +14,14 @@ from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DeleteView, TemplateView, UpdateView
+from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
 from app.mixins import RateLimitCaptchaMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
-from eznashdb.forms import RoomFormSet, ShulForm
+from eznashdb.forms import RoomFormSet, ShulDeleteForm, ShulForm
 from eznashdb.mixins import LoginRequiredMixin
 from eznashdb.models import Shul
 
@@ -159,6 +159,39 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             messages.error(self.request, "Fix the form errors to continue.")
         return self.reload_shul_form(form)
 
+    def post(self, request, *args, **kwargs):
+        """Handle POST requests - check for delete form first"""
+        # Check if this is a delete submission
+        if "delete_shul" in request.POST:
+            return self.handle_delete_submission()
+
+        # Otherwise, use the normal form handling
+        return super().post(request, *args, **kwargs)
+
+    def handle_delete_submission(self):
+        """Handle shul deletion form submission"""
+        if not self.is_update or not self.request.user.is_authenticated:
+            messages.error(self.request, "You cannot delete this shul.")
+            return self.reload_shul_form(self.get_form())
+
+        delete_form = ShulDeleteForm(self.request.POST)
+        if delete_form.is_valid():
+            # Set audit fields and soft delete
+            shul = self.get_object()
+            shul.deleted_by = self.request.user
+            shul.deletion_reason = delete_form.cleaned_data["deletion_reason"]
+            shul.save()  # Save audit fields first
+            shul.delete()  # Then soft delete
+
+            messages.success(
+                self.request,
+                f"Shul '{shul.name}' has been deleted. Your deletion reason has been recorded and will be reviewed.",
+            )
+            return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
+        else:
+            messages.error(self.request, "Unable to delete. Please provide a valid reason.")
+            return self.reload_shul_form(self.get_form())
+
     def handle_update_submit(self, form):
         """Handle update submission"""
         return self.save_shul_with_rooms(form)
@@ -258,6 +291,11 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             context["wizard_step"] = wizard_step
 
         context["room_fs"] = self.get_room_fs()
+
+        # Add delete form for existing shuls (only for authenticated users)
+        if self.is_update and self.request.user.is_authenticated:
+            context["delete_form"] = ShulDeleteForm()
+
         return context
 
     def get_room_fs(self):
@@ -289,21 +327,6 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             # CREATE MODE - STEP 1: return unbound formset (no validation)
             else:
                 return formset_class(prefix=prefix, instance=None)
-
-
-class DeleteShulView(DeleteView):
-    model = Shul
-    success_url = reverse_lazy("eznashdb:shuls")
-
-    def form_valid(self, form):
-        success_url = self.get_success_url()
-        self.delete_shul()
-        return HttpResponseRedirect(success_url)
-
-    @transaction.atomic()
-    def delete_shul(self):
-        self.object.rooms.all().delete()
-        self.object.delete()
 
 
 class AddressLookupView(View):

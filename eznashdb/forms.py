@@ -97,6 +97,26 @@ class BaseRoomFormSet(BaseInlineFormSet):
                 raise ValidationError("At least one room is required.")
 
 
+class ShulDeleteForm(forms.Form):
+    deletion_reason = forms.CharField(
+        min_length=25,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "class": "form-control",
+                "placeholder": "Please explain why this shul should be deleted...",
+            }
+        ),
+        help_text="Please explain why this shul should be deleted. This helps us monitor deletions and decide whether to restore the shul.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.fields["deletion_reason"].label = "Reason for deletion"
+
+
 RoomFormSet = inlineformset_factory(
     Shul,
     Room,

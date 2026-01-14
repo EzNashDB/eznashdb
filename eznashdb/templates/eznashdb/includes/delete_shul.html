@@ -1,8 +1,0 @@
-<form action="{% url 'eznashdb:delete_shul' shul.pk %}"
-      method="POST"
-      class="d-flex align-items-center">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-xs text-danger link-danger py-0">
-        <i class="fa fa-trash" aria-hidden="true"></i>
-    </button>
-</form>
