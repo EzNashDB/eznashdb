@@ -160,12 +160,8 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
         return self.reload_shul_form(form)
 
     def post(self, request, *args, **kwargs):
-        """Handle POST requests - check for delete form first"""
-        # Check if this is a delete submission
         if "delete_shul" in request.POST:
             return self.handle_delete_submission()
-
-        # Otherwise, use the normal form handling
         return super().post(request, *args, **kwargs)
 
     def handle_delete_submission(self):
