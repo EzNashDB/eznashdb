@@ -48,14 +48,12 @@
                             <h3 class="d-flex gap-3 justify-content-between align-items-center mb-0">
                                 {% if object %}
                                     <span class="text-truncate">Edit Shul: {{ object.name }}</span>
-                                    {% if delete_form %}
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-danger text-nowrap"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal">
-                                            <i class="fa-solid fa-trash me-1"></i>Delete
-                                        </button>
-                                    {% endif %}
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger text-nowrap"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal">
+                                        <i class="fa-solid fa-trash me-1"></i>Delete
+                                    </button>
                                 {% else %}
                                     <div class="d-flex gap-3 align-items-center">
                                         Add a Shul
@@ -152,7 +150,7 @@
         {% endpartialdef %}
     </div>
 </div>
-{% if delete_form %}
+{% if object %}
     <div class="modal fade"
          id="deleteModal"
          tabindex="-1"
