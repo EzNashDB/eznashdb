@@ -130,13 +130,7 @@
                     {% for shul in deleted_shuls %}
                         <tr>
                             <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 500;">{{ shul.name }}</td>
-                            <td style="border: 1px solid #dee2e6; padding: 10px;">
-                                {% if shul.deletion_reason %}
-                                    {{ shul.deletion_reason }}
-                                {% else %}
-                                    <em style="color: #999;">(No reason provided)</em>
-                                {% endif %}
-                            </td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.deletion_reason }}</td>
                             <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.deleted_by }}</td>
                             <td style="border: 1px solid #dee2e6;
                                        padding: 10px;

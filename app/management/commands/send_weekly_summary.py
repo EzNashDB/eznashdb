@@ -175,7 +175,7 @@ class Command(BaseCommand):
 
         return DeletedShulData(
             name=shul.name,
-            deletion_reason=shul.deletion_reason or "(No reason provided)",
+            deletion_reason=shul.deletion_reason,
             deleted_by=deleted_by_email,
             deleted_at=shul.deleted,
             country=self._get_country(shul.address),
