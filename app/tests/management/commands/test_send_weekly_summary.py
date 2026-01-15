@@ -134,10 +134,12 @@ def describe_send_weekly_summary():
             html = mail.outbox[0].alternatives[0][0]
             assert "Recent Shul" in html
 
-            # Clear outbox and test old shul exclusion
-            mail.outbox.clear()
-            call_command("send_weekly_summary", shuls=[old_shul])
-            assert len(mail.outbox) == 0
+            # Verify old shul is excluded from same email
+            assert "Old Shul" not in html
+
+            # Verify count in subject shows only recent updates
+            subject = mail.outbox[0].subject
+            assert "[1 updated, 0 deleted]" in subject
 
         def includes_shul_when_room_updated(superuser, old_shul):
             Room.objects.create(
@@ -211,24 +213,22 @@ def describe_send_weekly_summary():
         def includes_recently_deleted_shuls_with_details(
             superuser, recently_deleted_shul, old_deleted_shul
         ):
-            # Recent deletion should be included
             call_command("send_weekly_summary")
+
             assert len(mail.outbox) == 1
             html = mail.outbox[0].alternatives[0][0]
+
             assert "Recently Deleted Shul" in html
             assert "Test deletion" in html
             assert "admin@example.com" in html  # Deleted by
             assert "Israel" in html  # Country
 
-            # Clear and test old deletion exclusion
-            mail.outbox.clear()
-            call_command("send_weekly_summary")
-            assert len(mail.outbox) == 0
+            assert "Old Deleted Shul" not in html
 
         def handles_email_with_only_deleted_shuls(superuser, recently_deleted_shul):
             # Test email with only deleted shuls, no updated ones
             mail.outbox.clear()
-            call_command("send_weekly_summary", shuls=[recently_deleted_shul])
+            call_command("send_weekly_summary")
 
             assert len(mail.outbox) == 1
             subject = mail.outbox[0].subject
