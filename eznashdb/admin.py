@@ -56,7 +56,7 @@ class BaseShulAdmin(admin.ModelAdmin):
         return format_html("<br>".join(links))
 
 
-# Custom admin for Shul — only affects list page
+@admin.register(Shul)
 class ShulAdmin(BaseShulAdmin):
     list_display = (
         "name",
@@ -75,10 +75,6 @@ class ShulAdmin(BaseShulAdmin):
         # Use all_objects to include soft-deleted shuls, then apply optimizations
         qs = Shul.objects.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
         return qs
-
-
-# Register Shul with custom admin
-admin.site.register(Shul, ShulAdmin)
 
 
 @admin.register(DeletedShul)
