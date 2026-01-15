@@ -175,10 +175,8 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             shul.save()  # Save audit fields first
             shul.delete()  # Then soft delete
 
-            messages.success(
-                self.request,
-                f"Shul '{shul.name}' has been deleted. Your deletion reason has been recorded and will be reviewed.",
-            )
+            success_msg = f"Shul '{shul.name}' has been deleted. Your deletion reason has been recorded and will be reviewed."
+            messages.success(self.request, success_msg)
             return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
         else:
             messages.error(self.request, "Unable to delete. Please provide a valid reason.")
