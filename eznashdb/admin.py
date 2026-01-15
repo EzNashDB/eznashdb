@@ -5,6 +5,7 @@ from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.urls import reverse
 from django.utils.html import format_html
+from safedelete.models import HARD_DELETE
 from tinymce.widgets import TinyMCE
 
 from eznashdb.models import DeletedShul, Room, Shul
@@ -114,7 +115,14 @@ class DeletedShulAdmin(BaseShulAdmin):
     list_select_related = ("deleted_by",)
     search_fields = ("name", "address", "city")
     readonly_fields = ("deleted_by", "deletion_reason", "deleted")
-    actions = ["undelete_shuls"]
+    actions = ["undelete_shuls", "destroy_shuls"]
+
+    def get_actions(self, request):
+        """Remove the default delete action since shuls are already deleted"""
+        actions = super().get_actions(request)
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
+        return actions
 
     def get_queryset(self, request):
         """Use the default manager which only shows deleted shuls"""
@@ -170,6 +178,24 @@ class DeletedShulAdmin(BaseShulAdmin):
 
         self.message_user(
             request, f"Successfully undeleted {count} shul{'s' if count != 1 else ''}.", level="success"
+        )
+
+    @admin.action(description="⚠️ DESTROY selected shuls (PERMANENT)")
+    def destroy_shuls(self, request, queryset):
+        """Permanently hard delete soft-deleted shuls - THIS CANNOT BE UNDONE"""
+        count = queryset.count()
+
+        if count == 0:
+            self.message_user(request, "No deleted shuls selected.", level="warning")
+            return
+
+        # Hard delete using safedelete's HARD_DELETE policy
+        deleted_count, _ = queryset.delete(force_policy=HARD_DELETE)
+
+        self.message_user(
+            request,
+            f"PERMANENTLY DESTROYED {deleted_count} shul{'s' if deleted_count != 1 else ''}. This action cannot be undone.",
+            level="warning",
         )
 
 
