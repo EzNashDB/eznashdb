@@ -170,10 +170,6 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
 
     def handle_delete_submission(self):
         """Handle shul deletion form submission"""
-        if not self.is_update or not self.request.user.is_authenticated:
-            messages.error(self.request, "You cannot delete this shul.")
-            return self.reload_shul_form(self.get_form())
-
         delete_form = ShulDeleteForm(self.request.POST)
         if delete_form.is_valid():
             # Set audit fields and soft delete
