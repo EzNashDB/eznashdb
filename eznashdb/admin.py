@@ -72,7 +72,6 @@ class ShulAdmin(BaseShulAdmin):
     def get_queryset(self, request):
         from django.db.models import Count
 
-        # Use all_objects to include soft-deleted shuls, then apply optimizations
         qs = Shul.objects.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
         return qs
 
