@@ -69,6 +69,39 @@ def old_shul(db):
     return Shul.objects.get(pk=shul.pk)
 
 
+@pytest.fixture
+def recently_deleted_shul(db, superuser):
+    shul = Shul.objects.create(
+        name="Recently Deleted Shul",
+        address="789 Deleted St, Tel Aviv, Israel",
+        city="Tel Aviv",
+        latitude=32.0853,
+        longitude=34.7818,
+    )
+    shul.deleted_by = superuser
+    shul.deletion_reason = "Test deletion"
+    shul.save()
+    shul.delete()
+    return Shul.all_objects.get(pk=shul.pk)
+
+
+@pytest.fixture
+def old_deleted_shul(db, superuser):
+    shul = Shul.objects.create(
+        name="Old Deleted Shul",
+        address="999 Old Delete St",
+        latitude=32.0853,
+        longitude=34.7818,
+    )
+    shul.deleted_by = superuser
+    shul.deletion_reason = "Old deletion"
+    shul.save()
+    shul.delete()
+    # Manually set deleted timestamp to 10 days ago
+    Shul.all_objects.filter(pk=shul.pk).update(deleted=timezone.now() - timedelta(days=10))
+    return Shul.all_objects.get(pk=shul.pk)
+
+
 def describe_send_weekly_summary():
     def describe_recipient_handling():
         def sends_to_superusers_only(superuser, regular_user, recent_shul):
@@ -104,7 +137,8 @@ def describe_send_weekly_summary():
             call_command("send_weekly_summary")
 
             assert len(mail.outbox) == 1
-            assert "Recent Shul" in mail.outbox[0].body
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Recent Shul" in html
 
         def excludes_old_shuls(superuser, old_shul):
             call_command("send_weekly_summary")
@@ -123,7 +157,8 @@ def describe_send_weekly_summary():
             call_command("send_weekly_summary")
 
             assert len(mail.outbox) == 1
-            assert "Old Shul" in mail.outbox[0].body
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Old Shul" in html
 
     def describe_email_content():
         def includes_shul_name_as_link(superuser, recent_shul):
@@ -172,8 +207,72 @@ def describe_send_weekly_summary():
             call_command("send_weekly_summary")
 
             subject = mail.outbox[0].subject
-            assert "[1]" in subject  # Count of shuls
+            assert "[1 updated, 0 deleted]" in subject
             assert "Weekly Shul Updates" in subject
+
+        def includes_deleted_shul_count_in_subject(superuser, recent_shul, recently_deleted_shul):
+            call_command("send_weekly_summary")
+
+            subject = mail.outbox[0].subject
+            assert "[1 updated, 1 deleted]" in subject
+
+    def describe_deleted_shuls():
+        def includes_recently_deleted_shuls(superuser, recently_deleted_shul):
+            call_command("send_weekly_summary")
+
+            assert len(mail.outbox) == 1
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Recently Deleted Shul" in html
+
+        def excludes_old_deleted_shuls(superuser, old_deleted_shul):
+            call_command("send_weekly_summary")
+
+            # No email sent when no recent updates or deletions
+            assert len(mail.outbox) == 0
+
+        def includes_deletion_reason(superuser, recently_deleted_shul):
+            call_command("send_weekly_summary")
+
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Test deletion" in html
+
+        def includes_deleted_by_email(superuser, recently_deleted_shul):
+            call_command("send_weekly_summary")
+
+            html = mail.outbox[0].alternatives[0][0]
+            assert "admin@example.com" in html
+
+        def includes_deleted_shul_country(superuser, recently_deleted_shul):
+            call_command("send_weekly_summary")
+
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Israel" in html
+
+        def sends_email_with_only_deleted_shuls(superuser, recently_deleted_shul):
+            # No updated shuls, only deleted
+            call_command("send_weekly_summary")
+
+            assert len(mail.outbox) == 1
+            subject = mail.outbox[0].subject
+            assert "[0 updated, 1 deleted]" in subject
+
+        def shows_no_reason_provided_when_missing(superuser, db):
+            shul = Shul.objects.create(
+                name="No Reason Shul",
+                address="Test St",
+                latitude=32.0,
+                longitude=34.0,
+            )
+            shul.deleted_by = superuser
+            shul.deletion_reason = ""
+            shul.save()
+            shul.delete()
+
+            call_command("send_weekly_summary")
+
+            html = mail.outbox[0].alternatives[0][0]
+            assert "No Reason Shul" in html
+            assert "(No reason provided)" in html
 
     def describe_custom_days():
         def respects_days_argument(superuser, old_shul):
@@ -184,4 +283,16 @@ def describe_send_weekly_summary():
             # With 15 days, old_shul should be included
             call_command("send_weekly_summary", days=15)
             assert len(mail.outbox) == 1
-            assert "Old Shul" in mail.outbox[0].body
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Old Shul" in html
+
+        def respects_days_argument_for_deleted_shuls(superuser, old_deleted_shul):
+            # With default 7 days, old_deleted_shul (10 days old) should not be included
+            call_command("send_weekly_summary")
+            assert len(mail.outbox) == 0
+
+            # With 15 days, old_deleted_shul should be included
+            call_command("send_weekly_summary", days=15)
+            assert len(mail.outbox) == 1
+            html = mail.outbox[0].alternatives[0][0]
+            assert "Old Deleted Shul" in html
