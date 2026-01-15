@@ -64,34 +64,17 @@ class ShulAdmin(BaseShulAdmin):
         "view_on_map",
         "room_count",
         "rooms_links",
-        "deleted_info",
         "created_at",
         "updated_at",
     )
-    list_filter = ("deleted", "created_at", "updated_at")
-    readonly_fields = ("deleted_by", "deletion_reason")
-
-    def get_search_results(self, request, queryset, search_term):
-        """Override to include soft-deleted shuls in search"""
-        search_queryset = super().get_search_results(request, Shul.all_objects.all(), search_term)
-        return search_queryset
+    list_filter = ("created_at", "updated_at")
 
     def get_queryset(self, request):
         from django.db.models import Count
 
         # Use all_objects to include soft-deleted shuls, then apply optimizations
-        qs = Shul.all_objects.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
+        qs = Shul.objects.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
         return qs
-
-    @admin.display(description="Deletion Info")
-    def deleted_info(self, obj):
-        """Show deletion information for soft-deleted shuls"""
-        if obj.deleted:
-            info = f"Deleted by {obj.deleted_by}" if obj.deleted_by else "Deleted"
-            if obj.deletion_reason:
-                info += f"<br><small>{obj.deletion_reason[:50]}{'...' if len(obj.deletion_reason) > 50 else ''}</small>"
-            return format_html('<span class="text-danger">{}</span>', info)
-        return "Active"
 
 
 # Register Shul with custom admin
