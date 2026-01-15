@@ -7,28 +7,26 @@ from django.urls import reverse
 from django.utils.html import format_html
 from tinymce.widgets import TinyMCE
 
-from eznashdb.models import Room, Shul
+from eznashdb.models import DeletedShul, Room, Shul
 
 
-# Custom admin for Shul — only affects list page
-class ShulAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "short_address",
-        "view_on_map",
-        "room_count",
-        "rooms_links",
-        "deleted_info",
-        "created_at",
-        "updated_at",
-    )
-    list_filter = ("deleted", "created_at", "updated_at")
-    readonly_fields = ("deleted_by", "deletion_reason")
+# Base admin with shared methods for Shul and DeletedShul
+class BaseShulAdmin(admin.ModelAdmin):
+    """Base class with common display methods for Shul admins"""
 
-    def get_search_results(self, request, queryset, search_term):
-        """Override to include soft-deleted shuls in search"""
-        search_queryset = super().get_search_results(request, Shul.all_objects.all(), search_term)
-        return search_queryset
+    class Meta:
+        abstract = True
+
+    @admin.display(description="Address", ordering="address")
+    def short_address(self, obj):
+        """Truncate long addresses but show full address on hover"""
+        if obj.address:
+            max_length = 40
+            if len(obj.address) > max_length:
+                truncated = obj.address[:max_length] + "..."
+                return format_html('<span title="{}">{}</span>', obj.address, truncated)
+            return obj.address
+        return "-"
 
     @admin.display(description="Map")
     def view_on_map(self, obj):
@@ -56,23 +54,33 @@ class ShulAdmin(admin.ModelAdmin):
 
         return format_html("<br>".join(links))
 
+
+# Custom admin for Shul — only affects list page
+class ShulAdmin(BaseShulAdmin):
+    list_display = (
+        "name",
+        "short_address",
+        "view_on_map",
+        "room_count",
+        "rooms_links",
+        "deleted_info",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("deleted", "created_at", "updated_at")
+    readonly_fields = ("deleted_by", "deletion_reason")
+
+    def get_search_results(self, request, queryset, search_term):
+        """Override to include soft-deleted shuls in search"""
+        search_queryset = super().get_search_results(request, Shul.all_objects.all(), search_term)
+        return search_queryset
+
     def get_queryset(self, request):
         from django.db.models import Count
 
         # Use all_objects to include soft-deleted shuls, then apply optimizations
         qs = Shul.all_objects.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
         return qs
-
-    @admin.display(description="Address", ordering="address")
-    def short_address(self, obj):
-        """Truncate long addresses but show full address on hover"""
-        if obj.address:
-            max_length = 40
-            if len(obj.address) > max_length:
-                truncated = obj.address[:max_length] + "..."
-                return format_html('<span title="{}">{}</span>', obj.address, truncated)
-            return obj.address
-        return "-"
 
     @admin.display(description="Deletion Info")
     def deleted_info(self, obj):
@@ -87,6 +95,82 @@ class ShulAdmin(admin.ModelAdmin):
 
 # Register Shul with custom admin
 admin.site.register(Shul, ShulAdmin)
+
+
+@admin.register(DeletedShul)
+class DeletedShulAdmin(BaseShulAdmin):
+    """Admin interface specifically for soft-deleted shuls"""
+
+    list_display = (
+        "name",
+        "short_address",
+        "room_count",
+        "rooms_links",
+        "deleted_by_link",
+        "short_deletion_reason",
+        "deleted_at",
+    )
+    list_filter = ("deleted_by", "deleted")
+    list_select_related = ("deleted_by",)
+    search_fields = ("name", "address", "city")
+    readonly_fields = ("deleted_by", "deletion_reason", "deleted")
+    actions = ["undelete_shuls"]
+
+    def get_queryset(self, request):
+        """Use the default manager which only shows deleted shuls"""
+        from django.db.models import Count
+
+        # The DeletedShul proxy model uses SafeDeleteDeletedManager,
+        # so we just need to call the parent get_queryset and add optimizations
+        qs = super().get_queryset(request)
+        qs = qs.annotate(rooms__count=Count("rooms")).prefetch_related("rooms")
+        return qs
+
+    @admin.display(description="Deleted By", ordering="deleted_by__username")
+    def deleted_by_link(self, obj):
+        """Link to the user who deleted this shul"""
+        if not obj.deleted_by:
+            return "-"
+        url = reverse("admin:users_user_change", args=[obj.deleted_by.pk])
+        return format_html('<a href="{}">{}</a>', url, obj.deleted_by)
+
+    @admin.display(description="Deletion Reason", ordering="deletion_reason")
+    def short_deletion_reason(self, obj):
+        """Show truncated deletion reason"""
+        if obj.deletion_reason:
+            max_length = 50
+            if len(obj.deletion_reason) > max_length:
+                truncated = obj.deletion_reason[:max_length] + "..."
+                return format_html('<span title="{}">{}</span>', obj.deletion_reason, truncated)
+            return obj.deletion_reason
+        return "-"
+
+    @admin.display(description="Deleted At", ordering="deleted")
+    def deleted_at(self, obj):
+        """Show when the shul was deleted"""
+        if obj.deleted:
+            return obj.deleted
+        return "-"
+
+    @admin.action(description="Undelete selected shuls")
+    def undelete_shuls(self, request, queryset):
+        """Undelete selected shuls and clear deletion audit fields"""
+        count = queryset.count()
+
+        if count == 0:
+            self.message_user(request, "No deleted shuls selected.", level="warning")
+            return
+
+        # Undelete using safedelete's undelete method
+        queryset.undelete()
+
+        # Clear deletion audit fields for each shul
+        for shul in queryset:
+            shul.clear_deletion()
+
+        self.message_user(
+            request, f"Successfully undeleted {count} shul{'s' if count != 1 else ''}.", level="success"
+        )
 
 
 @admin.register(Room)
@@ -106,7 +190,7 @@ class RoomAdmin(admin.ModelAdmin):
 # Dynamically register all other models
 eznashdb_models = apps.get_app_config("eznashdb").models
 for _model_name, model in eznashdb_models.items():
-    if model not in [Shul, Room]:  # skip Shul since we already registered it
+    if model not in [Shul, Room, DeletedShul]:  # skip models we already registered
         admin.site.register(model)
 
 

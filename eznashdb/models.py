@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.sites.models import Site
 from django.db import models
 from django.urls import reverse
+from safedelete.managers import SafeDeleteDeletedManager
 from safedelete.models import SafeDeleteModel
 
 from eznashdb.enums import RelativeSize, SeeHearScore
@@ -89,6 +90,17 @@ class Shul(SafeDeleteModel):
         self.deleted_by = None
         self.deletion_reason = ""
         self.save()
+
+
+class DeletedShul(Shul):
+    """Proxy model to show only deleted shuls in admin"""
+
+    objects = SafeDeleteDeletedManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "deleted shul"
+        verbose_name_plural = "deleted shuls"
 
 
 class Room(models.Model):
