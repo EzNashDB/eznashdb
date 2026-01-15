@@ -136,6 +136,9 @@ class CaptchaVerifyView(View):
     def get(self, request):
         form = CaptchaVerificationForm()
         next_url = request.GET.get("next", "/")
+        if request.user.is_authenticated and request.user.is_superuser:
+            generate_captcha_token(request)
+            return redirect(next_url)
         return render(
             request,
             "eznashdb/captcha_verify.html",
