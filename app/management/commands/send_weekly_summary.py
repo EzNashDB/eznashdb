@@ -63,10 +63,25 @@ class Command(BaseCommand):
         days = options["days"]
         html_only = options["html"]
 
-        # Calculate cutoff with 1-hour buffer for edge cases
-        cutoff = timezone.now() - timedelta(days=days, hours=1)
+        updated_shuls, deleted_shuls = self._get_shul_changes(days)
 
-        # Get updated shuls (check both shul and room updated_at)
+        if not updated_shuls and not deleted_shuls:
+            self._log_no_changes()
+            return
+
+        template_context = self._prepare_template_context(updated_shuls, deleted_shuls)
+        html_body = render_to_string("email/weekly_summary.html", template_context)
+
+        if html_only:
+            self.stdout.write(html_body)
+            return
+
+        self._send_email(html_body, len(updated_shuls), len(deleted_shuls))
+
+    def _get_shul_changes(self, days):
+        """Get recently updated and deleted shuls."""
+        cutoff = timezone.now() - timedelta(days=days, hours=1)  # 1-hour buffer for edge cases
+
         updated_shuls = (
             Shul.objects.filter(Q(updated_at__gte=cutoff) | Q(rooms__updated_at__gte=cutoff))
             .distinct()
@@ -74,60 +89,44 @@ class Command(BaseCommand):
             .order_by("-updated_at")
         )
 
-        # Get deleted shuls (using all_objects to include soft-deleted)
         deleted_shuls = (
             Shul.all_objects.filter(deleted__gte=cutoff)
             .select_related("deleted_by")
             .order_by("-deleted")
         )
 
-        if not updated_shuls.exists() and not deleted_shuls.exists():
-            self.stdout.write(
-                self.style.SUCCESS("No shuls updated or deleted in the last week. Skipping email.")
-            )
-            return
+        return updated_shuls, deleted_shuls
 
-        # Prepare data for template
-        shuls_data = [self._prepare_shul_data(shul) for shul in updated_shuls]
-        deleted_shuls_data = [self._prepare_deleted_shul_data(shul) for shul in deleted_shuls]
+    def _prepare_template_context(self, updated_shuls, deleted_shuls):
+        """Prepare context data for email template."""
+        return {
+            "shuls": [self._prepare_shul_data(shul) for shul in updated_shuls],
+            "deleted_shuls": [self._prepare_deleted_shul_data(shul) for shul in deleted_shuls],
+            "deleted_shuls_admin_url": self._build_admin_url(),
+        }
 
-        # Build absolute URL to deleted shuls admin page
-        deleted_shuls_admin_path = "/admin/eznashdb/deletedshul/"
-        deleted_shuls_admin_url = (
-            f"{settings.SITE_URL}{deleted_shuls_admin_path}"
-            if settings.SITE_URL
-            else deleted_shuls_admin_path
+    def _build_admin_url(self):
+        """Build absolute URL to deleted shuls admin page."""
+        admin_path = "/admin/eznashdb/deletedshul/"
+        return f"{settings.SITE_URL}{admin_path}" if settings.SITE_URL else admin_path
+
+    def _log_no_changes(self):
+        """Log when no changes found."""
+        self.stdout.write(
+            self.style.SUCCESS("No shuls updated or deleted in the last week. Skipping email.")
         )
 
-        # Build HTML content
-        html_body = render_to_string(
-            "email/weekly_summary.html",
-            {
-                "shuls": shuls_data,
-                "deleted_shuls": deleted_shuls_data,
-                "deleted_shuls_admin_url": deleted_shuls_admin_url,
-            },
-        )
-
-        # If --html flag, just output HTML and exit
-        if html_only:
-            self.stdout.write(html_body)
-            return
-
-        # Get superusers with email addresses
+    def _send_email(self, html_body, updated_count, deleted_count):
+        """Send summary email to superusers."""
         superusers = User.objects.filter(is_superuser=True, email__isnull=False)
 
         if not superusers:
             self.stdout.write(self.style.WARNING("No superusers with email addresses found. Skipping."))
             return
 
-        # Build email content
-        shul_count = len(shuls_data)
-        deleted_count = len(deleted_shuls_data)
-        subject = f"Weekly Shul Updates [{shul_count} updated, {deleted_count} deleted] - {timezone.now().strftime('%B %d, %Y')}"
+        subject = self._build_subject(updated_count, deleted_count)
+        recipient_list = [user.email for user in superusers]
 
-        # Send email
-        recipient_list = [u.email for u in superusers]
         send_mail(
             subject=subject,
             message="",  # Gmail supports HTML, no need for text fallback
@@ -140,54 +139,55 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Sent weekly summary to {len(recipient_list)} superuser(s): "
-                f"{shul_count} shul(s) updated, {deleted_count} shul(s) deleted"
+                f"{updated_count} shul(s) updated, {deleted_count} shul(s) deleted"
             )
         )
 
+    def _build_subject(self, updated_count, deleted_count):
+        """Build email subject with counts and date."""
+        date_str = timezone.now().strftime("%B %d, %Y")
+        return f"Weekly Shul Updates [{updated_count} updated, {deleted_count} deleted] - {date_str}"
+
     def _prepare_shul_data(self, shul):
         """Prepare shul data for template rendering."""
-        rooms_data = []
-        for room in shul.rooms.all():
-            stars = "-"
-            if room.see_hear_score:
-                score = int(room.see_hear_score)
-                stars = "★" * score + "☆" * (5 - score)
-
-            rooms_data.append(
-                RoomData(
-                    name=room.name,
-                    size=room.relative_size or "-",
-                    stars=stars,
-                )
-            )
-
         return ShulData(
             name=shul.name,
             map_url=shul.get_map_url(absolute=True),
             country=self._get_country(shul.address),
-            rooms=rooms_data,
+            rooms=[self._prepare_room_data(room) for room in shul.rooms.all()],
             updated_at=shul.updated_at,
+        )
+
+    def _prepare_room_data(self, room):
+        """Prepare room data for template rendering."""
+        return RoomData(
+            name=room.name,
+            size=room.relative_size or "-",
+            stars=self._format_stars(room.see_hear_score),
         )
 
     def _prepare_deleted_shul_data(self, shul):
         """Prepare deleted shul data for template rendering."""
-        deleted_by_email = shul.deleted_by.email if shul.deleted_by else "Unknown"
-
         return DeletedShulData(
             name=shul.name,
             deletion_reason=shul.deletion_reason,
-            deleted_by=deleted_by_email,
+            deleted_by=shul.deleted_by.email if shul.deleted_by else "Unknown",
             deleted_at=shul.deleted,
             country=self._get_country(shul.address),
         )
 
+    def _format_stars(self, score):
+        """Convert numeric score to star rating."""
+        if not score:
+            return "-"
+
+        score_int = int(score)
+        return "★" * score_int + "☆" * (5 - score_int)
+
     def _get_country(self, address):
         """Extract country from address (last part after comma), or '-' for coordinates."""
-        if not address:
+        if not address or COORD_PATTERN.match(address.strip()):
             return "-"
-        if COORD_PATTERN.match(address.strip()):
-            return "-"
+
         parts = address.split(",")
-        if len(parts) > 1:
-            return parts[-1].strip()
-        return address.strip()
+        return parts[-1].strip() if len(parts) > 1 else address.strip()
