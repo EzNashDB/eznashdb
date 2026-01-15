@@ -7,12 +7,12 @@
                      role="alert"
                      aria-live="assertive"
                      aria-atomic="true"
-                     data-bs-autohide="{% if message.tags == 'warning' or message.tags == 'danger' %}
-                                           false
-                                       {% else %}
-                                           true
-                                       {% endif %}"
-                     data-bs-delay="5000">
+                     data-bs-autohide="true"
+                     data-bs-delay="{% if message.tags == 'warning' or message.tags == 'danger' %}
+                                        15000
+                                    {% else %}
+                                        5000
+                                    {% endif %}">
                     <div class="d-flex">
                         <div class="toast-body">{{ message|safe }}</div>
                         <button type="button"
