@@ -3,23 +3,40 @@
     <head>
         <meta charset="utf-8">
     </head>
-    <body style="font-family: sans-serif;">
-        <h2>Weekly Shul Updates</h2>
-        <p>
-            {{ shuls|length }} shul(s) updated
-            {% if deleted_shuls %}, {{ deleted_shuls|length }} shul(s) deleted{% endif %}
-        </p>
+    <body style="font-family: sans-serif; max-width: 900px; margin: 20px;">
+        <h2 style="margin-bottom: 10px;">Weekly Shul Updates</h2>
+        <div style="background: #f8f9fa;
+                    padding: 15px;
+                    border-radius: 4px;
+                    margin-bottom: 25px">
+            <strong>{{ shuls|length }}</strong> shul(s) updated
+            {% if deleted_shuls %}
+                &nbsp;|&nbsp; <strong style="color: #dc3545;">{{ deleted_shuls|length }}</strong> shul(s) deleted
+            {% endif %}
+        </div>
         {% if shuls %}
-            <h3>Updated Shuls</h3>
-            <table style="border-collapse:collapse;width:100%;margin-bottom:30px;">
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">Updated Shuls</h3>
+            <table style="border-collapse: collapse; width: 100%; margin-bottom: 40px;">
                 <thead>
-                    <tr style="background:#f0f0f0;">
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Shul</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Room</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Size</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Vis/Aud</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Updated At</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Country</th>
+                    <tr style="background: #e9ecef;">
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Shul</th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Room</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 60px">Size</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 80px">Rating</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 120px">Updated</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 80px">Country</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,42 +44,57 @@
                         {% with room_count=shul.rooms|length|default:1 %}
                             {% if shul.rooms %}
                                 {% for room in shul.rooms %}
-                                    <tr>
+                                    <tr style="{% if not forloop.first %}border-top: none;{% endif %}">
                                         {% if forloop.first %}
                                             <td rowspan="{{ room_count }}"
-                                                style="vertical-align:top;
-                                                       border:1px solid #ccc;
-                                                       padding:8px">
-                                                <a href="{{ shul.map_url }}">{{ shul.name }}</a>
+                                                style="vertical-align: top;
+                                                       border: 1px solid #dee2e6;
+                                                       padding: 10px;
+                                                       font-weight: 500">
+                                                <a href="{{ shul.map_url }}"
+                                                   style="color: #0066cc;
+                                                          text-decoration: none">{{ shul.name }}</a>
                                             </td>
                                         {% endif %}
-                                        <td style="border:1px solid #ccc;padding:8px;">{{ room.name }}</td>
-                                        <td style="border:1px solid #ccc;padding:8px;">{{ room.size }}</td>
-                                        <td style="border:1px solid #ccc;padding:8px;">{{ room.stars }}</td>
+                                        <td style="border: 1px solid #dee2e6; padding: 10px;">{{ room.name }}</td>
+                                        <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">{{ room.size }}</td>
+                                        <td style="border: 1px solid #dee2e6; padding: 10px;">{{ room.stars }}</td>
                                         {% if forloop.first %}
                                             <td rowspan="{{ room_count }}"
-                                                style="vertical-align:top;
-                                                       border:1px solid #ccc;
-                                                       padding:8px">{{ shul.updated_at }}</td>
+                                                style="vertical-align: top;
+                                                       border: 1px solid #dee2e6;
+                                                       padding: 10px;
+                                                       font-size: 13px;
+                                                       color: #666">
+                                                {{ shul.updated_at|date:"M d, g:i a" }}
+                                            </td>
                                             <td rowspan="{{ room_count }}"
-                                                style="vertical-align:top;
-                                                       border:1px solid #ccc;
-                                                       padding:8px">{{ shul.country }}</td>
+                                                style="vertical-align: top;
+                                                       border: 1px solid #dee2e6;
+                                                       padding: 10px">{{ shul.country }}</td>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td style="border:1px solid #ccc;padding:8px;">
-                                        <a href="{{ shul.map_url }}">{{ shul.name }}</a>
+                                    <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 500;">
+                                        <a href="{{ shul.map_url }}"
+                                           style="color: #0066cc;
+                                                  text-decoration: none">{{ shul.name }}</a>
                                     </td>
-                                    <td style="border:1px solid #ccc;padding:8px;">
+                                    <td style="border: 1px solid #dee2e6; padding: 10px; color: #999;">
                                         <em>(no rooms)</em>
                                     </td>
-                                    <td style="border:1px solid #ccc;padding:8px;">-</td>
-                                    <td style="border:1px solid #ccc;padding:8px;">-</td>
-                                    <td style="border:1px solid #ccc;padding:8px;">{{ shul.updated_at }}</td>
-                                    <td style="border:1px solid #ccc;padding:8px;">{{ shul.country }}</td>
+                                    <td style="border: 1px solid #dee2e6;
+                                               padding: 10px;
+                                               text-align: center;
+                                               color: #999">-</td>
+                                    <td style="border: 1px solid #dee2e6; padding: 10px; color: #999;">-</td>
+                                    <td style="border: 1px solid #dee2e6;
+                                               padding: 10px;
+                                               font-size: 13px;
+                                               color: #666">{{ shul.updated_at|date:"M d, g:i a" }}</td>
+                                    <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.country }}</td>
                                 </tr>
                             {% endif %}
                         {% endwith %}
@@ -71,41 +103,55 @@
             </table>
         {% endif %}
         {% if deleted_shuls %}
-            <h3 style="color:#dc3545;">Deleted Shuls</h3>
-            <p>
-                (<a href="{{ deleted_shuls_admin_url }}">View and manage in admin</a>)
+            <h3 style="color: #dc3545; margin-top: 30px; margin-bottom: 10px;">Deleted Shuls</h3>
+            <p style="margin-bottom: 15px;">
+                <a href="{{ deleted_shuls_admin_url }}" style="color: #0066cc;">View and manage in admin</a>
             </p>
-            <table style="border-collapse:collapse;width:100%;margin-bottom:30px;">
+            <table style="border-collapse: collapse; width: 100%; margin-bottom: 40px;">
                 <thead>
-                    <tr style="background:#fff3cd;">
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Shul</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Reason</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Deleted By</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Deleted At</th>
-                        <th style="border:1px solid #ccc;padding:8px;text-align:left;">Country</th>
+                    <tr style="background: #fff3cd;">
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Shul</th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Reason</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 120px">Deleted By</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 120px">Deleted</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 80px">Country</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for shul in deleted_shuls %}
                         <tr>
-                            <td style="border:1px solid #ccc;padding:8px;">
-                                <strong>{{ shul.name }}</strong>
-                            </td>
-                            <td style="border:1px solid #ccc;padding:8px;">
+                            <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 500;">{{ shul.name }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">
                                 {% if shul.deletion_reason %}
                                     {{ shul.deletion_reason }}
                                 {% else %}
-                                    <em>(No reason provided)</em>
+                                    <em style="color: #999;">(No reason provided)</em>
                                 {% endif %}
                             </td>
-                            <td style="border:1px solid #ccc;padding:8px;">{{ shul.deleted_by }}</td>
-                            <td style="border:1px solid #ccc;padding:8px;">{{ shul.deleted_at|date:"M d, Y, g:i a" }}</td>
-                            <td style="border:1px solid #ccc;padding:8px;">{{ shul.country }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.deleted_by }}</td>
+                            <td style="border: 1px solid #dee2e6;
+                                       padding: 10px;
+                                       font-size: 13px;
+                                       color: #666">{{ shul.deleted_at|date:"M d, g:i a" }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.country }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% endif %}
-        <p style="color:#666;font-size:12px;margin-top:20px;">Automated message from ezratnashim.com</p>
+        <p style="color: #999;
+                  font-size: 12px;
+                  margin-top: 30px;
+                  border-top: 1px solid #eee;
+                  padding-top: 15px">Automated message from ezratnashim.com</p>
     </body>
 </html>
