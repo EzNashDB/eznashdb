@@ -12,7 +12,7 @@ from django.db import transaction
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
@@ -175,8 +175,12 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             shul.save()  # Save audit fields first
             shul.delete()  # Then soft delete
 
-            success_msg = f"Shul '{shul.name}' has been deleted. Your deletion reason has been recorded and will be reviewed."
-            messages.success(self.request, success_msg)
+            contact_url = reverse("eznashdb:contact_us")
+            warning_msg = (
+                f"'{shul.name}' has been deleted. <br><br>"
+                f"Was this a mistake? <a href='{contact_url}' class='alert-link'>Contact us</a> to restore it."
+            )
+            messages.warning(self.request, warning_msg)
             return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
         else:
             messages.error(self.request, "Unable to delete. Please provide a valid reason.")
