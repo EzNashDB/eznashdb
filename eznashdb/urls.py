@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.ShulsFilterView.as_view(), name="shuls"),
     path("shuls/create/", views.CreateUpdateShulView.as_view(), name="create_shul"),
     path("shuls/<pk>/update/", views.CreateUpdateShulView.as_view(), name="update_shul"),
+    path("shuls/<int:pk>/undelete/", views.UndeleteShulView.as_view(), name="undelete_shul"),
     path("address-lookup/", views.AddressLookupView.as_view(), name="address_lookup"),
     path("contact/", views.ContactUsView.as_view(), name="contact_us"),
     path("gmaps-proxy/", views.GoogleMapsProxyView.as_view(), name="google_maps_proxy"),
