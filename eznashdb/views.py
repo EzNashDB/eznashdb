@@ -11,8 +11,9 @@ from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
@@ -175,10 +176,10 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
             shul.save()  # Save audit fields first
             shul.delete()  # Then soft delete
 
-            contact_url = reverse("eznashdb:contact_us")
-            warning_msg = (
-                f"'{shul.name}' has been deleted. <br><br>"
-                f"Was this a mistake? <a href='{contact_url}' class='alert-link'>Contact us</a> to restore it."
+            warning_msg = render_to_string(
+                "eznashdb/includes/deletion_warning_message.html",
+                {"shul": shul},
+                request=self.request,
             )
             messages.warning(self.request, warning_msg)
             return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
@@ -400,6 +401,28 @@ class GoogleMapsProxyView(RateLimitCaptchaMixin, LoginRequiredMixin, View):
 
         context = {"maps_url": maps_url, "shul": shul}
         return render(request, "maps_redirect.html", context)
+
+
+class UndeleteShulView(LoginRequiredMixin, View):
+    """Handle undoing a shul deletion"""
+
+    login_required_message = "Log in to restore shuls."
+
+    def post(self, request, pk):
+        # Get the soft-deleted shul (use all_objects to include deleted)
+        shul = get_object_or_404(Shul.all_objects, pk=pk)
+
+        # Check if it's actually deleted
+        if not shul.deleted:
+            messages.info(request, f"'{shul.name}' is not deleted.")
+        else:
+            # Undelete and clear audit fields
+            shul.undelete()
+            shul.clear_deletion()
+            messages.success(request, f"'{shul.name}' has been restored.")
+
+        # Return to the browse page
+        return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
 
 
 class ContactUsView(TemplateView):

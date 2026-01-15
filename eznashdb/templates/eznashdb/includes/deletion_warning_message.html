@@ -1,0 +1,13 @@
+'{{ shul.name }}' has been deleted.
+<br>
+<br>
+Was this a mistake?
+<form method="post"
+      action="{% url 'eznashdb:undelete_shul' pk=shul.id %}"
+      class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-secondary ms-2 align-baseline">
+        <i class="fa-solid fa-rotate-left"></i>
+        Undo
+    </button>
+</form>
