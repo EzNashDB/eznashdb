@@ -58,7 +58,7 @@ class RateLimitViolationMiddleware:
 
     def __call__(self, request):
         violation = self.get_violation(request)
-        if violation and violation.is_in_cooldown():
+        if not request.user.is_superuser and violation and violation.is_in_cooldown():
             return self.get_cooldown_response(request, violation)
         return self.get_response(request)
 

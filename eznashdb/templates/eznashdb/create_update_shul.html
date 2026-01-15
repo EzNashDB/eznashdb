@@ -45,9 +45,31 @@
                     <div class="row sticky-top bg-body py-2 border-bottom"
                          style="{# Below bootstrap modal + navbar, above map inputs #} z-index: 1025">
                         <div class="col-12">
-                            <h3 class="d-flex gap-3 align-items-center mb-0">
+                            <h3 class="d-flex gap-3 justify-content-between align-items-center mb-0">
                                 {% if object %}
-                                    Edit Shul: {{ object.name }}
+                                    <span class="text-truncate">Edit Shul: {{ object.name }}</span>
+                                    {% if delete_form %}
+                                        <div class="fs-6">
+                                            <a href="#"
+                                               class="btn btn-sm btn-outline-danger text-nowrap"
+                                               data-bs-toggle="collapse"
+                                               data-bs-target="#deleteSection">
+                                                <i class="fa-solid fa-trash me-1"></i>Delete
+                                            </a>
+                                            <div class="collapse mt-3 text-start" id="deleteSection">
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    {% crispy delete_form %}
+                                                    <button type="submit"
+                                                            name="delete_shul"
+                                                            value="true"
+                                                            class="btn btn-outline-danger mt-2">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endif %}
                                 {% else %}
                                     Add a Shul
                                     <span class="h5 m-0">
@@ -67,6 +89,9 @@
                                         </div>
                                         {% if form.instance.pk or wizard_step == '2' %}
                                             <div class="col">
+                                                <div class="d-md-none">
+                                                    <hr>
+                                                </div>
                                                 <div class="row">
                                                     <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
                                                 </div>
@@ -145,30 +170,6 @@
         {% endpartialdef %}
     </div>
 </div>
-{% if delete_form %}
-    <div class="row">
-        <div class="col-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
-            <div class="mt-4 pt-3 border-top">
-                <a href="#"
-                   class="text-muted small"
-                   data-bs-toggle="collapse"
-                   data-bs-target="#deleteSection">
-                    <i class="fa-solid fa-trash"></i>
-                Delete this shul</a>
-                <div class="collapse mt-3" id="deleteSection">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% crispy delete_form %}
-                        <button type="submit"
-                                name="delete_shul"
-                                value="true"
-                                class="btn btn-outline-danger mt-2">Delete</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endif %}
 {% endblock content %}
 
 {% block extra_media_bottom %}
