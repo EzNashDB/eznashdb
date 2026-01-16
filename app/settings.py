@@ -19,6 +19,7 @@ import dj_database_url
 import sentry_sdk
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
+from waffle import flag_is_active
 
 dotenv_path = join(dirname(__file__), "../.env")
 load_dotenv(dotenv_path)
@@ -75,7 +76,7 @@ DEBUG_TOOLBAR_PANELS = [
 
 
 def show_toolbar(request):
-    return DEBUG is True
+    return DEBUG is True and flag_is_active(request, "django_debug_toolbar")
 
 
 DEBUG_TOOLBAR_CONFIG = {
