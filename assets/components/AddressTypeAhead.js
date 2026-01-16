@@ -22,6 +22,7 @@ export const AddressTypeAhead = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 1000);
   const [isSearchError, setIsSearchError] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -37,10 +38,12 @@ export const AddressTypeAhead = ({
           throw new Error(items.error);
         }
         setOptions(items);
+        setHasSearched(true);
       })
       .catch((error) => {
         setOptions([]);
         setIsSearchError(true);
+        setHasSearched(true);
         console.error("Error:", error);
       })
       .finally(() => {
@@ -57,6 +60,7 @@ export const AddressTypeAhead = ({
 
   const handleInputChange = (text, e) => {
     if (isSearchError) setIsSearchError(false);
+    if (hasSearched) setHasSearched(false);
     onInput(text);
     handleSearch(text);
   };
@@ -75,6 +79,19 @@ export const AddressTypeAhead = ({
     </div>
   );
 
+  const noResultsMessage = (
+    <div className="alert alert-info m-0 py-1 px-2 text-wrap" role="alert">
+      No results found. Try a different search or drag the map.
+    </div>
+  );
+
+  const getPromptText = () => {
+    if (isSearchError) return genericSearchError;
+    if (hasSearched && !isLoading && options.length === 0)
+      return noResultsMessage;
+    return "Type to search...";
+  };
+
   return (
     <AsyncTypeahead
       selected={[inputValue]}
@@ -90,7 +107,7 @@ export const AddressTypeAhead = ({
       options={options}
       onInputChange={handleInputChange}
       placeholder="Search..."
-      promptText={isSearchError ? genericSearchError : "Type to search..."}
+      promptText={getPromptText()}
       inputProps={{
         name: "address",
         className: `${!isValid && "is-invalid"}`,
