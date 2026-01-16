@@ -1,9 +1,6 @@
 """Admin configuration for app infrastructure models."""
 
-from datetime import timedelta
-
 from django.contrib import admin
-from django.utils import timezone
 
 from app.models import RateLimitViolation
 
@@ -15,6 +12,7 @@ class RateLimitViolationAdmin(admin.ModelAdmin):
         "endpoint",
         "violation_count",
         "last_violation_at",
+        "is_active",
         "cooldown_until",
         "user",
     ]
@@ -23,7 +21,7 @@ class RateLimitViolationAdmin(admin.ModelAdmin):
     readonly_fields = ["first_violation_at", "last_violation_at"]
     ordering = ["-last_violation_at"]
 
-    def get_queryset(self, request):
-        """Show only active violations by default."""
-        qs = super().get_queryset(request)
-        return qs.filter(last_violation_at__gte=timezone.now() - timedelta(hours=24))
+    @admin.display(boolean=True, description="Active")
+    def is_active(self, obj):
+        """Display whether violation is active."""
+        return obj.is_active()
