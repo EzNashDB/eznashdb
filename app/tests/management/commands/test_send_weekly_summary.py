@@ -171,8 +171,6 @@ def describe_send_weekly_summary():
             assert "★★★★☆" in html  # 4/5 stars
 
         def extracts_country_from_address(superuser, recent_shul):
-            # Address is "123 Main St" with city "Jerusalem"
-            # Since there's no comma in address, it should show the whole address
             recent_shul.address = "123 Main St, Jerusalem, Israel"
             recent_shul.save()
 
