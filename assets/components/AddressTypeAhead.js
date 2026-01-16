@@ -81,7 +81,8 @@ export const AddressTypeAhead = ({
 
   const noResultsMessage = (
     <div className="alert alert-info m-0 py-1 px-2 text-wrap" role="alert">
-      No results found. Try a different search or drag the map.
+      No results found. <br />
+      Try searching city or street, then drag the map.
     </div>
   );
 
