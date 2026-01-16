@@ -102,10 +102,10 @@ class Command(BaseCommand):
         return {
             "shuls": [self._prepare_shul_data(shul) for shul in updated_shuls],
             "deleted_shuls": [self._prepare_deleted_shul_data(shul) for shul in deleted_shuls],
-            "deleted_shuls_admin_url": self._build_admin_url(),
+            "deleted_shuls_admin_url": self._build_deletedshul_admin_url(),
         }
 
-    def _build_admin_url(self):
+    def _build_deletedshul_admin_url(self):
         """Build absolute URL to deleted shuls admin page."""
         admin_path = "/admin/eznashdb/deletedshul/"
         return f"{settings.SITE_URL}{admin_path}" if settings.SITE_URL else admin_path
