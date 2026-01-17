@@ -68,6 +68,7 @@ class ShulAdmin(BaseShulAdmin):
         "updated_at",
     )
     list_filter = ("created_at", "updated_at")
+    readonly_fields = ("view_on_map", "rooms_links")
 
     def get_queryset(self, request):
         from django.db.models import Count
@@ -92,7 +93,7 @@ class DeletedShulAdmin(BaseShulAdmin):
     list_filter = ("deleted_by", "deleted")
     list_select_related = ("deleted_by",)
     search_fields = ("name", "address", "city")
-    readonly_fields = ("deleted_by", "deletion_reason", "deleted")
+    readonly_fields = ("deleted_by", "deletion_reason", "deleted", "view_on_map", "rooms_links")
     actions = ["undelete_shuls", "destroy_shuls"]
 
     def get_actions(self, request):
