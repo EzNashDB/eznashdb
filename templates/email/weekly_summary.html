@@ -13,6 +13,9 @@
             {% if deleted_shuls %}
                 &nbsp;|&nbsp; <strong style="color: #dc3545;">{{ deleted_shuls|length }}</strong> shul(s) deleted
             {% endif %}
+            {% if violations %}
+                &nbsp;|&nbsp; <strong style="color: #856404;">{{ violations|length }}</strong> rate limit violation(s)
+            {% endif %}
         </div>
         {% if shuls %}
             <h3 style="margin-top: 30px; margin-bottom: 15px;">Updated Shuls</h3>
@@ -137,6 +140,72 @@
                                        font-size: 13px;
                                        color: #666">{{ shul.deleted_at|date:"M d, g:i a" }}</td>
                             <td style="border: 1px solid #dee2e6; padding: 10px;">{{ shul.country }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        {% if violations %}
+            <h3 style="color: #856404; margin-top: 30px; margin-bottom: 15px;">Rate Limit Violations</h3>
+            <table style="border-collapse: collapse; width: 100%; margin-bottom: 40px;">
+                <thead>
+                    <tr style="background: #fff3cd;">
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">IP Address</th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Endpoint</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 60px">Count</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 140px">Status</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 120px">First</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 120px">Last</th>
+                        <th style="border: 1px solid #dee2e6;
+                                   padding: 10px;
+                                   text-align: left;
+                                   width: 150px">User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for violation in violations %}
+                        <tr>
+                            <td style="border: 1px solid #dee2e6;
+                                       padding: 10px;
+                                       font-family: monospace">{{ violation.ip_address }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">{{ violation.endpoint }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">
+                                {{ violation.violation_count }}
+                            </td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px; font-size: 13px;">
+                                {% if violation.is_in_cooldown %}
+                                    <span style="color: #721c24; font-weight: 500;">🚫 Blocked until {{ violation.cooldown_until|date:"M d, g:i a" }}</span>
+                                {% elif violation.is_active %}
+                                    <span style="color: #856404;">⚠️ Active (&lt;24hrs, counts toward escalation)</span>
+                                {% else %}
+                                    <span style="color: #666;">Inactive (&gt;24hrs old)</span>
+                                {% endif %}
+                            </td>
+                            <td style="border: 1px solid #dee2e6;
+                                       padding: 10px;
+                                       font-size: 13px;
+                                       color: #666">
+                                {{ violation.first_violation_at|date:"M d, g:i a" }}
+                            </td>
+                            <td style="border: 1px solid #dee2e6;
+                                       padding: 10px;
+                                       font-size: 13px;
+                                       color: #666">
+                                {{ violation.last_violation_at|date:"M d, g:i a" }}
+                            </td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px;">{{ violation.user_email }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from app.models import RateLimitViolation
 from eznashdb.models import Shul
 
 User = get_user_model()
@@ -43,6 +44,19 @@ class DeletedShulData:
     country: str
 
 
+@dataclass
+class RateLimitViolationData:
+    ip_address: str
+    endpoint: str
+    violation_count: int
+    first_violation_at: object  # datetime object for template formatting
+    last_violation_at: object  # datetime object for template formatting
+    user_email: str
+    is_active: bool
+    is_in_cooldown: bool
+    cooldown_until: object  # datetime object or None
+
+
 class Command(BaseCommand):
     help = "Send weekly summary email of shul changes to superusers"
 
@@ -64,31 +78,33 @@ class Command(BaseCommand):
         html_only = options["html"]
 
         updated_shuls, deleted_shuls = self._get_shul_changes(days)
+        violations = self._get_rate_limit_violations(days)
 
-        if not updated_shuls and not deleted_shuls:
+        if not updated_shuls and not deleted_shuls and not violations:
             self._log_no_changes()
             return
 
-        template_context = self._prepare_template_context(updated_shuls, deleted_shuls)
+        template_context = self._prepare_template_context(updated_shuls, deleted_shuls, violations)
         html_body = render_to_string("email/weekly_summary.html", template_context)
 
         if html_only:
             self.stdout.write(html_body)
             return
 
-        self._send_email(html_body, len(updated_shuls), len(deleted_shuls))
+        self._send_email(html_body, len(updated_shuls), len(deleted_shuls), len(violations))
+
+    def _get_cutoff(self, days):
+        return timezone.now() - timedelta(days=days, hours=1)  # 1-hour buffer for edge cases
 
     def _get_shul_changes(self, days):
         """Get recently updated and deleted shuls."""
-        cutoff = timezone.now() - timedelta(days=days, hours=1)  # 1-hour buffer for edge cases
-
+        cutoff = self._get_cutoff(days)
         updated_shuls = (
             Shul.objects.filter(Q(updated_at__gte=cutoff) | Q(rooms__updated_at__gte=cutoff))
             .distinct()
             .prefetch_related("rooms")
             .order_by("-updated_at")
         )
-
         deleted_shuls = (
             Shul.all_objects.filter(deleted__gte=cutoff)
             .select_related("deleted_by")
@@ -97,12 +113,22 @@ class Command(BaseCommand):
 
         return updated_shuls, deleted_shuls
 
-    def _prepare_template_context(self, updated_shuls, deleted_shuls):
+    def _get_rate_limit_violations(self, days):
+        """Get recent rate limit violations."""
+        cutoff = self._get_cutoff(days)
+        return (
+            RateLimitViolation.objects.filter(last_violation_at__gte=cutoff)
+            .select_related("user")
+            .order_by("-last_violation_at")
+        )
+
+    def _prepare_template_context(self, updated_shuls, deleted_shuls, violations):
         """Prepare context data for email template."""
         return {
             "shuls": [self._prepare_shul_data(shul) for shul in updated_shuls],
             "deleted_shuls": [self._prepare_deleted_shul_data(shul) for shul in deleted_shuls],
             "deleted_shuls_admin_url": self._build_deletedshul_admin_url(),
+            "violations": [self._prepare_violation_data(violation) for violation in violations],
         }
 
     def _build_deletedshul_admin_url(self):
@@ -116,7 +142,7 @@ class Command(BaseCommand):
             self.style.SUCCESS("No shuls updated or deleted in the last week. Skipping email.")
         )
 
-    def _send_email(self, html_body, updated_count, deleted_count):
+    def _send_email(self, html_body, updated_count, deleted_count, violation_count):
         """Send summary email to superusers."""
         superusers = User.objects.filter(is_superuser=True, email__isnull=False)
 
@@ -124,7 +150,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("No superusers with email addresses found. Skipping."))
             return
 
-        subject = self._build_subject(updated_count, deleted_count)
+        subject = self._build_subject(updated_count, deleted_count, violation_count)
         recipient_list = [user.email for user in superusers]
 
         send_mail(
@@ -139,14 +165,23 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Sent weekly summary to {len(recipient_list)} superuser(s): "
-                f"{updated_count} shul(s) updated, {deleted_count} shul(s) deleted"
+                f"{updated_count} shul(s) updated, {deleted_count} shul(s) deleted, "
+                f"{violation_count} rate limit violation(s)"
             )
         )
 
-    def _build_subject(self, updated_count, deleted_count):
+    def _build_subject(self, updated_count, deleted_count, violation_count):
         """Build email subject with counts and date."""
         date_str = timezone.now().strftime("%B %d, %Y")
-        return f"Weekly Shul Updates [{updated_count} updated, {deleted_count} deleted] - {date_str}"
+        parts = []
+        if updated_count > 0:
+            parts.append(f"{updated_count} updated")
+        if deleted_count > 0:
+            parts.append(f"{deleted_count} deleted")
+        if violation_count > 0:
+            parts.append(f"{violation_count} violations")
+        counts_str = ", ".join(parts)
+        return f"Weekly Shul Updates [{counts_str}] - {date_str}"
 
     def _prepare_shul_data(self, shul):
         """Prepare shul data for template rendering."""
@@ -174,6 +209,20 @@ class Command(BaseCommand):
             deleted_by=shul.deleted_by.email if shul.deleted_by else "Unknown",
             deleted_at=shul.deleted,
             country=self._get_country(shul.address),
+        )
+
+    def _prepare_violation_data(self, violation):
+        """Prepare rate limit violation data for template rendering."""
+        return RateLimitViolationData(
+            ip_address=violation.ip_address,
+            endpoint=violation.get_endpoint_display(),
+            violation_count=violation.violation_count,
+            first_violation_at=violation.first_violation_at,
+            last_violation_at=violation.last_violation_at,
+            user_email=violation.user.email if violation.user else "-",
+            is_active=violation.is_active(),
+            is_in_cooldown=violation.is_in_cooldown(),
+            cooldown_until=violation.cooldown_until,
         )
 
     def _format_stars(self, score):
