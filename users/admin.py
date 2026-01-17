@@ -13,8 +13,10 @@ class UserAdmin(BaseUserAdmin):
 
     list_display = [
         "email",
-        "username",
         "full_name",
+        "shuls_created_count",
+        "shuls_updated_count",
+        "shuls_deleted_count",
         "is_staff",
         "is_superuser",
         "is_active",
@@ -27,6 +29,20 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description="Name")
     def full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip()
+
+    @admin.display(description="Created")
+    def shuls_created_count(self, obj):
+        return obj.created_shuls.count()
+
+    @admin.display(description="Updated")
+    def shuls_updated_count(self, obj):
+        from eznashdb.models import Shul
+
+        return Shul.objects.filter(updated_by__contains=[obj.id]).count()
+
+    @admin.display(description="Deleted")
+    def shuls_deleted_count(self, obj):
+        return obj.deleted_shuls.count()
 
 
 @admin.register(Flag)
