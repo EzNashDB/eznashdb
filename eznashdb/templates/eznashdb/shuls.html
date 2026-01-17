@@ -621,11 +621,22 @@
                 };
             };
 
-            // Initialize map and filter count when DOM is ready
-            document.addEventListener("DOMContentLoaded", () => {
-                initMap();
-                FILTER_API.init();
-            });
+            // Initialize map and filter count when DOM is ready AND Leaflet is loaded
+            function initWhenReady(retriesLeft = 100) {
+                if (typeof L !== 'undefined') {
+                    initMap();
+                    FILTER_API.init();
+                } else if (retriesLeft > 0) {
+                    setTimeout(() => initWhenReady(retriesLeft - 1), 50);
+                } else {
+                    // Report to Sentry - this should be extremely rare
+                    window.logError(new Error('Leaflet library failed to load'), {
+                        type: 'leaflet_timeout'
+                    });
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", () => initWhenReady());
         })();
     </script>
     {% partialdef map_updates inline=True %}
