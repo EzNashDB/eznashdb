@@ -61,7 +61,7 @@ Goal: Simple, observable data that correlates with women's broader experience in
 ### Data Model
 - Multi-room support (main sanctuary, chapel, etc.)
 - Coordinate-based location storage
-- Anyone can edit (Wikipedia model - no formal review)
+- Anyone can edit (Wikipedia/Yelp model - no formal review)
 - Letter codes: L (equal/larger), M (half size), S (less than half), X (no women's section), & (mixed seating)
 
 ### Geographic Privacy
