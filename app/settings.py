@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False) == "True"
-DJANGO_ENV = os.environ.get("DJANGO_ENV", "production")
+DJANGO_ENV = os.environ.get("DJANGO_ENV", "prod")
 
 ALLOWED_HOSTS = [
     "ezratnashim.com",
@@ -49,6 +49,17 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Trust X-Forwarded-Proto header from proxy for HTTPS detection
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Security headers for production
+if DJANGO_ENV == "prod":
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = "DENY"
 
 INTERNAL_IPS = [
     "172.18.0.1",
