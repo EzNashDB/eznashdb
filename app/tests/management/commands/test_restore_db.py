@@ -64,7 +64,7 @@ def describe_backup_validation():
         mocks["subprocess"].run.side_effect = run_side_effect
 
         with pytest.raises(CommandError, match="Backup not found"):
-            call_command("restore_db", "nonexistent_backup.sql.gz")
+            call_command("restore_db", "backup_20241214_020000.sql.gz")
 
 
 def describe_download():

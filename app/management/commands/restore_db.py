@@ -1,5 +1,6 @@
 import gzip
 import os
+import re
 import shutil
 
 from django.conf import settings
@@ -17,6 +18,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         backup_filename = options["backup_filename"]
+
+        # Validate filename format to prevent path traversal
+        if not re.match(r"^backup_\d{8}_\d{6}\.sql\.gz$", backup_filename):
+            raise CommandError(
+                f"Invalid backup filename format. Expected: backup_YYYYMMDD_HHMMSS.sql.gz, "
+                f"got: {backup_filename}"
+            )
 
         self.stdout.write(f"Starting database restore from {backup_filename}...")
 
