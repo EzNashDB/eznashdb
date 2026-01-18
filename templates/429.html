@@ -1,8 +1,10 @@
 {% extends "centered_card_base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block card_header %}
     <h4>
-        {% if is_long_block %}
+        {% if violation.is_permanent_ban %}
             Access Restricted
         {% else %}
             Temporarily Blocked
@@ -12,22 +14,36 @@
 
 {% block card_body %}
     <div class="alert
-                {% if is_long_block %}
+                {% if violation.is_permanent_ban %}
                     alert-danger
                 {% else %}
                     alert-warning
                 {% endif %}
                 mb-0">
-        {% if is_long_block %}
+        {% if violation.is_permanent_ban %}
             <p>We've detected unusual activity from this location and have restricted access.</p>
-            <p class="mb-0">
-                If you believe this is a mistake, please
-                <a href="{% url 'eznashdb:contact_us' %}">contact us</a>.
-            </p>
+            {% if appeal_form %}
+                <p class="mb-0">If you believe this is a mistake, please submit an appeal below.</p>
+            {% else %}
+                <p class="mb-0">
+                    If you believe this is a mistake, please
+                    <a href="{% url 'eznashdb:contact_us' %}">contact us</a>.
+                </p>
+            {% endif %}
         {% else %}
             <p class="mb-0">
                 We've detected too many requests from this location. Please wait <strong>{{ retry_after }}</strong> minute{{ retry_after|pluralize }} before trying again.
             </p>
         {% endif %}
     </div>
+    {% if violation.is_permanent_ban and appeal_form %}
+        <div class="mt-4">
+            <h5>Submit an Appeal</h5>
+            <form method="post" action="{% url 'appeal_rate_limit' %}">
+                {% csrf_token %}
+                {% crispy appeal_form %}
+                <button type="submit" class="btn btn-primary mt-3">Submit Appeal</button>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}

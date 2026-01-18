@@ -4,6 +4,7 @@ import json
 import sentry_sdk
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
@@ -13,7 +14,8 @@ from django.views.generic import TemplateView
 from sentry_sdk import capture_message, set_context, set_tag
 
 from app.backups.core import list_gdrive_backups
-from app.forms import CaptchaVerificationForm
+from app.emails import send_appeal_notification
+from app.forms import CaptchaVerificationForm, RateLimitAppealForm
 from app.rate_limiting import generate_captcha_token
 
 
@@ -167,3 +169,25 @@ class CaptchaVerifyView(View):
                 "message": "CAPTCHA verification failed. Please try again.",
             },
         )
+
+
+@method_decorator(login_required, name="dispatch")
+class RateLimitAppealView(View):
+    """Handle rate limit appeal form submissions from 429 page."""
+
+    def post(self, request):
+        """Process appeal submission."""
+        form = RateLimitAppealForm(request.POST)
+        if form.is_valid():
+            appeal = form.save(commit=False)
+            appeal.appealed_by = request.user
+            appeal.save()
+
+            send_appeal_notification(appeal)
+
+            messages.success(
+                request, "Your appeal has been submitted. We'll review it and get back to you."
+            )
+            return HttpResponseRedirect("/")
+
+        return render(request, "429.html", {"appeal_form": form})

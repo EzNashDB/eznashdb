@@ -66,6 +66,10 @@ class ViolationRecorder:
         if not created and not violation.is_active():
             violation.first_violation_at = now
 
+        # Track all user IDs that have triggered this violation
+        if user and user.id not in violation.user_ids:
+            violation.user_ids.append(user.id)
+
         violation.save()
 
         self._log_to_sentry(violation)

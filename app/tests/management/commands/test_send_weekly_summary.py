@@ -14,24 +14,6 @@ User = get_user_model()
 
 
 @pytest.fixture
-def superuser(db):
-    return User.objects.create_superuser(
-        username="admin",
-        email="admin@example.com",
-        password="password",
-    )
-
-
-@pytest.fixture
-def superuser_without_email(db):
-    return User.objects.create_superuser(
-        username="admin_no_email",
-        email="",
-        password="password",
-    )
-
-
-@pytest.fixture
 def regular_user(db):
     return User.objects.create_user(
         username="regular",

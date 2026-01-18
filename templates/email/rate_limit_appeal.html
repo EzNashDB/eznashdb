@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .info-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        .info-table th { background: #e9ecef; padding: 10px; text-align: left; border: 1px solid #dee2e6; }
+        .info-table td { padding: 10px; border: 1px solid #dee2e6; }
+        .explanation { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; white-space: pre-wrap; }
+        .admin-link { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        .admin-link:hover { background: #0056b3; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h2 style="margin: 0; color: #495057;">🚨 New Rate Limit Appeal Submitted</h2>
+        </div>
+        {% with snapshot=appeal.violation_snapshot ip_address=appeal.violation.ip_address %}
+            <table class="info-table">
+                <tr>
+                    <th>IP Address</th>
+                    <td>
+                        <code>{{ ip_address|default:"Unknown" }}</code> (
+                        {% if ":" in ip_address %}
+                            IPv6
+                        {% else %}
+                            IPv4
+                        {% endif %}
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <th>Violation Count</th>
+                    <td>{{ snapshot.violation_count|default:"Unknown" }}</td>
+                </tr>
+                <tr>
+                    <th>Time Span</th>
+                    <td>{{ time_span }}</td>
+                </tr>
+                <tr>
+                    <th>Number of Users</th>
+                    <td>{{ snapshot.user_ids|length }}</td>
+                </tr>
+                <tr>
+                    <th>User IDs</th>
+                    <td>
+                        <code>{{ snapshot.user_ids|join:", " }}</code>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Appealed By</th>
+                    <td>{{ appeal.appealed_by.email }}</td>
+                </tr>
+            </table>
+            <h3>User's Explanation:</h3>
+            <div class="explanation">{{ appeal.explanation }}</div>
+        {% endwith %}
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ admin_url }}" class="admin-link">Review in Admin</a>
+        </div>
+        <hr style="margin-top: 30px; border: none; border-top: 1px solid #dee2e6">
+        <p style="color: #6c757d; font-size: 12px; text-align: center;">
+            Automated message from ezratnashim.com rate limit system
+        </p>
+    </body>
+</html>
