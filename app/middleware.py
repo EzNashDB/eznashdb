@@ -1,9 +1,12 @@
+from django.conf import settings
 from django.contrib import messages as django_messages
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils import timezone
+from waffle import flag_is_active
 
 from app.enums import RateLimitedEndpoint
+from app.forms import RateLimitAppealForm
 from app.models import RateLimitViolation
 from app.rate_limiting import get_client_ip
 
@@ -58,7 +61,8 @@ class RateLimitViolationMiddleware:
 
     def __call__(self, request):
         violation = self.get_violation(request)
-        if not request.user.is_superuser and violation and violation.is_in_cooldown():
+        feature_is_active = (not settings.DEBUG) or flag_is_active(request, "rate_limiting")
+        if feature_is_active and violation and violation.is_in_cooldown():
             return self.get_cooldown_response(request, violation)
         return self.get_response(request)
 
@@ -80,22 +84,22 @@ class RateLimitViolationMiddleware:
         return endpoint_key
 
     def get_cooldown_response(self, request, violation):
-        context = self.get_cooldown_context(violation)
+        context = self.get_cooldown_context(violation, request)
         response = render(request, "429.html", context)
         response.status_code = 429
         return response
 
-    def get_cooldown_context(self, violation):
+    def get_cooldown_context(self, violation, request=None):
         cooldown_end = violation.cooldown_until
-        if not cooldown_end:
-            return {"is_long_block": False, "retry_after": 0}
+        context = {"violation": violation}
 
-        remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
-        remaining_days = remaining_seconds / (60 * 60 * 24)
-        if remaining_days >= 1 / 10:
-            return {"is_long_block": True}
-        else:
-            return {
-                "is_long_block": False,
-                "retry_after": max(1, int(remaining_seconds / 60)),
-            }
+        # For permanent bans, include appeal form if user is authenticated
+        if violation.is_permanent_ban and request and request.user.is_authenticated:
+            context["appeal_form"] = RateLimitAppealForm(initial={"violation": violation.id})
+
+        # For temporary bans, calculate retry time
+        if not violation.is_permanent_ban and cooldown_end:
+            remaining_seconds = (cooldown_end - timezone.now()).total_seconds()
+            context["retry_after"] = max(1, int(remaining_seconds / 60))
+
+        return context

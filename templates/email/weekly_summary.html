@@ -185,7 +185,9 @@
                                 {{ violation.violation_count }}
                             </td>
                             <td style="border: 1px solid #dee2e6; padding: 10px; font-size: 13px;">
-                                {% if violation.is_in_cooldown %}
+                                {% if violation.is_permanent_ban %}
+                                    <span style="color: #721c24; font-weight: 600;">🚫 PERMANENTLY BANNED</span>
+                                {% elif violation.is_in_cooldown %}
                                     <span style="color: #721c24; font-weight: 500;">🚫 Blocked until {{ violation.cooldown_until|date:"M d, g:i a" }}</span>
                                 {% elif violation.is_active %}
                                     <span style="color: #856404;">⚠️ Active (&lt;24hrs, counts toward escalation)</span>

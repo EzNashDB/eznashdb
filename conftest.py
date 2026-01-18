@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 from allauth.socialaccount.models import SocialApp
@@ -45,6 +45,24 @@ def test_user(django_user_model):
     user.set_password("password")
     user.save()
     return user
+
+
+@pytest.fixture
+def superuser(django_user_model):
+    return django_user_model.objects.create_superuser(
+        username="admin",
+        email="admin@example.com",
+        password="password",
+    )
+
+
+@pytest.fixture
+def superuser_without_email(django_user_model):
+    return django_user_model.objects.create_superuser(
+        username="admin_no_email",
+        email="",
+        password="password",
+    )
 
 
 @pytest.fixture
