@@ -7,12 +7,12 @@ __pycache__/
 .vscode/
 .claude/
 
-# flakeheaven
-.flakeheaven_cache
-
 # testmon
 .testmondata*
 .testmondata-journal
+
+# ruff
+.ruff_cache
 
 # Node
 node_modules/
