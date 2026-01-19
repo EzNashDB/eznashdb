@@ -1,6 +1,6 @@
 # Ezrat Nashim Database - Project Instructions
 
-**Purpose**: Help future Claude sessions understand **why** things are the way they are, not just **what** the code does.
+**Purpose**: Help future AI Agent sessions understand **why** things are the way they are, not just **what** the code does.
 
 ## When to Update This File
 
