@@ -28,4 +28,16 @@
             <div id="feedbackFormContainer">{% include 'feedback/feedback_form_fields.html' %}</div>
         </form>
     </div>
+    <script>
+        // Reset submitting state after HTMX swap (on form errors)
+        document.body.addEventListener('htmx:afterSwap', (event) => {
+            if (event.target.id === 'feedbackFormContainer') {
+                const offcanvas = event.target.closest('.offcanvas');
+                const alpineData = Alpine.$data(offcanvas);
+                if (alpineData && alpineData.isSubmitting) {
+                    alpineData.isSubmitting = false;
+                }
+            }
+        });
+    </script>
 </div>
