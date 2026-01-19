@@ -2,7 +2,8 @@
 <form class="col"
       hx-get="{% url 'eznashdb:shuls' %}"
       hx-swap="none"
-      hx-trigger="change">
+      hx-trigger="change"
+      data-show-spinner>
     <div class="row">
         {% for field in filter.form %}
             <div class="col-12 col-md-6 col-lg-12 d-flex flex-column">{{ field|as_crispy_field }}</div>
