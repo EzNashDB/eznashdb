@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -10,6 +9,9 @@ from feedback.forms import FeedbackForm
 from feedback.github_client import GitHubClient, ImgurClient
 
 logger = logging.getLogger(__name__)
+
+# Default labels applied to all GitHub issues
+DEFAULT_ISSUE_LABELS = ["user-feedback"]
 
 
 class FeedbackView(View):
@@ -75,7 +77,7 @@ class FeedbackView(View):
             )
 
         # Create GitHub issue
-        labels = list(settings.GITHUB_ISSUE_LABELS)
+        labels = DEFAULT_ISSUE_LABELS.copy()
         if report_type == "bug":
             labels.append("bug")
         else:
