@@ -33,14 +33,8 @@ class FeedbackView(View):
         form = FeedbackForm(request.POST, request.FILES)
 
         if not form.is_valid():
-            # Don't swap - just show errors via messages
-            error_msgs = "; ".join(
-                [f"{field}: {', '.join(errors)}" for field, errors in form.errors.items()]
-            )
-            messages.error(request, error_msgs)
-            response = HttpResponse()
-            response["HX-Trigger"] = '{"refreshMessages": ""}'
-            return response
+            # Reload form with field errors
+            return render(request, "feedback/feedback_form_fields.html", {"form": form})
 
         # Extract form data
         report_type = form.cleaned_data["report_type"]
