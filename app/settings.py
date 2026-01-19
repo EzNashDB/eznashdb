@@ -118,6 +118,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "users",
+    "feedback",
 ]
 
 
@@ -386,3 +387,8 @@ WAFFLE_SWITCH_MODEL = "users.Switch"
 WAFFLE_SAMPLE_MODEL = "users.Sample"
 WAFFLE_CREATE_MISSING_FLAGS = WAFFLE_CREATE_MISSING_SWITCHES = WAFFLE_CREATE_MISSING_SAMPLES = True
 WAFFLE_FLAG_DEFAULT = WAFFLE_SWITCH_DEFAULT = WAFFLE_SAMPLE_DEFAULT = DJANGO_ENV == "dev"
+
+# GitHub Issue Reporting
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO", "")
+GITHUB_ISSUE_LABELS = os.getenv("GITHUB_ISSUE_LABELS", "user-feedback").split(",")

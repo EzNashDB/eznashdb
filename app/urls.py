@@ -23,6 +23,7 @@ urlpatterns = [
     path("appeal/", RateLimitAppealView.as_view(), name="appeal_rate_limit"),
     path("report-error/", ClientErrorReportView.as_view(), name="report_error"),
     path("verify-captcha/", CaptchaVerifyView.as_view(), name="captcha_verify"),
+    path("feedback/", include("feedback.urls")),
 ]
 
 if settings.DJANGO_ENV != "test":

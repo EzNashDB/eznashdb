@@ -21,7 +21,20 @@ class SpinnerManager {
 }
 
 document.addEventListener("htmx:beforeSend", (e) => {
-  new SpinnerManager().show();
+  // Don't show spinner for feedback form requests
+  const isFeedbackRequest = e.detail.requestConfig.path?.includes("/feedback/");
+  if (!isFeedbackRequest) {
+    new SpinnerManager().show();
+  }
+});
+
+document.addEventListener("htmx:afterSwap", (e) => {
+  // Hide spinner after HTMX swaps (but shulsDataLoaded will also hide it)
+  const isFeedbackRequest =
+    e.detail.requestConfig?.path?.includes("/feedback/");
+  if (!isFeedbackRequest) {
+    new SpinnerManager().hide();
+  }
 });
 
 document.addEventListener("shulsDataLoaded", (e) => {

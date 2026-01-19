@@ -1,0 +1,30 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="feedbackOffcanvas"
+     aria-labelledby="feedbackOffcanvasLabel"
+     style="width: 500px;
+            max-width: 90vw"
+     x-data="{ reportType: 'bug', screenshotPreview: null, isSubmitting: false, handleScreenshotChange(event) { const file = event.target.files[0]; if (file) { if (file.size > 5 * 1024 * 1024) { alert('File size must be less than 5MB'); event.target.value = ''; this.screenshotPreview = null; return; } const reader = new FileReader(); reader.onload = (e) => { this.screenshotPreview = e.target.result; }; reader.readAsDataURL(file); } else { this.screenshotPreview = null; } }, getBrowserInfo() { const nav = navigator; return nav.userAgent + ' | Screen: ' + screen.width + 'x' + screen.height; } }">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="feedbackOffcanvasLabel">Send Feedback</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="feedbackForm"
+              method="post"
+              action="{% url 'feedback:submit' %}"
+              enctype="multipart/form-data"
+              hx-post="{% url 'feedback:submit' %}"
+              hx-swap="none"
+              @submit="isSubmitting = true"
+              novalidate>
+            {% csrf_token %}
+            <div id="feedbackFormContainer">{% include 'feedback/feedback_form_fields.html' %}</div>
+        </form>
+    </div>
+</div>
