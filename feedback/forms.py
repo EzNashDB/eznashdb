@@ -3,32 +3,19 @@ from django.core.validators import FileExtensionValidator
 
 
 class FeedbackForm(forms.Form):
-    """Form for submitting bug reports and feature requests."""
+    """Form for submitting feedback."""
 
-    REPORT_TYPE_CHOICES = [
-        ("bug", "Bug Report"),
-        ("feature", "Feature Request"),
-    ]
-
-    # Common fields
-    report_type = forms.ChoiceField(
-        choices=REPORT_TYPE_CHOICES,
-        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
-        initial="bug",
-    )
-
-    description = forms.CharField(
+    details = forms.CharField(
         max_length=2000,
         min_length=50,
         widget=forms.Textarea(
             attrs={
                 "class": "form-control",
                 "rows": 5,
-                ":placeholder": "reportType === 'bug' ? 'What happened? How can we reproduce it?' : 'What feature would you like? How would it help?'",
+                "placeholder": "What happened or what would you like to see?",
             }
         ),
-        help_text="50-2000 characters",
-        label="Description",
+        label="Details",
     )
 
     email = forms.EmailField(

@@ -37,17 +37,16 @@ class FeedbackView(View):
             return render(request, "feedback/feedback_form_fields.html", {"form": form})
 
         # Extract form data
-        report_type = form.cleaned_data["report_type"]
         email = form.cleaned_data.get("email", "")
         current_url = form.cleaned_data.get("current_url", "")
         browser_info = form.cleaned_data.get("browser_info", "")
         screenshot = form.cleaned_data.get("screenshot")
 
-        # Get description and auto-generate title
-        description = form.cleaned_data["description"]
+        # Get details and auto-generate title
+        details = form.cleaned_data["details"]
 
         # Generate title from first sentence/line (up to 80 chars)
-        title = description.split("\n")[0]  # First line
+        title = details.split("\n")[0]  # First line
         title = title.split(".")[0]  # Or first sentence
         title = (title[:77] + "...") if len(title) > 80 else title
         title = title.strip() or "Feedback"  # Fallback if empty
@@ -55,27 +54,13 @@ class FeedbackView(View):
         # Create GitHub client
         client = GitHubClient()
 
-        # Format issue body based on report type
-        if report_type == "bug":
-            body = client.format_bug_report(
-                description=description,
-                current_url=current_url,
-                browser_info=browser_info,
-                email=email,
-            )
-        else:  # feature
-            body = client.format_feature_request(
-                description=description,
-                current_url=current_url,
-                email=email,
-            )
+        # Format minimal issue body
+        body = f"{details}\n\nSubmitted from: {current_url}\nBrowser: {browser_info}"
+        if email:
+            body += f"\nEmail: {email}"
 
         # Create GitHub issue
         labels = DEFAULT_ISSUE_LABELS.copy()
-        if report_type == "bug":
-            labels.append("bug")
-        else:
-            labels.append("enhancement")
 
         issue_data = client.create_issue(title=title, body=body, labels=labels)
 
