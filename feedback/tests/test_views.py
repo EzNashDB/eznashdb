@@ -25,60 +25,24 @@ def feedback_data():
 
 
 class TestFeedbackView:
-    def test_post_form_invalid_shows_error_message(self, rf, feedback_data):
-        """Test that invalid form shows error message via messages framework."""
+    def test_post_form_invalid_renders_form_with_errors(self, rf, feedback_data):
+        """Test that invalid form re-renders form with field errors."""
         # Create invalid form data
         invalid_data = feedback_data.copy()
         invalid_data["description"] = ""  # Make it invalid
 
         request = rf.post("/feedback/", invalid_data)
-        request._messages = Mock()
 
         view = FeedbackView()
+        response = view.post(request)
 
-        # Mock the messages framework
-        with patch("feedback.views.messages") as mock_messages:
-            response = view.post(request)
-
-            # Should call messages.error
-            mock_messages.error.assert_called_once()
-
-            # Should trigger refreshMessages event
-            assert response["HX-Trigger"] == '{"refreshMessages": ""}'
-            # Middleware will add messages, so content can be empty
-            assert response.content == b""
-
-    def test_post_github_api_failure_shows_error_message(self, rf, feedback_data):
-        """Test that GitHub API failure shows error message."""
-        request = rf.post("/feedback/", feedback_data)
-        request._messages = Mock()
-
-        view = FeedbackView()
-
-        # Mock form validation to pass
-        mock_form = Mock(spec=FeedbackForm)
-        mock_form.is_valid.return_value = True
-        mock_form.cleaned_data = feedback_data
-
-        with patch("feedback.views.FeedbackForm", return_value=mock_form), patch(
-            "feedback.views.messages"
-        ) as mock_messages, patch("feedback.views.GitHubClient") as mock_github_client:
-            # Mock GitHub client to fail
-            mock_client_instance = Mock()
-            mock_client_instance.create_issue.return_value = None
-            mock_github_client.return_value = mock_client_instance
-
-            response = view.post(request)
-
-            # Should call messages.error
-            mock_messages.error.assert_called_with(
-                request, "Unable to submit feedback. Please try again."
-            )
-
-            # Should trigger refreshMessages event
-            assert response["HX-Trigger"] == '{"refreshMessages": ""}'
-            # Middleware will add messages, so content can be empty
-            assert response.content == b""
+        # Should return rendered template with form errors
+        assert response.status_code == 200
+        assert b"invalid-feedback" in response.content  # Crispy forms adds this for errors
+        # Check that form has errors
+        form = FeedbackForm(invalid_data)
+        assert not form.is_valid()
+        assert "description" in form.errors
 
     def test_post_success_shows_success_message(self, rf, feedback_data):
         """Test that successful submission shows success message."""

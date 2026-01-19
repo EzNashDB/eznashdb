@@ -20,7 +20,8 @@
               action="{% url 'feedback:submit' %}"
               enctype="multipart/form-data"
               hx-post="{% url 'feedback:submit' %}"
-              hx-swap="none"
+              hx-target="#feedbackFormContainer"
+              hx-swap="innerHTML"
               @submit="isSubmitting = true"
               novalidate>
             {% csrf_token %}
