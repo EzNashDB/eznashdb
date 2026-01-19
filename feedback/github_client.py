@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime, timezone
 
 import requests
 from django.conf import settings
@@ -120,55 +119,3 @@ class GitHubClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to add screenshot comment: {e}")
             return False
-
-    def format_bug_report(
-        self,
-        description: str,
-        current_url: str,
-        browser_info: str,
-        email: str | None = None,
-    ) -> str:
-        """Format bug report as markdown."""
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-
-        body = f"""## Bug Report
-
-{description}
-
----
-
-**Context:**
-- URL: {current_url}
-- Browser: {browser_info}
-- Submitted: {timestamp}
-"""
-
-        if email:
-            body += f"- Contact: {email}\n"
-
-        return body
-
-    def format_feature_request(
-        self,
-        description: str,
-        current_url: str,
-        email: str | None = None,
-    ) -> str:
-        """Format feature request as markdown."""
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-
-        body = f"""## Feature Request
-
-{description}
-
----
-
-**Context:**
-- Submitted from: {current_url}
-- Submitted: {timestamp}
-"""
-
-        if email:
-            body += f"- Contact: {email}\n"
-
-        return body

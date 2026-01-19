@@ -15,8 +15,7 @@ def rf():
 @pytest.fixture
 def feedback_data():
     return {
-        "report_type": "bug",
-        "description": "Test bug report",
+        "details": "Test feedback",
         "email": "test@example.com",
         "current_url": "https://example.com/test",
         "browser_info": "Test Browser",
@@ -29,7 +28,7 @@ class TestFeedbackView:
         """Test that invalid form re-renders form with field errors."""
         # Create invalid form data
         invalid_data = feedback_data.copy()
-        invalid_data["description"] = ""  # Make it invalid
+        invalid_data["details"] = ""  # Make it invalid
 
         request = rf.post("/feedback/", invalid_data)
 
@@ -42,7 +41,7 @@ class TestFeedbackView:
         # Check that form has errors
         form = FeedbackForm(invalid_data)
         assert not form.is_valid()
-        assert "description" in form.errors
+        assert "details" in form.errors
 
     def test_post_success_shows_success_message(self, rf, feedback_data):
         """Test that successful submission shows success message."""
@@ -54,7 +53,7 @@ class TestFeedbackView:
         # Mock form validation
         mock_form = Mock(spec=FeedbackForm)
         mock_form.is_valid.return_value = True
-        mock_form.cleaned_data = feedback_data
+        mock_form.cleaned_data = feedback_data.copy()
 
         with patch("feedback.views.FeedbackForm", return_value=mock_form), patch(
             "feedback.views.messages"
@@ -64,8 +63,6 @@ class TestFeedbackView:
             # Mock GitHub client to succeed
             mock_client_instance = Mock()
             mock_client_instance.create_issue.return_value = {"number": 123}
-            mock_client_instance.format_bug_report.return_value = "Formatted bug report"
-            mock_client_instance.add_screenshot_comment = Mock()
             mock_github_client.return_value = mock_client_instance
 
             response = view.post(request)

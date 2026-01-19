@@ -1,28 +1,7 @@
 {% load crispy_forms_tags %}
 {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
-{# Report Type Selector #}
-<div class="mb-4">
-    <label class="form-label">What would you like to report?</label>
-    <div class="btn-group w-100" role="group">
-        <input type="radio"
-               class="btn-check"
-               name="report_type"
-               id="reportTypeBug"
-               value="bug"
-               x-model="reportType"
-               checked>
-        <label class="btn btn-outline-secondary" for="reportTypeBug">Bug</label>
-        <input type="radio"
-               class="btn-check"
-               name="report_type"
-               id="reportTypeFeature"
-               value="feature"
-               x-model="reportType">
-        <label class="btn btn-outline-secondary" for="reportTypeFeature">Feature Request</label>
-    </div>
-</div>
 {# Description #}
-<div>{{ form.description|as_crispy_field }}</div>
+<div>{{ form.details|as_crispy_field }}</div>
 {# Screenshot Upload - custom handling for Alpine.js #}
 <div class="mb-3">
     <label for="{{ form.screenshot.id_for_label }}" class="form-label">Screenshot</label>
