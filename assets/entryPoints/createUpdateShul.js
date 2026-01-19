@@ -4,9 +4,18 @@ import { AddressInputWithModal } from "../components/AddressInputWithModal";
 
 const initAddressInput = () => {
   const addressInput = document.querySelector("input[name=address]");
+  if (!addressInput) return; // Exit if address input doesn't exist
+
+  // Check if already initialized
+  const existingContainer = addressInput.closest(
+    "div[data-address-input-initialized]"
+  );
+  if (existingContainer) return; // Exit if already initialized
+
   const addressParent = addressInput.parentElement;
   // Wrap input in container div to use as react root
   const addressContainer = document.createElement("div");
+  addressContainer.setAttribute("data-address-input-initialized", "true");
   addressContainer.appendChild(addressInput);
   addressParent.appendChild(addressContainer);
   const getProps = () => {
@@ -30,4 +39,10 @@ const initAddressInput = () => {
   );
 };
 document.addEventListener("DOMContentLoaded", initAddressInput);
-document.addEventListener("htmx:afterSettle", initAddressInput);
+document.addEventListener("htmx:afterSettle", (e) => {
+  // Only re-init if the settled element contains an address input
+  // This prevents feedback form from triggering re-initialization
+  if (e.target.querySelector && e.target.querySelector("input[name=address]")) {
+    initAddressInput();
+  }
+});

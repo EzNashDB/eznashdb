@@ -1,0 +1,33 @@
+<button class="feedback-tab btn btn-info btn-sm shadow-sm"
+        type="button"
+        hx-get="{% url 'feedback:submit' %}"
+        hx-target="#feedbackOffcanvasContainer"
+        hx-swap="innerHTML"
+        aria-label="Send Feedback">
+    <i class="fa-solid fa-envelope"></i>
+    Send Feedback
+</button>
+<script>
+// Show offcanvas after HTMX loads it
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.target.id === 'feedbackOffcanvasContainer') {
+        const offcanvas = new bootstrap.Offcanvas(document.getElementById('feedbackOffcanvas'));
+        offcanvas.show();
+    }
+});
+
+// Handle successful submission
+document.body.addEventListener('feedbackSubmitted', function() {
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('feedbackOffcanvas'));
+    if (offcanvas) offcanvas.hide();
+
+    // Clear the container after offcanvas closes
+    setTimeout(() => {
+        document.getElementById('feedbackOffcanvasContainer').innerHTML = '';
+    }, 300);
+});
+
+
+
+
+</script>

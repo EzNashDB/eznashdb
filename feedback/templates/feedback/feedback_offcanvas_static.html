@@ -1,0 +1,117 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="feedbackOffcanvas"
+     aria-labelledby="feedbackOffcanvasLabel"
+     style="width: 500px;
+            max-width: 90vw"
+     x-data="{ reportType: 'bug', screenshotPreview: null, isSubmitting: false, handleScreenshotChange(event) { const file = event.target.files[0]; if (file) { if (file.size > 5 * 1024 * 1024) { alert('File size must be less than 5MB'); event.target.value = ''; this.screenshotPreview = null; return; } const reader = new FileReader(); reader.onload = (e) => { this.screenshotPreview = e.target.result; }; reader.readAsDataURL(file); } else { this.screenshotPreview = null; } }, getBrowserInfo() { const nav = navigator; return nav.userAgent + ' | Screen: ' + screen.width + 'x' + screen.height; } }">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="feedbackOffcanvasLabel">Send Feedback</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="feedbackForm"
+              method="post"
+              action="{% url 'feedback:submit' %}"
+              enctype="multipart/form-data"
+              @submit="isSubmitting = true"
+              novalidate>
+            {% csrf_token %}
+            {# Report Type Selector #}
+            <div class="mb-4">
+                <label class="form-label">What would you like to report?</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio"
+                           class="btn-check"
+                           name="report_type"
+                           id="reportTypeBug"
+                           value="bug"
+                           x-model="reportType"
+                           checked>
+                    <label class="btn btn-outline-primary" for="reportTypeBug">Bug Report</label>
+                    <input type="radio"
+                           class="btn-check"
+                           name="report_type"
+                           id="reportTypeFeature"
+                           value="feature"
+                           x-model="reportType">
+                    <label class="btn btn-outline-primary" for="reportTypeFeature">Feature Request</label>
+                </div>
+            </div>
+            {# Bug description #}
+            <div x-show="reportType === 'bug'">
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="bug_description"
+                              rows="5"
+                              class="form-control"
+                              placeholder="What happened? How can we reproduce it?"></textarea>
+                    <div class="form-text">50-2000 characters</div>
+                </div>
+            </div>
+            {# Feature description #}
+            <div x-show="reportType === 'feature'">
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="feature_description"
+                              rows="5"
+                              class="form-control"
+                              placeholder="What feature would you like? How would it help?"></textarea>
+                    <div class="form-text">50-2000 characters</div>
+                </div>
+            </div>
+            {# Email #}
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="your@email.com"
+                       value="{% if user.is_authenticated %}
+                                  {{ user.email }}
+                              {% endif %}">
+                <div class="form-text">Optional - only if you'd like us to follow up</div>
+            </div>
+            {# Screenshot Upload #}
+            <div class="mb-3">
+                <label class="form-label">Screenshot</label>
+                <input type="file"
+                       name="screenshot"
+                       class="form-control"
+                       accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                       @change="handleScreenshotChange($event)">
+                <div class="form-text">Optional - PNG, JPEG, GIF, or SVG (max 5MB)</div>
+                {# Screenshot Preview #}
+                <div x-show="screenshotPreview" class="mt-2">
+                    <img :src="screenshotPreview"
+                         class="img-thumbnail"
+                         style="max-height: 200px">
+                </div>
+            </div>
+            {# Hidden Fields #}
+            <input type="hidden" name="current_url" :value="window.location.href">
+            <input type="hidden" name="browser_info" :value="getBrowserInfo()">
+            <input type="hidden" name="honeypot" value="">
+            {# Submit Buttons #}
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+                <button type="submit"
+                        class="btn btn-primary flex-grow-1"
+                        :disabled="isSubmitting">
+                    <span x-show="!isSubmitting">Submit Feedback</span>
+                    <span x-show="isSubmitting">
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Submitting...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

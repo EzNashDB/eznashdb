@@ -1,0 +1,66 @@
+{% load crispy_forms_tags %}
+{% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+{# Report Type Selector #}
+<div class="mb-4">
+    <label class="form-label">What would you like to report?</label>
+    <div class="btn-group w-100" role="group">
+        <input type="radio"
+               class="btn-check"
+               name="report_type"
+               id="reportTypeBug"
+               value="bug"
+               x-model="reportType"
+               checked>
+        <label class="btn btn-outline-secondary" for="reportTypeBug">Bug</label>
+        <input type="radio"
+               class="btn-check"
+               name="report_type"
+               id="reportTypeFeature"
+               value="feature"
+               x-model="reportType">
+        <label class="btn btn-outline-secondary" for="reportTypeFeature">Feature Request</label>
+    </div>
+</div>
+{# Description #}
+<div>{{ form.description|as_crispy_field }}</div>
+{# Screenshot Upload - custom handling for Alpine.js #}
+<div class="mb-3">
+    <label for="{{ form.screenshot.id_for_label }}" class="form-label">Screenshot</label>
+    <input type="file"
+           name="screenshot"
+           id="{{ form.screenshot.id_for_label }}"
+           class="form-control"
+           accept="image/png,image/jpeg,image/gif,image/svg+xml"
+           @change="handleScreenshotChange($event)">
+    {% if form.screenshot.errors %}
+        <div class="invalid-feedback d-block">{{ form.screenshot.errors.0 }}</div>
+    {% endif %}
+    <div class="form-text">{{ form.screenshot.help_text }}</div>
+    {# Screenshot Preview #}
+    <div x-show="screenshotPreview" class="mt-2">
+        <img :src="screenshotPreview"
+             class="img-thumbnail"
+             style="max-height: 200px">
+    </div>
+</div>
+{# Email #}
+{{ form.email|as_crispy_field }}
+{# Hidden Fields #}
+<input type="hidden" name="current_url" :value="window.location.href">
+<input type="hidden" name="browser_info" :value="getBrowserInfo()">
+{{ form.honeypot }}
+{# Submit Buttons #}
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+    <button type="submit"
+            class="btn btn-primary flex-grow-1"
+            :disabled="isSubmitting">
+        <span x-show="!isSubmitting">Submit Feedback</span>
+        <span x-show="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"></span>
+            Submitting...
+        </span>
+    </button>
+</div>
