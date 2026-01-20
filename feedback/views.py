@@ -67,9 +67,7 @@ class FeedbackView(View):
         if not issue_data:
             # GitHub API failed
             messages.error(request, "Unable to submit feedback. Please try again.")
-            response = HttpResponse()
-            response["HX-Trigger"] = '{"refreshMessages": ""}'
-            return response
+            return HttpResponse()
 
         # Upload screenshot if provided
         if screenshot and issue_data:
@@ -81,5 +79,5 @@ class FeedbackView(View):
         # Success - trigger event to close offcanvas and show success message
         messages.success(request, "Thanks! We received your feedback and will review it soon.")
         response = HttpResponse()
-        response["HX-Trigger"] = '{"feedbackSubmitted": "", "refreshMessages": ""}'
+        response["HX-Trigger"] = "feedbackSubmitted"
         return response

@@ -58,6 +58,4 @@ def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to
         assert len(messages) == 1
         assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
         assert messages[0].level_tag == "success"
-
-        # Should trigger both feedbackSubmitted and refreshMessages events
-        assert response["HX-Trigger"] == '{"feedbackSubmitted": "", "refreshMessages": ""}'
+        assert response["HX-Trigger"] == "feedbackSubmitted"
