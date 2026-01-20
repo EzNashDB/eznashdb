@@ -2,19 +2,9 @@
 {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
 {# Description #}
 <div>{{ form.details|as_crispy_field }}</div>
-{# Screenshot Upload - custom handling for Alpine.js #}
+{# Screenshot Upload #}
 <div class="mb-3">
-    <label for="{{ form.screenshot.id_for_label }}" class="form-label">Screenshot</label>
-    <input type="file"
-           name="screenshot"
-           id="{{ form.screenshot.id_for_label }}"
-           class="form-control"
-           accept="image/png,image/jpeg,image/gif,image/svg+xml"
-           @change="handleScreenshotChange($event)">
-    {% if form.screenshot.errors %}
-        <div class="invalid-feedback d-block">{{ form.screenshot.errors.0 }}</div>
-    {% endif %}
-    <div class="form-text">{{ form.screenshot.help_text }}</div>
+    {{ form.screenshot|as_crispy_field }}
     {# Screenshot Preview #}
     <div x-show="screenshotPreview" class="mt-2">
         <img :src="screenshotPreview"
