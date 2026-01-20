@@ -9,7 +9,7 @@ from feedback.views import FeedbackView
 @pytest.fixture
 def feedback_data():
     return {
-        "details": "Test feedback",
+        "details": "This is a test feedback message that is longer than 50 characters to ensure the form validates properly.",
         "email": "test@example.com",
         "current_url": "https://example.com/test",
         "browser_info": "Test Browser",
@@ -37,24 +37,15 @@ def test_post_form_invalid_renders_form_with_errors(rf, feedback_data):
     assert "details" in form.errors
 
 
-def test_post_success_shows_success_message(rf, feedback_data):
+def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to_request):
     """Test that successful submission shows success message."""
     request = rf.post("/feedback/", feedback_data)
-    request._messages = Mock()
+    # Set up messages storage for RequestFactory
+    request = add_middleware_to_request(request)
 
     view = FeedbackView()
 
-    # Mock form validation
-    mock_form = Mock(spec=FeedbackForm)
-    mock_form.is_valid.return_value = True
-    mock_form.cleaned_data = feedback_data.copy()
-
-    with (
-        patch("feedback.views.FeedbackForm", return_value=mock_form),
-        patch("feedback.views.messages") as mock_messages,
-        patch("feedback.views.GitHubClient") as mock_github_client,
-        patch("feedback.views.ImgurClient"),
-    ):
+    with patch("feedback.views.GitHubClient") as mock_github_client, patch("feedback.views.ImgurClient"):
         # Mock GitHub client to succeed
         mock_client_instance = Mock()
         mock_client_instance.create_issue.return_value = {"number": 123}
@@ -62,12 +53,11 @@ def test_post_success_shows_success_message(rf, feedback_data):
 
         response = view.post(request)
 
-    # Should call messages.success
-    mock_messages.success.assert_called_with(
-        request, "Thanks! We received your feedback and will review it soon."
-    )
+        # Should have added success message to request
+        messages = list(request._messages)
+        assert len(messages) == 1
+        assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
+        assert messages[0].level_tag == "success"
 
-    # Should trigger both feedbackSubmitted and refreshMessages events
-    assert response["HX-Trigger"] == '{"feedbackSubmitted": "", "refreshMessages": ""}'
-    # Middleware will add messages, so content can be empty
-    assert response.content == b""
+        # Should trigger both feedbackSubmitted and refreshMessages events
+        assert response["HX-Trigger"] == '{"feedbackSubmitted": "", "refreshMessages": ""}'

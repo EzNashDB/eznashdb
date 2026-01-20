@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import pytest
 from allauth.socialaccount.models import SocialApp
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sites.models import Site
 from django.core.handlers.wsgi import WSGIRequest
 from django.urls import resolve, reverse
@@ -98,3 +99,14 @@ def rf_GET(rf) -> Callable:
         return request
 
     return _GET_request
+
+
+@pytest.fixture
+def add_middleware_to_request():
+    def _add_middleware_to_request(request):
+        request.session = getattr(request, "session", {})
+        messages = FallbackStorage(request)
+        request._messages = messages
+        return request
+
+    return _add_middleware_to_request
