@@ -182,6 +182,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "app.context_processors.navbar",
                 "app.context_processors.honeypot",
+                "feedback.context_processors.feedback_form",
             ],
         },
     },

@@ -25,7 +25,9 @@
               @submit="isSubmitting = true"
               novalidate>
             {% csrf_token %}
-            <div id="feedbackFormContainer">{% include 'feedback/feedback_form_fields.html' %}</div>
+            <div id="feedbackFormContainer">
+                {% include 'feedback/feedback_form_fields.html' with form=feedback_form %}
+            </div>
         </form>
     </div>
     <script>
