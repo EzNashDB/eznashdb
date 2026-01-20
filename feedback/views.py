@@ -14,8 +14,6 @@ TITLE_TRUNCATION_SUFFIX = "..."
 class FeedbackView(View):
     """Handle feedback form display and submission."""
 
-    template_name = "feedback/feedback_offcanvas.html"
-
     def get(self, request):
         """Render the feedback form."""
         form = FeedbackForm(
@@ -74,7 +72,7 @@ class FeedbackView(View):
 
         # Create GitHub client and issue
         client = GitHubClient()
-        issue_data = client.create_issue(title=title, body=body, labels=DEFAULT_ISSUE_LABELS.copy())
+        issue_data = client.create_issue(title=title, body=body, labels=DEFAULT_ISSUE_LABELS)
 
         if not issue_data:
             return None  # Indicate failure
