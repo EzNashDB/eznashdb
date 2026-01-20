@@ -35,8 +35,10 @@ def test_post_form_invalid_renders_form_with_errors(rf, feedback_data):
     assert "details" in form.errors
 
 
-def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to_request, mocker):
-    """Test that successful submission shows success message."""
+def test_post_success_shows_success_message(
+    rf, feedback_data, add_middleware_to_request, mocker, mailoutbox, superuser
+):
+    """Test that successful submission shows success message and sends email."""
     request = rf.post("/feedback/", feedback_data)
     # Set up messages storage for RequestFactory
     request = add_middleware_to_request(request)
@@ -45,7 +47,10 @@ def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to
 
     # Mock GitHub client to succeed
     mock_client_instance = mocker.Mock()
-    mock_client_instance.create_issue.return_value = {"number": 123}
+    mock_client_instance.create_issue.return_value = {
+        "number": 123,
+        "html_url": "https://github.com/test/repo/issues/123",
+    }
     mocker.patch("feedback.views.GitHubClient", return_value=mock_client_instance)
     mocker.patch("feedback.views.ImgurClient")
 
@@ -57,6 +62,47 @@ def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to
     assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
     assert messages[0].level_tag == "success"
     assert response["HX-Trigger"] == "feedbackSubmitted"
+
+    # Should have sent one email
+    assert len(mailoutbox) == 1
+    email = mailoutbox[0]
+    assert email.subject == "New Feedback Submitted"
+    assert email.to == ["admin@example.com"]
+    assert email.from_email == "ezratnashimdb@gmail.com"
+    # Check that email contains the feedback details (in HTML part)
+    html_content = email.alternatives[0][0] if email.alternatives else ""
+    assert feedback_data["details"] in html_content
+    assert feedback_data["email"] in html_content
+    assert feedback_data["current_url"] in html_content
+    assert feedback_data["browser_info"] in html_content
+    assert "https://github.com/test/repo/issues/123" in html_content
+
+
+def test_post_github_failure_no_email_sent(
+    rf, feedback_data, add_middleware_to_request, mocker, mailoutbox, superuser
+):
+    """Test that email is not sent when GitHub issue creation fails."""
+    request = rf.post("/feedback/", feedback_data)
+    # Set up messages storage for RequestFactory
+    request = add_middleware_to_request(request)
+
+    view = FeedbackView()
+
+    # Mock GitHub client to fail
+    mock_client_instance = mocker.Mock()
+    mock_client_instance.create_issue.return_value = None
+    mocker.patch("feedback.views.GitHubClient", return_value=mock_client_instance)
+
+    view.post(request)
+
+    # Should have added error message
+    messages = list(request._messages)
+    assert len(messages) == 1
+    assert str(messages[0]) == "Unable to submit feedback. Please try again."
+    assert messages[0].level_tag == "danger"
+
+    # Should not have sent any emails
+    assert len(mailoutbox) == 0
 
 
 def describe_generate_issue_title():

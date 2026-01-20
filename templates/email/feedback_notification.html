@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>New Feedback Submitted</title>
+        <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .content { background-color: #ffffff; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; }
+        .details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .label { font-weight: bold; color: #495057; }
+        .value { margin-bottom: 10px; }
+        .link { color: #007bff; text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>New Feedback Submitted</h2>
+                <p>A new feedback submission has been received and a GitHub issue has been created.</p>
+            </div>
+            <div class="content">
+                <div class="details">
+                    <div class="value">
+                        <span class="label">Details:</span>
+                        <br>
+                        {{ details|linebreaks }}
+                    </div>
+                    <div class="value">
+                        <span class="label">Email:</span> {{ user_email|default:"-" }}
+                    </div>
+                    <div class="value">
+                        <span class="label">Submitted from:</span> <a href="{{ current_url }}" class="link">{{ current_url }}</a>
+                    </div>
+                    <div class="value">
+                        <span class="label">Browser:</span> {{ browser_info }}
+                    </div>
+                    {% if issue_url %}
+                        <div class="value">
+                            <span class="label">GitHub Issue:</span> <a href="{{ issue_url }}" class="link">{{ issue_url }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <p>
+                    You can view and manage this feedback in the <a href="{{ issue_url }}" class="link">GitHub repository</a>.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
+from app.emails import send_feedback_notification
 from feedback.forms import FeedbackForm
 from feedback.github_client import GitHubClient, ImgurClient
 
@@ -89,6 +90,15 @@ class FeedbackView(View):
             # GitHub API failed
             messages.error(request, "Unable to submit feedback. Please try again.")
             return HttpResponse()
+
+        # Send email notification to superusers
+        send_feedback_notification(
+            details=form.cleaned_data["details"],
+            user_email=form.cleaned_data.get("email", ""),
+            current_url=form.cleaned_data.get("current_url", ""),
+            browser_info=form.cleaned_data.get("browser_info", ""),
+            issue_data=issue_data,
+        )
 
         # Success - trigger event to close offcanvas and show success message
         messages.success(request, "Thanks! We received your feedback and will review it soon.")
