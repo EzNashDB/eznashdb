@@ -1,23 +1,19 @@
 {% load crispy_forms_tags %}
 {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
-{# Description #}
 <div>{{ form.details|as_crispy_field }}</div>
-{# Screenshot Upload #}
 <div class="mb-3">
     {{ form.screenshot|as_crispy_field }}
-    {# Screenshot Preview #}
     <div x-show="screenshotPreview" class="mt-2">
         <img :src="screenshotPreview"
              class="img-thumbnail"
              style="max-height: 200px">
     </div>
 </div>
-{# Email #}
 {{ form.email|as_crispy_field }}
 {# Hidden Fields #}
 <input type="hidden" name="current_url" :value="window.location.href">
 <input type="hidden" name="browser_info" :value="getBrowserInfo()">
-{{ form.honeypot }}
+<div>{{ form.website }}</div>
 {# Submit Buttons #}
 <div class="d-flex gap-2">
     <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>

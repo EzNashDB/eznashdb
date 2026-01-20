@@ -72,6 +72,9 @@
               crossorigin="anonymous">
         {# custom styling #}
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <style>
+            div:has(> .{{ HONEYPOT_FIELD_CLASS }}) { position: absolute !important; left: -9999px !important; }
+        </style>
 
         {% block extra_media_top %}
         {% endblock extra_media_top %}

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from django.urls import reverse
 
-from users.forms import HONEYPOT_FIELD_CLASS
+from app.fields import HONEYPOT_FIELD_CLASS
 
 
 @dataclass
