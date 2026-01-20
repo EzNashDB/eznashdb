@@ -1,5 +1,3 @@
-from unittest.mock import Mock, patch
-
 import pytest
 
 from feedback.forms import FeedbackForm
@@ -37,7 +35,7 @@ def test_post_form_invalid_renders_form_with_errors(rf, feedback_data):
     assert "details" in form.errors
 
 
-def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to_request):
+def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to_request, mocker):
     """Test that successful submission shows success message."""
     request = rf.post("/feedback/", feedback_data)
     # Set up messages storage for RequestFactory
@@ -45,20 +43,20 @@ def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to
 
     view = FeedbackView()
 
-    with patch("feedback.views.GitHubClient") as mock_github_client, patch("feedback.views.ImgurClient"):
-        # Mock GitHub client to succeed
-        mock_client_instance = Mock()
-        mock_client_instance.create_issue.return_value = {"number": 123}
-        mock_github_client.return_value = mock_client_instance
+    # Mock GitHub client to succeed
+    mock_client_instance = mocker.Mock()
+    mock_client_instance.create_issue.return_value = {"number": 123}
+    mocker.patch("feedback.views.GitHubClient", return_value=mock_client_instance)
+    mocker.patch("feedback.views.ImgurClient")
 
-        response = view.post(request)
+    response = view.post(request)
 
-        # Should have added success message to request
-        messages = list(request._messages)
-        assert len(messages) == 1
-        assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
-        assert messages[0].level_tag == "success"
-        assert response["HX-Trigger"] == "feedbackSubmitted"
+    # Should have added success message to request
+    messages = list(request._messages)
+    assert len(messages) == 1
+    assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
+    assert messages[0].level_tag == "success"
+    assert response["HX-Trigger"] == "feedbackSubmitted"
 
 
 def describe_generate_issue_title():
