@@ -52,7 +52,6 @@
     <div class="offcanvas-body">
         <form id="feedbackForm"
               method="post"
-              action="{% url 'feedback:submit' %}"
               enctype="multipart/form-data"
               hx-post="{% url 'feedback:submit' %}"
               hx-target="#feedbackFormContainer"
