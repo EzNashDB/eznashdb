@@ -314,7 +314,7 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
                 temp_form = ShulForm(self.request.POST)
                 temp_instance = None
                 if temp_form.is_valid():
-                    temp_instance = Shul(**temp_form.cleaned_data)
+                    temp_instance = temp_form.save(commit=False)
                 return formset_class(
                     self.request.POST, self.request.FILES, prefix=prefix, instance=temp_instance
                 )

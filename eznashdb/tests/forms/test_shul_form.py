@@ -12,6 +12,7 @@ def test_displays_shul_fields():
     assert soup.find(attrs={"id": "id_latitude"})
     assert soup.find(attrs={"id": "id_longitude"})
     assert soup.find(attrs={"id": "id_place_id"})
+    assert soup.find(attrs={"id": "id_zoom"})
 
 
 def describe_validation():

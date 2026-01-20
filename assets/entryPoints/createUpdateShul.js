@@ -24,6 +24,7 @@ const initAddressInput = () => {
       lat: "latitude",
       lon: "longitude",
       place_id: "place_id",
+      zoom: "zoom",
     };
     const values = {};
     for (const prop in propsToInputNames) {

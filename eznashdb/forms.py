@@ -11,6 +11,8 @@ from eznashdb.widgets import SingleTomSelectWidget
 
 
 class ShulForm(ModelForm):
+    zoom = forms.CharField(required=False, widget=forms.HiddenInput())
+
     class Meta:
         model = Shul
         fields = [
@@ -42,6 +44,7 @@ class ShulForm(ModelForm):
         empty_values = [None, ""]
         if any(cleaned_data.get(field_name) in empty_values for field_name in ["latitude", "longitude"]):
             self.add_error("address", "Please select a valid address.")
+        return cleaned_data
 
 
 class RoomForm(ModelForm):
