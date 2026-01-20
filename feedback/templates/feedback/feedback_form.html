@@ -40,6 +40,7 @@
           return nav.userAgent + ' | Screen: ' + screen.width + 'x' + screen.height;
         }
      }"
+     @htmx:after-swap.window="if ($event.target.id === 'feedbackFormContainer') isSubmitting = false"
     {# djlint:on #}
     >
     <div class="offcanvas-header border-bottom">
@@ -69,17 +70,6 @@
         document.body.addEventListener('feedbackSubmitted', function() {
             const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('feedbackOffcanvas'));
             if (offcanvas) offcanvas.hide();
-        });
-
-        // Reset submitting state after HTMX swap (on form errors)
-        document.body.addEventListener('htmx:afterSwap', (event) => {
-            if (event.target.id === 'feedbackFormContainer') {
-                const offcanvas = event.target.closest('.offcanvas');
-                const alpineData = Alpine.$data(offcanvas);
-                if (alpineData && alpineData.isSubmitting) {
-                    alpineData.isSubmitting = false;
-                }
-            }
         });
 
         // Position feedback button to the left of scrollbar
