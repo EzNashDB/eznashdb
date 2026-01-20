@@ -7,6 +7,7 @@ export const AddressInputWithModal = ({
   lat,
   lon,
   place_id,
+  zoom,
   initialIsValid,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -20,7 +21,7 @@ export const AddressInputWithModal = ({
     lat,
     lon,
     place_id,
-    zoom: hasCoordsInProps ? 16 : 1,
+    zoom: zoom || (hasCoordsInProps ? 16 : 1),
   }).current;
 
   const [currLocation, setCurrLocation] = useState(initialLocation);

@@ -192,6 +192,12 @@ export const AddressInput = ({
           id="id_place_id"
           value={`${currLocation?.place_id || ""}`}
         ></input>
+        <input
+          type="hidden"
+          name="zoom"
+          id="id_zoom"
+          value={`${currLocation?.zoom || ""}`}
+        ></input>
       </div>
       {!isModal && (
         <span className="invalid-feedback">
