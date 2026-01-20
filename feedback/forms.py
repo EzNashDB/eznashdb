@@ -19,7 +19,6 @@ class FeedbackForm(forms.Form):
         ),
         help_text="50-2000 characters",
     )
-
     email = forms.EmailField(
         required=False,
         widget=forms.EmailInput(
@@ -29,8 +28,6 @@ class FeedbackForm(forms.Form):
             }
         ),
     )
-
-    # Optional screenshot
     screenshot = forms.ImageField(
         required=False,
         validators=[FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "gif", "svg"])],
@@ -43,12 +40,9 @@ class FeedbackForm(forms.Form):
         ),
         help_text="Up to 5mb",
     )
-
     # Hidden/auto-filled fields
     current_url = forms.CharField(required=False, widget=forms.HiddenInput(), max_length=500)
-
     browser_info = forms.CharField(required=False, widget=forms.HiddenInput(), max_length=500)
-
     # Honeypot field to catch spam
     website = HoneyPotField()
 
