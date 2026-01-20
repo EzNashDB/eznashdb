@@ -1,6 +1,6 @@
 {% load static %}
 {% load crispy_forms_tags %}
-<button class="feedback-tab btn btn-info btn-sm shadow-sm"
+<button class="feedback-tab btn btn-info btn-sm text-nowrap shadow-sm"
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#feedbackOffcanvas"
@@ -81,5 +81,18 @@
                 }
             }
         });
+
+        // Position feedback button to the left of scrollbar
+        (function() {
+            const position = () => {
+                const btn = document.querySelector('.feedback-tab');
+                const container = document.querySelector('.main-scroll-container');
+                if (!btn || !container) return;
+                btn.style.right = (container.offsetWidth - container.clientWidth) + 'px';
+            };
+
+            ['DOMContentLoaded', 'load', 'resize'].forEach(e => window.addEventListener(e, position));
+            document.body.addEventListener('htmx:afterSwap', position);
+        })();
     </script>
 </div>
