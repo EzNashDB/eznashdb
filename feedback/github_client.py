@@ -1,9 +1,5 @@
-import logging
-
 import requests
 from django.conf import settings
-
-logger = logging.getLogger(__name__)
 
 
 class ImgurClient:
@@ -39,14 +35,11 @@ class ImgurClient:
             data = response.json()
             if data.get("success"):
                 image_url = data["data"]["link"]
-                logger.info(f"Uploaded image to Imgur: {image_url}")
                 return image_url
             else:
-                logger.error(f"Imgur upload failed: {data}")
                 return None
 
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to upload to Imgur: {e}")
+        except requests.exceptions.RequestException:
             return None
 
 
@@ -75,7 +68,6 @@ class GitHubClient:
             Issue data dict if successful, None otherwise
         """
         if not self.token or not self.repo:
-            logger.error("GitHub token or repo not configured")
             return None
 
         url = f"{self.base_url}/repos/{self.repo}/issues"
@@ -85,10 +77,8 @@ class GitHubClient:
             response = requests.post(url, json=data, headers=self.headers, timeout=10)
             response.raise_for_status()
             issue_data = response.json()
-            logger.info(f"Created GitHub issue #{issue_data['number']}")
             return issue_data
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to create GitHub issue: {e}")
+        except requests.exceptions.RequestException:
             return None
 
     def add_screenshot_comment(self, issue_number: int, image_url: str) -> bool:
@@ -103,7 +93,6 @@ class GitHubClient:
             True if successful, False otherwise
         """
         if not self.token or not self.repo:
-            logger.error("GitHub token or repo not configured")
             return False
 
         try:
@@ -114,8 +103,6 @@ class GitHubClient:
 
             response = requests.post(url, json=data, headers=self.headers, timeout=10)
             response.raise_for_status()
-            logger.info(f"Added screenshot to issue #{issue_number}")
             return True
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to add screenshot comment: {e}")
+        except requests.exceptions.RequestException:
             return False
