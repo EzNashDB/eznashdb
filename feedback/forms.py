@@ -15,7 +15,7 @@ class FeedbackForm(forms.Form):
                 "placeholder": "What happened or what would you like to see?",
             }
         ),
-        label="Details",
+        help_text="50-2000 characters",
     )
 
     email = forms.EmailField(
@@ -36,8 +36,10 @@ class FeedbackForm(forms.Form):
             attrs={
                 "class": "form-control",
                 "accept": "image/png,image/jpeg,image/gif,image/svg+xml",
+                "@change": "handleScreenshotChange($event)",
             }
         ),
+        help_text="Up to 5mb",
     )
 
     # Hidden/auto-filled fields
