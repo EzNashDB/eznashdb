@@ -1,6 +1,8 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
 
+from app.fields import HoneyPotField
+
 
 class FeedbackForm(forms.Form):
     """Form for submitting feedback."""
@@ -47,18 +49,8 @@ class FeedbackForm(forms.Form):
 
     browser_info = forms.CharField(required=False, widget=forms.HiddenInput(), max_length=500)
 
-    # Honeypot for spam protection
-    honeypot = forms.CharField(
-        required=False,
-        widget=forms.HiddenInput(attrs={"autocomplete": "off", "tabindex": "-1"}),
-    )
-
-    def clean_honeypot(self):
-        """Reject submissions with honeypot filled (likely spam)."""
-        value = self.cleaned_data.get("honeypot", "")
-        if value:
-            raise forms.ValidationError("Invalid submission detected.")
-        return value
+    # Honeypot field to catch spam
+    website = HoneyPotField()
 
     def clean_screenshot(self):
         """Validate screenshot file size."""
