@@ -12,14 +12,7 @@ TITLE_TRUNCATION_SUFFIX = "..."
 
 
 class FeedbackView(View):
-    """Handle feedback form display and submission."""
-
-    def get(self, request):
-        """Render the feedback form."""
-        form = FeedbackForm(
-            initial={"email": request.user.email if request.user.is_authenticated else ""}
-        )
-        return render(request, self.template_name, {"form": form})
+    """Handle feedback form submission."""
 
     def _generate_issue_title(self, details):
         """Generate a concise title from feedback details."""
@@ -99,6 +92,7 @@ class FeedbackView(View):
 
         # Success - trigger event to close offcanvas and show success message
         messages.success(request, "Thanks! We received your feedback and will review it soon.")
-        response = HttpResponse()
+        # Send back blank form to reinitialize
+        response = render(request, "feedback/feedback_form_fields.html", {"form": FeedbackForm()})
         response["HX-Trigger"] = "feedbackSubmitted"
         return response
