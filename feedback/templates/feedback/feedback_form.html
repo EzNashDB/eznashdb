@@ -9,12 +9,39 @@
     Send Feedback
 </button>
 <div class="offcanvas offcanvas-end"
-     tabindex="-1"
-     id="feedbackOffcanvas"
-     aria-labelledby="feedbackOffcanvasLabel"
-     style="width: 500px;
-            max-width: 90vw"
-     x-data="{ screenshotPreview: null, isSubmitting: false, handleScreenshotChange(event) { const file = event.target.files[0]; if (file) { if (file.size > 5 * 1024 * 1024) { alert('File size must be less than 5MB'); event.target.value = ''; this.screenshotPreview = null; return; } const reader = new FileReader(); reader.onload = (e) => { this.screenshotPreview = e.target.result; }; reader.readAsDataURL(file); } else { this.screenshotPreview = null; } }, getBrowserInfo() { const nav = navigator; return nav.userAgent + ' | Screen: ' + screen.width + 'x' + screen.height; } }">
+    tabindex="-1"
+    id="feedbackOffcanvas"
+    aria-labelledby="feedbackOffcanvasLabel"
+    style="width: 500px; max-width: 90vw"
+    {# djlint:off #}
+     x-data="{
+        screenshotPreview: null,
+        isSubmitting: false,
+        handleScreenshotChange(event) {
+          const file = event.target.files[0];
+          if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+              alert('File size must be less than 5MB');
+              event.target.value = '';
+              this.screenshotPreview = null;
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              this.screenshotPreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          } else {
+            this.screenshotPreview = null;
+          }
+        },
+        getBrowserInfo() {
+          const nav = navigator;
+          return nav.userAgent + ' | Screen: ' + screen.width + 'x' + screen.height;
+        }
+     }"
+    {# djlint:on #}
+    >
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title" id="feedbackOffcanvasLabel">Send Feedback</h5>
         <button type="button"
