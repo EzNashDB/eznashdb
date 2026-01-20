@@ -59,3 +59,56 @@ def test_post_success_shows_success_message(rf, feedback_data, add_middleware_to
         assert str(messages[0]) == "Thanks! We received your feedback and will review it soon."
         assert messages[0].level_tag == "success"
         assert response["HX-Trigger"] == "feedbackSubmitted"
+
+
+def describe_generate_issue_title():
+    """Tests for _generate_issue_title method."""
+
+    def test_empty_string_returns_feedback():
+        """Test that empty details returns 'Feedback'."""
+        view = FeedbackView()
+        assert view._generate_issue_title("") == "Feedback"
+
+    def test_uses_first_sentence_when_shorter():
+        """Test that first sentence is used when it's shorter than the line."""
+        view = FeedbackView()
+        details = "Short sentence. This is much longer additional text on the same line"
+        result = view._generate_issue_title(details)
+        assert result == "Short sentence"
+
+    def test_uses_first_line_when_no_period():
+        """Test that first line is used when there's no period."""
+        view = FeedbackView()
+        details = "This is a line without a period\nSecond line here"
+        result = view._generate_issue_title(details)
+        assert result == "This is a line without a period"
+
+    def test_uses_first_line_when_shorter_than_first_sentence():
+        """Test that first line is used when shorter than first sentence."""
+        view = FeedbackView()
+        details = "Short\n. Long sentence continues here and keeps going."
+        result = view._generate_issue_title(details)
+        assert result == "Short"
+
+    def test_truncates_long_titles():
+        """Test that titles longer than MAX_TITLE_LENGTH are truncated."""
+        view = FeedbackView()
+        long_text = "a" * 100
+        result = view._generate_issue_title(long_text)
+        assert len(result) == 80  # MAX_TITLE_LENGTH
+        assert result.endswith("...")
+        assert result == "a" * 77 + "..."
+
+    def test_whitespace_stripped():
+        """Test that whitespace is properly stripped."""
+        view = FeedbackView()
+        details = "   Padded title   "
+        result = view._generate_issue_title(details)
+        assert result == "Padded title"
+
+    def test_empty_first_line_returns_feedback():
+        """Test that empty first line returns 'Feedback'."""
+        view = FeedbackView()
+        details = "\nSecond line"
+        result = view._generate_issue_title(details)
+        assert result == "Feedback"
