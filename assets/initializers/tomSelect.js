@@ -89,7 +89,19 @@ export default function initializeTomSelects() {
       },
       onChange: function (value) {
         const option = this.options[value];
-        const html = option?.html || option?.text || value;
+        let html = option?.html || option?.text || value;
+
+        // For room form fields, extract everything except the badge
+        if (
+          this.input.name.includes("relative_size") ||
+          this.input.name.includes("see_hear_score")
+        ) {
+          // Remove the badge span from the option HTML
+          html = html.replace(
+            /<span class=['"]badge[^>]*>[^<]*<\/span>\s*/,
+            ""
+          );
+        }
 
         window.dispatchEvent(
           new CustomEvent("tom-select-changed", {
