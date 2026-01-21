@@ -52,7 +52,7 @@
                         {% for room in shul.rooms.all %}
                             <li class="list-group-item">
                                 <div class="h6 fw-bold">{{ room.name }}</div>
-                                {% with not_set_display="<kbd class=\"fw-bold\">?</kbd> - Not set" %}
+                                {% with not_set_display="<span class='text-muted'>- Not set -</span>" %}
                                 {% include "eznashdb/includes/room_metrics.html" with room=room not_set_display=not_set_display vis_col_class='col-5' size_col_class='col-7' layout='compact' %}
                             {% endwith %}
                         </li>
