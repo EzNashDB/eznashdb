@@ -50,6 +50,10 @@ body {
   cursor: auto;
 }
 
+.text-wrap-pretty {
+  text-wrap: pretty;
+}
+
 .striped> :nth-child(even of :not([style*="display: none;"])) {
   /* Based on bootstrap table-striped styling */
   --bs-table-color-type: var(--bs-table-color);

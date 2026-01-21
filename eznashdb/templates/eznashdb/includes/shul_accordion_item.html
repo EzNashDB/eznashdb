@@ -52,21 +52,19 @@
                         {% for room in shul.rooms.all %}
                             <li class="list-group-item">
                                 <div class="h6 fw-bold">{{ room.name }}</div>
-                                {% with not_set_display="<kbd class='fw-bold'>?</kbd> - Not set" %}
-                                <div class="ps-3 gap-2 d-flex flex-column">
-                                    <div class="d-flex">
-                                        <i class="fa-solid fa-up-right-and-down-left-from-center me-3 mt-1"
-                                           style="width:16px;
-                                                  display:inline-block;
-                                                  text-align:center"></i>
-                                        <span>{{ room.get_relative_size_display|safe|default:not_set_display }}</span>
+                                {% with not_set_display="<kbd class=\"fw-bold\">?</kbd> - Not set" %}
+                                <div class="row g-3">
+                                    <div class="col-5">
+                                        <div class="small text-muted mb-1 text-nowrap">
+                                            <i class="fa-solid fa-eye me-1"></i> Vis. & Aud.
+                                        </div>
+                                        <div>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</div>
                                     </div>
-                                    <div class="d-flex">
-                                        <i class="fa-solid fa-eye me-3 mt-1"
-                                           style="width:16px;
-                                                  display:inline-block;
-                                                  text-align:center"></i>
-                                        <span>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</span>
+                                    <div class="col-7">
+                                        <div class="small text-muted mb-1 text-nowrap">
+                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> Size
+                                        </div>
+                                        <div>{{ room.get_relative_size_display|safe|default:not_set_display }}</div>
                                     </div>
                                 </div>
                             {% endwith %}
@@ -77,4 +75,4 @@
         </div>
     </div>
 </div>
-{% if not is_last %}<hr class="my-0 text-secondary-subtle">{% endif %}
+{% if not is_last %}<hr class="my-0 text-secondary-subtle" />{% endif %}

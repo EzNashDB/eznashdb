@@ -13,7 +13,7 @@ class DisplayChoicesMixin:
     @classmethod
     def get_display_choices(cls, include_blank=False):
         """Generate choices with custom display HTML."""
-        choices = [(choice.value, choice.get_display()) for choice in cls]
+        choices = [(choice.value, choice.get_option_display()) for choice in cls]
         if include_blank:
             choices = [("", "-------")] + choices
         return choices
@@ -29,10 +29,19 @@ class RelativeSize(DisplayChoicesMixin, models.TextChoices):
     def get_display(self):
         return mark_safe(
             f"""
-            <div class='d-inline-flex gap-1'>
-                <div><kbd class='fw-bold'>{self.value}</kbd></div>
-                -
-                <div class='flex-grow-1 overflow-hidden text-break'>{self.label}</div>
+            <div class='text-wrap-pretty'>
+                <span class='flex-grow-1 overflow-hidden text-break'>
+                {self.label}
+                </span>
+            </div>
+            """
+        )
+
+    def get_option_display(self):
+        return mark_safe(
+            f"""
+            <div class='d-flex align-items-center gap-2'>
+                <span class='badge text-bg-secondary px-1 d-inline-block text-center' style='width: 1.5rem;'>{self.value}</span> {self.label}
             </div>
             """
         )
@@ -48,8 +57,18 @@ class SeeHearScore(DisplayChoicesMixin, models.TextChoices):
     def get_display(self):
         score = int(self.value)
         stars = self._render_stars(score)
+        return mark_safe(f"<span class='text-nowrap'>{stars}</span>")
+
+    def get_option_display(self):
+        score = int(self.value)
+        stars = self._render_stars(score)
         return mark_safe(
-            f"<span class='text-nowrap'><kbd class='fw-bold'>{score}</kbd> - {stars}</span>"
+            f"""
+            <span>
+                <span class='badge bg-secondary me-1 d-inline-block text-center' style='width: 1.5rem;'>{self.value}</span>
+                <span class='text-nowrap'>{stars}</span>
+            </span>
+            """
         )
 
     @staticmethod
