@@ -37,9 +37,6 @@ class RelativeSize(DisplayChoicesMixin, models.TextChoices):
             """
         )
 
-    def get_short_display(self):
-        return mark_safe(f"<span class='badge bg-secondary'>{self.value}</span>")
-
     def get_option_display(self):
         return mark_safe(
             f"""
@@ -61,9 +58,6 @@ class SeeHearScore(DisplayChoicesMixin, models.TextChoices):
         score = int(self.value)
         stars = self._render_stars(score)
         return mark_safe(f"<span class='text-nowrap'>{stars}</span>")
-
-    def get_short_display(self):
-        return mark_safe(f"<span class='badge bg-secondary'>{self.value}</span>")
 
     def get_option_display(self):
         score = int(self.value)
