@@ -68,8 +68,8 @@ class RoomForm(ModelForm):
         }
         widgets = {
             "name": TextInput(attrs={"x-model": "roomName"}),
-            "relative_size": SingleTomSelectWidget(),
-            "see_hear_score": SingleTomSelectWidget(),
+            "relative_size": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
+            "see_hear_score": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
         }
 
     def __init__(self, *args, **kwargs):
