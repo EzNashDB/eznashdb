@@ -74,15 +74,17 @@
 
         // Position feedback button to the left of scrollbar
         (function() {
-            const position = () => {
-                const btn = document.querySelector('.feedback-tab');
-                const container = document.querySelector('.main-scroll-container');
-                if (!btn || !container) return;
+            const btn = document.querySelector('.feedback-tab');
+            const container = document.querySelector('.main-scroll-container');
+            if (!btn || !container) return;
+
+            const repositionButton = () => {
                 btn.style.right = (container.offsetWidth - container.clientWidth) + 'px';
             };
 
-            ['DOMContentLoaded', 'load', 'resize'].forEach(e => window.addEventListener(e, position));
-            document.body.addEventListener('htmx:afterSwap', position);
+            // Watch for any size changes to the container
+            const resizeObserver = new ResizeObserver(repositionButton);
+            resizeObserver.observe(container);
         })();
     </script>
 </div>
