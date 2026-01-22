@@ -91,11 +91,8 @@ export default function initializeTomSelects() {
         const option = this.options[value];
         let html = option?.html || option?.text || value;
 
-        // For room form fields, extract everything except the badge
-        if (
-          this.input.name.includes("relative_size") ||
-          this.input.name.includes("see_hear_score")
-        ) {
+        // For fields with data-strip-badge, remove the badge from the option HTML
+        if (this.input.dataset.stripBadge === "true") {
           // Remove the badge span from the option HTML
           html = html.replace(
             /<span class=['"]badge[^>]*>[^<]*<\/span>\s*/,
