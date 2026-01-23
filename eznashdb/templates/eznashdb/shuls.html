@@ -626,6 +626,8 @@
                 if (typeof L !== 'undefined') {
                     initMap();
                     FILTER_API.init();
+                    // Call replaceMapShuls if the markers script has loaded
+                    window.SHUL_MAP_API.replaceMapShuls?.();
                 } else if (retriesLeft > 0) {
                     setTimeout(() => initWhenReady(retriesLeft - 1), 50);
                 } else {
@@ -732,11 +734,9 @@
                 replaceMapShuls,
             };
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    window.SHUL_MAP_API.replaceMapShuls();
-                });
-            } else {
+            // On HTMX updates, map is already ready - call directly
+            // On initial load, initWhenReady will call replaceMapShuls after map init
+            if (window.SHUL_MAP_API?.clearMarkers) {
                 window.SHUL_MAP_API.replaceMapShuls();
             }
         })();
