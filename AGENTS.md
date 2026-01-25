@@ -1,35 +1,13 @@
-# Ezrat Nashim Database - Project Instructions
+# Ezrat Nashim Database
 
-**Purpose**: Help future AI Agent sessions understand **why** things are the way they are, not just **what** the code does.
+Crowdsourced database tracking women's seating in synagogues worldwide.
 
-## When to Update This File
+## Product Overview
+Two metrics tracked:
+1. **Size** of ezrat nashim relative to men's section (L/M/S/X/&)
+2. **Quality** of visibility/audibility (1-5 star rating)
 
-**✅ DO document:**
-- Design philosophy that drives code decisions (e.g., "map-first homepage because tool is self-explanatory")
-- Non-obvious architectural choices (e.g., "coordinate-based duplicate prevention")
-- Product decisions that affect implementation (e.g., "Wikipedia model - anyone can edit")
-- Cross-cutting patterns not evident from one file (e.g., how React integrates with Django templates)
-
-**❌ DON'T document:**
-- Implementation details already clear from code/comments
-- Standard framework patterns (React state lifting, Django views, etc.)
-- Bug fixes or optimizations (those belong in git commit messages)
-- Library-specific quirks already commented in the code
-
-**Decision heuristic**: If you could figure it out by reading the code for 5 minutes, don't add it. If it explains **why we chose this approach**, add it.
-
-**When to check**: After completing significant work or reaching conclusions about design/architecture, actively ask yourself: "Did we discover or decide something that explains why the codebase is the way it is?" If yes, ask the user if it should be documented here.
-
----
-
-## What This Is
-Crowdsourced database tracking women's seating in synagogues worldwide. Two metrics:
-1. Size of ezrat nashim relative to men's section (L/M/S/X/&)
-2. Visibility/audibility quality (1-5 star rating)
-
-Goal: Simple, observable data that correlates with women's broader experience in the synagogue.
-
-**Philosophy**: Rather than attempting comprehensive evaluations, we intentionally limit ourselves to a small set of measurable indicators in order to keep the site easy to use and contribute to.
+**Philosophy**: Simple, observable data that correlates with women's broader experience. We intentionally limit scope to keep the site easy to use and contribute to.
 
 ## Tech Stack
 - **Backend**: Django
@@ -73,6 +51,13 @@ Goal: Simple, observable data that correlates with women's broader experience in
 - Homepage = map (not explanation page)
 - Navigation: Browse Shuls | Add a Shul | About | Contact
 - Map-first because tool is self-explanatory
+
+### Authentication
+- **Google-only in production**: No email/password signup - users sign in with Google OAuth
+- **Why**: Simplifies auth flow, eliminates password management, email verification, and account settings pages
+- **Auto-linking**: If a user previously had an email/password account, logging in with Google using the same email auto-connects accounts (via `SocialAccountAdapter.pre_social_login()`)
+- **Dev fallback**: In DEBUG mode on non-localhost hosts (e.g., 10.0.0.8 for local network testing), email/password login is available since Google OAuth requires localhost or registered HTTPS URLs
+- **No login messages**: Protected pages redirect directly to Google - no intermediate "please log in" messages since the OAuth flow is self-explanatory
 
 ## Key Policies
 
