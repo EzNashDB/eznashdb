@@ -8,6 +8,7 @@ from json.decoder import JSONDecodeError
 import requests
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -23,7 +24,6 @@ from app.mixins import RateLimitCaptchaMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulDeleteForm, ShulForm
-from eznashdb.mixins import LoginRequiredMixin
 from eznashdb.models import Shul
 
 
@@ -101,7 +101,6 @@ class ShulsFilterView(FilterView):
 
 
 class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView):
-    login_required_message = "Log in to add or edit shuls."
     model = Shul
     form_class = ShulForm
     template_name = "eznashdb/create_update_shul.html"
@@ -382,8 +381,6 @@ class AddressLookupView(View):
 
 
 class GoogleMapsProxyView(RateLimitCaptchaMixin, LoginRequiredMixin, View):
-    login_required_message = "Log in to open in Google Maps."
-
     def get(self, request, *args, **kwargs):
         # Check if CAPTCHA is required
         if redirect := self.redirect_if_captcha_required(request):
@@ -405,8 +402,6 @@ class GoogleMapsProxyView(RateLimitCaptchaMixin, LoginRequiredMixin, View):
 
 class UndeleteShulView(LoginRequiredMixin, View):
     """Handle undoing a shul deletion"""
-
-    login_required_message = "Log in to restore shuls."
 
     def post(self, request, pk):
         # Get the soft-deleted shul (use all_objects to include deleted)

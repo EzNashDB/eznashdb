@@ -234,18 +234,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# django-allauth configuration (using new v65+ settings)
-ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_FORMS = {"signup": "users.forms.HoneypotSignupForm"}
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# django-allauth configuration (Google-only authentication)
+SOCIALACCOUNT_ONLY = True  # Disable email/password authentication
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 
 # Social account settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip intermediate page, go directly to Google
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Trust provider's email verification
 SOCIALACCOUNT_EMAIL_REQUIRED = False  # Don't require email confirmation for social accounts
 SOCIALACCOUNT_QUERY_EMAIL = True  # Ask provider for email
@@ -268,6 +265,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # Redirects
+LOGIN_URL = "/accounts/google/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 

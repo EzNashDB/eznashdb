@@ -29,12 +29,6 @@
                                 <h6 class="dropdown-header text-truncate" style="max-width: 250px;">{{ user.email }}</h6>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'account_settings' %}">Account Settings</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
                                 <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item">Logout</button>

@@ -1,6 +1,7 @@
 from functools import partial
 
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.urls import reverse
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
@@ -427,4 +428,4 @@ def test_requires_authentication(client):
     """View requires login to access"""
     response = client.get(reverse("eznashdb:create_shul"))
     assert response.status_code == 302
-    assert "/accounts/login/" in response.url
+    assert settings.LOGIN_URL in response.url

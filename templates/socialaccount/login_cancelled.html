@@ -1,5 +1,7 @@
 {% extends "account/base.html" %}
 
+{% load socialaccount %}
+
 {% block title %}Login Cancelled - The Ezrat Nashim Database{% endblock %}
 
 {% block account_content %}
@@ -9,6 +11,6 @@
         You cancelled the Google login process.
     </div>
     <div class="d-grid gap-2 mt-4">
-        <a href="{% url 'account_login' %}" class="btn btn-primary">Back to Login</a>
+        <a href="{% provider_login_url 'google' %}" class="btn btn-primary">Try Again</a>
     </div>
 {% endblock %}
