@@ -1,0 +1,28 @@
+{% extends "account/base.html" %}
+
+{% block title %}Sign In (Dev) - The Ezrat Nashim Database{% endblock %}
+
+{% block account_content %}
+    <h2 class="mb-4">
+        Sign In <small class="text-muted">(Dev Mode)</small>
+    </h2>
+    <form method="post" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <div class="mb-3">
+            <label for="id_login" class="form-label">Email</label>
+            <input type="email" name="login" id="id_login" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Password</label>
+            <input type="password"
+                   name="password"
+                   id="id_password"
+                   class="form-control"
+                   required>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </div>
+    </form>
+{% endblock %}
