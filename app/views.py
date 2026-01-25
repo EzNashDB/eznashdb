@@ -16,6 +16,7 @@ from sentry_sdk import capture_message, set_context, set_tag
 from app.backups.core import list_gdrive_backups
 from app.emails import send_appeal_notification
 from app.forms import CaptchaVerificationForm, RateLimitAppealForm
+from app.mixins import is_rate_limiting_active
 from app.rate_limiting import generate_captcha_token
 
 
@@ -138,7 +139,8 @@ class CaptchaVerifyView(View):
     def get(self, request):
         form = CaptchaVerificationForm()
         next_url = request.GET.get("next", "/")
-        if request.user.is_authenticated and request.user.is_superuser:
+        # Auto-bypass CAPTCHA if rate limiting feature is disabled
+        if not is_rate_limiting_active(request):
             generate_captcha_token(request)
             return redirect(next_url)
         return render(
