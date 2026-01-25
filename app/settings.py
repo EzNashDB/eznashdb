@@ -236,8 +236,9 @@ AUTHENTICATION_BACKENDS = [
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# django-allauth configuration (Google-only authentication)
-SOCIALACCOUNT_ONLY = True  # Disable email/password authentication
+# django-allauth configuration (Google-only authentication in production)
+if not DEBUG:
+    SOCIALACCOUNT_ONLY = True  # Disable email/password authentication
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 
 # Social account settings
@@ -265,7 +266,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # Redirects
-LOGIN_URL = "/accounts/google/login/"
+LOGIN_URL = "/accounts/login/" if DEBUG else "/accounts/google/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
