@@ -4,12 +4,11 @@ from users.models import User
 
 
 def describe_navbar():
-    def shows_login_for_anonymous(client):
+    def shows_sign_in_for_anonymous(client):
         response = client.get("/")
         content = str(response.content)
 
-        assert "Login" in content
-        assert "Sign Up" in content
+        assert "Sign in" in content
         assert "Account" not in content  # No account dropdown
 
     def shows_account_dropdown_for_authenticated(client, db):
@@ -27,4 +26,4 @@ def describe_navbar():
         assert "Account" in content  # Dropdown button
         assert "Logout" in content  # In dropdown
         assert "test@example.com" in content  # Email shown in dropdown
-        assert "Login" not in content  # No login link
+        assert "Sign in" not in content  # No sign in link

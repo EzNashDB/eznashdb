@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from django.conf import settings
 from django.urls import reverse
 
 from app.fields import HONEYPOT_FIELD_CLASS
@@ -23,8 +24,7 @@ def navbar(request):
 
     # Authentication links - dropdown for authenticated users handled in template
     if not (hasattr(request, "user") and request.user.is_authenticated):
-        navbar_items.append(NavbarItem("Login", reverse("account_login")))
-        navbar_items.append(NavbarItem("Sign Up", reverse("account_signup")))
+        navbar_items.append(NavbarItem("Sign in", settings.LOGIN_URL))
 
     # Add admin link for staff users
     if hasattr(request, "user") and request.user.is_staff:

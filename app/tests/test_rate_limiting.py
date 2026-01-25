@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 import pytest
+from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -195,7 +196,7 @@ def describe_rate_limit_appeal_view():
         response = client.post(url, {"explanation": "Test"})
 
         assert response.status_code == 302
-        assert "/accounts/login/" in response.url
+        assert settings.LOGIN_URL in response.url
 
     def creates_appeal_with_snapshot(client, test_user, superuser):
         """Should create appeal with violation snapshot and send email"""

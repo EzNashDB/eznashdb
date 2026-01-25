@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 
@@ -9,7 +10,7 @@ def test_requires_login(client, test_shul):
     response = client.get(url, data={"id": test_shul.id})
 
     assert response.status_code == 302
-    assert "/accounts/login/" in response.url
+    assert settings.LOGIN_URL in response.url
 
 
 @pytest.mark.django_db
