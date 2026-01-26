@@ -260,6 +260,7 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         "AUTH_PARAMS": {
             "access_type": "online",
+            "prompt": "select_account",
         },
         "FETCH_USERINFO": True,
     }
