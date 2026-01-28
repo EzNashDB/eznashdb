@@ -15,7 +15,7 @@ from sentry_sdk import capture_message, set_context, set_tag
 
 from app.backups.core import list_gdrive_backups
 from app.emails import send_appeal_notification
-from app.forms import CaptchaVerificationForm, RateLimitAppealForm
+from app.forms import AbuseAppealForm, CaptchaVerificationForm
 from app.mixins import is_rate_limiting_active
 from app.rate_limiting import generate_captcha_token
 
@@ -174,16 +174,14 @@ class CaptchaVerifyView(View):
 
 
 @method_decorator(login_required, name="dispatch")
-class RateLimitAppealView(View):
-    """Handle rate limit appeal form submissions from 429 page."""
+class AppealBanView(View):
+    """Handle abuse appeal form submissions from 429 page."""
 
     def post(self, request):
         """Process appeal submission."""
-        form = RateLimitAppealForm(request.POST)
+        form = AbuseAppealForm(request.POST)
         if form.is_valid():
-            appeal = form.save(commit=False)
-            appeal.appealed_by = request.user
-            appeal.save()
+            appeal = form.save()
 
             send_appeal_notification(appeal)
 

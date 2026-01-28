@@ -5,12 +5,17 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django_ratelimit.decorators import ratelimit
+from django_ratelimit.core import is_ratelimited
 from waffle import flag_is_active
 
-from app.enums import RateLimitedEndpoint
-from app.rate_limiting import ViolationRecorder, check_captcha_required, get_client_ip
+from app.abuse_config import RATE_LIMIT
+from app.abuse_prevention import (
+    get_blocked_response,
+    is_sensitive_url,
+    process_abuse_state,
+    record_abuse_violation,
+)
+from app.rate_limiting import consume_captcha_token
 
 
 def is_rate_limiting_active(request):
@@ -22,32 +27,46 @@ def is_rate_limiting_active(request):
     return (not settings.DEBUG) or flag_is_active(request, "rate_limiting")
 
 
-class RateLimitCaptchaMixin:
-    """Mixin to add rate limiting and CAPTCHA to views that expose coordinates."""
+class AbusePreventionMixin:
+    """Mixin to add user-based abuse prevention to views that expose sensitive data."""
 
-    endpoint_key = RateLimitedEndpoint.COORDINATE_ACCESS
-
-    @method_decorator(
-        ratelimit(
-            key=lambda _group, request: get_client_ip(request),
-            rate="30/h",
-            method=["GET", "POST"],
-            block=False,  # Don't auto-block, record violation instead
-        )
-    )
     def dispatch(self, request, *args, **kwargs):
-        was_limited = getattr(request, "limited", False)
-        if was_limited and is_rate_limiting_active(request):
-            ViolationRecorder(request, self.endpoint_key).record()
-        return super().dispatch(request, *args, **kwargs)
+        if self.should_pass_through(request):
+            return super().dispatch(request, *args, **kwargs)
 
-    def redirect_if_captcha_required(self, request):
-        """
-        Check if CAPTCHA is required and redirect to verification page if needed.
-        Returns redirect response if CAPTCHA required, None otherwise.
-        """
-        if check_captcha_required(request, self.endpoint_key):
+        # Check enforcement before processing request
+        abuse_enforcement_result = process_abuse_state(request.user)
+        if not abuse_enforcement_result.allowed:
+            return get_blocked_response(request, abuse_enforcement_result)
+
+        # Check if CAPTCHA is required and user hasn't solved it yet
+        # Do this BEFORE counting the request to avoid double-counting
+        if abuse_enforcement_result.requires_captcha and not consume_captcha_token(request):
             captcha_url = reverse("captcha_verify")
             next_url = request.get_full_path()
             return HttpResponseRedirect(f"{captcha_url}?{urlencode({'next': next_url})}")
-        return None
+
+        # Apply django-ratelimit for rate tracking
+        was_limited = is_ratelimited(
+            request=request,
+            group="abuse_prevention",
+            key=lambda g, r: str(r.user.pk),
+            rate=RATE_LIMIT,
+            method=["GET", "POST"],
+            increment=True,
+        )
+
+        # Process the request
+        response = super().dispatch(request, *args, **kwargs)
+
+        # Record the outcome (was this request rate-limited?)
+        record_abuse_violation(request.user, was_limited)
+
+        return response
+
+    def should_pass_through(self, request):
+        return (
+            not is_sensitive_url(request)
+            or not is_rate_limiting_active(request)
+            or not request.user.is_authenticated
+        )
