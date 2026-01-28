@@ -4,7 +4,7 @@
 
 {% block card_header %}
     <h4>
-        {% if violation.is_permanent_ban %}
+        {% if abuse_state.is_permanently_banned %}
             Access Restricted
         {% else %}
             Temporarily Blocked
@@ -14,14 +14,14 @@
 
 {% block card_body %}
     <div class="alert
-                {% if violation.is_permanent_ban %}
+                {% if abuse_state.is_permanently_banned %}
                     alert-danger
                 {% else %}
                     alert-warning
                 {% endif %}
                 mb-0">
-        {% if violation.is_permanent_ban %}
-            <p>We've detected unusual activity from this location and have restricted access.</p>
+        {% if abuse_state.is_permanently_banned %}
+            <p>We've detected unusual activity from your account and have restricted access.</p>
             {% if appeal_form %}
                 <p class="mb-0">If you believe this is a mistake, please submit an appeal below.</p>
             {% else %}
@@ -32,14 +32,14 @@
             {% endif %}
         {% else %}
             <p class="mb-0">
-                We've detected too many requests from this location. Please wait <strong>{{ retry_after }}</strong> minute{{ retry_after|pluralize }} before trying again.
+                We've detected too many requests from your account. Please wait <strong>{{ retry_after }}</strong> before trying again.
             </p>
         {% endif %}
     </div>
-    {% if violation.is_permanent_ban and appeal_form %}
+    {% if abuse_state.is_permanently_banned and appeal_form %}
         <div class="mt-4">
             <h5>Submit an Appeal</h5>
-            <form method="post" action="{% url 'appeal_rate_limit' %}">
+            <form method="post" action="{% url 'appeal_ban' %}">
                 {% csrf_token %}
                 {% crispy appeal_form %}
                 <button type="submit" class="btn btn-primary mt-3">Submit Appeal</button>

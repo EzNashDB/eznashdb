@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .info-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        .info-table th { background: #e9ecef; padding: 10px; text-align: left; border: 1px solid #dee2e6; }
+        .info-table td { padding: 10px; border: 1px solid #dee2e6; }
+        .explanation { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; white-space: pre-wrap; }
+        .admin-link { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        .admin-link:hover { background: #0056b3; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h2 style="margin: 0; color: #495057;">New Abuse Appeal Submitted</h2>
+        </div>
+        <table class="info-table">
+            <tr>
+                <th>User Email</th>
+                <td>{{ snapshot.user_email|default:appeal.abuse_state.user.email }}</td>
+            </tr>
+            <tr>
+                <th>Points at Time of Appeal</th>
+                <td>{{ snapshot.points|default:"Unknown" }}</td>
+            </tr>
+            <tr>
+                <th>Permanently Banned</th>
+                <td>{{ snapshot.is_permanently_banned|yesno:"Yes,No,Unknown" }}</td>
+            </tr>
+            {% if time_span %}
+                <tr>
+                    <th>Episode Duration</th>
+                    <td>{{ time_span }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th>Sensitive Requests in Episode</th>
+                <td>{{ snapshot.sensitive_count_in_episode|default:"Unknown" }}</td>
+            </tr>
+        </table>
+        <h3>User's Explanation:</h3>
+        <div class="explanation">{{ appeal.explanation }}</div>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ admin_url }}" class="admin-link">Review in Admin</a>
+        </div>
+        <hr style="margin-top: 30px; border: none; border-top: 1px solid #dee2e6">
+        <p style="color: #6c757d; font-size: 12px; text-align: center;">
+            Automated message from ezratnashim.com abuse prevention system
+        </p>
+    </body>
+</html>

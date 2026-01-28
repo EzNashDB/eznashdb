@@ -3,7 +3,7 @@ from django import forms
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
-from app.models import RateLimitAppeal, RateLimitViolation
+from app.models import AbuseAppeal, AbuseState
 
 
 class CaptchaVerificationForm(forms.Form):
@@ -12,16 +12,14 @@ class CaptchaVerificationForm(forms.Form):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
-class RateLimitAppealForm(forms.ModelForm):
-    """Form for appealing rate limit bans."""
+class AbuseAppealForm(forms.ModelForm):
+    """Form for appealing abuse bans."""
 
-    violation = forms.ModelChoiceField(
-        queryset=RateLimitViolation.objects.all(), widget=forms.HiddenInput()
-    )
+    abuse_state = forms.ModelChoiceField(queryset=AbuseState.objects.all(), widget=forms.HiddenInput())
 
     class Meta:
-        model = RateLimitAppeal
-        fields = ["violation", "explanation"]
+        model = AbuseAppeal
+        fields = ["abuse_state", "explanation"]
         widgets = {
             "explanation": forms.Textarea(
                 attrs={
@@ -38,19 +36,22 @@ class RateLimitAppealForm(forms.ModelForm):
         self.helper.form_tag = False
 
     def save(self, commit=True):
-        """Save appeal with violation snapshot."""
+        """Save appeal with state snapshot."""
         appeal = super().save(commit=False)
 
-        # Capture snapshot of violation state
-        appeal.violation_snapshot = {
-            "ip_address": appeal.violation.ip_address,
-            "endpoint": appeal.violation.endpoint,
-            "violation_count": appeal.violation.violation_count,
-            "first_violation_at": appeal.violation.first_violation_at.isoformat(),
-            "last_violation_at": appeal.violation.last_violation_at.isoformat(),
-            "user_id": appeal.violation.user.id if appeal.violation.user else None,
-            "user_email": appeal.violation.user.email if appeal.violation.user else None,
-            "user_ids": appeal.violation.user_ids,
+        # Capture snapshot of abuse state
+        state = appeal.abuse_state
+        appeal.state_snapshot = {
+            "user_email": state.user.email,
+            "points": state.points,
+            "is_permanently_banned": state.is_permanently_banned,
+            "episode_started_at": state.episode_started_at.isoformat()
+            if state.episode_started_at
+            else None,
+            "last_violation_at": state.last_violation_at.isoformat()
+            if state.last_violation_at
+            else None,
+            "sensitive_count_in_episode": state.sensitive_count_in_episode,
         }
 
         if commit:

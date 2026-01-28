@@ -20,7 +20,7 @@ from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
-from app.mixins import RateLimitCaptchaMixin
+from app.mixins import AbusePreventionMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulDeleteForm, ShulForm
@@ -100,7 +100,7 @@ class ShulsFilterView(FilterView):
         return super().get_template_names()
 
 
-class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView):
+class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView):
     model = Shul
     form_class = ShulForm
     template_name = "eznashdb/create_update_shul.html"
@@ -125,18 +125,7 @@ class CreateUpdateShulView(RateLimitCaptchaMixin, LoginRequiredMixin, UpdateView
     def is_update(self):
         return self.get_object() is not None
 
-    def dispatch(self, request, *args, **kwargs):
-        # Only apply rate limiting for update mode
-        if self.is_update:
-            return RateLimitCaptchaMixin.dispatch(self, request, *args, **kwargs)
-        # Skip rate limiting for create mode
-        return super(RateLimitCaptchaMixin, self).dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
-        # Check CAPTCHA only for update mode
-        if self.is_update and (redirect := self.redirect_if_captcha_required(request)):
-            return redirect
-
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -380,12 +369,8 @@ class AddressLookupView(View):
         return results
 
 
-class GoogleMapsProxyView(RateLimitCaptchaMixin, LoginRequiredMixin, View):
+class GoogleMapsProxyView(AbusePreventionMixin, LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        # Check if CAPTCHA is required
-        if redirect := self.redirect_if_captcha_required(request):
-            return redirect
-
         # Normal flow - redirect to Google Maps
         shul_id = request.GET.get("id")
         if not shul_id:

@@ -1,5 +1,3 @@
-"""Email notification functions for rate limiting."""
-
 from datetime import datetime
 
 from django.conf import settings
@@ -22,22 +20,27 @@ def send_appeal_notification(appeal):
         return
 
     # Use snapshot data for accurate representation of what user was appealing
-    snapshot = appeal.violation_snapshot
+    snapshot = appeal.state_snapshot
 
-    # Calculate time span from snapshot timestamps
-    first = datetime.fromisoformat(snapshot.get("first_violation_at", ""))
-    last = datetime.fromisoformat(snapshot.get("last_violation_at", ""))
-    time_span = last - first
+    # Calculate time span from snapshot timestamps if available
+    time_span = None
+    episode_started = snapshot.get("episode_started_at")
+    last_violation = snapshot.get("last_violation_at")
+    if episode_started and last_violation:
+        start = datetime.fromisoformat(episode_started)
+        end = datetime.fromisoformat(last_violation)
+        time_span = end - start
 
-    subject = f"New Rate Limit Appeal from {appeal.violation.ip_address}"
+    subject = f"New Abuse Appeal from {appeal.abuse_state.user.email}"
 
     # Render HTML email from template
     html_message = render_to_string(
-        "email/rate_limit_appeal.html",
+        "email/abuse_appeal.html",
         {
             "appeal": appeal,
+            "snapshot": snapshot,
             "time_span": time_span,
-            "admin_url": f"{settings.SITE_URL}/admin/app/ratelimitappeal/{appeal.id}/change/",
+            "admin_url": f"{settings.SITE_URL}/admin/app/abuseappeal/{appeal.id}/change/",
         },
     )
 
