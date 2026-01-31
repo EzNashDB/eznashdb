@@ -57,7 +57,7 @@ class FieldsOptions:
         "Visibility & Audibility",
         "fa-solid fa-eye",
         """
-            How well can women see and hear from the women's section?
+            Compared to men, how well can women see and hear?
         """,
     )
 
