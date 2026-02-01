@@ -5,6 +5,7 @@ from django.urls import reverse
 from waffle.testutils import override_flag
 
 from app.models import GooglePlacesUsage
+from eznashdb.enums import GeocodingProvider
 
 
 def describe_google_places_details():
@@ -21,7 +22,7 @@ def describe_google_places_details():
             "lat": 40.7128,
             "lon": -74.0060,
             "display_name": "123 Main St, City",
-            "source": "google",
+            "source": GeocodingProvider.GOOGLE,
         }
 
         url = reverse("eznashdb:address_lookup_details")
@@ -31,7 +32,7 @@ def describe_google_places_details():
         result = response.json()
         assert result["lat"] == 40.7128
         assert result["lon"] == -74.0060
-        assert result["source"] == "google"
+        assert result["source"] == GeocodingProvider.GOOGLE
 
         # Verify session_token was passed to get_details
         mock_google_instance.get_details.assert_called_once_with("ChIJ123", "test-token")

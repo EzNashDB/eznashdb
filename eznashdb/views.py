@@ -22,6 +22,7 @@ from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulDeleteForm, ShulForm
 from eznashdb.geocoding import GooglePlacesBudgetChecker, GooglePlacesClient, OSMClient
 from eznashdb.models import Shul
+from eznashdb.place_search import PlaceSearchMerger
 
 
 class ShulsFilterView(FilterView):
@@ -311,7 +312,7 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
 
 class AddressLookupView(LoginRequiredMixin, View):
     """
-    Address autocomplete lookup with Google Places API (when enabled) and OSM fallback.
+    Address autocomplete lookup merging Google Places and OSM results.
     """
 
     def get(self, request):
@@ -319,20 +320,23 @@ class AddressLookupView(LoginRequiredMixin, View):
         session_token = request.GET.get("session_token", "")
 
         budget_checker = GooglePlacesBudgetChecker()
+        use_google = budget_checker.can_use(request, request.user)
 
-        # Try Google Places if enabled and within budget
-        if budget_checker.can_use(request, request.user):
-            client = GooglePlacesClient(settings.GOOGLE_PLACES_API_KEY)
-            results = client.autocomplete(query, session_token)
-            if results is not None:
-                budget_checker.increment_autocomplete(request.user)
-                return JsonResponse(results, safe=False)
+        # Setup clients
+        google_client = GooglePlacesClient(settings.GOOGLE_PLACES_API_KEY) if use_google else None
+        osm_client = OSMClient(settings.BASE_OSM_URL, settings.MAPS_CO_API_KEY)
 
-        # Fallback to OSM
-        client = OSMClient(settings.BASE_OSM_URL, settings.MAPS_CO_API_KEY)
-        results = client.search_with_israel_fallback(query)
-        if results is None:
-            return JsonResponse({"error": "Failed to retrieve city data"}, status=500)
+        # Use merger to get results from both providers
+        merger = PlaceSearchMerger(google_client, osm_client)
+        normalized_results = merger.search(query, session_token)
+
+        # Increment Google usage if it was used
+        if use_google:
+            budget_checker.increment_autocomplete(request.user)
+
+        # Convert NormalizedPlace objects to JSON format
+        results = [place.as_dict() for place in normalized_results]
+
         return JsonResponse(results, safe=False)
 
 

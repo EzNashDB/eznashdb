@@ -10,6 +10,7 @@ from django.test import override_settings
 from waffle.testutils import override_flag
 
 from app.models import GooglePlacesUsage, GooglePlacesUserUsage
+from eznashdb.enums import GeocodingProvider
 from eznashdb.geocoding import GooglePlacesBudgetChecker, GooglePlacesClient, OSMClient
 
 User = get_user_model()
@@ -45,7 +46,7 @@ def describe_google_places_client():
                     "display_name": "Test Synagogue",
                     "lat": None,
                     "lon": None,
-                    "source": "google",
+                    "source": GeocodingProvider.GOOGLE,
                 }
             ]
 
@@ -85,7 +86,7 @@ def describe_google_places_client():
                 "lat": 40.7128,
                 "lon": -74.0060,
                 "display_name": "123 Main St, New York, NY",
-                "source": "google",
+                "source": GeocodingProvider.GOOGLE,
             }
 
         def it_includes_session_token_in_headers(client, mocker):
@@ -111,6 +112,40 @@ def describe_google_places_client():
             result = client.get_details("invalid_place", "session123")
 
             assert result is None
+
+    def describe_autocomplete_and_normalize():
+        def it_normalizes_autocomplete_result(client, mocker):
+            # Mock the autocomplete response
+            mock_response = [
+                {
+                    "id": "ChIJ123",
+                    "place_id": "ChIJ123",
+                    "display_name": "Beth Israel Synagogue, Washington DC",
+                    "lat": None,
+                    "lon": None,
+                    "source": GeocodingProvider.GOOGLE,
+                }
+            ]
+            mocker.patch.object(client, "autocomplete", return_value=mock_response)
+
+            results = client.autocomplete_and_normalize("beth israel", "token123")
+
+            assert len(results) == 1
+            place = results[0]
+            assert place.id == "google:ChIJ123"
+            assert place.provider == GeocodingProvider.GOOGLE
+            assert place.name == "Beth Israel Synagogue, Washington DC"
+            assert place.display_address == ""
+            assert place.latitude is None
+            assert place.longitude is None
+            assert place.raw_data["place_id"] == "ChIJ123"
+
+        def it_handles_autocomplete_failure(client, mocker):
+            mocker.patch.object(client, "autocomplete", return_value=None)
+
+            results = client.autocomplete_and_normalize("test", "token123")
+
+            assert results is None
 
 
 def describe_osm_client():
@@ -174,7 +209,7 @@ def describe_osm_client():
             results = client.search_with_israel_fallback("tel aviv")
 
             assert results[0]["id"] == "123"
-            assert results[0]["source"] == "osm"
+            assert results[0]["source"] == GeocodingProvider.OSM
 
         def it_expands_israel_queries_to_include_palestine(client, mocker):
             mock_response = mocker.Mock()
@@ -204,6 +239,40 @@ def describe_osm_client():
 
             assert "Israel" in results[0]["display_name"]
             assert "Palestinian Territory" not in results[0]["display_name"]
+
+    def describe_search_and_normalize():
+        def it_normalizes_place_with_coordinates(client, mocker):
+            mock_response = [
+                {
+                    "place_id": "12345",
+                    "display_name": "Ohev Sholom Synagogue, Washington, DC",
+                    "lat": "38.9",
+                    "lon": "-77.0",
+                    "type": "place_of_worship",
+                    "class": "amenity",
+                    "extratags": {"religion": "jewish"},
+                }
+            ]
+            mocker.patch.object(client, "search_with_israel_fallback", return_value=mock_response)
+
+            results = client.search_and_normalize("ohev sholom")
+
+            assert len(results) == 1
+            place = results[0]
+            assert place.id == "osm:12345"
+            assert place.provider == GeocodingProvider.OSM
+            assert place.name == "Ohev Sholom Synagogue, Washington, DC"
+            assert place.display_address == ""
+            assert place.latitude == 38.9
+            assert place.longitude == -77.0
+            assert place.raw_data["place_id"] == "12345"
+
+        def it_handles_search_failure(client, mocker):
+            mocker.patch.object(client, "search_with_israel_fallback", return_value=None)
+
+            results = client.search_and_normalize("test")
+
+            assert results is None
 
 
 @pytest.mark.django_db
