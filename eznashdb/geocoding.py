@@ -11,6 +11,8 @@ from django.db.models import F
 from waffle import flag_is_active
 
 from app.models import GooglePlacesUsage, GooglePlacesUserUsage
+from eznashdb.enums import GeocodingProvider
+from eznashdb.place_search import NormalizedPlace
 
 
 class GooglePlacesClient:
@@ -53,7 +55,7 @@ class GooglePlacesClient:
                         "display_name": place_prediction.get("text", {}).get("text", ""),
                         "lat": None,
                         "lon": None,
-                        "source": "google",
+                        "source": GeocodingProvider.GOOGLE,
                     }
                 )
 
@@ -89,8 +91,37 @@ class GooglePlacesClient:
             "lat": location.get("latitude"),
             "lon": location.get("longitude"),
             "display_name": data.get("formattedAddress", ""),
-            "source": "google",
+            "source": GeocodingProvider.GOOGLE,
         }
+
+    def autocomplete_and_normalize(self, query: str, session_token: str) -> list[NormalizedPlace] | None:
+        """
+        Get autocomplete suggestions and normalize to NormalizedPlace format.
+        Returns list of NormalizedPlace objects, or None on failure.
+        """
+        results = self.autocomplete(query, session_token)
+        if results is None:
+            return None
+
+        normalized = []
+        for result in results:
+            place_id = result.get("place_id")
+            if not place_id:
+                continue
+
+            normalized.append(
+                NormalizedPlace(
+                    id=f"google:{place_id}",
+                    provider=GeocodingProvider.GOOGLE,
+                    name=result.get("display_name", ""),
+                    display_address="",  # Google autocomplete doesn't split name/address
+                    latitude=None,  # Autocomplete doesn't return coords
+                    longitude=None,
+                    raw_data=result,
+                )
+            )
+
+        return normalized
 
 
 class OSMClient:
@@ -169,12 +200,49 @@ class OSMClient:
 
         for result in results:
             result["id"] = result.get("place_id")
-            result["source"] = "osm"
+            result["source"] = GeocodingProvider.OSM
             # Replace Palestinian Territory with Israel in display names
             for israel, palestine in israel_palestine_pairs:
                 result["display_name"] = result.get("display_name", "").replace(palestine, israel)
 
         return results
+
+    def search_and_normalize(self, query: str) -> list[NormalizedPlace] | None:
+        """
+        Search and normalize to NormalizedPlace format.
+        Returns list of NormalizedPlace objects, or None on failure.
+        """
+        results = self.search_with_israel_fallback(query)
+        if results is None:
+            return None
+
+        normalized = []
+        for result in results:
+            place_id = result.get("place_id")
+            if not place_id:
+                continue
+
+            # Parse coordinates
+            lat = result.get("lat")
+            lon = result.get("lon")
+            if lat is not None:
+                lat = float(lat)
+            if lon is not None:
+                lon = float(lon)
+
+            normalized.append(
+                NormalizedPlace(
+                    id=f"osm:{place_id}",
+                    provider=GeocodingProvider.OSM,
+                    name=result.get("display_name", ""),
+                    display_address="",  # OSM combines everything in display_name
+                    latitude=lat,
+                    longitude=lon,
+                    raw_data=result,
+                )
+            )
+
+        return normalized
 
 
 class GooglePlacesBudgetChecker:

@@ -1,6 +1,15 @@
+from enum import Enum
+
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+
+
+class GeocodingProvider(str, Enum):
+    """Provider for geocoding/place search services."""
+
+    GOOGLE = "google"
+    OSM = "osm"
 
 
 class DisplayChoicesMixin:
