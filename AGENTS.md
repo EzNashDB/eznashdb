@@ -24,6 +24,8 @@ Two metrics tracked:
 ### Testing
 - **TDD approach**: Prefer using Test-Driven Development when it makes sense - write tests first to drive design and implementation
 - **Tool**: pytest with pytest-describe for test organization
+- **Mocking**: Use pytest-mock's `mocker` fixture instead of `unittest.mock`
+- **Request factory**: Use pytest-django's `rf` fixture instead of creating `RequestFactory()` instances
 - **Quality over quantity**: Aggressively remove redundant tests - each test should verify unique behavior
 - **Naming**: Test names must accurately describe what they test, not what you wish they tested
 - **Simplicity**: Prefer inline setup over fixtures unless the abstraction adds clear value

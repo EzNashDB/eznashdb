@@ -1,47 +1,50 @@
-import urllib
+from datetime import date
 
-import pytest
-import requests
-from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
+from waffle.testutils import override_flag
 
-DUMMY_OSM_RECORD = {"name": "osm response", "place_id": 1}
+from app.models import GooglePlacesUsage, GooglePlacesUserUsage
 
-
-@pytest.fixture
-def mock_osm(mocker):
-    def _mock_osm(response_data, status_code=200):
-        original_get = requests.get
-
-        def side_effect(*args, **kwargs):
-            url = kwargs.get("url") or args[0]
-            if (settings.NOMINATIM_DOMAIN in url) or (settings.MAPS_CO_DOMAIN in url):
-                mock_response = mocker.Mock()
-                mock_response.json.return_value = response_data
-                mock_response.status_code = status_code
-                return mock_response
-            else:
-                return original_get(*args, **kwargs)
-
-        return mocker.patch("requests.get", side_effect=side_effect)
-
-    return _mock_osm
+DUMMY_OSM_RECORD = {"name": "osm response", "place_id": 1, "id": 1, "source": "osm"}
 
 
-def test_returns_osm_response(client, mock_osm):
-    osm_response = [DUMMY_OSM_RECORD]
-    mock_osm(osm_response)
+def test_requires_login(client):
+    """Address lookup requires login now."""
+    url = reverse("eznashdb:address_lookup")
+    query_params = {"q": "city name"}
+    response = client.get(url, data=query_params)
+
+    # Should redirect to login
+    assert response.status_code == 302
+
+
+def test_returns_osm_response_when_logged_in(client, mocker, test_user):
+    client.force_login(test_user)
+
+    # Mock OSMClient
+    mock_client = mocker.patch("eznashdb.views.OSMClient")
+    mock_instance = mock_client.return_value
+    mock_instance.search_with_israel_fallback.return_value = [DUMMY_OSM_RECORD]
+
     url = reverse("eznashdb:address_lookup")
     query_params = {"q": "city name"}
     response = client.get(url, data=query_params)
 
     assert response.status_code == 200
-    assert response.json() == osm_response
+    results = response.json()
+    assert len(results) == 1
+    assert results[0]["source"] == "osm"
 
 
-def test_returns_error_on_500(client, mock_osm):
-    osm_response = "ERROR"
-    mock_osm(osm_response, 500)
+def test_returns_500_when_osm_fails(client, mocker, test_user):
+    client.force_login(test_user)
+
+    # Mock OSMClient to return None (failure)
+    mock_client = mocker.patch("eznashdb.views.OSMClient")
+    mock_instance = mock_client.return_value
+    mock_instance.search_with_israel_fallback.return_value = None
+
     url = reverse("eznashdb:address_lookup")
     query_params = {"q": "city name"}
     response = client.get(url, data=query_params)
@@ -50,58 +53,103 @@ def test_returns_error_on_500(client, mock_osm):
     assert "failed" in str(response.json()).lower()
 
 
-def describe_israel_searches():
-    @pytest.mark.parametrize(
-        ("query", "expected_israel_term", "expected_palestine_term"),
-        [
-            ("Jerusalem, Israel", "israel", "palestinian territory"),
-            ("ירושלים, ישראל", "ישראל", "palestinian territory"),
-            ("Tel Aviv, IL", "il", "ps"),
-        ],
-    )
-    def includes_palestine_in_israel_searches(
-        client, mock_osm, query, expected_israel_term, expected_palestine_term
-    ):
-        osm_response = [DUMMY_OSM_RECORD]
-        mocked_get = mock_osm(osm_response)
-        url = reverse("eznashdb:address_lookup")
-        response = client.get(url, {"q": query})
+def describe_google_places_integration():
+    @override_flag("google_places_api", active=False)
+    def uses_osm_when_flag_disabled(client, test_user, mocker):
+        client.force_login(test_user)
 
-        assert len(mocked_get.call_args_list) == 2
-        call_urls = [args[0][0] for args in mocked_get.call_args_list]
-        assert urllib.parse.quote_plus(expected_israel_term) in call_urls[0]
-        assert urllib.parse.quote_plus(expected_palestine_term) in call_urls[1]
+        # Mock OSMClient
+        mock_osm_client = mocker.patch("eznashdb.views.OSMClient")
+        mock_osm_instance = mock_osm_client.return_value
+        mock_osm_instance.search_with_israel_fallback.return_value = [DUMMY_OSM_RECORD]
+
+        url = reverse("eznashdb:address_lookup")
+        response = client.get(url, {"q": "test"})
+
         assert response.status_code == 200
-        assert response.json() == osm_response * 2
+        results = response.json()
+        assert len(results) == 1
+        assert results[0]["source"] == "osm"
 
-    @pytest.mark.parametrize(
-        ("display_name", "israel", "palestine"),
-        [
-            (
-                "מעלה שומרון, קרני שומרון, שטח C, יהודה ושומרון, الأراضي الفلسطينية",
-                "ישראל",
-                "الأراضي الفلسطينية",
-            ),
-            (
-                "Maale Shomron, Karney Shomron, Area C, Judea and Samaria, Palestinian Territory",
-                "Israel",
-                "Palestinian Territory",
-            ),
-        ],
-    )
-    def returns_israel_for_palestine(client, mock_osm, display_name, israel, palestine):
-        DUMMY_OSM_RECORD = {
-            "name": "osm response",
-            "place_id": 1,
-            "display_name": display_name,
-        }
+    @override_flag("google_places_api", active=True)
+    @override_settings(GOOGLE_PLACES_API_KEY="test-key")
+    def uses_google_when_flag_enabled(client, test_user, mocker):
+        client.force_login(test_user)
 
-        osm_response = [DUMMY_OSM_RECORD]
-        mock_osm(osm_response)
+        # Mock GooglePlacesClient
+        mock_google_client = mocker.patch("eznashdb.views.GooglePlacesClient")
+        mock_google_instance = mock_google_client.return_value
+        mock_google_instance.autocomplete.return_value = [
+            {
+                "id": "ChIJ123",
+                "place_id": "ChIJ123",
+                "display_name": "Young Israel of Hollywood",
+                "lat": None,
+                "lon": None,
+                "source": "google",
+            }
+        ]
+
         url = reverse("eznashdb:address_lookup")
-        query_params = {"q": "something"}
-        response = client.get(url, data=query_params)
+        response = client.get(url, {"q": "young israel", "session_token": "test-token"})
 
-        response_record = response.json()[0]
-        assert israel in response_record["display_name"]
-        assert palestine not in response_record["display_name"]
+        assert response.status_code == 200
+        results = response.json()
+        assert len(results) == 1
+        assert results[0]["source"] == "google"
+        assert results[0]["place_id"] == "ChIJ123"
+        assert results[0]["display_name"] == "Young Israel of Hollywood"
+
+        # Check usage was tracked
+        usage = GooglePlacesUsage.objects.get(date=date.today())
+        assert usage.autocomplete_requests == 1
+
+        user_usage = GooglePlacesUserUsage.objects.get(user=test_user, date=date.today())
+        assert user_usage.autocomplete_requests == 1
+
+    @override_flag("google_places_api", active=True)
+    @override_settings(GOOGLE_PLACES_API_KEY="test-key")
+    def falls_back_to_osm_when_daily_limit_reached(client, test_user, mocker):
+        client.force_login(test_user)
+
+        # Create usage that definitely exceeds monthly quota
+        GooglePlacesUsage.objects.create(
+            date=date.today(),
+            autocomplete_requests=10001,
+            details_requests=0,
+        )
+
+        # Mock OSMClient
+        mock_osm_client = mocker.patch("eznashdb.views.OSMClient")
+        mock_osm_instance = mock_osm_client.return_value
+        mock_osm_instance.search_with_israel_fallback.return_value = [DUMMY_OSM_RECORD]
+
+        url = reverse("eznashdb:address_lookup")
+        response = client.get(url, {"q": "test"})
+
+        assert response.status_code == 200
+        results = response.json()
+        assert results[0]["source"] == "osm"
+
+    @override_flag("google_places_api", active=True)
+    @override_settings(
+        GOOGLE_PLACES_API_KEY="test-key",
+        GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT=5,
+    )
+    def falls_back_to_osm_when_user_limit_reached(client, test_user, mocker):
+        client.force_login(test_user)
+
+        # Create existing usage at limit
+        GooglePlacesUserUsage.objects.create(user=test_user, date=date.today(), autocomplete_requests=5)
+
+        # Mock OSMClient
+        mock_osm_client = mocker.patch("eznashdb.views.OSMClient")
+        mock_osm_instance = mock_osm_client.return_value
+        mock_osm_instance.search_with_israel_fallback.return_value = [DUMMY_OSM_RECORD]
+
+        url = reverse("eznashdb:address_lookup")
+        response = client.get(url, {"q": "test"})
+
+        assert response.status_code == 200
+        results = response.json()
+        assert results[0]["source"] == "osm"

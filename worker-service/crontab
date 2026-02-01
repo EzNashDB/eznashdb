@@ -3,3 +3,4 @@ SHELL=/bin/bash
 
 0 11 * * * cd /django && python manage.py backup_db >> /var/log/cron.log 2>&1
 0 8 * * 1 cd /django && python manage.py send_weekly_summary >> /var/log/cron.log 2>&1
+0 3 1 * * cd /django && python manage.py cleanup_google_places_usage_records >> /var/log/cron.log 2>&1
