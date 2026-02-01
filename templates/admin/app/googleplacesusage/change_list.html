@@ -1,0 +1,42 @@
+{% extends "admin/change_list.html" %}
+
+{% block result_list %}
+    {% if monthly_summary %}
+        <div class="module" style="margin-bottom: 20px;">
+            <h2>Current Month Summary</h2>
+            <div style="display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                        padding: 10px">
+                <div>
+                    <h3>Monthly Usage</h3>
+                    <p>
+                        <strong>Autocomplete:</strong> {{ monthly_summary.autocomplete_requests|default:0 }} / {{ monthly_summary.autocomplete_limit }}
+                    </p>
+                    <p>
+                        <strong>Details:</strong> {{ monthly_summary.details_requests|default:0 }} / {{ monthly_summary.details_limit }}
+                    </p>
+                    <p>
+                        <strong>Total Cost:</strong> ${{ monthly_summary.total_cost|floatformat:2 }}
+                    </p>
+                </div>
+                <div>
+                    <h3>Today's Budget</h3>
+                    <p>
+                        <strong>Autocomplete Budget:</strong> {{ monthly_summary.today_autocomplete_budget }}
+                    </p>
+                    <p>
+                        <strong>Autocomplete Used:</strong> {{ monthly_summary.today_autocomplete }}
+                    </p>
+                    <p>
+                        <strong>Details Budget:</strong> {{ monthly_summary.today_details_budget }}
+                    </p>
+                    <p>
+                        <strong>Details Used:</strong> {{ monthly_summary.today_details }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

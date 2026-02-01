@@ -8,8 +8,10 @@ import {
 import { Form, InputGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 import { hasHebrew } from "../utils/text";
+import { v4 as uuidv4 } from "uuid";
 
 const SEARCH_URL = "/address-lookup";
+const DETAILS_URL = "/address-lookup/details";
 
 export const AddressTypeAhead = ({
   inputValue,
@@ -23,6 +25,7 @@ export const AddressTypeAhead = ({
   const [debouncedSearchQuery] = useDebounce(searchQuery, 1000);
   const [isSearchError, setIsSearchError] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [sessionToken, setSessionToken] = useState(() => uuidv4());
   const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -31,7 +34,9 @@ export const AddressTypeAhead = ({
   useEffect(() => {
     if (!debouncedSearchQuery) return;
     setIsLoading(true);
-    fetch(`${SEARCH_URL}?q=${debouncedSearchQuery}`)
+    fetch(
+      `${SEARCH_URL}?q=${debouncedSearchQuery}&session_token=${sessionToken}`
+    )
       .then((resp) => resp.json())
       .then((items) => {
         if (items.error) {
@@ -49,12 +54,40 @@ export const AddressTypeAhead = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, sessionToken]);
 
   const handleChange = (selected) => {
     const option = selected[0];
     if (option) {
-      onAddressSelected(option);
+      // If this is a Google Places result, fetch details first
+      if (option.source === "google") {
+        setIsLoading(true);
+        fetch(
+          `${DETAILS_URL}?place_id=${option.place_id}&session_token=${sessionToken}`
+        )
+          .then((resp) => resp.json())
+          .then((details) => {
+            if (details.error) {
+              throw new Error(details.error);
+            }
+            // Pass the enriched option with coordinates
+            onAddressSelected(details);
+            // Reset session token after successful selection
+            setSessionToken(uuidv4());
+          })
+          .catch((error) => {
+            console.error("Error fetching place details:", error);
+            setIsSearchError(true);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      } else {
+        // OSM result already has coordinates
+        onAddressSelected(option);
+        // Reset session token for next search
+        setSessionToken(uuidv4());
+      }
     }
   };
 

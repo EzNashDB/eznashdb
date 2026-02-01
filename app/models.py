@@ -1,6 +1,9 @@
 """Infrastructure models for the app."""
 
+from calendar import monthrange
+from datetime import date as date_type
 from datetime import timedelta
+from typing import NamedTuple
 
 import sentry_sdk
 from django.conf import settings
@@ -13,6 +16,13 @@ from app.abuse_config import (
     POINTS_DECAY_HOURS,
     SENSITIVE_CAP_PER_EPISODE,
 )
+
+
+class GooglePlacesCount(NamedTuple):
+    """Count of Google Places API requests (autocomplete and details)."""
+
+    autocomplete: int
+    details: int
 
 
 class AbuseState(models.Model):
@@ -165,3 +175,85 @@ class AbuseAppeal(models.Model):
 
     def __str__(self):
         return f"Appeal from {self.abuse_state.user.email} - {self.status}"
+
+
+class GooglePlacesUsage(models.Model):
+    """Global daily usage tracking for Google Places API."""
+
+    # Monthly hard caps (never exceed these)
+    MONTHLY_AUTOCOMPLETE_LIMIT = 10000
+    MONTHLY_DETAILS_LIMIT = 10000
+
+    date = models.DateField(unique=True, db_index=True)
+    autocomplete_requests = models.PositiveIntegerField(default=0)
+    details_requests = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Google Places Usage"
+        verbose_name_plural = "Google Places Usage"
+
+    def __str__(self):
+        return f"{self.date}: {self.autocomplete_requests} autocomplete, {self.details_requests} details"
+
+    @classmethod
+    def get_monthly_usage_before_date(cls, target_date: date_type) -> GooglePlacesCount:
+        """Get total autocomplete and details requests before target_date (not including it)."""
+        first_day = date_type(target_date.year, target_date.month, 1)
+        monthly_records = cls.objects.filter(date__gte=first_day, date__lt=target_date)
+        autocomplete = sum(r.autocomplete_requests for r in monthly_records)
+        details = sum(r.details_requests for r in monthly_records)
+        return GooglePlacesCount(autocomplete, details)
+
+    @classmethod
+    def get_usage_for_date(cls, target_date: date_type) -> GooglePlacesCount:
+        """Get autocomplete and details requests for a specific date."""
+        record = cls.objects.filter(date=target_date).first()
+        if not record:
+            return GooglePlacesCount(0, 0)
+        return GooglePlacesCount(record.autocomplete_requests, record.details_requests)
+
+    @classmethod
+    def get_daily_budget(cls, target_date: date_type) -> GooglePlacesCount:
+        """
+        Calculate daily budget for target_date based on usage from previous days.
+        Returns GooglePlacesCount with autocomplete and details budgets.
+        """
+        # Get usage before this date (not including it)
+        usage = cls.get_monthly_usage_before_date(target_date)
+
+        # Calculate remaining quota
+        autocomplete_remaining = cls.MONTHLY_AUTOCOMPLETE_LIMIT - usage.autocomplete
+        details_remaining = cls.MONTHLY_DETAILS_LIMIT - usage.details
+
+        # Calculate days remaining in month (including target_date)
+        _, days_in_month = monthrange(target_date.year, target_date.month)
+        days_remaining = days_in_month - target_date.day + 1
+
+        # Spread remaining quota over remaining days
+        autocomplete_budget = max(0, autocomplete_remaining // days_remaining)
+        details_budget = max(0, details_remaining // days_remaining)
+
+        return GooglePlacesCount(autocomplete_budget, details_budget)
+
+
+class GooglePlacesUserUsage(models.Model):
+    """
+    Per-user daily usage tracking for Google Places API (abuse prevention).
+
+    Note: Only tracks autocomplete requests, not details requests. This is intentional
+    because details requests can only be made after selecting an autocomplete result,
+    so limiting autocomplete inherently limits details. Tracking autocomplete is
+    sufficient for preventing abuse (e.g., users spamming the search box).
+    """
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date = models.DateField(db_index=True)
+    autocomplete_requests = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ["user", "date"]
+        verbose_name = "Google Places User Usage"
+        verbose_name_plural = "Google Places User Usage"
+
+    def __str__(self):
+        return f"{self.user.email} on {self.date}: {self.autocomplete_requests} requests"

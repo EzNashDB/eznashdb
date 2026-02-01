@@ -1,11 +1,7 @@
 import math
-import time
-import urllib
 from collections import defaultdict
 from decimal import Decimal
-from json.decoder import JSONDecodeError
 
-import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,6 +20,7 @@ from app.mixins import AbusePreventionMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.forms import RoomFormSet, ShulDeleteForm, ShulForm
+from eznashdb.geocoding import GooglePlacesBudgetChecker, GooglePlacesClient, OSMClient
 from eznashdb.models import Shul
 
 
@@ -312,61 +309,57 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
                 return formset_class(prefix=prefix, instance=None)
 
 
-class AddressLookupView(View):
-    def get_OSM_response(self, q):
-        OSM_param_dict = {
-            "format": "json",
-            "addressdetails": 1,
-            "namedetails": 1,
-            "q": q,
-            "api_key": settings.MAPS_CO_API_KEY,
-        }
-        OSM_params = urllib.parse.urlencode(OSM_param_dict)
-        OSM_url = settings.BASE_OSM_URL + "?" + OSM_params
-        response = requests.get(OSM_url)
-        try:
-            if type(response.json()) is not list:
-                response.status_code = 500
-        except JSONDecodeError:
-            response.status_code = 500
-        return response
+class AddressLookupView(LoginRequiredMixin, View):
+    """
+    Address autocomplete lookup with Google Places API (when enabled) and OSM fallback.
+    """
 
     def get(self, request):
         query = request.GET.get("q", "").lower()
-        OSM_response = self.get_OSM_response(query)
-        if OSM_response.status_code != 200:
+        session_token = request.GET.get("session_token", "")
+
+        budget_checker = GooglePlacesBudgetChecker()
+
+        # Try Google Places if enabled and within budget
+        if budget_checker.can_use(request, request.user):
+            client = GooglePlacesClient(settings.GOOGLE_PLACES_API_KEY)
+            results = client.autocomplete(query, session_token)
+            if results is not None:
+                budget_checker.increment_autocomplete(request.user)
+                return JsonResponse(results, safe=False)
+
+        # Fallback to OSM
+        client = OSMClient(settings.BASE_OSM_URL, settings.MAPS_CO_API_KEY)
+        results = client.search_with_israel_fallback(query)
+        if results is None:
             return JsonResponse({"error": "Failed to retrieve city data"}, status=500)
-        results = OSM_response.json().copy()
+        return JsonResponse(results, safe=False)
 
-        modified_query = query
-        for israel, palestine in [
-            ("il", "ps"),
-            ("israel", "palestinian territory"),
-            ("ישראל", "palestinian territory"),
-        ]:
-            if israel in query:
-                modified_query = modified_query.replace(israel, palestine)
-        if modified_query != query:
-            # Sleep to avoid too many requests error
-            time.sleep(1)
-            response_2 = self.get_OSM_response(modified_query)
-            # Leave JSONDecodeError unhandled at this point. Users will get results from first query
-            # and errors will get logged
-            results.extend(response_2.json().copy())
-        if OSM_response.status_code == 200:
-            return JsonResponse(self.format_results(results), safe=False)
 
-    def format_results(self, results):
-        israel_palestine_pairs = [
-            ("ישראל", "الأراضي الفلسطينية"),
-            ("Israel", "Palestinian Territory"),
-        ]
+class AddressLookupDetailsView(LoginRequiredMixin, View):
+    """
+    Fetch place details (including coordinates) from Google Places API.
+    Called when user selects a Google Places autocomplete suggestion.
+    """
 
-        for result in results:
-            result["id"] = result.get("place_id")
-            for israel, palestine in israel_palestine_pairs:
-                result["display_name"] = result.get("display_name", "").replace(palestine, israel)
-        return results
+    def get(self, request):
+        place_id = request.GET.get("place_id", "")
+        session_token = request.GET.get("session_token", "")
+
+        if not place_id:
+            return JsonResponse({"error": "Missing place_id parameter"}, status=400)
+
+        if not settings.GOOGLE_PLACES_API_KEY:
+            return JsonResponse({"error": "Google Places API not configured"}, status=500)
+
+        client = GooglePlacesClient(settings.GOOGLE_PLACES_API_KEY)
+        result = client.get_details(place_id, session_token)
+
+        if result is None:
+            return JsonResponse({"error": "Failed to fetch place details"}, status=500)
+
+        GooglePlacesBudgetChecker().increment_details()
+        return JsonResponse(result)
 
 
 class GoogleMapsProxyView(AbusePreventionMixin, LoginRequiredMixin, View):
