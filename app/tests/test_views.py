@@ -1,6 +1,12 @@
+import json
 from unittest.mock import Mock
 
+from django.contrib.auth import get_user_model
+
 from app.views import RestoreDBView
+from eznashdb.views import AddressLookupView
+
+User = get_user_model()
 
 
 def describe_list_available_backups():
@@ -58,3 +64,53 @@ def describe_list_available_backups():
         backups = view.list_available_backups()
 
         assert backups[0]["display_date"] == "December 14, 2024 at 02:00 PM"
+
+
+def describe_address_lookup_view():
+    def returns_results_and_google_available_flag_when_google_available(mocker, rf, django_user_model):
+        # Mock the budget checker to allow Google
+        mock_checker = mocker.patch("eznashdb.views.GooglePlacesBudgetChecker")
+        mock_checker.return_value.can_use.return_value = True
+
+        # Mock the merger to return some results
+        mock_merger = mocker.patch("eznashdb.views.PlaceSearchMerger")
+        mock_place = Mock()
+        mock_place.as_dict.return_value = {"display_name": "Test Place"}
+        mock_merger.return_value.search.return_value = [mock_place]
+
+        user = django_user_model.objects.create_user(username="testuser", email="test@example.com")
+        request = rf.get("/address-lookup", {"q": "test", "session_token": "token123"})
+        request.user = user
+
+        view = AddressLookupView()
+        response = view.get(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert "results" in data
+        assert "google_available" in data
+        assert data["google_available"] is True
+        assert len(data["results"]) == 1
+        assert data["results"][0]["display_name"] == "Test Place"
+
+    def returns_google_available_false_when_budget_exceeded(mocker, rf, django_user_model):
+        # Mock the budget checker to deny Google
+        mock_checker = mocker.patch("eznashdb.views.GooglePlacesBudgetChecker")
+        mock_checker.return_value.can_use.return_value = False
+
+        # Mock the merger to return OSM results only
+        mock_merger = mocker.patch("eznashdb.views.PlaceSearchMerger")
+        mock_place = Mock()
+        mock_place.as_dict.return_value = {"display_name": "OSM Place"}
+        mock_merger.return_value.search.return_value = [mock_place]
+
+        user = django_user_model.objects.create_user(username="testuser", email="test@example.com")
+        request = rf.get("/address-lookup", {"q": "test", "session_token": "token123"})
+        request.user = user
+
+        view = AddressLookupView()
+        response = view.get(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert data["google_available"] is False

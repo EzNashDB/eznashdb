@@ -337,7 +337,7 @@ class AddressLookupView(LoginRequiredMixin, View):
         # Convert NormalizedPlace objects to JSON format
         results = [place.as_dict() for place in normalized_results]
 
-        return JsonResponse(results, safe=False)
+        return JsonResponse({"results": results, "google_available": use_google}, safe=False)
 
 
 class AddressLookupDetailsView(LoginRequiredMixin, View):
