@@ -9,6 +9,7 @@ import { Form, InputGroup } from "react-bootstrap";
 import { useDebounce } from "use-debounce";
 import { hasHebrew } from "../utils/text";
 import { v4 as uuidv4 } from "uuid";
+import { LimitedResultsModal } from "./LimitedResultsModal";
 
 const SEARCH_URL = "/address-lookup";
 const DETAILS_URL = "/address-lookup/details";
@@ -26,6 +27,8 @@ export const AddressTypeAhead = ({
   const [isSearchError, setIsSearchError] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [sessionToken, setSessionToken] = useState(() => uuidv4());
+  const [googleAvailable, setGoogleAvailable] = useState(true);
+  const [showLimitedResultsModal, setShowLimitedResultsModal] = useState(false);
   const inputIsHebrew = hasHebrew(inputValue.display_name);
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -38,11 +41,20 @@ export const AddressTypeAhead = ({
       `${SEARCH_URL}?q=${debouncedSearchQuery}&session_token=${sessionToken}`
     )
       .then((resp) => resp.json())
-      .then((items) => {
-        if (items.error) {
-          throw new Error(items.error);
+      .then((data) => {
+        if (data.error) {
+          throw new Error(data.error);
         }
-        setOptions(items);
+        // Handle both old format (array) and new format (object with results)
+        if (Array.isArray(data)) {
+          // Old format: API returned array directly
+          setOptions(data);
+          setGoogleAvailable(true);
+        } else {
+          // New format: API returned object with results and google_available
+          setOptions(Array.isArray(data.results) ? data.results : []);
+          setGoogleAvailable(data.google_available ?? true);
+        }
         setHasSearched(true);
       })
       .catch((error) => {
@@ -127,70 +139,92 @@ export const AddressTypeAhead = ({
   };
 
   return (
-    <AsyncTypeahead
-      selected={[inputValue]}
-      className="w-100 position-relative shadow-sm"
-      filterBy={filterBy}
-      id="address-select"
-      isLoading={isLoading}
-      labelKey="display_name"
-      minLength={3}
-      onSearch={handleSearch}
-      onChange={handleChange}
-      useCache={false}
-      options={options}
-      onInputChange={handleInputChange}
-      placeholder="Search..."
-      promptText={getPromptText()}
-      inputProps={{
-        name: "address",
-        className: `${!isValid && "is-invalid"}`,
-        autoComplete: "one-time-code",
-        dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
-        lang: `${inputIsHebrew ? "he" : "en"}`,
-      }}
-      renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
-        <Hint>
-          <InputGroup>
-            <InputGroup.Text>
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </InputGroup.Text>
-            <Form.Control
-              {...inputProps}
-              ref={(node) => {
-                inputRef(node);
-                referenceElementRef(node);
-              }}
-            />
-          </InputGroup>
-        </Hint>
-      )}
-      renderMenu={(results, menuProps) => {
-        const {
-          newSelectionPrefix,
-          paginationText,
-          renderMenuItemChildren,
-          ..._menuProps
-        } = menuProps;
-        return (
-          <Menu {..._menuProps} className="shadow-lg">
-            {results.map((result, index) => {
-              const isHebrew = hasHebrew(result.display_name);
-              return (
-                <MenuItem
-                  option={result}
-                  position={index}
-                  key={index}
-                  dir={isHebrew ? "rtl" : "ltr"}
-                  lang={isHebrew ? "he" : "en"}
-                >
-                  <span className="text-wrap">{result.display_name}</span>
-                </MenuItem>
-              );
-            })}
-          </Menu>
-        );
-      }}
-    />
+    <>
+      <LimitedResultsModal
+        show={showLimitedResultsModal}
+        onHide={() => setShowLimitedResultsModal(false)}
+      />
+      <AsyncTypeahead
+        selected={[inputValue]}
+        className="w-100 position-relative shadow-sm"
+        filterBy={filterBy}
+        id="address-select"
+        isLoading={isLoading}
+        labelKey="display_name"
+        minLength={3}
+        onSearch={handleSearch}
+        onChange={handleChange}
+        useCache={false}
+        options={options}
+        onInputChange={handleInputChange}
+        placeholder="Search..."
+        promptText={getPromptText()}
+        inputProps={{
+          name: "address",
+          className: `${!isValid && "is-invalid"}`,
+          autoComplete: "one-time-code",
+          dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
+          lang: `${inputIsHebrew ? "he" : "en"}`,
+        }}
+        renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
+          <Hint>
+            <InputGroup>
+              <InputGroup.Text>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </InputGroup.Text>
+              <Form.Control
+                {...inputProps}
+                ref={(node) => {
+                  inputRef(node);
+                  referenceElementRef(node);
+                }}
+              />
+            </InputGroup>
+          </Hint>
+        )}
+        renderMenu={(results, menuProps) => {
+          const {
+            newSelectionPrefix,
+            paginationText,
+            renderMenuItemChildren,
+            ..._menuProps
+          } = menuProps;
+          return (
+            <Menu {..._menuProps} className="shadow-lg">
+              {!googleAvailable && results.length > 0 && (
+                <div className="px-3 pb-2 border-bottom">
+                  <small className="text-muted">
+                    Some results temporarily unavailable.{" "}
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowLimitedResultsModal(true);
+                      }}
+                    >
+                      Why?
+                    </a>
+                  </small>
+                </div>
+              )}
+              {results.map((result, index) => {
+                const isHebrew = hasHebrew(result.display_name);
+                return (
+                  <MenuItem
+                    option={result}
+                    position={index}
+                    key={index}
+                    dir={isHebrew ? "rtl" : "ltr"}
+                    lang={isHebrew ? "he" : "en"}
+                  >
+                    <span className="text-wrap">{result.display_name}</span>
+                  </MenuItem>
+                );
+              })}
+            </Menu>
+          );
+        }}
+      />
+    </>
   );
 };

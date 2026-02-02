@@ -43,7 +43,7 @@ def test_returns_results_when_logged_in(client, mocker, test_user):
     response = client.get(url, data=query_params)
 
     assert response.status_code == 200
-    results = response.json()
+    results = response.json().get("results")
     assert len(results) == 1
     assert results[0]["source"] == GeocodingProvider.OSM
 
@@ -61,7 +61,7 @@ def test_returns_empty_list_when_search_returns_no_results(client, mocker, test_
     response = client.get(url, data=query_params)
 
     assert response.status_code == 200
-    results = response.json()
+    results = response.json().get("results")
     assert len(results) == 0
 
 
@@ -90,7 +90,7 @@ def describe_google_places_integration():
         response = client.get(url, {"q": "young israel", "session_token": "test-token"})
 
         assert response.status_code == 200
-        results = response.json()
+        results = response.json().get("results")
         assert len(results) == 1
         assert results[0]["source"] == GeocodingProvider.GOOGLE
         assert results[0]["place_id"] == "ChIJ123"
