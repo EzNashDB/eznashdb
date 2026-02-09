@@ -173,7 +173,6 @@ class OSMClient:
         # Create modified query with Palestine instead of Israel
         modified_query = query
         for israel, palestine in [
-            ("il", "ps"),
             ("israel", "palestinian territory"),
             ("ישראל", "palestinian territory"),
         ]:
