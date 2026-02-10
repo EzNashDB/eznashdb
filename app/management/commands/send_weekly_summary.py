@@ -6,11 +6,11 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from app.models import AbuseState
+from app.models import AbuseState, GooglePlacesUsage, GooglePlacesUserUsage
 from eznashdb.models import Shul
 
 User = get_user_model()
@@ -55,6 +55,20 @@ class AbuseStateData:
     is_permanently_banned: bool
 
 
+@dataclass
+class GooglePlacesUsageData:
+    weekly_autocomplete: int
+    weekly_details: int
+    monthly_autocomplete: int
+    monthly_details: int
+    monthly_autocomplete_limit: int
+    monthly_details_limit: int
+    autocomplete_percent_used: int
+    details_percent_used: int
+    user_limit_hits: int  # times a user hit their daily limit this week
+    monthly_user_limit_hits: int  # times a user hit their daily limit this month
+
+
 class Command(BaseCommand):
     help = "Send weekly summary email of shul changes to superusers"
 
@@ -77,12 +91,19 @@ class Command(BaseCommand):
 
         updated_shuls, deleted_shuls = self._get_shul_changes(days)
         abuse_states = self._get_abuse_states(days)
+        google_places_usage = self._get_google_places_usage(days)
 
-        if not updated_shuls and not deleted_shuls and not abuse_states:
+        # Skip email if no changes across all metrics
+        has_google_usage = (
+            google_places_usage.weekly_autocomplete > 0 or google_places_usage.weekly_details > 0
+        )
+        if not updated_shuls and not deleted_shuls and not abuse_states and not has_google_usage:
             self._log_no_changes()
             return
 
-        template_context = self._prepare_template_context(updated_shuls, deleted_shuls, abuse_states)
+        template_context = self._prepare_template_context(
+            updated_shuls, deleted_shuls, abuse_states, google_places_usage, days
+        )
         html_body = render_to_string("email/weekly_summary.html", template_context)
 
         if html_only:
@@ -120,13 +141,59 @@ class Command(BaseCommand):
             .order_by("-last_violation_at")
         )
 
-    def _prepare_template_context(self, updated_shuls, deleted_shuls, abuse_states):
+    def _get_google_places_usage(self, days):
+        """Get Google Places API usage metrics."""
+        cutoff = self._get_cutoff(days)
+        now = timezone.now()
+        first_day_of_month = now.date().replace(day=1)
+
+        def get_totals(cutoff_date):
+            result = GooglePlacesUsage.objects.filter(date__gte=cutoff_date).aggregate(
+                autocomplete=Sum("autocomplete_requests", default=0),
+                details=Sum("details_requests", default=0),
+            )
+            return result["autocomplete"], result["details"]
+
+        def percent_used(used, limit):
+            return int((used / limit) * 100) if limit > 0 and used else 0
+
+        def get_user_limit_hits(cutoff_date):
+            return GooglePlacesUserUsage.objects.filter(
+                autocomplete_requests__gte=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+                date__gte=cutoff_date,
+            ).count()
+
+        weekly_autocomplete, weekly_details = get_totals(cutoff.date())
+        monthly_autocomplete, monthly_details = get_totals(first_day_of_month)
+        user_limit_hits = get_user_limit_hits(cutoff.date())
+        monthly_user_limit_hits = get_user_limit_hits(first_day_of_month)
+
+        return GooglePlacesUsageData(
+            weekly_autocomplete=weekly_autocomplete,
+            weekly_details=weekly_details,
+            monthly_autocomplete=monthly_autocomplete,
+            monthly_details=monthly_details,
+            monthly_autocomplete_limit=GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT,
+            monthly_details_limit=GooglePlacesUsage.MONTHLY_DETAILS_LIMIT,
+            autocomplete_percent_used=percent_used(
+                monthly_autocomplete, GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT
+            ),
+            details_percent_used=percent_used(monthly_details, GooglePlacesUsage.MONTHLY_DETAILS_LIMIT),
+            user_limit_hits=user_limit_hits,
+            monthly_user_limit_hits=monthly_user_limit_hits,
+        )
+
+    def _prepare_template_context(
+        self, updated_shuls, deleted_shuls, abuse_states, google_places_usage, days
+    ):
         """Prepare context data for email template."""
         return {
             "shuls": [self._prepare_shul_data(shul) for shul in updated_shuls],
             "deleted_shuls": [self._prepare_deleted_shul_data(shul) for shul in deleted_shuls],
             "deleted_shuls_admin_url": self._build_deletedshul_admin_url(),
             "abuse_states": [self._prepare_abuse_state_data(state) for state in abuse_states],
+            "google_places_usage": google_places_usage,
+            "days": days,
         }
 
     def _build_deletedshul_admin_url(self):
@@ -137,7 +204,10 @@ class Command(BaseCommand):
     def _log_no_changes(self):
         """Log when no changes found."""
         self.stdout.write(
-            self.style.SUCCESS("No shuls updated or deleted in the last week. Skipping email.")
+            self.style.SUCCESS(
+                "No changes detected (shuls, deletions, abuse states, or Google Places usage). "
+                "Skipping email."
+            )
         )
 
     def _send_email(self, html_body, updated_count, deleted_count, abuse_count):

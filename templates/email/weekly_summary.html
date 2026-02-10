@@ -17,6 +17,39 @@
                 &nbsp;|&nbsp; <strong style="color: #856404;">{{ abuse_states|length }}</strong> abuse state(s)
             {% endif %}
         </div>
+        {% if google_places_usage %}
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">Google Places API Usage</h3>
+            <table style="border-collapse: collapse; width: 100%; margin-bottom: 25px;">
+                <thead>
+                    <tr style="background: #e7f3ff;">
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;"></th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Autocomplete</th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Details</th>
+                        <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">User limit hits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">Past {{ days }} days</td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">{{ google_places_usage.weekly_autocomplete }}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">{{ google_places_usage.weekly_details }}</td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">{{ google_places_usage.user_limit_hits }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">Month to date</td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">
+                            {{ google_places_usage.monthly_autocomplete }}/{{ google_places_usage.monthly_autocomplete_limit }} ({{ google_places_usage.autocomplete_percent_used }}%)
+                        </td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">
+                            {{ google_places_usage.monthly_details }}/{{ google_places_usage.monthly_details_limit }} ({{ google_places_usage.details_percent_used }}%)
+                        </td>
+                        <td style="border: 1px solid #dee2e6; padding: 10px;">
+                            {{ google_places_usage.monthly_user_limit_hits }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
         {% if shuls %}
             <h3 style="margin-top: 30px; margin-bottom: 15px;">Updated Shuls</h3>
             <table style="border-collapse: collapse; width: 100%; margin-bottom: 40px;">

@@ -1,12 +1,14 @@
 from datetime import timedelta
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.utils import timezone
+from freezegun import freeze_time
 
 from app.abuse_config import PERMANENT_BAN_THRESHOLD
-from app.models import AbuseState
+from app.models import AbuseState, GooglePlacesUsage, GooglePlacesUserUsage
 from eznashdb.models import Room, Shul
 
 User = get_user_model()
@@ -134,16 +136,12 @@ def describe_send_weekly_summary():
 
     def describe_shul_filtering():
         def includes_only_recent_updates(superuser, recent_shul, old_shul, mailoutbox):
-            # Recent shul should be included
             call_command("send_weekly_summary")
             assert len(mailoutbox) == 1
             html = mailoutbox[0].alternatives[0][0]
             assert "Recent Shul" in html
-
-            # Verify old shul is excluded from same email
             assert "Old Shul" not in html
 
-            # Verify count in subject shows only recent updates
             subject = mailoutbox[0].subject
             assert "[1 updated]" in subject
 
@@ -165,16 +163,12 @@ def describe_send_weekly_summary():
             call_command("send_weekly_summary")
 
             html = mailoutbox[0].alternatives[0][0]
-
-            # Shul link and basic info
             assert '<a href="' in html
             assert "Recent Shul</a>" in html
             assert f"selectedShul={recent_shul.pk}" in html
-
-            # Room details
             assert "Main Sanctuary" in html
-            assert ">M<" in html  # Size column
-            assert "★★★★☆" in html  # 4/5 stars
+            assert ">M<" in html
+            assert "★★★★☆" in html
 
         def extracts_country_from_address(superuser, recent_shul, mailoutbox):
             recent_shul.address = "123 Main St, Jerusalem, Israel"
@@ -197,7 +191,6 @@ def describe_send_weekly_summary():
 
             html = mailoutbox[0].alternatives[0][0]
             assert "Coord Shul" in html
-            # Country column should show "-"
             assert ">-<" in html
 
         def includes_deleted_shul_count_in_subject(
@@ -225,7 +218,6 @@ def describe_send_weekly_summary():
             assert "Old Deleted Shul" not in html
 
         def handles_email_with_only_deleted_shuls(superuser, recently_deleted_shul, mailoutbox):
-            # Test email with only deleted shuls, no updated ones
             mailoutbox.clear()
             call_command("send_weekly_summary")
 
@@ -237,11 +229,9 @@ def describe_send_weekly_summary():
         def respects_days_argument_for_both_updated_and_deleted(
             superuser, old_shul, old_deleted_shul, mailoutbox
         ):
-            # Default 7 days - should exclude both (10 days old)
             call_command("send_weekly_summary")
             assert len(mailoutbox) == 0
 
-            # 15 days - should include both
             call_command("send_weekly_summary", days=15)
             assert len(mailoutbox) == 1
             html = mailoutbox[0].alternatives[0][0]
@@ -256,14 +246,9 @@ def describe_send_weekly_summary():
 
             assert len(mailoutbox) == 1
             html = mailoutbox[0].alternatives[0][0]
-
-            # Recent abuse state should be included
             assert "regular@example.com" in html
-            assert ">3<" in html.replace("\n", "").replace(" ", "")  # Points
-            # Should show blocked status (in cooldown)
+            assert ">3<" in html.replace("\n", "").replace(" ", "")
             assert "Blocked until" in html
-
-            # Old abuse state should not be included
             assert "old@example.com" not in html
 
         def includes_abuse_count_in_subject(superuser, recent_abuse_state, mailoutbox):
@@ -273,11 +258,9 @@ def describe_send_weekly_summary():
             assert "[1 abuse]" in subject
 
         def respects_days_argument_for_abuse_states(superuser, old_abuse_state, mailoutbox):
-            # Default 7 days - should exclude (10 days old)
             call_command("send_weekly_summary")
             assert len(mailoutbox) == 0
 
-            # 15 days - should include
             call_command("send_weekly_summary", days=15)
             assert len(mailoutbox) == 1
             html = mailoutbox[0].alternatives[0][0]
@@ -316,7 +299,6 @@ def describe_send_weekly_summary():
             assert "PERMANENTLY BANNED" in html
 
         def shows_captcha_required_status_for_active_users(superuser, db, mailoutbox):
-            # User with points but no cooldown, should show "Active (CAPTCHA required)"
             user = User.objects.create_user(
                 username="active", email="active@example.com", password="pass"
             )
@@ -332,3 +314,160 @@ def describe_send_weekly_summary():
             html = mailoutbox[0].alternatives[0][0]
             assert "active@example.com" in html
             assert "Active (CAPTCHA required)" in html
+
+    def describe_google_places_usage():
+        def shows_usage_section_with_weekly_and_monthly_totals(superuser, db, mailoutbox):
+            now = timezone.now()
+
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=2)).date(),
+                autocomplete_requests=100,
+                details_requests=50,
+            )
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=5)).date(),
+                autocomplete_requests=200,
+                details_requests=75,
+            )
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=1)).date(),
+                autocomplete_requests=50,
+                details_requests=25,
+            )
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            assert ">350<" in html
+            assert ">150<" in html
+            assert "350/10000 (3%)" in html
+            assert "150/10000 (1%)" in html
+
+        def aggregates_weekly_totals_across_multiple_days(superuser, db, mailoutbox):
+            now = timezone.now()
+
+            for i in range(1, 8):
+                GooglePlacesUsage.objects.create(
+                    date=(now - timedelta(days=i)).date(),
+                    autocomplete_requests=10,
+                    details_requests=5,
+                )
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            assert ">70<" in html
+            assert ">35<" in html
+
+        def calculates_monthly_percentages(superuser, db, mailoutbox):
+            now = timezone.now()
+
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=1)).date(),
+                autocomplete_requests=5000,
+                details_requests=2000,
+            )
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            assert "(50%)" in html
+            assert "(20%)" in html
+
+        def respects_days_argument(superuser, db, mailoutbox):
+            now = timezone.now()
+
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=10)).date(),
+                autocomplete_requests=100,
+                details_requests=50,
+            )
+
+            call_command("send_weekly_summary")
+            assert len(mailoutbox) == 0
+
+            call_command("send_weekly_summary", days=15)
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            assert ">100<" in html
+            assert ">50<" in html
+
+        def shows_user_limit_hits_when_present(superuser, regular_user, db, mailoutbox):
+            now = timezone.now()
+
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=1)).date(),
+                autocomplete_requests=100,
+                details_requests=50,
+            )
+
+            user2 = User.objects.create_user(username="user2", email="user2@example.com")
+            GooglePlacesUserUsage.objects.create(
+                user=regular_user,
+                date=(now - timedelta(days=2)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+            GooglePlacesUserUsage.objects.create(
+                user=regular_user,
+                date=(now - timedelta(days=4)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+            GooglePlacesUserUsage.objects.create(
+                user=user2,
+                date=(now - timedelta(days=3)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+            GooglePlacesUserUsage.objects.create(
+                user=user2,
+                date=(now - timedelta(days=1)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT - 20,
+            )
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            assert ">User limit hits<" in html
+            assert ">3<" in html
+
+        @freeze_time("2026-02-10 02:00:00")  # >7 days into the month
+        def shows_monthly_user_limit_hits(superuser, regular_user, db, mailoutbox):
+            now = timezone.now()
+            first_day_of_month = now.date().replace(day=1)
+
+            GooglePlacesUsage.objects.create(
+                date=(now - timedelta(days=1)).date(),
+                autocomplete_requests=100,
+                details_requests=50,
+            )
+
+            user2 = User.objects.create_user(username="user2", email="user2@example.com")
+            GooglePlacesUserUsage.objects.create(
+                user=regular_user,
+                date=(now - timedelta(days=2)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+            GooglePlacesUserUsage.objects.create(
+                user=user2,
+                date=(now - timedelta(days=4)).date(),
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+
+            user3 = User.objects.create_user(username="user3", email="user3@example.com")
+            GooglePlacesUserUsage.objects.create(
+                user=user3,
+                date=first_day_of_month,
+                autocomplete_requests=settings.GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT,
+            )
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            stripped_html = html.replace("\n", "").replace(" ", "")
+            assert ">User limit hits<" in html
+            assert ">2<" in stripped_html
+            assert ">3<" in stripped_html
