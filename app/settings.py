@@ -362,8 +362,10 @@ MAPS_CO_DOMAIN = "https://geocode.maps.co/search"
 NOMINATIM_DOMAIN = "https://nominatim.openstreetmap.org/"
 BASE_OSM_URL = MAPS_CO_API_KEY and MAPS_CO_DOMAIN or NOMINATIM_DOMAIN
 
-# Google Places API
-GOOGLE_PLACES_API_KEY = os.environ.get("GOOGLE_PLACES_API_KEY")
+# Google Places API (disabled on dev - restricted to ezratnashim.com)
+GOOGLE_PLACES_API_KEY = None
+if DJANGO_ENV == "prod":
+    GOOGLE_PLACES_API_KEY = os.environ.get("GOOGLE_PLACES_API_KEY")
 # Per-user daily limit (abuse prevention)
 GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT = int(
     os.environ.get("GOOGLE_PLACES_USER_DAILY_AUTOCOMPLETE_LIMIT", 50)
