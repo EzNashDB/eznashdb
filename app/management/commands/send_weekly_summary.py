@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from datetime import timedelta
 
+from constance import config
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -173,12 +174,14 @@ class Command(BaseCommand):
             weekly_details=weekly_details,
             monthly_autocomplete=monthly_autocomplete,
             monthly_details=monthly_details,
-            monthly_autocomplete_limit=GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT,
-            monthly_details_limit=GooglePlacesUsage.MONTHLY_DETAILS_LIMIT,
+            monthly_autocomplete_limit=config.GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT,
+            monthly_details_limit=config.GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT,
             autocomplete_percent_used=percent_used(
-                monthly_autocomplete, GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT
+                monthly_autocomplete, config.GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT
             ),
-            details_percent_used=percent_used(monthly_details, GooglePlacesUsage.MONTHLY_DETAILS_LIMIT),
+            details_percent_used=percent_used(
+                monthly_details, config.GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT
+            ),
             user_limit_hits=user_limit_hits,
             monthly_user_limit_hits=monthly_user_limit_hits,
         )

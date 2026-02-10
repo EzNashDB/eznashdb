@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     "template_partials",
     "django_recaptcha",
     "waffle",
+    "constance",
     "app",
     "eznashdb",
     "allauth",
@@ -396,6 +397,19 @@ WAFFLE_SWITCH_MODEL = "users.Switch"
 WAFFLE_SAMPLE_MODEL = "users.Sample"
 WAFFLE_CREATE_MISSING_FLAGS = WAFFLE_CREATE_MISSING_SWITCHES = WAFFLE_CREATE_MISSING_SAMPLES = True
 WAFFLE_FLAG_DEFAULT = WAFFLE_SWITCH_DEFAULT = WAFFLE_SAMPLE_DEFAULT = DJANGO_ENV == "dev"
+
+# Django Constance
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+CONSTANCE_CONFIG = {
+    "GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT": (
+        10000,
+        "Monthly autocomplete request limit for Google Places API free tier",
+    ),
+    "GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT": (
+        10000,
+        "Monthly details request limit for Google Places API free tier",
+    ),
+}
 
 # GitHub Issue Reporting
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
