@@ -180,17 +180,16 @@ class OSMClient:
 
     def _format_results(self, results: list[dict]) -> list[dict]:
         """Format OSM results to standardized structure."""
-        israel_palestine_pairs = [
-            ("ישראל", "الأراضي الفلسطينية"),
-            ("Israel", "Palestinian Territory"),
+        replacement_pairs = [
+            ("الأراضي الفلسطينية", "ישראל"),
+            ("Palestinian Territory", "Israel"),
         ]
 
         for result in results:
             result["id"] = result.get("place_id")
             result["source"] = GeocodingProvider.OSM
-            # Replace Palestinian Territory with Israel in display names
-            for israel, palestine in israel_palestine_pairs:
-                result["display_name"] = result.get("display_name", "").replace(palestine, israel)
+            for original, replacement in replacement_pairs:
+                result["display_name"] = result.get("display_name", "").replace(original, replacement)
 
         return results
 
