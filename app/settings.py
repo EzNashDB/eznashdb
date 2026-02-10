@@ -400,16 +400,7 @@ WAFFLE_FLAG_DEFAULT = WAFFLE_SWITCH_DEFAULT = WAFFLE_SAMPLE_DEFAULT = DJANGO_ENV
 
 # Django Constance
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-CONSTANCE_CONFIG = {
-    "GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT": (
-        10000,
-        "Monthly autocomplete request limit for Google Places API free tier",
-    ),
-    "GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT": (
-        10000,
-        "Monthly details request limit for Google Places API free tier",
-    ),
-}
+from app.constance_config import CONSTANCE_CONFIG  # noqa: E402 F401
 
 # GitHub Issue Reporting
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
