@@ -50,14 +50,14 @@ def describe_google_places_client():
                 }
             ]
 
-        def it_returns_none_on_api_failure(client, mocker):
+        def it_returns_empty_list_on_api_failure(client, mocker):
             mock_response = mocker.Mock()
             mock_response.status_code = 500
 
             mocker.patch("requests.post", return_value=mock_response)
             results = client.autocomplete("test query", "session123")
 
-            assert results is None
+            assert results == []
 
         def it_handles_empty_suggestions(client, mocker):
             mock_response = mocker.Mock()
@@ -141,11 +141,11 @@ def describe_google_places_client():
             assert place.raw_data["place_id"] == "ChIJ123"
 
         def it_handles_autocomplete_failure(client, mocker):
-            mocker.patch.object(client, "autocomplete", return_value=None)
+            mocker.patch.object(client, "autocomplete", return_value=[])
 
             results = client.autocomplete_and_normalize("test", "token123")
 
-            assert results is None
+            assert results == []
 
 
 def describe_osm_client():
@@ -177,25 +177,25 @@ def describe_osm_client():
                 }
             ]
 
-        def it_returns_none_on_invalid_json(client, mocker):
+        def it_returns_empty_list_on_invalid_json(client, mocker):
             mock_response = mocker.Mock()
             mock_response.json.return_value = {"error": "invalid"}  # Not a list
 
             mocker.patch("requests.get", return_value=mock_response)
             results = client.search("test query")
 
-            assert results is None
+            assert results == []
 
-        def it_returns_none_on_request_exception(client, mocker):
+        def it_returns_empty_list_on_request_exception(client, mocker):
             mocker.patch(
                 "eznashdb.geocoding.requests.get",
                 side_effect=requests.RequestException("Network error"),
             )
             results = client.search("test query")
 
-            assert results is None
+            assert results == []
 
-    def describe_search_with_israel_fallback():
+    def describe_search_and_format_results():
         def it_formats_results_with_osm_source(client, mocker):
             mock_response = mocker.Mock()
             mock_response.json.return_value = [
@@ -206,36 +206,22 @@ def describe_osm_client():
             ]
 
             mocker.patch("requests.get", return_value=mock_response)
-            results = client.search_with_israel_fallback("tel aviv")
+            results = client.search_and_format_results("tel aviv")
 
             assert results[0]["id"] == "123"
             assert results[0]["source"] == GeocodingProvider.OSM
 
-        def it_expands_israel_queries_to_include_palestine(client, mocker):
-            mock_response = mocker.Mock()
-            mock_response.json.return_value = [{"place_id": "123"}]
-
-            mock_get = mocker.patch("requests.get", return_value=mock_response)
-            mocker.patch("time.sleep")  # Skip the sleep delay
-            client.search_with_israel_fallback("tel aviv, israel")
-
-            # Should make two requests: original and modified
-            assert mock_get.call_count == 2
-
         def it_replaces_palestinian_territory_with_israel_in_display_names(client, mocker):
-            mock_response_1 = mocker.Mock()
-            mock_response_1.json.return_value = [
+            mock_response = mocker.Mock()
+            mock_response.json.return_value = [
                 {
                     "place_id": "123",
                     "display_name": "Jerusalem, Palestinian Territory",
                 }
             ]
-            mock_response_2 = mocker.Mock()
-            mock_response_2.json.return_value = []
 
-            mocker.patch("requests.get", side_effect=[mock_response_1, mock_response_2])
-            mocker.patch("time.sleep")
-            results = client.search_with_israel_fallback("jerusalem, israel")
+            mocker.patch("requests.get", return_value=mock_response)
+            results = client.search_and_format_results("jerusalem")
 
             assert "Israel" in results[0]["display_name"]
             assert "Palestinian Territory" not in results[0]["display_name"]
@@ -253,7 +239,7 @@ def describe_osm_client():
                     "extratags": {"religion": "jewish"},
                 }
             ]
-            mocker.patch.object(client, "search_with_israel_fallback", return_value=mock_response)
+            mocker.patch.object(client, "search_and_format_results", return_value=mock_response)
 
             results = client.search_and_normalize("ohev sholom")
 
@@ -268,11 +254,11 @@ def describe_osm_client():
             assert place.raw_data["place_id"] == "12345"
 
         def it_handles_search_failure(client, mocker):
-            mocker.patch.object(client, "search_with_israel_fallback", return_value=None)
+            mocker.patch.object(client, "search_and_format_results", return_value=[])
 
             results = client.search_and_normalize("test")
 
-            assert results is None
+            assert results == []
 
 
 @pytest.mark.django_db

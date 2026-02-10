@@ -161,7 +161,7 @@ def describe_place_search_merger():
             raw_data={},
         )
 
-        google_client_mock.autocomplete_and_normalize.return_value = None
+        google_client_mock.autocomplete_and_normalize.return_value = []
         osm_client_mock.search_and_normalize.return_value = [osm_place]
 
         results = merger.search("test", session_token="token123")
@@ -182,7 +182,7 @@ def describe_place_search_merger():
         )
 
         google_client_mock.autocomplete_and_normalize.return_value = [google_place]
-        osm_client_mock.search_and_normalize.return_value = None
+        osm_client_mock.search_and_normalize.return_value = []
 
         results = merger.search("test", session_token="token123")
 
@@ -191,8 +191,8 @@ def describe_place_search_merger():
         assert results[0].id == "google:1"
 
     def it_handles_both_failures(merger, google_client_mock, osm_client_mock):
-        google_client_mock.autocomplete_and_normalize.return_value = None
-        osm_client_mock.search_and_normalize.return_value = None
+        google_client_mock.autocomplete_and_normalize.return_value = []
+        osm_client_mock.search_and_normalize.return_value = []
 
         results = merger.search("test", session_token="token123")
 
