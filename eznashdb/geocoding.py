@@ -1,11 +1,11 @@
 """Geocoding client classes for Google Places and OpenStreetMap."""
 
-import time
 import urllib.parse
 from datetime import date
 from json.decoder import JSONDecodeError
 
 import requests
+import sentry_sdk
 from django.conf import settings
 from django.db.models import F
 from waffle import flag_is_active
@@ -21,10 +21,10 @@ class GooglePlacesClient:
     def __init__(self, api_key: str):
         self.api_key = api_key
 
-    def autocomplete(self, query: str, session_token: str) -> list[dict] | None:
+    def autocomplete(self, query: str, session_token: str) -> list[dict]:
         """
         Get autocomplete suggestions from Google Places API.
-        Returns list of suggestions without coordinates, or None on failure.
+        Returns list of suggestions without coordinates, or empty list on failure.
         """
         url = "https://places.googleapis.com/v1/places:autocomplete"
         headers = {
@@ -39,7 +39,11 @@ class GooglePlacesClient:
         response = requests.post(url, json=payload, headers=headers)
 
         if response.status_code != 200:
-            return None
+            sentry_sdk.capture_message(
+                f"Google Places autocomplete failed with status {response.status_code} for query: {query}",
+                level="warning",
+            )
+            return []
 
         data = response.json()
         suggestions = data.get("suggestions", [])
@@ -94,14 +98,12 @@ class GooglePlacesClient:
             "source": GeocodingProvider.GOOGLE,
         }
 
-    def autocomplete_and_normalize(self, query: str, session_token: str) -> list[NormalizedPlace] | None:
+    def autocomplete_and_normalize(self, query: str, session_token: str) -> list[NormalizedPlace]:
         """
         Get autocomplete suggestions and normalize to NormalizedPlace format.
-        Returns list of NormalizedPlace objects, or None on failure.
+        Returns list of NormalizedPlace objects.
         """
         results = self.autocomplete(query, session_token)
-        if results is None:
-            return None
 
         normalized = []
         for result in results:
@@ -131,10 +133,10 @@ class OSMClient:
         self.base_url = base_url
         self.api_key = api_key
 
-    def search(self, query: str) -> list[dict] | None:
+    def search(self, query: str) -> list[dict]:
         """
         Search for locations using Nominatim API.
-        Returns list of results with coordinates, or None on failure.
+        Returns list of results with coordinates, or empty list on failure.
         """
         params = {
             "format": "json",
@@ -154,41 +156,27 @@ class OSMClient:
             # Validate response is a list
             data = response.json()
             if not isinstance(data, list):
-                return None
+                sentry_sdk.capture_message(
+                    f"OSM geocoding returned non-list response for query: {query}",
+                    level="warning",
+                )
+                return []
 
             return data
 
-        except (JSONDecodeError, requests.RequestException):
-            return None
+        except (JSONDecodeError, requests.RequestException) as e:
+            sentry_sdk.capture_message(
+                f"OSM geocoding failed for query '{query}': {e}",
+                level="warning",
+            )
+            return []
 
-    def search_with_israel_fallback(self, query: str) -> list[dict] | None:
+    def search_and_format_results(self, query: str) -> list[dict]:
         """
-        Search with automatic Israel/Palestine query expansion.
-        Returns combined results from original query and Palestine variant.
+        Search for locations and return formatted results.
+        Returns list of formatted results with standardized fields.
         """
-        results = self.search(query)
-        if results is None:
-            return None
-
-        # Create modified query with Palestine instead of Israel
-        modified_query = query
-        for israel, palestine in [
-            ("israel", "palestinian territory"),
-            ("ישראל", "palestinian territory"),
-        ]:
-            if israel in query:
-                modified_query = modified_query.replace(israel, palestine)
-
-        # If query was modified, fetch additional results
-        if modified_query != query:
-            # Sleep to avoid too many requests error
-            time.sleep(1)
-            additional_results = self.search(modified_query)
-            if additional_results is not None:
-                results.extend(additional_results)
-
-        # Format results to match standard format
-        return self._format_results(results)
+        return self._format_results(self.search(query))
 
     def _format_results(self, results: list[dict]) -> list[dict]:
         """Format OSM results to standardized structure."""
@@ -206,14 +194,12 @@ class OSMClient:
 
         return results
 
-    def search_and_normalize(self, query: str) -> list[NormalizedPlace] | None:
+    def search_and_normalize(self, query: str) -> list[NormalizedPlace]:
         """
         Search and normalize to NormalizedPlace format.
-        Returns list of NormalizedPlace objects, or None on failure.
+        Returns list of NormalizedPlace objects.
         """
-        results = self.search_with_israel_fallback(query)
-        if results is None:
-            return None
+        results = self.search_and_format_results(query)
 
         normalized = []
         for result in results:
