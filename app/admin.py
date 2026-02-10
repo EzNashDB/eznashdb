@@ -1,6 +1,7 @@
 from calendar import monthrange
 from datetime import date
 
+from constance import config
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Sum
@@ -205,7 +206,7 @@ class GooglePlacesUsageAdmin(admin.ModelAdmin):
 
         # Check if there's rollover (daily budget higher than base rate)
         _, days_in_month = monthrange(obj.date.year, obj.date.month)
-        base_daily_budget = GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT // days_in_month
+        base_daily_budget = config.GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT // days_in_month
         has_rollover = budget.autocomplete > base_daily_budget
 
         # Calculate usage percentage (use autocomplete as the limiting factor)
@@ -266,9 +267,9 @@ class GooglePlacesUsageAdmin(admin.ModelAdmin):
 
         extra_context["monthly_summary"] = {
             "autocomplete_requests": total_autocomplete,
-            "autocomplete_limit": GooglePlacesUsage.MONTHLY_AUTOCOMPLETE_LIMIT,
+            "autocomplete_limit": config.GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT,
             "details_requests": total_details,
-            "details_limit": GooglePlacesUsage.MONTHLY_DETAILS_LIMIT,
+            "details_limit": config.GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT,
             "total_cost": total_cost,
             "today_autocomplete": today_usage.autocomplete,
             "today_autocomplete_budget": budget.autocomplete,

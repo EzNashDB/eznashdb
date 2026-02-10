@@ -6,6 +6,7 @@ from datetime import timedelta
 from typing import NamedTuple
 
 import sentry_sdk
+from constance import config
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -180,10 +181,6 @@ class AbuseAppeal(models.Model):
 class GooglePlacesUsage(models.Model):
     """Global daily usage tracking for Google Places API."""
 
-    # Monthly hard caps (never exceed these)
-    MONTHLY_AUTOCOMPLETE_LIMIT = 10000
-    MONTHLY_DETAILS_LIMIT = 10000
-
     date = models.DateField(unique=True, db_index=True)
     autocomplete_requests = models.PositiveIntegerField(default=0)
     details_requests = models.PositiveIntegerField(default=0)
@@ -222,8 +219,8 @@ class GooglePlacesUsage(models.Model):
         usage = cls.get_monthly_usage_before_date(target_date)
 
         # Calculate remaining quota
-        autocomplete_remaining = cls.MONTHLY_AUTOCOMPLETE_LIMIT - usage.autocomplete
-        details_remaining = cls.MONTHLY_DETAILS_LIMIT - usage.details
+        autocomplete_remaining = config.GOOGLE_PLACES_MONTHLY_AUTOCOMPLETE_LIMIT - usage.autocomplete
+        details_remaining = config.GOOGLE_PLACES_MONTHLY_DETAILS_LIMIT - usage.details
 
         # Calculate days remaining in month (including target_date)
         _, days_in_month = monthrange(target_date.year, target_date.month)

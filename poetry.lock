@@ -516,6 +516,20 @@ socialaccount = ["oauthlib (>=3.3.0,<4)", "pyjwt[crypto] (>=2.0,<3)", "requests 
 steam = ["python3-openid (>=3.0.8,<4)"]
 
 [[package]]
+name = "django-constance"
+version = "4.3.4"
+description = "Django live settings with pluggable backends, including Redis."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_constance-4.3.4-py3-none-any.whl", hash = "sha256:598f8c967a675fe2c7fe3688510ac8302e1b6df2141d01b8d29577532a8241db"},
+    {file = "django_constance-4.3.4.tar.gz", hash = "sha256:30d1b325f636177c708cce63abbde7015593f5c60b2bc0b0e2eebe8c36e2ce59"},
+]
+
+[package.extras]
+redis = ["redis"]
+
+[[package]]
 name = "django-cors-headers"
 version = "3.11.0"
 description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
@@ -1979,4 +1993,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f442dd1d1366d28ed34a18455244df594043b80c6b765dad0a0d29943a10d310"
+content-hash = "85bfe7e1d60ea00cf864b11cc2c1f49a6aeb517135a911bff97347eb28a1f613"
