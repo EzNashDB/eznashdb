@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
-from app.abuse_config import PERMANENT_BAN_THRESHOLD
 from app.models import AbuseAppeal, AbuseState, GooglePlacesUsage, GooglePlacesUserUsage
 
 
@@ -55,21 +54,21 @@ class AbuseStateAdmin(admin.ModelAdmin):
     @admin.action(description="Permanently ban selected users")
     def ban_user(self, request, queryset):
         """Permanently ban users by setting points to threshold."""
-        queryset.update(points=PERMANENT_BAN_THRESHOLD)
+        queryset.update(points=config.ABUSE_PERMANENT_BAN_THRESHOLD)
         self.message_user(request, f"{queryset.count()} users banned.")
 
     @admin.action(description="Unban selected users")
     def unban_user(self, request, queryset):
         """Unban users but keep them on thin ice (one more violation = banned)."""
         queryset.update(
-            points=PERMANENT_BAN_THRESHOLD - 1,
+            points=config.ABUSE_PERMANENT_BAN_THRESHOLD - 1,
             sensitive_count_in_episode=0,
             cooldown_until=None,
             last_points_update_at=timezone.now(),
         )
         self.message_user(
             request,
-            f"{queryset.count()} users unbanned (set to {PERMANENT_BAN_THRESHOLD - 1} points).",
+            f"{queryset.count()} users unbanned (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} points).",
         )
 
 
@@ -136,7 +135,7 @@ class AbuseAppealAdmin(admin.ModelAdmin):
 
             # Unban: reset the abuse state to clean state
             state = appeal.abuse_state
-            state.points = PERMANENT_BAN_THRESHOLD - 1
+            state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
             state.sensitive_count_in_episode = 0
             state.cooldown_until = None
             state.last_points_update_at = timezone.now()
@@ -144,7 +143,7 @@ class AbuseAppealAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            f"{queryset.count()} appeals approved (set to {PERMANENT_BAN_THRESHOLD - 1} points).",
+            f"{queryset.count()} appeals approved (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} points).",
         )
 
     @admin.action(description="Deny selected appeals")
@@ -158,7 +157,7 @@ class AbuseAppealAdmin(admin.ModelAdmin):
 
             # Ensure user is banned
             state = appeal.abuse_state
-            state.points = PERMANENT_BAN_THRESHOLD
+            state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
             state.save(update_fields=["points"])
 
         self.message_user(request, f"{queryset.count()} appeals denied (users banned).")

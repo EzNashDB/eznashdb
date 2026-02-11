@@ -4,17 +4,18 @@ from dataclasses import dataclass
 from datetime import timedelta
 from enum import Enum, auto
 
+from constance import config
 from django.shortcuts import render
 from django.utils import timezone
 
-from app.abuse_config import (
-    EPISODE_TIMEOUT_MINUTES,
-    ESCALATION_LADDER,
-    SENSITIVE_CAP_PER_EPISODE,
-    SENSITIVE_URL_NAMES,
-)
 from app.forms import AbuseAppealForm
 from app.models import AbuseState
+
+# Sensitive URL names that require abuse prevention checks
+SENSITIVE_URL_NAMES = [
+    "eznashdb:update_shul",
+    "eznashdb:google_maps_proxy",
+]
 
 
 class BlockReason(Enum):
@@ -62,7 +63,10 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
         )
 
     # 3. Episode cap (only reached if no cooldown was created)
-    if state.is_episode_active() and state.sensitive_count_in_episode >= SENSITIVE_CAP_PER_EPISODE:
+    if (
+        state.is_episode_active()
+        and state.sensitive_count_in_episode >= config.ABUSE_SENSITIVE_CAP_PER_EPISODE
+    ):
         return AbuseEnforcementResult(
             allowed=False,
             reason=BlockReason.EPISODE_CAP,
@@ -70,7 +74,7 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
         )
 
     # 4. CAPTCHA
-    requires_captcha = state.points >= 1
+    requires_captcha = state.points >= config.ABUSE_CAPTCHA_THRESHOLD
 
     return AbuseEnforcementResult(
         allowed=True,
@@ -80,10 +84,10 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
 
 
 def get_cooldown_minutes(points):
-    max_points = max(ESCALATION_LADDER.keys())
+    ladder = config.ABUSE_COOLDOWN_LADDER
+    max_points = len(ladder) - 1
     effective_points = min(points, max_points)
-    _, cooldown_minutes = ESCALATION_LADDER.get(effective_points, (True, 0))
-    return cooldown_minutes
+    return ladder[effective_points]
 
 
 def record_abuse_violation(user, was_rate_limited: bool) -> None:
@@ -129,10 +133,12 @@ def get_blocked_response(request, result):
         minutes = max(1, int(remaining_seconds / 60))
         context["retry_after"] = format_retry_time(minutes)
     elif result.reason == BlockReason.EPISODE_CAP:
-        # Calculate retry time until episode ends (60 min from last violation)
+        # Calculate time until episode ends
         state = result.abuse_state
         if state and state.last_violation_at:
-            episode_ends = state.last_violation_at + timedelta(minutes=EPISODE_TIMEOUT_MINUTES)
+            episode_ends = state.last_violation_at + timedelta(
+                minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES
+            )
             remaining_seconds = (episode_ends - timezone.now()).total_seconds()
             minutes = max(1, int(remaining_seconds / 60))
             context["retry_after"] = format_retry_time(minutes)

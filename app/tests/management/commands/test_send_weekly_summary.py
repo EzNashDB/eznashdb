@@ -1,13 +1,13 @@
 from datetime import timedelta
 
 import pytest
+from constance import config
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from app.abuse_config import PERMANENT_BAN_THRESHOLD
 from app.models import AbuseState, GooglePlacesUsage, GooglePlacesUserUsage
 from eznashdb.models import Room, Shul
 
@@ -287,7 +287,7 @@ def describe_send_weekly_summary():
             )
             AbuseState.objects.create(
                 user=user,
-                points=PERMANENT_BAN_THRESHOLD,
+                points=config.ABUSE_PERMANENT_BAN_THRESHOLD,
                 last_violation_at=timezone.now(),
             )
 

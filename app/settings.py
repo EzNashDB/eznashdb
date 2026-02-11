@@ -400,7 +400,11 @@ WAFFLE_FLAG_DEFAULT = WAFFLE_SWITCH_DEFAULT = WAFFLE_SAMPLE_DEFAULT = DJANGO_ENV
 
 # Django Constance
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-from app.constance_config import CONSTANCE_CONFIG  # noqa: E402 F401
+from app.constance_config import (  # noqa: E402 F401
+    CONSTANCE_ADDITIONAL_FIELDS,
+    CONSTANCE_CONFIG,
+    CONSTANCE_CONFIG_FIELDSETS,
+)
 
 # GitHub Issue Reporting
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")

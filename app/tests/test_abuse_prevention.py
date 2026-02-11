@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 import pytest
+from constance import config
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
@@ -11,7 +12,6 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
-from app.abuse_config import EPISODE_TIMEOUT_MINUTES, PERMANENT_BAN_THRESHOLD, SENSITIVE_CAP_PER_EPISODE
 from app.abuse_prevention import (
     BlockReason,
     get_blocked_response,
@@ -53,14 +53,14 @@ def describe_points_decay():
     def does_not_decay_when_permanently_banned(test_user):
         """Should not decay points when user is permanently banned (at threshold)"""
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.last_points_update_at = timezone.now() - timedelta(hours=48)
         state.save()
 
         state.apply_points_decay()
 
         # Points should not decay - permanent ban freezes decay
-        assert state.points == PERMANENT_BAN_THRESHOLD
+        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True
 
     def updates_last_points_update_at_after_decay(test_user):
@@ -97,7 +97,9 @@ def describe_episode_lifecycle():
     def episode_inactive_after_timeout(test_user):
         """Episode should be inactive after timeout window"""
         state = AbuseState.get_or_create(test_user)
-        state.last_violation_at = timezone.now() - timedelta(minutes=EPISODE_TIMEOUT_MINUTES + 1)
+        state.last_violation_at = timezone.now() - timedelta(
+            minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES + 1
+        )
         state.save()
 
         assert state.is_episode_active() is False
@@ -135,7 +137,7 @@ def describe_sensitive_cap():
         """Should block when sensitive count reaches cap"""
         state = AbuseState.get_or_create(test_user)
         state.last_violation_at = timezone.now()  # Active episode
-        state.sensitive_count_in_episode = SENSITIVE_CAP_PER_EPISODE
+        state.sensitive_count_in_episode = config.ABUSE_SENSITIVE_CAP_PER_EPISODE
         state.save()
 
         result = process_abuse_state(test_user)
@@ -147,7 +149,7 @@ def describe_sensitive_cap():
         """Should allow when sensitive count below cap"""
         state = AbuseState.get_or_create(test_user)
         state.last_violation_at = timezone.now()  # Active episode
-        state.sensitive_count_in_episode = SENSITIVE_CAP_PER_EPISODE - 1
+        state.sensitive_count_in_episode = config.ABUSE_SENSITIVE_CAP_PER_EPISODE - 1
         state.save()
 
         result = process_abuse_state(test_user)
@@ -224,12 +226,12 @@ def describe_escalation_ladder():
     def permanent_ban_at_threshold(test_user):
         """Should be permanently banned when points reach threshold"""
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD - 1
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
         state.save()
 
         state.record_violation()
 
-        assert state.points == PERMANENT_BAN_THRESHOLD
+        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True
 
 
@@ -240,7 +242,7 @@ def describe_enforcement_order():
     def permanent_ban_blocks_first(test_user):
         """Permanent ban should block before other checks"""
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         result = process_abuse_state(test_user)
@@ -276,7 +278,7 @@ def describe_appeal_ban_view():
 
         # Create abuse state with permanent ban (points at threshold)
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.episode_started_at = timezone.now() - timedelta(hours=1)
         state.last_violation_at = timezone.now()
         state.save()
@@ -297,7 +299,7 @@ def describe_appeal_ban_view():
         # Check snapshot was captured
         assert appeal.state_snapshot is not None
         assert appeal.state_snapshot["user_email"] == test_user.email
-        assert appeal.state_snapshot["points"] == PERMANENT_BAN_THRESHOLD
+        assert appeal.state_snapshot["points"] == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert appeal.state_snapshot["is_permanently_banned"] is True
 
         # Check email was sent to superuser
@@ -311,7 +313,7 @@ def describe_429_context():
     def includes_form_for_authenticated_permanent_ban(rf, test_user):
         """Should include form for authenticated users with permanent ban"""
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         request = rf.get("/shuls/")
@@ -332,13 +334,13 @@ def describe_appeal_admin_actions():
         """Approving appeal should reset abuse state to clean state"""
         # Create abuse state and appeal
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         appeal = AbuseAppeal.objects.create(
             abuse_state=state,
             explanation="Test appeal",
-            state_snapshot={"points": PERMANENT_BAN_THRESHOLD},
+            state_snapshot={"points": config.ABUSE_PERMANENT_BAN_THRESHOLD},
         )
 
         # Execute admin action
@@ -360,7 +362,7 @@ def describe_appeal_admin_actions():
 
         # Check abuse state was set to threshold - 1 (unbanned but on thin ice)
         state.refresh_from_db()
-        assert state.points == PERMANENT_BAN_THRESHOLD - 1
+        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
         assert state.is_permanently_banned is False
         assert state.cooldown_until is None
 
@@ -368,13 +370,13 @@ def describe_appeal_admin_actions():
         """Denying appeal should update status but keep abuse state"""
         # Create abuse state and appeal
         state = AbuseState.get_or_create(test_user)
-        state.points = PERMANENT_BAN_THRESHOLD
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         appeal = AbuseAppeal.objects.create(
             abuse_state=state,
             explanation="Test appeal",
-            state_snapshot={"points": PERMANENT_BAN_THRESHOLD},
+            state_snapshot={"points": config.ABUSE_PERMANENT_BAN_THRESHOLD},
         )
 
         # Execute admin action
@@ -396,5 +398,5 @@ def describe_appeal_admin_actions():
 
         # Check abuse state is banned (points set to threshold)
         state.refresh_from_db()
-        assert state.points == PERMANENT_BAN_THRESHOLD
+        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True

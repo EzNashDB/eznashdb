@@ -11,13 +11,6 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from app.abuse_config import (
-    EPISODE_TIMEOUT_MINUTES,
-    PERMANENT_BAN_THRESHOLD,
-    POINTS_DECAY_HOURS,
-    SENSITIVE_CAP_PER_EPISODE,
-)
-
 
 class GooglePlacesCount(NamedTuple):
     """Count of Google Places API requests (autocomplete and details)."""
@@ -50,7 +43,7 @@ class AbuseState(models.Model):
 
     @property
     def is_permanently_banned(self):
-        return self.points >= PERMANENT_BAN_THRESHOLD
+        return self.points >= config.ABUSE_PERMANENT_BAN_THRESHOLD
 
     def is_in_cooldown(self):
         """Check if currently in a cooldown period."""
@@ -66,7 +59,7 @@ class AbuseState(models.Model):
         """Check if episode is active (last violation within timeout window)."""
         if self.last_violation_at is None:
             return False
-        timeout = timedelta(minutes=EPISODE_TIMEOUT_MINUTES)
+        timeout = timedelta(minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES)
         return self.last_violation_at >= timezone.now() - timeout
 
     def refresh(self):
@@ -80,7 +73,7 @@ class AbuseState(models.Model):
 
         now = timezone.now()
         hours_since_update = (now - self.last_points_update_at).total_seconds() / 3600
-        points_to_decay = int(hours_since_update // POINTS_DECAY_HOURS)
+        points_to_decay = int(hours_since_update // config.ABUSE_POINTS_DECAY_HOURS)
 
         if points_to_decay > 0:
             self.points = max(0, self.points - points_to_decay)
@@ -92,7 +85,7 @@ class AbuseState(models.Model):
 
         if (
             self.is_episode_active()
-            and self.sensitive_count_in_episode >= SENSITIVE_CAP_PER_EPISODE
+            and self.sensitive_count_in_episode >= config.ABUSE_SENSITIVE_CAP_PER_EPISODE
             and not self.is_in_cooldown()
         ):
             cooldown_minutes = get_cooldown_minutes(self.points)
