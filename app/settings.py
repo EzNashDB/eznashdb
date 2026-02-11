@@ -380,7 +380,15 @@ DB_BACKUPS_PATH = os.getenv("DB_BACKUPS_PATH")
 TINYMCE_DEFAULT_CONFIG = {
     "height": 450,
     "width": "100%",
-    "plugins": "lists code",
+    "plugins": "link image anchor | lists code",
+    "toolbar": (
+        "undo redo | blocks | "
+        "bold italic underline strikethrough | "
+        "alignleft aligncenter alignright alignjustify | "
+        "bullist numlist outdent indent | "
+        "link anchor | "
+        "removeformat | code help"
+    ),
 }
 
 # reCAPTCHA configuration
