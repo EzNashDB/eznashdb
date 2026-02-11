@@ -2,13 +2,13 @@
 
 from urllib.parse import urlencode
 
+from constance import config
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django_ratelimit.core import is_ratelimited
 from waffle import flag_is_active
 
-from app.abuse_config import RATE_LIMIT
 from app.abuse_prevention import (
     get_blocked_response,
     is_sensitive_url,
@@ -51,7 +51,7 @@ class AbusePreventionMixin:
             request=request,
             group="abuse_prevention",
             key=lambda g, r: str(r.user.pk),
-            rate=RATE_LIMIT,
+            rate=config.ABUSE_RATE_LIMIT,
             method=["GET", "POST"],
             increment=True,
         )
