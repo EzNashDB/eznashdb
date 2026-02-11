@@ -6,8 +6,9 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect, render
+from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
@@ -191,3 +192,10 @@ class AppealBanView(View):
             return HttpResponseRedirect("/")
 
         return render(request, "429.html", {"appeal_form": form})
+
+
+def custom_500(request):
+    """Custom 500 error handler that provides request context for waffle tags."""
+
+    template = loader.get_template("500.html")
+    return HttpResponseServerError(template.render({"request": request}))
