@@ -122,16 +122,20 @@ class AbuseState(models.Model):
 
     def _log_violation_to_sentry(self) -> None:
         """Log abuse violation to Sentry for monitoring."""
-        sentry_sdk.capture_message(
-            f"Abuse prevention: user {self.user.email} hit rate limit, now at {self.points} points",
-            level="warning",
-            extra={
-                "user_id": self.user.id,
-                "user_email": self.user.email,
-                "points": self.points,
-                "is_permanently_banned": self.is_permanently_banned,
-            },
-        )
+        try:
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra("user_id", self.user.id)
+                scope.set_extra("user_email", self.user.email)
+                scope.set_extra("points", self.points)
+                scope.set_extra("is_permanently_banned", self.is_permanently_banned)
+                sentry_sdk.capture_message(
+                    f"Abuse prevention: user {self.user.email} hit rate limit, now at {self.points} points",
+                    level="warning",
+                )
+        except Exception:
+            # Catch all exceptions from Sentry SDK (API errors, network issues, etc.)
+            # Observability failures should never break core functionality
+            pass
 
 
 class AbuseAppeal(models.Model):

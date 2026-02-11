@@ -12,6 +12,9 @@ from app.views import (
     RestoreDBView,
 )
 
+# Custom error handler that provides request context
+handler500 = "app.views.custom_500"
+
 urlpatterns = [
     path("", include("eznashdb.urls")),
     path("accounts/", include("allauth.urls")),
