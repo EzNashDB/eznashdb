@@ -315,6 +315,34 @@ def describe_send_weekly_summary():
             assert "active@example.com" in html
             assert "Active (CAPTCHA required)" in html
 
+        def applies_points_decay_before_sending(superuser, db, mailoutbox):
+            user = User.objects.create_user(
+                username="decayuser", email="decay@example.com", password="pass"
+            )
+            now = timezone.now()
+            # Create state with 3 points, but last updated 48 hours ago (should decay by 2 points to 1)
+            state = AbuseState.objects.create(
+                user=user,
+                points=3,
+                last_violation_at=now - timedelta(minutes=30),
+            )
+            # Set last_points_update_at after creation (can't override auto_now_add in create())
+            state.last_points_update_at = now - timedelta(hours=48)
+            state.save()
+
+            call_command("send_weekly_summary")
+
+            assert len(mailoutbox) == 1
+            html = mailoutbox[0].alternatives[0][0]
+            # Verify email shows decayed points (1, not 3)
+            assert "decay@example.com" in html
+            stripped_html = html.replace("\n", "").replace(" ", "")
+            assert ">1<" in stripped_html
+
+            # Verify DB record was updated
+            state.refresh_from_db()
+            assert state.points == 1
+
     def describe_google_places_usage():
         def shows_usage_section_with_weekly_and_monthly_totals(superuser, db, mailoutbox):
             now = timezone.now()

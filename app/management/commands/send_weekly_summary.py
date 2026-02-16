@@ -136,11 +136,14 @@ class Command(BaseCommand):
     def _get_abuse_states(self, days):
         """Get recent abuse states with violations."""
         cutoff = self._get_cutoff(days)
-        return (
+        states = list(
             AbuseState.objects.filter(last_violation_at__gte=cutoff)
             .select_related("user")
             .order_by("-last_violation_at")
         )
+        for state in states:
+            state.refresh()
+        return states
 
     def _get_google_places_usage(self, days):
         """Get Google Places API usage metrics."""
