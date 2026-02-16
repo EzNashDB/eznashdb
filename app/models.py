@@ -45,6 +45,15 @@ class AbuseState(models.Model):
     def is_permanently_banned(self):
         return self.points >= config.ABUSE_PERMANENT_BAN_THRESHOLD
 
+    @property
+    def decayed_points(self):
+        """Current points after time-based decay (read-only, no DB write)."""
+        if self.points == 0 or self.is_permanently_banned:
+            return self.points
+        hours = (timezone.now() - self.last_points_update_at).total_seconds() / 3600
+        decay = int(hours // config.ABUSE_POINTS_DECAY_HOURS)
+        return max(0, self.points - decay)
+
     def is_in_cooldown(self):
         """Check if currently in a cooldown period."""
         return self.cooldown_until and self.cooldown_until > timezone.now()
@@ -66,18 +75,17 @@ class AbuseState(models.Model):
         self.apply_points_decay()
         self.apply_episode_cap_cooldown()
 
+    def get_points(self):
+        """Get current points with decay applied and persisted."""
+        self.apply_points_decay()
+        return self.points
+
     def apply_points_decay(self) -> None:
         """Apply on-demand points decay: -1 point per 24 hours since last update."""
-        if self.points == 0 or self.is_permanently_banned:
-            return
-
-        now = timezone.now()
-        hours_since_update = (now - self.last_points_update_at).total_seconds() / 3600
-        points_to_decay = int(hours_since_update // config.ABUSE_POINTS_DECAY_HOURS)
-
-        if points_to_decay > 0:
-            self.points = max(0, self.points - points_to_decay)
-            self.last_points_update_at = now
+        new_points = self.decayed_points
+        if new_points != self.points:
+            self.points = new_points
+            self.last_points_update_at = timezone.now()
             self.save(update_fields=["points", "last_points_update_at"])
 
     def apply_episode_cap_cooldown(self) -> None:

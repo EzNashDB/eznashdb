@@ -75,6 +75,19 @@ def describe_points_decay():
 
         assert state.last_points_update_at > old_time
 
+    def get_points_applies_and_persists_decay(test_user):
+        """Should apply decay and persist when calling get_points()"""
+        state = AbuseState.get_or_create(test_user)
+        state.points = 3
+        state.last_points_update_at = timezone.now() - timedelta(hours=48)
+        state.save()
+
+        points = state.get_points()
+
+        assert points == 1  # 3 - 2 (48h / 24h)
+        state.refresh_from_db()
+        assert state.points == 1  # Should be persisted to DB
+
 
 @pytest.mark.django_db
 def describe_episode_lifecycle():

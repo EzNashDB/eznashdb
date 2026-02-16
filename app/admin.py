@@ -16,7 +16,7 @@ from app.models import AbuseAppeal, AbuseState, GooglePlacesUsage, GooglePlacesU
 class AbuseStateAdmin(admin.ModelAdmin):
     list_display = [
         "user_email",
-        "points",
+        "display_points",
         "status",
         "last_violation_at",
         "episode_started_at",
@@ -36,6 +36,13 @@ class AbuseStateAdmin(admin.ModelAdmin):
     def user_email(self, obj):
         """Display user email."""
         return obj.user.email
+
+    @admin.display(description="Points")
+    def display_points(self, obj):
+        decayed = obj.decayed_points
+        if decayed != obj.points:
+            return format_html("{} → {}", obj.points, decayed)
+        return obj.points
 
     @admin.display(description="Status")
     def status(self, obj):
