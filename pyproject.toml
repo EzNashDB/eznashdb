@@ -99,7 +99,6 @@ django-cors-headers = "^3.11.0"
 psycopg2-binary = "^2.9.5"
 django-filter = "^23.2"
 django-crispy-forms = "^2.0"
-faker = "^19.1.0"
 requests = "^2.31.0"
 sentry-sdk = {extras = ["django"], version = "^1.44.0"}
 django-enforce-host = "^1.1.0"
@@ -137,6 +136,7 @@ pytest-describe = "^3.0.0"
 pytest-env = "^1.2.0"
 pytest-mock = "^3.15.1"
 freezegun = "^1.5.5"
+faker = "^19.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
