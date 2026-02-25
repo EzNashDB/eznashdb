@@ -55,4 +55,4 @@ EXPOSE 8000
 # Set up rclone config from environment variable on startup, then start gunicorn
 CMD mkdir -p /root/.config/rclone && \
     echo "$RCLONE_CONFIG_CONTENT" > /root/.config/rclone/rclone.conf && \
-    gunicorn --bind :8000 --workers 1 --threads 3 app.wsgi
+    gunicorn --bind :8000 --workers 1 --threads 3 --max-requests 1000 --max-requests-jitter 50 app.wsgi
