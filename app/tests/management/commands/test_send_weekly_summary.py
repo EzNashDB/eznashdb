@@ -344,6 +344,8 @@ def describe_send_weekly_summary():
             assert state.points == 1
 
     def describe_google_places_usage():
+        # Freeze to mid-month so "yesterday" and "5 days ago" fall within the current month
+        @freeze_time("2026-02-15")
         def shows_usage_section_with_weekly_and_monthly_totals(superuser, db, mailoutbox):
             now = timezone.now()
 
@@ -389,6 +391,7 @@ def describe_send_weekly_summary():
             assert ">70<" in html
             assert ">35<" in html
 
+        @freeze_time("2026-02-15")  # mid-month so yesterday is still in the current month
         def calculates_monthly_percentages(superuser, db, mailoutbox):
             now = timezone.now()
 
