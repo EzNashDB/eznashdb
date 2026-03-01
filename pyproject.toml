@@ -116,6 +116,7 @@ django-waffle = "^5.0.0"
 django-safedelete = "^1.4.1"
 pillow = "^12.1.0"
 django-constance = "^4.3.4"
+python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
