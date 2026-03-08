@@ -2,6 +2,10 @@ import setBodyHeight from "../initializers/bodyHeight";
 import initializeTomSelects from "../initializers/tomSelect";
 import initializeTooltips from "../initializers/tooltips";
 import Alpine from "alpinejs";
+import htmx from "htmx.org";
+import "../utils/geolocation";
+
+window.htmx = htmx;
 
 (() => {
   function onDocumentEvent(eventName, funcs) {

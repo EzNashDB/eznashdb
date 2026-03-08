@@ -188,7 +188,7 @@
     <script type="text/javascript">
     window.htmxSubmitting = false;
     document.body.addEventListener("htmx:beforeRequest", (e) => {
-        if (e.target?.type === 'submit') window.htmxSubmitting = true;
+        if (e.target && e.target.type === 'submit') window.htmxSubmitting = true;
     });
     // Reset htmxSubmitting after request completes
     document.body.addEventListener("htmx:afterRequest", (e) => {

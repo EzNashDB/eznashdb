@@ -37,9 +37,15 @@ window.GeolocationUtils = (() => {
 
     const geolocationOptions = {
       enableHighAccuracy:
-        options.enableHighAccuracy ?? DEFAULT_OPTIONS.enableHighAccuracy,
-      timeout: options.timeout ?? DEFAULT_OPTIONS.timeout,
-      maximumAge: options.maximumAge ?? DEFAULT_OPTIONS.maximumAge,
+        options.enableHighAccuracy != null
+          ? options.enableHighAccuracy
+          : DEFAULT_OPTIONS.enableHighAccuracy,
+      timeout:
+        options.timeout != null ? options.timeout : DEFAULT_OPTIONS.timeout,
+      maximumAge:
+        options.maximumAge != null
+          ? options.maximumAge
+          : DEFAULT_OPTIONS.maximumAge,
     };
 
     navigator.geolocation.getCurrentPosition(

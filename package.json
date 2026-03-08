@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "alpinejs": "^3.13.7",
+    "htmx.org": "^2.0.8",
     "leaflet": "^1.9.4",
     "leaflet-gesture-handling": "^1.2.2",
     "less": "^4.2.0",
