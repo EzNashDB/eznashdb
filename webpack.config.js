@@ -16,6 +16,14 @@ module.exports = {
     filename: "[name].js",
     path: path.resolve(__dirname, "./static/dist"),
   },
+  resolve: {
+    alias: {
+      alpinejs: path.resolve(
+        __dirname,
+        "node_modules/alpinejs/dist/module.cjs.js"
+      ),
+    },
+  },
   module: {
     rules: [
       {
@@ -23,6 +31,14 @@ module.exports = {
         exclude: /node_modules/,
         loader: "babel-loader",
         options: { presets: ["@babel/preset-env", "@babel/preset-react"] },
+      },
+      {
+        test: /\.js$/,
+        include: /node_modules\/htmx\.org/,
+        loader: "babel-loader",
+        options: {
+          plugins: ["@babel/plugin-transform-optional-chaining"],
+        },
       },
       {
         test: /\.(sass|less|css)$/,
