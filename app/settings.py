@@ -50,6 +50,8 @@ CSRF_TRUSTED_ORIGINS = [
 # Trust X-Forwarded-Proto header from proxy for HTTPS detection
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 # Security headers for production
 if DJANGO_ENV == "prod":
     SECURE_SSL_REDIRECT = True
