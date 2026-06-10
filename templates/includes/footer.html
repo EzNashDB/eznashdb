@@ -2,18 +2,29 @@
 <footer class="bg-light border-top mt-auto">
     <div class="container py-4">
         <div class="row align-items-center">
-            <div class="col-md-6  mb-3 mb-md-0">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <h5 class="mb-1">The Ezrat Nashim Database</h5>
                 <p class="text-muted small mb-0">Mapping women's spaces in synagogues around the world</p>
             </div>
             <div class="col-md-6 text-md-end">
-                <p class="text-muted small mb-1">
-                    <a href="/about/" class="text-decoration-none">About</a> |
-                    <a href="{% url 'eznashdb:contact_us' %}" class="text-decoration-none">Contact</a> |
+                <p class="text-muted small mb-2 d-flex justify-content-md-end align-items-center gap-3">
+                    <a href="/about/" class="text-decoration-none">About</a>
+                    <a href="{% url 'eznashdb:contact_us' %}" class="text-decoration-none">Contact</a>
                     <a href="https://github.com/EzNashDB/eznashdb"
-                       class="text-decoration-none"
+                       class="text-decoration-none fs-5 text-muted"
                        target="_blank"
-                       rel="noopener">GitHub</a>
+                       rel="noopener"
+                       aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.instagram.com/theezratnashimdatabase/"
+                       class="text-decoration-none fs-5 text-muted"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61583770480933"
+                       class="text-decoration-none fs-5 text-muted"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                 </p>
                 <p class="text-muted small mb-0 d-flex justify-content-md-end align-items-center gap-2">
                     <span>Built and maintained by</span>
