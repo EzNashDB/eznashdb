@@ -149,6 +149,14 @@ td.td-shrink {
   z-index: 10;
 }
 
+/* htmx indicators: hide via display so they take no space when not loading */
+.htmx-indicator {
+  display: none;
+}
+.htmx-request .htmx-indicator {
+  display: inline-block;
+}
+
 /* tomselect */
 .ts-dropdown [data-selectable].option {
   display: flex;

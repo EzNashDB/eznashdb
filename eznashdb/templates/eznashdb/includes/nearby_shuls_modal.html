@@ -32,7 +32,13 @@
                     {# djlint:on #}
                     hx-post='{{ request.path }}'
                     hx-target='#shul_form'
-                    hx-swap='outerHTML'>Continue Anyway</button>
+                    hx-swap='outerHTML'
+                    hx-disabled-elt="this">
+                    <span class="htmx-indicator spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"></span>
+                    Continue Anyway
+                </button>
             </div>
         </div>
     </div>
