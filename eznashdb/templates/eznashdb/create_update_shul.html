@@ -125,7 +125,11 @@
                                 {# djlint:on #}
                                 hx-post='{{ request.path }}'
                                 hx-target='#shul_form'
-                                hx-swap='outerHTML'>
+                                hx-swap='outerHTML'
+                                hx-disabled-elt="this">
+                                <span class="htmx-indicator spinner-border spinner-border-sm me-2"
+                                      role="status"
+                                      aria-hidden="true"></span>
                                 {% if wizard_step == '1' %}
                                     Next: Add Rooms
                                     <i class="ms-2 fa-solid fa-arrow-right"></i>
