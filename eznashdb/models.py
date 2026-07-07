@@ -26,7 +26,7 @@ class Shul(SafeDeleteModel):
         null=True,
         blank=True,
     )
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
     address = models.CharField(max_length=255, blank=True)
     latitude = models.DecimalField(max_digits=22, decimal_places=17)
     longitude = models.DecimalField(max_digits=22, decimal_places=17)
@@ -112,7 +112,7 @@ class Room(models.Model):
     )
     updated_by = ArrayField(models.IntegerField(), blank=True, default=list)
     shul = models.ForeignKey("eznashdb.Shul", on_delete=models.PROTECT, related_name="rooms")
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
     relative_size = models.CharField(max_length=50, blank=True, choices=RelativeSize.choices, default="")
     see_hear_score = models.CharField(
         max_length=50, blank=True, choices=SeeHearScore.choices, default=""
