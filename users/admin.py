@@ -104,7 +104,14 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Flag)
 class FlagAdmin(WaffleFlagAdmin):
+    raw_id_fields = ()  # drop waffle's raw-id widget for `users`
+    autocomplete_fields = ("users", "groups")
     filter_horizontal = tuple(list(WaffleFlagAdmin.filter_horizontal) + ["user_permissions"])
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        # Waffle's FlagAdmin special-cases `users` to force a raw-id widget;
+        # bypass that so `autocomplete_fields` above takes effect instead.
+        return admin.ModelAdmin.formfield_for_dbfield(self, db_field, **kwargs)
 
 
 @admin.register(Switch)
