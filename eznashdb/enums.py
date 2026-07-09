@@ -86,3 +86,14 @@ class SeeHearScore(DisplayChoicesMixin, models.TextChoices):
         filled = "<i class='fa-solid fa-star text-warning'></i>"
         empty = "<i class='fa-regular fa-star text-warning'></i>"
         return "".join(filled if i < score else empty for i in range(5))
+
+
+class KaddishAllowed(models.TextChoices):
+    ALONE_OR_WITH_MEN = "ALONE_OR_WITH_MEN", _("Yes – alone or with men")
+    WITH_MEN_ONLY = "WITH_MEN_ONLY", _("Yes – only with men")
+    NO = "NO", _("No")
+
+
+class ManJoinsKaddish(models.TextChoices):
+    YES = "YES", _("Yes")
+    NO = "NO", _("No")
