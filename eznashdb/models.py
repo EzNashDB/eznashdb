@@ -8,7 +8,7 @@ from django.urls import reverse
 from safedelete.managers import SafeDeleteDeletedManager
 from safedelete.models import SafeDeleteModel
 
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import KaddishAllowed, ManJoinsKaddish, RelativeSize, SeeHearScore
 
 
 class Shul(SafeDeleteModel):
@@ -33,6 +33,12 @@ class Shul(SafeDeleteModel):
     place_id = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=255, blank=True)
     deletion_reason = models.TextField(blank=True)
+    is_kaddish_allowed = models.CharField(
+        max_length=50, blank=True, choices=KaddishAllowed.choices, default=""
+    )
+    has_man_join_kaddish = models.CharField(
+        max_length=50, blank=True, choices=ManJoinsKaddish.choices, default=""
+    )
 
     class Meta:
         verbose_name = "shul"
