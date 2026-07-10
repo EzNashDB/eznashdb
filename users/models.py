@@ -6,7 +6,8 @@ from waffle.utils import get_cache, get_setting, keyfmt
 
 
 class User(AbstractUser):
-    pass
+    def __str__(self):
+        return self.email or self.username
 
 
 class Flag(AbstractUserFlag):
