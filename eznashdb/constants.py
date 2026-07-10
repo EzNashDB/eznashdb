@@ -60,6 +60,14 @@ class FieldsOptions:
             Compared to men, how well can women see and hear?
         """,
     )
+    KADDISH_ALLOWED = FieldOptions(
+        "Can women say mourner's kaddish?",
+        "fa-solid fa-comment",
+    )
+    MAN_JOINS_KADDISH = FieldOptions(
+        "Is there always a man who will join?",
+        "fa-solid fa-user-plus",
+    )
 
 
 JUST_SAVED_SHUL_SESSION_KEY = "just_saved_shul_id"

@@ -21,15 +21,21 @@ class ShulForm(ModelForm):
             "latitude",
             "longitude",
             "place_id",
+            "is_kaddish_allowed",
+            "has_man_join_kaddish",
         ]
         labels = {
             "name": FieldsOptions.SHUL_NAME.label,
             "address": FieldsOptions.ADDRESS.label,
+            "is_kaddish_allowed": FieldsOptions.KADDISH_ALLOWED.label,
+            "has_man_join_kaddish": FieldsOptions.MAN_JOINS_KADDISH.label,
         }
         widgets = {
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),
             "place_id": HiddenInput(),
+            "is_kaddish_allowed": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
+            "has_man_join_kaddish": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
         }
 
     def __init__(self, *args, **kwargs):
