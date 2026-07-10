@@ -3,6 +3,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% load partials %}
+{% load waffle_tags %}
 
 {% block title %}
     {% if not form.instance.pk %}
@@ -100,58 +101,67 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
+                                                {% flag "kaddish" %}
+                                                <div class="row">
+                                                    <h5 class="col-12 upt-3 mb-2" id="kaddish-form-header">Kaddish</h5>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-12">{{ form.is_kaddish_allowed|as_crispy_field }}</div>
+                                                    <div class="col-12">{{ form.has_man_join_kaddish|as_crispy_field }}</div>
+                                                </div>
+                                            {% endflag %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row border-top pt-3 mt-3">
-                        <div class="col-12 d-flex flex-column flex-md-row justify-content-center align-items-center gap-2">
-                            <a href="/" class="btn btn-link text-muted order-md-0 order-1">
-                                <i class="fa-solid fa-arrow-left me-1"></i>Back to Home
-                            </a>
-                            <button type="submit"
-                                class="btn btn-primary order-md-1 order-0 text-nowrap"
-                                style="min-width: 200px;"
-                                {# djlint:off #}
+                </div>
+                <div class="row border-top pt-3 mt-3">
+                    <div class="col-12 d-flex flex-column flex-md-row justify-content-center align-items-center gap-2">
+                        <a href="/" class="btn btn-link text-muted order-md-0 order-1">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Back to Home
+                        </a>
+                        <button type="submit"
+                            class="btn btn-primary order-md-1 order-0 text-nowrap"
+                            style="min-width: 200px;"
+                            {# djlint:off #}
                                     hx-vals='js:{
                                         "check_nearby_shuls": (() => {
                                             const dirtyFields = Alpine.$data(document.getElementById("shul-form-state")).dirtyFields;
                                             return dirtyFields.has("latitude") || dirtyFields.has("longitude");
                                         })(),
                                     }'
-                                {# djlint:on #}
-                                hx-post='{{ request.path }}'
-                                hx-target='#shul_form'
-                                hx-swap='outerHTML'
-                                hx-disabled-elt="this">
-                                <span class="htmx-indicator spinner-border spinner-border-sm me-2"
-                                      role="status"
-                                      aria-hidden="true"></span>
-                                {% if wizard_step == '1' %}
-                                    Next: Add Rooms
-                                    <i class="ms-2 fa-solid fa-arrow-right"></i>
-                                {% else %}
-                                    Save
-                                {% endif %}
-                            </button>
-                        </div>
+                            {# djlint:on #}
+                            hx-post='{{ request.path }}'
+                            hx-target='#shul_form'
+                            hx-swap='outerHTML'
+                            hx-disabled-elt="this">
+                            <span class="htmx-indicator spinner-border spinner-border-sm me-2"
+                                  role="status"
+                                  aria-hidden="true"></span>
+                            {% if wizard_step == '1' %}
+                                Next: Add Rooms
+                                <i class="ms-2 fa-solid fa-arrow-right"></i>
+                            {% else %}
+                                Save
+                            {% endif %}
+                        </button>
                     </div>
                 </div>
-                <script>
+            </div>
+            <script>
                     window.shulForm = {
                         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
                     }
-                </script>
-                <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
-                {% if nearby_shuls %}
-                    {% include "eznashdb/includes/nearby_shuls_modal.html" %}
-                {% endif %}
-            </form>
-        {% endpartialdef %}
-    </div>
+            </script>
+            <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
+            {% if nearby_shuls %}
+                {% include "eznashdb/includes/nearby_shuls_modal.html" %}
+            {% endif %}
+        </form>
+    {% endpartialdef %}
+</div>
 </div>
 {% if object %}
     <div class="modal fade"
