@@ -284,7 +284,7 @@
         }
 
         const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
-        const header = document.getElementById('rooms-form-header');
+        const header = document.getElementById('{% flag "kaddish" %}kaddish-form-header{% else %}rooms-form-header{% endflag %}');
 
         if (!roomCollapseEl || !header) return;
 
