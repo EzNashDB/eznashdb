@@ -78,38 +78,38 @@
                                                 <div class="d-md-none">
                                                     <hr />
                                                 </div>
-                                                <div class="row">
-                                                    <h5 class="col-12 pt-3 mb-2" id="rooms-form-header">Rooms</h5>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    {{ room_fs.management_form }}
-                                                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                                    <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
-                                                        {% if not shul.rooms.exists %}
-                                                            'rooms-0-form'
-                                                        {% else %}
-                                                            null
-                                                        {% endif %}
-                                                        }">
-                                                        {% for form in room_fs %}
-                                                            {% crispy form %}
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <div class="row justify-content-end">
-                                                            <div class="add-room-container col-12 d-flex justify-content-end"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 {% flag "kaddish" %}
                                                 <div class="row">
-                                                    <h5 class="col-12 upt-3 mb-2" id="kaddish-form-header">Kaddish</h5>
+                                                    <h5 class="col-12 pt-3 mb-2" id="kaddish-form-header">Kaddish</h5>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-12">{{ form.is_kaddish_allowed|as_crispy_field }}</div>
                                                     <div class="col-12">{{ form.has_man_join_kaddish|as_crispy_field }}</div>
                                                 </div>
                                             {% endflag %}
+                                            <div class="row">
+                                                <h5 class="col-12 upt-3 mb-2" id="rooms-form-header">Rooms</h5>
+                                            </div>
+                                            <div class="row mb-3">
+                                                {{ room_fs.management_form }}
+                                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
+                                                    {% if not shul.rooms.exists %}
+                                                        'rooms-0-form'
+                                                    {% else %}
+                                                        null
+                                                    {% endif %}
+                                                    }">
+                                                    {% for form in room_fs %}
+                                                        {% crispy form %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="add-room-container col-12 d-flex justify-content-end"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     {% endif %}
                                 </div>
