@@ -61,11 +61,11 @@ class FieldsOptions:
         """,
     )
     KADDISH_ALLOWED = FieldOptions(
-        "Can women say mourner's kaddish?",
+        "Are women welcome to say kaddish?",
         "fa-solid fa-comment",
     )
     MAN_JOINS_KADDISH = FieldOptions(
-        "Is there always a man who will join?",
+        "Does the shul ensure a man will join if needed?",
         "fa-solid fa-user-plus",
     )
 
