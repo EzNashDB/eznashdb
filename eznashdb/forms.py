@@ -5,7 +5,7 @@ from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factor
 from django.forms.models import BaseInlineFormSet
 
 from eznashdb.constants import FieldsOptions
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import KaddishAllowed, ManJoinsKaddish, RelativeSize, SeeHearScore
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import SingleTomSelectWidget
 
@@ -34,8 +34,8 @@ class ShulForm(ModelForm):
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),
             "place_id": HiddenInput(),
-            "is_kaddish_allowed": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
-            "has_man_join_kaddish": SingleTomSelectWidget(attrs={"data-strip-badge": "true"}),
+            "is_kaddish_allowed": SingleTomSelectWidget(),
+            "has_man_join_kaddish": SingleTomSelectWidget(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -44,6 +44,12 @@ class ShulForm(ModelForm):
         helper.template = "eznashdb/shul_form.html"
         helper.form_tag = False
         self.fields["address"].required = True
+        self.fields["is_kaddish_allowed"].choices = KaddishAllowed.get_display_choices(
+            include_blank=True
+        )
+        self.fields["has_man_join_kaddish"].choices = ManJoinsKaddish.get_display_choices(
+            include_blank=True
+        )
 
     def clean(self):
         cleaned_data = super().clean()

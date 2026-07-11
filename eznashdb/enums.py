@@ -88,12 +88,49 @@ class SeeHearScore(DisplayChoicesMixin, models.TextChoices):
         return "".join(filled if i < score else empty for i in range(5))
 
 
-class KaddishAllowed(models.TextChoices):
-    ALONE_OR_WITH_MEN = "ALONE_OR_WITH_MEN", _("Yes – alone or with men")
-    WITH_MEN_ONLY = "WITH_MEN_ONLY", _("Yes – only with men")
+class IconDisplayChoicesMixin(DisplayChoicesMixin):
+    """DisplayChoicesMixin that renders a leading FontAwesome icon."""
+
+    @property
+    def icon_class(self):
+        raise NotImplementedError
+
+    def get_display(self):
+        return mark_safe(
+            f"<span class='text-nowrap'><i class='{self.icon_class}'></i> {self.label}</span>"
+        )
+
+    def get_option_display(self):
+        return mark_safe(
+            f"""
+            <div class='d-flex align-items-center gap-2'>
+                <i class='{self.icon_class}'></i> {self.label}
+            </div>
+            """
+        )
+
+
+class KaddishAllowed(IconDisplayChoicesMixin, models.TextChoices):
+    ALONE_OR_WITH_MEN = "ALONE_OR_WITH_MEN", _("Yes (alone or with men)")
+    WITH_MEN_ONLY = "WITH_MEN_ONLY", _("Only with men")
     NO = "NO", _("No")
 
+    @property
+    def icon_class(self):
+        return {
+            self.ALONE_OR_WITH_MEN: "fa-solid fa-circle-check text-success",
+            self.WITH_MEN_ONLY: "fa-solid fa-circle-exclamation text-warning",
+            self.NO: "fa-solid fa-circle-xmark text-danger",
+        }[self]
 
-class ManJoinsKaddish(models.TextChoices):
+
+class ManJoinsKaddish(IconDisplayChoicesMixin, models.TextChoices):
     YES = "YES", _("Yes")
     NO = "NO", _("No")
+
+    @property
+    def icon_class(self):
+        return {
+            self.YES: "fa-solid fa-circle-check text-success",
+            self.NO: "fa-solid fa-circle-xmark text-danger",
+        }[self]

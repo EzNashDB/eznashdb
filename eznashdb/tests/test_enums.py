@@ -1,4 +1,4 @@
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import KaddishAllowed, RelativeSize, SeeHearScore
 
 
 def describe_relative_size():
@@ -103,3 +103,14 @@ def describe_see_hear_score():
         assert len(choices) == len(SeeHearScore) + 1
         # First choice should be blank
         assert choices[0] == ("", "-------")
+
+
+def describe_icon_display_choices():
+    """Tests for IconDisplayChoicesMixin option rendering (via KaddishAllowed)"""
+
+    def test_get_option_display_renders_icon_and_label():
+        option = KaddishAllowed.ALONE_OR_WITH_MEN
+        result = option.get_option_display()
+
+        assert option.icon_class in result
+        assert str(option.label) in result
