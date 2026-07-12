@@ -65,7 +65,7 @@ class FieldsOptions:
         "fa-solid fa-comment",
     )
     MAN_JOINS_KADDISH = FieldOptions(
-        "Does the shul ensure a man will join if needed?",
+        "If needed, does the shul ensure a man will join?",
         "fa-solid fa-user-plus",
     )
 
