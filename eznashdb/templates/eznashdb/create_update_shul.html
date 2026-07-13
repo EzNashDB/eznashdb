@@ -78,6 +78,7 @@
                                                 <div class="d-md-none">
                                                     <hr />
                                                 </div>
+                                                <div id="step2-scroll-anchor"></div>
                                                 {% flag "kaddish" %}
                                                 <div class="row">
                                                     <h5 class="col-12 pt-3 mb-2" id="kaddish-form-header">
@@ -290,7 +291,7 @@
         }
 
         const roomCollapseEl = document.querySelector('.room-form .accordion-collapse');
-        const header = document.getElementById('{% flag "kaddish" %}kaddish-form-header{% else %}rooms-form-header{% endflag %}');
+        const header = document.getElementById('step2-scroll-anchor');
 
         if (!roomCollapseEl || !header) return;
 
