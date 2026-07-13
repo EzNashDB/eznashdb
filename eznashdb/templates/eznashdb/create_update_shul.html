@@ -91,7 +91,10 @@
                                                 </div>
                                             {% endflag %}
                                             <div class="row">
-                                                <h5 class="col-12 upt-3 mb-2" id="rooms-form-header">Rooms</h5>
+                                                <h5 class="{% flag "kaddish" %}
+                                                           {% else %}
+                                                           pt-3 {% endflag %} col-12 mb-2"
+                                                    id="rooms-form-header">Rooms</h5>
                                             </div>
                                             <div class="row mb-3">
                                                 {{ room_fs.management_form }}
