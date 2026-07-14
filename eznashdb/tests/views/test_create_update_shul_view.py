@@ -6,7 +6,7 @@ from django.urls import reverse
 from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
-from eznashdb.enums import KaddishAllowed, ManJoinsKaddish
+from eznashdb.enums import KaddishPolicy
 from eznashdb.models import Shul
 from eznashdb.views import CreateUpdateShulView
 from users.models import User
@@ -172,24 +172,22 @@ def describe_update():
 
 def describe_kaddish_flag():
     @override_flag("kaddish", active=True)
-    def shows_kaddish_fields_when_flag_active(rf_GET, test_shul, test_user):
+    def shows_kaddish_field_when_flag_active(rf_GET, test_shul, test_user):
         request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
         request.user = test_user
         response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert soup.find(attrs={"name": "is_kaddish_allowed"})
-        assert soup.find(attrs={"name": "has_man_join_kaddish"})
+        assert soup.find(attrs={"name": "kaddish_policy"})
 
     @override_flag("kaddish", active=False)
-    def hides_kaddish_fields_when_flag_inactive(rf_GET, test_shul, test_user):
+    def hides_kaddish_field_when_flag_inactive(rf_GET, test_shul, test_user):
         request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
         request.user = test_user
         response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert not soup.find(attrs={"name": "is_kaddish_allowed"})
-        assert not soup.find(attrs={"name": "has_man_join_kaddish"})
+        assert not soup.find(attrs={"name": "kaddish_policy"})
 
     @override_flag("kaddish", active=True)
     def saves_kaddish_fields(client, test_shul, test_user):
@@ -200,8 +198,7 @@ def describe_kaddish_flag():
             "latitude": test_shul.latitude,
             "longitude": test_shul.longitude,
             "check_nearby_shuls": "false",
-            "is_kaddish_allowed": KaddishAllowed.ALONE_OR_WITH_MEN,
-            "has_man_join_kaddish": ManJoinsKaddish.NO,
+            "kaddish_policy": KaddishPolicy.SHUL_ENSURES_MAN,
             **get_room_fields(room_index=0),
             **get_room_fs_metadata_fields(total_forms=1),
         }
@@ -212,8 +209,7 @@ def describe_kaddish_flag():
         )
 
         test_shul.refresh_from_db()
-        assert test_shul.is_kaddish_allowed == KaddishAllowed.ALONE_OR_WITH_MEN
-        assert test_shul.has_man_join_kaddish == ManJoinsKaddish.NO
+        assert test_shul.kaddish_policy == KaddishPolicy.SHUL_ENSURES_MAN
 
 
 def test_shows_nearby_modal_when_check_nearby_shuls_true(client, test_user):
