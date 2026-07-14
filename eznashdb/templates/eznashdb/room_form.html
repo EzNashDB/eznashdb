@@ -1,11 +1,10 @@
 {% load crispy_forms_tags %}
 <div class="accordion-item room-form" id="{{ room_fs.prefix }}-{{ forloop.counter0 }}-form"
     {# djlint:off #}
-        {% with dropdown_default="<span class='text-muted'>- Not set -</span>" %}
         x-data='{
             roomName: "{{ form.instance.name }}",
-            sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:dropdown_default|escapejs }}",
-            seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:dropdown_default|escapejs }}",
+            sizeBanner: "{{ form.instance.get_relative_size_display|safe|default:'--'|escapejs }}",
+            seeHearBanner: "{{ form.instance.get_see_hear_score_display|safe|default:'--'|escapejs }}",
             handleTomFieldChanged(event) {
                 this.updateIfMatch(event, "relative_size", "sizeBanner");
                 this.updateIfMatch(event, "see_hear_score", "seeHearBanner");
@@ -15,10 +14,9 @@
                 const isChildSource = $el.contains(sourceElem);
                 const isFieldNameMatch = event.detail.fieldName.includes(eventFieldName);
                 if (!isChildSource || !isFieldNameMatch) return;
-                this[stateFieldName] = event.detail.html || "{{dropdown_default|escapejs}}";
+                this[stateFieldName] = event.detail.html || "{{'--'|escapejs}}";
             },
         }'
-        {% endwith %}
         x-init="
             const collapseEl = $el.querySelector('.accordion-collapse');
             collapseEl.addEventListener('show.bs.collapse', () => openRoom = $el.id);
