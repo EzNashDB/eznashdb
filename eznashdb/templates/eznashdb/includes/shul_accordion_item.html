@@ -1,5 +1,6 @@
 {# Shared accordion item for a single shul - used by both cluster and exact pin popups #}
 {# Parameters: shul, accordion_id, item_id_prefix, total_shuls (optional), is_expanded (optional bool), is_last (optional bool) #}
+{% load waffle_tags %}
 <div class="accordion-item border-0"
      x-init="SHUL_MAP_API.initShulAccordion($el, {{ shul.pk }})">
     <h2 class="accordion-header" style="scroll-margin-top: 15px">
@@ -47,32 +48,43 @@
        x-init="$el.textContent = new Date($el.dataset.utc).toLocaleString(undefined, {dateStyle: 'medium'})"></span>
                     </div>
                 </div>
-                {% if shul.rooms.exists %}
-                    <ul class="list-group mt-3">
-                        {% for room in shul.rooms.all %}
-                            <li class="list-group-item">
-                                <div class="h6 fw-bold">{{ room.name }}</div>
-                                {% with not_set_display="<span class='text-muted'>- Not set -</span>" %}
-                                <div class="row g-3">
-                                    <div class="col-7">
-                                        <div class="small text-muted mb-1 text-nowrap">
-                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> Size
-                                        </div>
-                                        <div>{{ room.get_relative_size_display|safe|default:not_set_display }}</div>
+                {% flag "kaddish" %}
+                <div class="">
+                    <hr>
+                    <div class="d-flex align-items-start gap-2">
+                        <span class="text-muted">Kaddish:</span>
+                        <div>
+                            {{ shul.get_kaddish_policy_display|safe|default:"<span class='text-muted'>- Not set -</span>" }}
+                        </div>
+                    </div>
+                </div>
+            {% endflag %}
+            {% if shul.rooms.exists %}
+                <ul class="list-group mt-3">
+                    {% for room in shul.rooms.all %}
+                        <li class="list-group-item">
+                            <div class="h6 fw-bold">{{ room.name }}</div>
+                            {% with not_set_display="<span class='text-muted'>- Not set -</span>" %}
+                            <div class="row g-3">
+                                <div class="col-7">
+                                    <div class="small text-muted mb-1 text-nowrap">
+                                        <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> Size
                                     </div>
-                                    <div class="col-5">
-                                        <div class="small text-muted mb-1 text-nowrap">
-                                            <i class="fa-solid fa-eye me-1"></i> Vis. & Aud.
-                                        </div>
-                                        <div>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</div>
-                                    </div>
+                                    <div>{{ room.get_relative_size_display|safe|default:not_set_display }}</div>
                                 </div>
-                            {% endwith %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
+                                <div class="col-5">
+                                    <div class="small text-muted mb-1 text-nowrap">
+                                        <i class="fa-solid fa-eye me-1"></i> Vis. & Aud.
+                                    </div>
+                                    <div>{{ room.get_see_hear_score_display|safe|default:not_set_display }}</div>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
+</div>
 </div>
 {% if not is_last %}<hr class="my-0 text-secondary-subtle" />{% endif %}

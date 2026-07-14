@@ -96,9 +96,7 @@ class IconDisplayChoicesMixin(DisplayChoicesMixin):
         raise NotImplementedError
 
     def get_display(self):
-        return mark_safe(
-            f"<span class='text-nowrap'><i class='{self.icon_class}'></i> {self.label}</span>"
-        )
+        return mark_safe(f"<i class='{self.icon_class}'></i> {self.label}")
 
     def get_option_display(self):
         return mark_safe(

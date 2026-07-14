@@ -45,6 +45,12 @@ class Shul(SafeDeleteModel):
     def __str__(self) -> str:
         return f"{self.name}"
 
+    def get_kaddish_policy_display(self):
+        if self.kaddish_policy:
+            return KaddishPolicy(self.kaddish_policy).get_display()
+        else:
+            return ""
+
     @property
     def display_lat(self):
         return self.rounded_lat + self.get_jitter("lat")
