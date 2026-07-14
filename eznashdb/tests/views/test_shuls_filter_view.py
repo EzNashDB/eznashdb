@@ -38,13 +38,13 @@ def describe_rooms():
 
         assert relative_size.value in str(soup)
 
-    def test_displays_not_set_for_unknown_relative_size(test_shul, GET_request):
+    def test_displays_dash_for_unknown_relative_size(test_shul, GET_request):
         test_shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert "not set" in str(soup).lower()
+        assert "--" in str(soup)
 
     @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
     def test_shows_room_see_hear_score(test_shul, GET_request, see_hear_score):
@@ -63,13 +63,13 @@ def describe_rooms():
         assert str(marker_script).count(filled_class) == expected_filled_star_count
         assert str(marker_script).count(empty_class) == expected_empty_star_count
 
-    def test_shows_not_set_for_unknown_see_hear_score(test_shul, GET_request):
+    def test_shows_dash_for_unknown_see_hear_score(test_shul, GET_request):
         test_shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
 
         response = ShulsFilterView.as_view()(GET_request)
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
-        assert "not set" in str(soup).lower()
+        assert "--" in str(soup)
 
 
 def describe_exact_pin_behavior():
