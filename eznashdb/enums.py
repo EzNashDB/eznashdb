@@ -110,27 +110,17 @@ class IconDisplayChoicesMixin(DisplayChoicesMixin):
         )
 
 
-class KaddishAllowed(IconDisplayChoicesMixin, models.TextChoices):
-    ALONE_OR_WITH_MEN = "ALONE_OR_WITH_MEN", _("Yes (alone or with men)")
-    WITH_MEN_ONLY = "WITH_MEN_ONLY", _("Only with men")
+class KaddishPolicy(IconDisplayChoicesMixin, models.TextChoices):
+    CAN_SAY_ALONE = "CAN_SAY_ALONE", _("Yes, can say alone")
+    SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Yes, shul ensures a man always joins")
+    ONLY_IF_MAN = "ONLY_IF_MAN", _("Only if a man joins, need to coordinate")
     NO = "NO", _("No")
 
     @property
     def icon_class(self):
         return {
-            self.ALONE_OR_WITH_MEN: "fa-solid fa-circle-check text-success",
-            self.WITH_MEN_ONLY: "fa-solid fa-circle-exclamation text-warning",
-            self.NO: "fa-solid fa-circle-xmark text-danger",
-        }[self]
-
-
-class ManJoinsKaddish(IconDisplayChoicesMixin, models.TextChoices):
-    YES = "YES", _("Yes")
-    NO = "NO", _("No")
-
-    @property
-    def icon_class(self):
-        return {
-            self.YES: "fa-solid fa-circle-check text-success",
+            self.CAN_SAY_ALONE: "fa-solid fa-circle-check text-success",
+            self.SHUL_ENSURES_MAN: "fa-solid fa-circle-check text-success",
+            self.ONLY_IF_MAN: "fa-solid fa-circle-exclamation text-warning",
             self.NO: "fa-solid fa-circle-xmark text-danger",
         }[self]
