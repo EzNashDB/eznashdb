@@ -221,10 +221,6 @@
                 return window.innerWidth < 1024 || window.innerHeight < 600;
             };
 
-            const getClusterKey = (lat, lon) => {
-                return `${lat}_${lon}`;
-            };
-
             // ============================================================================
             // POPUP SETUP HELPER
             // ============================================================================
@@ -448,7 +444,8 @@
                     }
 
                     // Security cluster - show combined popup
-                    const clusterKey = getClusterKey(firstPos.lat, firstPos.lng);
+                    const firstShulId = childMarkers[0].options.shulId;
+                    const clusterKey = window.SHUL_MAP_API.shulToClusterKey[firstShulId];
                     const popupContent = window.SHUL_MAP_API.clusterPopupHtmlMap?.[clusterKey];
 
                     if (!popupContent) {
