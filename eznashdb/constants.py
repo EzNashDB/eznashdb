@@ -27,17 +27,21 @@ class LabelWithIcon:
 
 @dataclass()
 class FieldOptions:
-    label_str: str = ""
+    label_text: str = ""
     icon_class: str = ""
     help_text: str = ""
+    verbose_label_text: str = ""
+
+    def _with_icon(self, text: str) -> str:
+        return self.icon_class and LabelWithIcon(text, self.icon_class) or text
 
     @property
-    def label(self) -> str:
-        return self.icon_class and LabelWithIcon(self.label_str, self.icon_class) or self.label_str
+    def filter_label(self) -> str:
+        return self._with_icon(self.label_text)
 
     @property
-    def help_with_icon(self) -> str:
-        return self.icon_class and LabelWithIcon(self.help_text, self.icon_class) or self.help_text
+    def form_label(self) -> str:
+        return self._with_icon(self.verbose_label_text or self.label_text)
 
 
 class FieldsOptions:
@@ -46,23 +50,24 @@ class FieldsOptions:
     ROOM_NAME = FieldOptions(
         "Room Name",
         "fa-solid fa-tag",
-        "Main Sanctuary, Beit Midrash, etc.",
+        help_text="Main Sanctuary, Beit Midrash, etc.",
     )
     RELATIVE_SIZE = FieldOptions(
         "Size of Women's Section",
         "fa-solid fa-up-right-and-down-left-from-center",
-        "How large is the women's section?",
+        verbose_label_text="How large is the women's section?",
     )
     SEE_HEAR = FieldOptions(
         "Visibility & Audibility",
         "fa-solid fa-eye",
-        """
+        verbose_label_text="""
             Compared to men, how well can women see and hear?
         """,
     )
     KADDISH_POLICY = FieldOptions(
-        "Can women say kaddish?",
+        "Kaddish",
         "fa-solid fa-comment",
+        verbose_label_text="Can women say kaddish?",
     )
 
 
