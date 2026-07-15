@@ -15,50 +15,6 @@ def test_request(rf, test_user):
     return request
 
 
-class YesNoUnknownFilterTest:
-    shul_model_field = None
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["True"]),
-            (False, ["False"]),
-            (None, ["--"]),
-        ],
-    )
-    def test_includes_shuls_that_match_single_value(self, test_shul, test_request, value, query):
-        Shul.objects.filter(pk=test_shul.pk).update(**{self.shul_model_field: value})
-        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["True", "False"]),
-            (False, ["False", "--"]),
-            (None, ["True", "--"]),
-        ],
-    )
-    def test_includes_shuls_that_match_any_of_multiple_values(
-        self, test_shul, test_request, value, query
-    ):
-        Shul.objects.filter(pk=test_shul.pk).update(**{self.shul_model_field: value})
-
-        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 1
-
-    @pytest.mark.parametrize(
-        ("value", "query"),
-        [
-            (True, ["False", "--"]),
-            (False, ["True", "--"]),
-            (None, ["True", "False"]),
-        ],
-    )
-    def test_excludes_shuls_that_do_not_match_any_value(self, test_request, test_shul, value, query):
-        Shul.objects.filter(pk=test_shul.pk).update(**{self.shul_model_field: value})
-
-        assert ShulFilterSet({self.shul_model_field: query}, request=test_request).qs.count() == 0
-
-
 def describe_relative_size_filter():
     @pytest.mark.parametrize(
         ("value", "query"),
@@ -66,7 +22,7 @@ def describe_relative_size_filter():
             (RelativeSize.S.value, ["S"]),
             (RelativeSize.M.value, ["M"]),
             (RelativeSize.L.value, ["L"]),
-            ("", ["--"]),
+            ("", [""]),
         ],
     )
     def includes_shuls_that_match_single_value(test_request, test_shul, value, query):
@@ -86,8 +42,8 @@ def describe_relative_size_filter():
         ("value", "query"),
         [
             # (RelativeSize.M.value, ["M", "L"]),
-            (RelativeSize.M.value, ["M", "--"]),
-            ("", ["M", "--"]),
+            (RelativeSize.M.value, ["M", ""]),
+            ("", ["M", ""]),
         ],
     )
     def includes_shuls_that_match_any_of_multiple_values(test_request, test_shul, value, query):
@@ -110,7 +66,7 @@ def describe_relative_size_filter():
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
 
     def unknown_includes_shuls_without_rooms(test_request, test_shul):
-        data = {"rooms__relative_size": ["--"]}
+        data = {"rooms__relative_size": [""]}
         assert test_shul in ShulFilterSet(data, request=test_request).qs
 
 
@@ -123,7 +79,7 @@ def describe_see_hear_score_filter():
             (SeeHearScore._3.value, ["3"]),
             (SeeHearScore._4.value, ["4"]),
             (SeeHearScore._5.value, ["5"]),
-            ("", ["--"]),
+            ("", [""]),
         ],
     )
     def includes_shuls_that_match_single_value(test_shul, test_request, value, query):
@@ -143,8 +99,8 @@ def describe_see_hear_score_filter():
         ("value", "query"),
         [
             (SeeHearScore._3.value, ["3", "5"]),
-            (SeeHearScore._3.value, ["3", "--"]),
-            ("", ["4", "--"]),
+            (SeeHearScore._3.value, ["3", ""]),
+            ("", ["4", ""]),
         ],
     )
     def includes_shuls_that_match_any_of_multiple_values(test_shul, test_request, value, query):
@@ -167,7 +123,7 @@ def describe_see_hear_score_filter():
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
 
     def unknown_includes_shuls_without_rooms(test_shul, test_request):
-        data = {"rooms__see_hear_score": ["--"]}
+        data = {"rooms__see_hear_score": [""]}
         assert test_shul in ShulFilterSet(data, request=test_request).qs
 
 
@@ -180,7 +136,7 @@ def describe_kaddish_policy_filter():
             (KaddishPolicy.SHUL_ENSURES_MAN.value, ["SHUL_ENSURES_MAN"]),
             (KaddishPolicy.ONLY_IF_MAN.value, ["ONLY_IF_MAN"]),
             (KaddishPolicy.NO.value, ["NO"]),
-            ("", ["--"]),
+            ("", [""]),
         ],
     )
     def includes_shuls_that_match_single_value(test_shul, test_request, value, query):
@@ -194,7 +150,7 @@ def describe_kaddish_policy_filter():
         ("value", "query"),
         [
             (KaddishPolicy.NO.value, ["NO", "ONLY_IF_MAN"]),
-            ("", ["NO", "--"]),
+            ("", ["NO", ""]),
         ],
     )
     def includes_shuls_that_match_any_of_multiple_values(test_shul, test_request, value, query):

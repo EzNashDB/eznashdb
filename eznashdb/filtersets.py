@@ -4,20 +4,19 @@ from waffle import flag_is_active
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
-from eznashdb.filters import MultipleChoiceOrUnknownCharFilter, MultiSelectModelFieldFilter
+from eznashdb.filters import MultiSelectModelFieldFilter
 from eznashdb.models import Room, Shul
 from eznashdb.widgets import SearchableMultiTomSelectWidget
 
 
 class ShulFilterSet(FilterSet):
     name = MultipleChoiceFilter(label=FieldsOptions.SHUL_NAME.filter_label)
-    kaddish_policy = MultipleChoiceOrUnknownCharFilter(
+    kaddish_policy = MultiSelectModelFieldFilter(
         model_field="kaddish_policy",
         choices=KaddishPolicy.get_display_choices(include_blank=True),
         label=FieldsOptions.KADDISH_POLICY.filter_label,
-        method="filter_kaddish_policy",
     )
-    rooms__relative_size = MultipleChoiceOrUnknownCharFilter(
+    rooms__relative_size = MultiSelectModelFieldFilter(
         model_field="rooms__relative_size",
         choices=RelativeSize.get_display_choices(include_blank=True),
         label=FieldsOptions.RELATIVE_SIZE.filter_label,
@@ -41,12 +40,7 @@ class ShulFilterSet(FilterSet):
         self.form.fields["name"].choices = choices
         self.form.fields["name"].widget = SearchableMultiTomSelectWidget(choices=choices)
 
-    def filter_kaddish_policy(self, qs, name, value):
-        value = [x if x != "--" else "" for x in value]
-        return qs.filter(kaddish_policy__in=value).distinct()
-
     def filter_rooms__relative_size(self, qs, name, value):
-        value = [x if x != "--" else "" for x in value]
         query = Q(rooms__relative_size__in=value)
         if "" in value:
             query |= Q(rooms__isnull=True)
@@ -54,7 +48,6 @@ class ShulFilterSet(FilterSet):
         return qs
 
     def filter_rooms__see_hear_score(self, qs, name, value):
-        value = [x if x != "--" else "" for x in value]
         query = Q(rooms__see_hear_score__in=value)
         if "" in value:
             query |= Q(rooms__isnull=True)
