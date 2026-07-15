@@ -109,9 +109,9 @@ class IconDisplayChoicesMixin(DisplayChoicesMixin):
 
 
 class KaddishPolicy(IconDisplayChoicesMixin, models.TextChoices):
-    CAN_SAY_ALONE = "CAN_SAY_ALONE", _("Yes, can say alone")
-    SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Yes, shul ensures a man always joins")
-    ONLY_IF_MAN = "ONLY_IF_MAN", _("Only if a man joins, need to coordinate")
+    CAN_SAY_ALONE = "CAN_SAY_ALONE", _("Can say alone")
+    SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Shul ensures a man will join")
+    ONLY_IF_MAN = "ONLY_IF_MAN", _("Only with men, need to coordinate")
     NO = "NO", _("No")
 
     @property
