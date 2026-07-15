@@ -1,7 +1,8 @@
 import pytest
 from django.urls import resolve, reverse
+from waffle.testutils import override_flag
 
-from eznashdb.enums import RelativeSize, SeeHearScore
+from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
 from eznashdb.filtersets import ShulFilterSet
 from eznashdb.models import Shul
 
@@ -167,6 +168,60 @@ def describe_see_hear_score_filter():
 
     def unknown_includes_shuls_without_rooms(test_shul, test_request):
         data = {"rooms__see_hear_score": ["--"]}
+        assert test_shul in ShulFilterSet(data, request=test_request).qs
+
+
+def describe_kaddish_policy_filter():
+    @override_flag("kaddish", active=True)
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (KaddishPolicy.CAN_SAY_ALONE.value, ["CAN_SAY_ALONE"]),
+            (KaddishPolicy.SHUL_ENSURES_MAN.value, ["SHUL_ENSURES_MAN"]),
+            (KaddishPolicy.ONLY_IF_MAN.value, ["ONLY_IF_MAN"]),
+            (KaddishPolicy.NO.value, ["NO"]),
+            ("", ["--"]),
+        ],
+    )
+    def includes_shuls_that_match_single_value(test_shul, test_request, value, query):
+        Shul.objects.filter(pk=test_shul.pk).update(kaddish_policy=value)
+
+        data = {"kaddish_policy": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @override_flag("kaddish", active=True)
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (KaddishPolicy.NO.value, ["NO", "ONLY_IF_MAN"]),
+            ("", ["NO", "--"]),
+        ],
+    )
+    def includes_shuls_that_match_any_of_multiple_values(test_shul, test_request, value, query):
+        Shul.objects.filter(pk=test_shul.pk).update(kaddish_policy=value)
+
+        data = {"kaddish_policy": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 1
+
+    @override_flag("kaddish", active=True)
+    @pytest.mark.parametrize(
+        ("value", "query"),
+        [
+            (KaddishPolicy.NO.value, ["CAN_SAY_ALONE", "ONLY_IF_MAN"]),
+            ("", ["CAN_SAY_ALONE", "NO"]),
+        ],
+    )
+    def excludes_shuls_that_do_not_match_any_value(test_shul, test_request, value, query):
+        Shul.objects.filter(pk=test_shul.pk).update(kaddish_policy=value)
+
+        data = {"kaddish_policy": query}
+        assert ShulFilterSet(data, request=test_request).qs.count() == 0
+
+    @override_flag("kaddish", active=False)
+    def is_ignored_when_flag_inactive(test_shul, test_request):
+        Shul.objects.filter(pk=test_shul.pk).update(kaddish_policy=KaddishPolicy.NO.value)
+
+        data = {"kaddish_policy": ["CAN_SAY_ALONE"]}
         assert test_shul in ShulFilterSet(data, request=test_request).qs
 
 

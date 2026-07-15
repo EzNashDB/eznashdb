@@ -24,9 +24,9 @@ class ShulForm(ModelForm):
             "kaddish_policy",
         ]
         labels = {
-            "name": FieldsOptions.SHUL_NAME.label,
-            "address": FieldsOptions.ADDRESS.label,
-            "kaddish_policy": FieldsOptions.KADDISH_POLICY.label,
+            "name": FieldsOptions.SHUL_NAME.form_label,
+            "address": FieldsOptions.ADDRESS.form_label,
+            "kaddish_policy": FieldsOptions.KADDISH_POLICY.form_label,
         }
         widgets = {
             "latitude": HiddenInput(),
@@ -63,9 +63,9 @@ class RoomForm(ModelForm):
             "see_hear_score",
         ]
         labels = {
-            "name": FieldsOptions.ROOM_NAME.label,
-            "relative_size": FieldsOptions.RELATIVE_SIZE.help_with_icon,
-            "see_hear_score": FieldsOptions.SEE_HEAR.help_with_icon,
+            "name": FieldsOptions.ROOM_NAME.form_label,
+            "relative_size": FieldsOptions.RELATIVE_SIZE.form_label,
+            "see_hear_score": FieldsOptions.SEE_HEAR.form_label,
         }
         help_texts = {
             "name": FieldsOptions.ROOM_NAME.help_text,

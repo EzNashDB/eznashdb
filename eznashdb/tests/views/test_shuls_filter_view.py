@@ -1,5 +1,6 @@
 import pytest
 from bs4 import BeautifulSoup
+from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.enums import RelativeSize, SeeHearScore
@@ -70,6 +71,22 @@ def describe_rooms():
         soup = BeautifulSoup(str(response.render().content), features="html.parser")
 
         assert "--" in str(soup)
+
+
+def describe_kaddish_policy_filter():
+    @override_flag("kaddish", active=True)
+    def shows_kaddish_filter_when_flag_active(GET_request):
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+        assert soup.find(attrs={"name": "kaddish_policy"})
+
+    @override_flag("kaddish", active=False)
+    def hides_kaddish_filter_when_flag_inactive(GET_request):
+        response = ShulsFilterView.as_view()(GET_request)
+        soup = BeautifulSoup(str(response.render().content), features="html.parser")
+
+        assert not soup.find(attrs={"name": "kaddish_policy"})
 
 
 def describe_exact_pin_behavior():
