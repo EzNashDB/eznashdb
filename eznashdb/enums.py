@@ -112,7 +112,7 @@ class KaddishPolicy(IconDisplayChoicesMixin, models.TextChoices):
     CAN_SAY_ALONE = "CAN_SAY_ALONE", _("Can say alone")
     SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Shul ensures a man will join")
     ONLY_IF_MAN = "ONLY_IF_MAN", _("Only with men, need to coordinate")
-    NO = "NO", _("No")
+    NO = "NO", _("Not allowed")
 
     @property
     def icon_class(self):
