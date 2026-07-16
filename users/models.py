@@ -1,11 +1,21 @@
 from django.contrib.auth.models import AbstractUser, Permission
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 from waffle.models import CACHE_EMPTY, AbstractBaseSample, AbstractBaseSwitch, AbstractUserFlag
 from waffle.utils import get_cache, get_setting, keyfmt
 
 
 class User(AbstractUser):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower("email"),
+                condition=~models.Q(email=""),
+                name="unique_user_email_ci",
+            ),
+        ]
+
     def __str__(self):
         return self.email or self.username
 

@@ -1,5 +1,7 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
 from waffle.admin import FlagAdmin as WaffleFlagAdmin
@@ -9,9 +11,40 @@ from waffle.admin import SwitchAdmin as WaffleSwitchAdmin
 from users.models import Flag, Sample, Switch, User
 
 
+class UserEmailCreationForm(forms.ModelForm):
+    """Create a user from just an email, so their account can be pre-configured
+    (e.g. feature flags) before they ever log in with Google."""
+
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip()
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError("A user with this email already exists.")
+        return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data["email"]
+        user.set_unusable_password()  # they'll sign in via Google
+        if commit:
+            user.save()
+        return user
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     """Admin interface for User model."""
+
+    add_form = UserEmailCreationForm
+    add_fieldsets = ((None, {"classes": ("wide",), "fields": ("email",)}),)
+    # Drop BaseUserAdmin's add_form_template: it hardcodes "enter a username
+    # and password" help text that no longer applies to the email-only form.
+    add_form_template = None
 
     list_display = [
         "email",
