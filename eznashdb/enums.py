@@ -110,7 +110,7 @@ class IconDisplayChoicesMixin(DisplayChoicesMixin):
 
 class KaddishPolicy(IconDisplayChoicesMixin, models.TextChoices):
     CAN_SAY_ALONE = "CAN_SAY_ALONE", _("Can say alone")
-    SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Shul ensures a man will join")
+    SHUL_ENSURES_MAN = "SHUL_ENSURES_MAN", _("Can say, a man will always join")
     ONLY_IF_MAN = "ONLY_IF_MAN", _("Only with men (ask or plan ahead)")
     NO = "NO", _("Not allowed")
 
