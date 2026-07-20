@@ -8,8 +8,11 @@ import logging
 
 import requests
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 BREVO_API_BASE = "https://api.brevo.com/v3"
 REQUEST_TIMEOUT_SECONDS = 5
@@ -60,4 +63,7 @@ def sync_contact(user):
         "listIds": [int(settings.BREVO_CONTACT_LIST_ID)] if settings.BREVO_CONTACT_LIST_ID else [],
         "updateEnabled": True,
     }
-    return _post("/contacts", payload)
+    response = _post("/contacts", payload)
+    if response is not None:
+        User.objects.filter(pk=user.pk).update(brevo_synced_at=timezone.now())
+    return response

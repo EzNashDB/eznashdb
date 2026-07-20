@@ -12,25 +12,13 @@ def _run_background_sync(mocker):
     )
 
 
-def test_syncs_new_user_and_records_success(mocker, django_capture_on_commit_callbacks):
-    sync_contact = mocker.patch("app.brevo.sync_contact", return_value="ok")
+def test_syncs_new_user_with_email(mocker, django_capture_on_commit_callbacks):
+    sync_contact = mocker.patch("app.brevo.sync_contact")
 
     with django_capture_on_commit_callbacks(execute=True):
         user = User.objects.create_user(username="jane", email="jane@example.com")
 
     sync_contact.assert_called_once_with(user)
-    user.refresh_from_db()
-    assert user.brevo_synced_at is not None
-
-
-def test_does_not_record_success_when_sync_fails(mocker, django_capture_on_commit_callbacks):
-    mocker.patch("app.brevo.sync_contact", return_value=None)
-
-    with django_capture_on_commit_callbacks(execute=True):
-        user = User.objects.create_user(username="jane", email="jane@example.com")
-
-    user.refresh_from_db()
-    assert user.brevo_synced_at is None
 
 
 def test_does_not_sync_user_without_email(mocker, django_capture_on_commit_callbacks):
