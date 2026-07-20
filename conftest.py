@@ -22,6 +22,11 @@ def _enable_db_access_for_all_tests(db):
 
 
 @pytest.fixture(autouse=True)
+def _mock_brevo(mocker):
+    mocker.patch("app.brevo._post", return_value=None)
+
+
+@pytest.fixture(autouse=True)
 def google_social_app(db):
     """Set up Google OAuth SocialApp for tests that render auth templates"""
     site = Site.objects.get_current()

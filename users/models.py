@@ -7,6 +7,8 @@ from waffle.utils import get_cache, get_setting, keyfmt
 
 
 class User(AbstractUser):
+    brevo_synced_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
