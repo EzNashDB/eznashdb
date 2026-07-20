@@ -80,3 +80,19 @@ def describe_sync_contact():
         brevo.sync_contact(user_without_email)
 
         post.assert_not_called()
+
+    def records_brevo_synced_at_on_success(user, mocker):
+        mocker.patch("app.brevo._post", return_value=mocker.Mock())
+
+        brevo.sync_contact(user)
+
+        user.refresh_from_db()
+        assert user.brevo_synced_at is not None
+
+    def does_not_record_brevo_synced_at_on_failure(user, mocker):
+        mocker.patch("app.brevo._post", return_value=None)
+
+        brevo.sync_contact(user)
+
+        user.refresh_from_db()
+        assert user.brevo_synced_at is None
