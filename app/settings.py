@@ -289,6 +289,9 @@ else:
 # Site URL for generating absolute URLs (falls back to Sites framework if not set)
 SITE_URL = os.environ.get("SITE_URL")
 
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY") if DJANGO_ENV == "prod" else None
+BREVO_CONTACT_LIST_ID = os.environ.get("BREVO_CONTACT_LIST_ID")
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

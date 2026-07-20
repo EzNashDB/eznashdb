@@ -56,6 +56,7 @@ class UserAdmin(BaseUserAdmin):
         "is_superuser",
         "is_active",
         "date_joined",
+        "brevo_synced_at",
     ]
     list_filter = ["is_staff", "is_active", "date_joined"]
     search_fields = ["email", "username", "first_name", "last_name"]
