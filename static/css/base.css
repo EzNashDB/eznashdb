@@ -9,6 +9,23 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+.navbar-logo svg {
+    width: 50px;
+    height: 50px;
+    margin-bottom: -10px;
+    margin-top: -10px;
+        color: var(--bs-light);
+
+}
+
+.footer-logo svg {
+    width: 60px;
+    height: 60px;
+    margin-bottom: -10px;
+    margin-top: -5px;
+    color: var(--bs-dark);
+}
+
 .main-scroll-container {
   margin-top: 56px;
   height: calc(100% - 56px);
