@@ -1,14 +1,16 @@
 {% load svg %}
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2 py-1" href="/">
-            <span class="navbar-logo" aria-hidden="true">{% inline_svg 'img/logo.svg' %}</span>
-            <span class="d-flex flex-column lh-1">
-                <span>The Ezrat Nashim Database</span>
-                <small class="text-white-50 fw-normal" style="font-size: 0.8rem;">A project by Ari Abramowitz</small>
+    <div class="container flex-nowrap">
+        <a class="navbar-brand d-flex align-items-center gap-2 py-1 text-truncate"
+           href="/">
+            <span class="navbar-logo flex-shrink-0" aria-hidden="true">{% inline_svg 'img/logo.svg' %}</span>
+            <span class="d-flex flex-column lh-1 text-truncate">
+                <span class="text-truncate">The Ezrat Nashim Database</span>
+                <small class="text-white-50 fw-normal text-truncate"
+                       style="font-size: 0.8rem">A project by Ari Abramowitz</small>
             </span>
         </a>
-        <button class="navbar-toggler"
+        <button class="navbar-toggler flex-shrink-0"
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#navbarNav"
