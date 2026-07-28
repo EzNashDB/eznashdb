@@ -55,6 +55,12 @@ body {
   width: fit-content;
 }
 
+/* Bootstrap has no min-w-0 utility. Needed to let flex items shrink below
+   content size without overflow:hidden, which clips focus rings/shadows. */
+.min-w-0 {
+  min-width: 0;
+}
+
 .pointer-events-none {
   pointer-events: none;
 }
