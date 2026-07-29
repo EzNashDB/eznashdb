@@ -13,6 +13,7 @@ from app.models import AbuseState
 
 # Sensitive URL names that require abuse prevention checks
 SENSITIVE_URL_NAMES = [
+    "eznashdb:create_shul",
     "eznashdb:update_shul",
     "eznashdb:google_maps_proxy",
 ]
