@@ -682,7 +682,7 @@
                 // Build cluster popups for ALL shuls (including singles)
                 const clusterPopupHtmlMap = {};
                 {% for cluster_key, shuls in shul_clusters.items %}
-                    clusterPopupHtmlMap["{{ cluster_key }}"] = `{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}`;
+                    clusterPopupHtmlMap["{{ cluster_key }}"] = '{% filter escapejs %}{% include "eznashdb/includes/shul_cluster_popup.html" with shuls=shuls %}{% endfilter %}';
                 {% endfor %}
 
                 // Add exact pin if present (blue icon at exact coordinates, not jittered)
@@ -696,7 +696,7 @@
                         shadowSize: [41, 41]
                     });
                     const exactPinClusterKey = `exact_pin_{{ exact_pin_shul.id }}`;
-                    clusterPopupHtmlMap[exactPinClusterKey] = `{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul %}`;
+                    clusterPopupHtmlMap[exactPinClusterKey] = '{% filter escapejs %}{% include "eznashdb/includes/exact_pin_popup.html" with shul=exact_pin_shul %}{% endfilter %}';
                     shulToClusterKey[{{ exact_pin_shul.id }}] = exactPinClusterKey;
                     mapApi.addMarkerWithWorldWrap(
                         {{ exact_pin_shul.id }},
