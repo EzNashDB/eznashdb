@@ -1,3 +1,7 @@
+:root {
+  --navbar-height: 56px;
+}
+
 html,
 body {
   padding: 0;
@@ -9,27 +13,49 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
-.navbar-logo svg {
-    width: 50px;
-    height: 50px;
-    margin-bottom: -10px;
-    margin-top: -10px;
-        color: var(--bs-light);
-
+/* Navbar */
+.navbar {
+  min-height: var(--navbar-height);
 }
 
-.footer-logo svg {
-    width: 60px;
-    height: 60px;
-    margin-bottom: -10px;
-    margin-top: -5px;
-    color: var(--bs-dark);
+.navbar-logo {
+  /* display:flex (not inline) so this box's height follows the svg's
+     margin-adjusted size below. */
+  display: flex;
+  flex-shrink: 0;
+  align-self: flex-end;
+  position: relative;
+  bottom: 2px;
+}
+
+.navbar-logo svg {
+  width: 50px;
+  height: 50px;
+  /* logo.svg has top/bottom padding baked into its viewBox; these
+     margins trim it off. */
+  margin-top: -5px;
+  margin-bottom: -10px;
+  color: var(--bs-light);
+}
+
+.navbar-subtitle {
+  font-size: 0.8rem;
+  /* lh-1 + text-truncate clips descenders (j, p, y); this extends the clip box. */
+  padding-bottom: 0.2rem;
 }
 
 .main-scroll-container {
-  margin-top: 56px;
-  height: calc(100% - 56px);
+  margin-top: var(--navbar-height);
+  height: calc(100% - var(--navbar-height));
   overflow-y: auto;
+}
+
+.footer-logo svg {
+  width: 60px;
+  height: 60px;
+  margin-bottom: -10px;
+  margin-top: -5px;
+  color: var(--bs-dark);
 }
 
 .spinner-overlay {
