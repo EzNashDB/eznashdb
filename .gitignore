@@ -7,7 +7,7 @@ __pycache__/
 .vscode/
 .claude/
 /keypairs
-
+/.uncommitted
 
 # testmon
 .testmondata*
