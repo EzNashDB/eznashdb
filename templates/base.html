@@ -127,6 +127,7 @@
                 src="{% static 'vendor/django-dynamic-formset/jquery.formset.js' %}"></script>
         <script src="{% static 'dist/base.js' %}"></script>
         <script src="{% static 'eznashdb/js/base.static.js' %}"></script>
+        <script src="{% static 'eznashdb/js/abuse_modal.js' %}"></script>
         {% if debug %}
             <script>
             {# django-debug-toolbar HTMX config, per https://django-debug-toolbar.readthedocs.io/en/latest/installation.html #}
@@ -163,6 +164,7 @@
         {% block extra_media_bottom %}
         {% endblock extra_media_bottom %}
 
+        <div id="abuse-modal-container"></div>
         {# Feedback system #}
         {% include 'feedback/feedback_form.html' %}
     </body>

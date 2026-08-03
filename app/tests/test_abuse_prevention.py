@@ -8,13 +8,14 @@ from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.template.loader import render_to_string
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
 from app.abuse_prevention import (
     BlockReason,
-    get_blocked_response,
+    build_block_context,
     process_abuse_state,
     record_abuse_violation,
 )
@@ -320,23 +321,42 @@ def describe_appeal_ban_view():
         assert "New Abuse Appeal" in mailoutbox[0].subject
         assert superuser.email in mailoutbox[0].to
 
+    def invalid_submission_renders_429_with_correct_title(client, test_user):
+        """Regression test: the invalid-form branch must show "Access
+        Restricted", not the default "Temporarily Blocked" a missing
+        abuse_state would produce."""
+        client.force_login(test_user)
 
-@pytest.mark.django_db
-def describe_429_context():
-    def includes_form_for_authenticated_permanent_ban(rf, test_user):
-        """Should include form for authenticated users with permanent ban"""
         state = AbuseState.get_or_create(test_user)
         state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
-        request = rf.get("/shuls/")
-        request.user = test_user
+        url = reverse("appeal_ban")
+        response = client.post(url, {"explanation": "", "abuse_state": state.id})
+
+        assert response.status_code == 200
+        assert b"<html" in response.content
+        assert b"Access Restricted" in response.content
+
+
+@pytest.mark.django_db
+def describe_429_context():
+    def includes_form_for_authenticated_permanent_ban(test_user):
+        """Should include form for authenticated users with permanent ban.
+
+        Guards the context-building + template pair directly, independent of
+        which delivery path (htmx modal vs. full-page 429) is in play - those
+        have their own coverage in test_abuse_enforcement_delivery.py.
+        """
+        state = AbuseState.get_or_create(test_user)
+        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.save()
 
         result = process_abuse_state(test_user)
-        response = get_blocked_response(request, result)
+        context = build_block_context(result)
+        html = render_to_string("includes/abuse_modal.html", context)
 
-        # Check that the response contains the appeal form
-        assert b"Submit an Appeal" in response.content
+        assert "Submit an Appeal" in html
 
 
 @pytest.mark.django_db

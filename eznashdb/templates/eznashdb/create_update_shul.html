@@ -269,6 +269,12 @@
             const addNewButton = modalEl.querySelector('[hx-post]');
             if (addNewButton) {
                 addNewButton.addEventListener('htmx:confirm', (confirmEvent) => {
+                    // If the nearby shuls modal is still open (typical case), wait
+                    // for it to close before issuing the request. Otherwise (e.g.
+                    // the request triggered a captcha requirement and the modal is
+                    // already closed when the request gets resent), let the
+                    // request fire immediately.
+                    if (!modalEl.classList.contains('show')) return;
                     confirmEvent.preventDefault();
                     // Wait for modal to fully hide before allowing HTMX request
                     modal.hide();
@@ -313,6 +319,8 @@
 
     document.addEventListener("DOMContentLoaded", initRoomFormset);
     document.addEventListener("htmx:afterSettle", (e) => {
+        // Only react to the wizard form's own swap
+        if (!e.target || !e.target.closest || !e.target.closest('#shul_form')) return;
         showNearbyShuls();
         initRoomFormset();
         if (getWizardStep() === '2') {

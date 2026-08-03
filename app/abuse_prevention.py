@@ -5,7 +5,6 @@ from datetime import timedelta
 from enum import Enum, auto
 
 from constance import config
-from django.shortcuts import render
 from django.utils import timezone
 
 from app.forms import AbuseAppealForm
@@ -123,8 +122,10 @@ def format_retry_time(minutes):
     return " ".join(parts)
 
 
-def get_blocked_response(request, result):
-    """Generate 429 response for blocked requests."""
+def build_block_context(result):
+    """
+    Build the template context describing a blocked request.
+    """
     context = {"abuse_state": result.abuse_state}
 
     if result.reason == BlockReason.PERMANENTLY_BANNED:
@@ -144,6 +145,4 @@ def get_blocked_response(request, result):
             minutes = max(1, int(remaining_seconds / 60))
             context["retry_after"] = format_retry_time(minutes)
 
-    response = render(request, "429.html", context)
-    response.status_code = 429
-    return response
+    return context
