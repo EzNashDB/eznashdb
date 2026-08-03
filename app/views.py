@@ -6,9 +6,10 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import TemplateView
 from sentry_sdk import capture_message, set_context, set_tag
@@ -16,8 +17,19 @@ from sentry_sdk import capture_message, set_context, set_tag
 from app.backups.core import list_gdrive_backups
 from app.emails import send_appeal_notification
 from app.forms import AbuseAppealForm, CaptchaVerificationForm
-from app.mixins import is_rate_limiting_active
+from app.mixins import HtmxRequestMixin, is_rate_limiting_active
+from app.models import AbuseState
 from app.rate_limiting import generate_captcha_token
+
+
+def _validated_next(request, raw_next):
+    if raw_next and url_has_allowed_host_and_scheme(
+        raw_next,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return raw_next
+    return "/"
 
 
 @method_decorator(staff_member_required, name="dispatch")
@@ -130,52 +142,70 @@ class ClientErrorReportView(View):
             return JsonResponse({"error": str(e)}, status=500)
 
 
-class CaptchaVerifyView(View):
+class CaptchaVerifyView(HtmxRequestMixin, View):
     """
     Dedicated view for CAPTCHA verification.
-    After successful verification, generates a one-time token and redirects to 'next' URL.
+    After successful verification, generates a one-time token and redirects to 'next' URL
+    (or triggers abuseCaptchaVerified for htmx requests).
     """
+
+    def get_next_url(self):
+        raw_next = self.request.POST.get("next") or self.request.GET.get("next")
+        return _validated_next(self.request, raw_next)
 
     def get(self, request):
         form = CaptchaVerificationForm()
-        next_url = request.GET.get("next", "/")
         # Auto-bypass CAPTCHA if rate limiting feature is disabled
         if not is_rate_limiting_active(request):
             generate_captcha_token(request)
-            return redirect(next_url)
+            return redirect(self.get_next_url())
         return render(
             request,
             "eznashdb/captcha_verify.html",
             {
                 "form": form,
-                "next_url": next_url,
+                "next_url": self.get_next_url(),
             },
         )
 
     def post(self, request):
         form = CaptchaVerificationForm(request.POST)
-        next_url = request.POST.get("next", "/")
 
         if form.is_valid():
-            # Generate one-time bypass token and redirect
-            generate_captcha_token(request)
-            return HttpResponseRedirect(next_url)
+            return self.handle_success(request)
+        return self.handle_failure(request, form)
 
-        # Captcha failed - show form again with error
+    def handle_success(self, request):
+        # Generate one-time bypass token
+        generate_captcha_token(request)
+        if self.is_htmx:
+            response = HttpResponse("")
+            response["HX-Reswap"] = "none"
+            response["HX-Trigger"] = "abuseCaptchaVerified"
+            return response
+        return HttpResponseRedirect(self.get_next_url())
+
+    def handle_failure(self, request, form):
+        message = "CAPTCHA verification failed. Please try again."
+        next_url = self.get_next_url()
+        if self.is_htmx:
+            response = render(
+                request,
+                "includes/captcha_modal.html",
+                {"form": form, "next_url": next_url, "message": message},
+            )
+            response["HX-Trigger-After-Swap"] = "abuseCaptchaRequired"
+            return response
         return render(
             request,
             "eznashdb/captcha_verify.html",
-            {
-                "form": form,
-                "next_url": next_url,
-                "message": "CAPTCHA verification failed. Please try again.",
-            },
+            {"form": form, "next_url": next_url, "message": message},
         )
 
 
 @method_decorator(login_required, name="dispatch")
 class AppealBanView(View):
-    """Handle abuse appeal form submissions from 429 page."""
+    """Handle abuse appeal form submissions from the permanent-ban page."""
 
     def post(self, request):
         """Process appeal submission."""
@@ -190,7 +220,8 @@ class AppealBanView(View):
             )
             return HttpResponseRedirect("/")
 
-        return render(request, "429.html", {"appeal_form": form})
+        abuse_state = AbuseState.get_or_create(request.user)
+        return render(request, "429.html", {"appeal_form": form, "abuse_state": abuse_state})
 
 
 def custom_500(request):
