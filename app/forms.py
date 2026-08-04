@@ -43,7 +43,7 @@ class AbuseAppealForm(forms.ModelForm):
         state = appeal.abuse_state
         appeal.state_snapshot = {
             "user_email": state.user.email,
-            "points": state.points,
+            "strikes": state.strikes,
             "is_permanently_banned": state.is_permanently_banned,
             "episode_started_at": state.episode_started_at.isoformat()
             if state.episode_started_at
