@@ -74,7 +74,7 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
         )
 
     # 4. CAPTCHA
-    requires_captcha = state.points >= config.ABUSE_CAPTCHA_THRESHOLD
+    requires_captcha = state.strikes >= config.ABUSE_CAPTCHA_THRESHOLD
 
     return AbuseEnforcementResult(
         allowed=True,
@@ -83,11 +83,11 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
     )
 
 
-def get_cooldown_minutes(points):
+def get_cooldown_minutes(strikes):
     ladder = config.ABUSE_COOLDOWN_LADDER
-    max_points = len(ladder) - 1
-    effective_points = min(points, max_points)
-    return ladder[effective_points]
+    max_strikes = len(ladder) - 1
+    effective_strikes = min(strikes, max_strikes)
+    return ladder[effective_strikes]
 
 
 def record_abuse_violation(user, was_rate_limited: bool) -> None:

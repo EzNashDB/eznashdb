@@ -14,7 +14,7 @@ from app.rate_limiting import CAPTCHA_TOKEN_SESSION_KEY
 def _block_with_cooldown(user, minutes=30) -> AbuseState:
     """Put the user into a temporary cooldown block (not a permanent ban)."""
     state = AbuseState.get_or_create(user)
-    state.points = 2
+    state.strikes = 2
     state.cooldown_until = timezone.now() + timedelta(minutes=minutes)
     state.save()
     return state
@@ -22,14 +22,14 @@ def _block_with_cooldown(user, minutes=30) -> AbuseState:
 
 def _require_captcha(user) -> AbuseState:
     state = AbuseState.get_or_create(user)
-    state.points = config.ABUSE_CAPTCHA_THRESHOLD
+    state.strikes = config.ABUSE_CAPTCHA_THRESHOLD
     state.save()
     return state
 
 
 def _permanently_ban(user) -> AbuseState:
     state = AbuseState.get_or_create(user)
-    state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+    state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
     state.save()
     return state
 

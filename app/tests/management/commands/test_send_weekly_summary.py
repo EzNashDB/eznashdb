@@ -92,7 +92,7 @@ def recent_abuse_state(db, regular_user):
     now = timezone.now()
     return AbuseState.objects.create(
         user=regular_user,
-        points=3,
+        strikes=3,
         episode_started_at=now - timedelta(days=2),
         last_violation_at=now - timedelta(minutes=30),
         cooldown_until=now + timedelta(hours=1),
@@ -105,7 +105,7 @@ def old_abuse_state(db):
     old_time = timezone.now() - timedelta(days=10)
     return AbuseState.objects.create(
         user=user,
-        points=1,
+        strikes=1,
         last_violation_at=old_time,
     )
 
@@ -287,7 +287,7 @@ def describe_send_weekly_summary():
             )
             AbuseState.objects.create(
                 user=user,
-                points=config.ABUSE_PERMANENT_BAN_THRESHOLD,
+                strikes=config.ABUSE_PERMANENT_BAN_THRESHOLD,
                 last_violation_at=timezone.now(),
             )
 
@@ -304,7 +304,7 @@ def describe_send_weekly_summary():
             )
             AbuseState.objects.create(
                 user=user,
-                points=1,
+                strikes=1,
                 last_violation_at=timezone.now(),
             )
 
@@ -315,33 +315,33 @@ def describe_send_weekly_summary():
             assert "active@example.com" in html
             assert "Active (CAPTCHA required)" in html
 
-        def applies_points_decay_before_sending(superuser, db, mailoutbox):
+        def applies_strikes_decay_before_sending(superuser, db, mailoutbox):
             user = User.objects.create_user(
                 username="decayuser", email="decay@example.com", password="pass"
             )
             now = timezone.now()
-            # Create state with 3 points, but last updated 48 hours ago (should decay by 2 points to 1)
+            # Create state with 3 strikes, but last updated 48 hours ago (should decay by 2 strikes to 1)
             state = AbuseState.objects.create(
                 user=user,
-                points=3,
+                strikes=3,
                 last_violation_at=now - timedelta(minutes=30),
             )
-            # Set last_points_update_at after creation (can't override auto_now_add in create())
-            state.last_points_update_at = now - timedelta(hours=48)
+            # Set last_strikes_update_at after creation (can't override auto_now_add in create())
+            state.last_strikes_update_at = now - timedelta(hours=48)
             state.save()
 
             call_command("send_weekly_summary")
 
             assert len(mailoutbox) == 1
             html = mailoutbox[0].alternatives[0][0]
-            # Verify email shows decayed points (1, not 3)
+            # Verify email shows decayed strikes (1, not 3)
             assert "decay@example.com" in html
             stripped_html = html.replace("\n", "").replace(" ", "")
             assert ">1<" in stripped_html
 
             # Verify DB record was updated
             state.refresh_from_db()
-            assert state.points == 1
+            assert state.strikes == 1
 
     def describe_google_places_usage():
         # Freeze to mid-month so "yesterday" and "5 days ago" fall within the current month

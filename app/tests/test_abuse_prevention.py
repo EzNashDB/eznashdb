@@ -26,68 +26,68 @@ User = get_user_model()
 
 
 @pytest.mark.django_db
-def describe_points_decay():
-    """Points decay logic"""
+def describe_strikes_decay():
+    """Strikes decay logic"""
 
-    def decays_1_point_per_24_hours(test_user):
-        """Should decay 1 point per 24 hours"""
+    def decays_1_strike_per_24_hours(test_user):
+        """Should decay 1 strike per 24 hours"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 3
-        state.last_points_update_at = timezone.now() - timedelta(hours=48)
+        state.strikes = 3
+        state.last_strikes_update_at = timezone.now() - timedelta(hours=48)
         state.save()
 
-        state.apply_points_decay()
+        state.apply_strikes_decay()
 
-        assert state.points == 1  # 3 - 2 (48h / 24h)
+        assert state.strikes == 1  # 3 - 2 (48h / 24h)
 
     def does_not_decay_below_zero(test_user):
-        """Should not decay points below zero"""
+        """Should not decay strikes below zero"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 1
-        state.last_points_update_at = timezone.now() - timedelta(hours=72)
+        state.strikes = 1
+        state.last_strikes_update_at = timezone.now() - timedelta(hours=72)
         state.save()
 
-        state.apply_points_decay()
+        state.apply_strikes_decay()
 
-        assert state.points == 0  # Cannot go negative
+        assert state.strikes == 0  # Cannot go negative
 
     def does_not_decay_when_permanently_banned(test_user):
-        """Should not decay points when user is permanently banned (at threshold)"""
+        """Should not decay strikes when user is permanently banned (at threshold)"""
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
-        state.last_points_update_at = timezone.now() - timedelta(hours=48)
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.last_strikes_update_at = timezone.now() - timedelta(hours=48)
         state.save()
 
-        state.apply_points_decay()
+        state.apply_strikes_decay()
 
-        # Points should not decay - permanent ban freezes decay
-        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
+        # Strikes should not decay - permanent ban freezes decay
+        assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True
 
-    def updates_last_points_update_at_after_decay(test_user):
-        """Should update last_points_update_at timestamp after decay"""
+    def updates_last_strikes_update_at_after_decay(test_user):
+        """Should update last_strikes_update_at timestamp after decay"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 2
+        state.strikes = 2
         old_time = timezone.now() - timedelta(hours=24)
-        state.last_points_update_at = old_time
+        state.last_strikes_update_at = old_time
         state.save()
 
-        state.apply_points_decay()
+        state.apply_strikes_decay()
 
-        assert state.last_points_update_at > old_time
+        assert state.last_strikes_update_at > old_time
 
-    def get_points_applies_and_persists_decay(test_user):
-        """Should apply decay and persist when calling get_points()"""
+    def get_strikes_applies_and_persists_decay(test_user):
+        """Should apply decay and persist when calling get_strikes()"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 3
-        state.last_points_update_at = timezone.now() - timedelta(hours=48)
+        state.strikes = 3
+        state.last_strikes_update_at = timezone.now() - timedelta(hours=48)
         state.save()
 
-        points = state.get_points()
+        strikes = state.get_strikes()
 
-        assert points == 1  # 3 - 2 (48h / 24h)
+        assert strikes == 1  # 3 - 2 (48h / 24h)
         state.refresh_from_db()
-        assert state.points == 1  # Should be persisted to DB
+        assert state.strikes == 1  # Should be persisted to DB
 
 
 @pytest.mark.django_db
@@ -118,28 +118,28 @@ def describe_episode_lifecycle():
 
         assert state.is_episode_active() is False
 
-    def new_episode_increments_points(test_user):
-        """Starting a new episode should increment points and set count to 1"""
+    def new_episode_increments_strikes(test_user):
+        """Starting a new episode should increment strikes and set count to 1"""
         state = AbuseState.get_or_create(test_user)
-        initial_points = state.points
+        initial_strikes = state.strikes
 
         state.record_violation()
 
-        assert state.points == initial_points + 1
+        assert state.strikes == initial_strikes + 1
         assert state.sensitive_count_in_episode == 1
 
-    def same_episode_does_not_increment_points(test_user):
-        """Multiple violations in same episode should not increment points but should increment count"""
+    def same_episode_does_not_increment_strikes(test_user):
+        """Multiple violations in same episode should not increment strikes but should increment count"""
         state = AbuseState.get_or_create(test_user)
 
         # First violation starts episode
         state.record_violation()
-        points_after_first = state.points
+        strikes_after_first = state.strikes
 
         # Second violation in same episode
         state.record_violation()
 
-        assert state.points == points_after_first  # No additional point
+        assert state.strikes == strikes_after_first  # No additional strike
         assert state.sensitive_count_in_episode == 2  # Count should increment
 
 
@@ -173,7 +173,7 @@ def describe_sensitive_cap():
     def increments_count_on_successful_request(test_user):
         """Should increment sensitive count on non-rate-limited request during episode"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 1  # Ensure episode context
+        state.strikes = 1  # Ensure episode context
         state.last_violation_at = timezone.now()  # Active episode
         state.sensitive_count_in_episode = 5
         state.save()
@@ -186,7 +186,7 @@ def describe_sensitive_cap():
     def increments_count_on_rate_limited_request_during_episode(test_user):
         """Should increment sensitive count even when rate-limited during active episode"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 1
+        state.strikes = 1
         state.last_violation_at = timezone.now()  # Active episode
         state.sensitive_count_in_episode = 5
         state.save()
@@ -195,7 +195,7 @@ def describe_sensitive_cap():
         record_abuse_violation(test_user, was_rate_limited=True)
 
         state.refresh_from_db()
-        assert state.points == 1  # Points should not increment (same episode)
+        assert state.strikes == 1  # Strikes should not increment (same episode)
         assert state.sensitive_count_in_episode == 6  # Should increment, not reset
 
 
@@ -203,49 +203,49 @@ def describe_sensitive_cap():
 def describe_escalation_ladder():
     """Escalation ladder thresholds"""
 
-    def no_captcha_at_zero_points(test_user):
-        """Should not require CAPTCHA at 0 points"""
+    def no_captcha_at_zero_strikes(test_user):
+        """Should not require CAPTCHA at 0 strikes"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 0
+        state.strikes = 0
         state.save()
 
         result = process_abuse_state(test_user)
 
         assert result.requires_captcha is False
 
-    def captcha_required_at_one_point(test_user):
-        """Should require CAPTCHA at 1+ points"""
+    def captcha_required_at_one_strike(test_user):
+        """Should require CAPTCHA at 1+ strikes"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 1
+        state.strikes = 1
         state.save()
 
         result = process_abuse_state(test_user)
 
         assert result.requires_captcha is True
 
-    def cooldown_applied_at_two_points(test_user):
-        """Should apply 1-hour cooldown at 2 points"""
+    def cooldown_applied_at_two_strikes(test_user):
+        """Should apply 1-hour cooldown at 2 strikes"""
         state = AbuseState.get_or_create(test_user)
-        state.points = 1  # Will become 2 after violation
+        state.strikes = 1  # Will become 2 after violation
         state.save()
 
         state.record_violation()
 
-        assert state.points == 2
+        assert state.strikes == 2
         assert state.cooldown_until is not None
         # Should be approximately 1 hour from now
         expected_cooldown = timezone.now() + timedelta(minutes=60)
         assert abs((state.cooldown_until - expected_cooldown).total_seconds()) < 5
 
     def permanent_ban_at_threshold(test_user):
-        """Should be permanently banned when points reach threshold"""
+        """Should be permanently banned when strikes reach threshold"""
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
         state.save()
 
         state.record_violation()
 
-        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
+        assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True
 
 
@@ -256,7 +256,7 @@ def describe_enforcement_order():
     def permanent_ban_blocks_first(test_user):
         """Permanent ban should block before other checks"""
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         result = process_abuse_state(test_user)
@@ -290,9 +290,9 @@ def describe_appeal_ban_view():
         """Should create appeal with state snapshot and send email"""
         client.force_login(test_user)
 
-        # Create abuse state with permanent ban (points at threshold)
+        # Create abuse state with permanent ban (strikes at threshold)
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.episode_started_at = timezone.now() - timedelta(hours=1)
         state.last_violation_at = timezone.now()
         state.save()
@@ -313,7 +313,7 @@ def describe_appeal_ban_view():
         # Check snapshot was captured
         assert appeal.state_snapshot is not None
         assert appeal.state_snapshot["user_email"] == test_user.email
-        assert appeal.state_snapshot["points"] == config.ABUSE_PERMANENT_BAN_THRESHOLD
+        assert appeal.state_snapshot["strikes"] == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert appeal.state_snapshot["is_permanently_banned"] is True
 
         # Check email was sent to superuser
@@ -328,7 +328,7 @@ def describe_appeal_ban_view():
         client.force_login(test_user)
 
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         url = reverse("appeal_ban")
@@ -349,7 +349,7 @@ def describe_429_context():
         have their own coverage in test_abuse_enforcement_delivery.py.
         """
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         result = process_abuse_state(test_user)
@@ -367,13 +367,13 @@ def describe_appeal_admin_actions():
         """Approving appeal should reset abuse state to clean state"""
         # Create abuse state and appeal
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         appeal = AbuseAppeal.objects.create(
             abuse_state=state,
             explanation="Test appeal",
-            state_snapshot={"points": config.ABUSE_PERMANENT_BAN_THRESHOLD},
+            state_snapshot={"strikes": config.ABUSE_PERMANENT_BAN_THRESHOLD},
         )
 
         # Execute admin action
@@ -395,7 +395,7 @@ def describe_appeal_admin_actions():
 
         # Check abuse state was set to threshold - 1 (unbanned but on thin ice)
         state.refresh_from_db()
-        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
+        assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
         assert state.is_permanently_banned is False
         assert state.cooldown_until is None
 
@@ -403,13 +403,13 @@ def describe_appeal_admin_actions():
         """Denying appeal should update status but keep abuse state"""
         # Create abuse state and appeal
         state = AbuseState.get_or_create(test_user)
-        state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
 
         appeal = AbuseAppeal.objects.create(
             abuse_state=state,
             explanation="Test appeal",
-            state_snapshot={"points": config.ABUSE_PERMANENT_BAN_THRESHOLD},
+            state_snapshot={"strikes": config.ABUSE_PERMANENT_BAN_THRESHOLD},
         )
 
         # Execute admin action
@@ -429,7 +429,7 @@ def describe_appeal_admin_actions():
         assert appeal.reviewed_by == superuser
         assert appeal.reviewed_at is not None
 
-        # Check abuse state is banned (points set to threshold)
+        # Check abuse state is banned (strikes set to threshold)
         state.refresh_from_db()
-        assert state.points == config.ABUSE_PERMANENT_BAN_THRESHOLD
+        assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True

@@ -48,7 +48,7 @@ class DeletedShulData:
 @dataclass
 class AbuseStateData:
     user_email: str
-    points: int
+    strikes: int
     episode_started_at: object  # datetime object for template formatting
     last_violation_at: object  # datetime object for template formatting
     is_in_cooldown: bool
@@ -286,7 +286,7 @@ class Command(BaseCommand):
         """Prepare abuse state data for template rendering."""
         return AbuseStateData(
             user_email=state.user.email,
-            points=state.get_points(),
+            strikes=state.get_strikes(),
             episode_started_at=state.episode_started_at,
             last_violation_at=state.last_violation_at,
             is_in_cooldown=state.is_in_cooldown(),

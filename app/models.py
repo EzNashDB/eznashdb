@@ -27,8 +27,8 @@ class AbuseState(models.Model):
         on_delete=models.CASCADE,
         related_name="abuse_state",
     )
-    points = models.PositiveIntegerField(default=0)
-    last_points_update_at = models.DateTimeField(auto_now_add=True)
+    strikes = models.PositiveIntegerField(default=0)
+    last_strikes_update_at = models.DateTimeField(auto_now_add=True)
     episode_started_at = models.DateTimeField(null=True, blank=True)
     last_violation_at = models.DateTimeField(null=True, blank=True)
     sensitive_count_in_episode = models.PositiveIntegerField(default=0)
@@ -39,20 +39,20 @@ class AbuseState(models.Model):
         verbose_name_plural = "Abuse States"
 
     def __str__(self):
-        return f"{self.user.email} - {self.points} points"
+        return f"{self.user.email} - {self.strikes} strikes"
 
     @property
     def is_permanently_banned(self):
-        return self.points >= config.ABUSE_PERMANENT_BAN_THRESHOLD
+        return self.strikes >= config.ABUSE_PERMANENT_BAN_THRESHOLD
 
     @property
-    def decayed_points(self):
-        """Current points after time-based decay (read-only, no DB write)."""
-        if self.points == 0 or self.is_permanently_banned:
-            return self.points
-        hours = (timezone.now() - self.last_points_update_at).total_seconds() / 3600
-        decay = int(hours // config.ABUSE_POINTS_DECAY_HOURS)
-        return max(0, self.points - decay)
+    def decayed_strikes(self):
+        """Current strikes after time-based decay (read-only, no DB write)."""
+        if self.strikes == 0 or self.is_permanently_banned:
+            return self.strikes
+        hours = (timezone.now() - self.last_strikes_update_at).total_seconds() / 3600
+        decay = int(hours // config.ABUSE_STRIKES_DECAY_HOURS)
+        return max(0, self.strikes - decay)
 
     def is_in_cooldown(self):
         """Check if currently in a cooldown period."""
@@ -72,21 +72,21 @@ class AbuseState(models.Model):
         return self.last_violation_at >= timezone.now() - timeout
 
     def refresh(self):
-        self.apply_points_decay()
+        self.apply_strikes_decay()
         self.apply_episode_cap_cooldown()
 
-    def get_points(self):
-        """Get current points with decay applied and persisted."""
-        self.apply_points_decay()
-        return self.points
+    def get_strikes(self):
+        """Get current strikes with decay applied and persisted."""
+        self.apply_strikes_decay()
+        return self.strikes
 
-    def apply_points_decay(self) -> None:
-        """Apply on-demand points decay: -1 point per 24 hours since last update."""
-        new_points = self.decayed_points
-        if new_points != self.points:
-            self.points = new_points
-            self.last_points_update_at = timezone.now()
-            self.save(update_fields=["points", "last_points_update_at"])
+    def apply_strikes_decay(self) -> None:
+        """Apply on-demand strikes decay: -1 strike per 24 hours since last update."""
+        new_strikes = self.decayed_strikes
+        if new_strikes != self.strikes:
+            self.strikes = new_strikes
+            self.last_strikes_update_at = timezone.now()
+            self.save(update_fields=["strikes", "last_strikes_update_at"])
 
     def apply_episode_cap_cooldown(self) -> None:
         from app.abuse_prevention import get_cooldown_minutes
@@ -96,7 +96,7 @@ class AbuseState(models.Model):
             and self.sensitive_count_in_episode >= config.ABUSE_SENSITIVE_CAP_PER_EPISODE
             and not self.is_in_cooldown()
         ):
-            cooldown_minutes = get_cooldown_minutes(self.points)
+            cooldown_minutes = get_cooldown_minutes(self.strikes)
             if cooldown_minutes > 0:
                 self.cooldown_until = timezone.now() + timedelta(minutes=cooldown_minutes)
                 self.save(update_fields=["cooldown_until"])
@@ -109,12 +109,12 @@ class AbuseState(models.Model):
         is_new_episode = not self.is_episode_active()
 
         if is_new_episode:
-            self.points += 1
+            self.strikes += 1
             self.sensitive_count_in_episode = 1
             self.episode_started_at = now
-            self.last_points_update_at = now
+            self.last_strikes_update_at = now
 
-            cooldown_minutes = get_cooldown_minutes(self.points)
+            cooldown_minutes = get_cooldown_minutes(self.strikes)
             if cooldown_minutes > 0:
                 self.cooldown_until = now + timedelta(minutes=cooldown_minutes)
             else:
@@ -134,10 +134,10 @@ class AbuseState(models.Model):
             with sentry_sdk.push_scope() as scope:
                 scope.set_extra("user_id", self.user.id)
                 scope.set_extra("user_email", self.user.email)
-                scope.set_extra("points", self.points)
+                scope.set_extra("strikes", self.strikes)
                 scope.set_extra("is_permanently_banned", self.is_permanently_banned)
                 sentry_sdk.capture_message(
-                    f"Abuse prevention: user {self.user.email} hit rate limit, now at {self.points} points",
+                    f"Abuse prevention: user {self.user.email} hit rate limit, now at {self.strikes} strikes",
                     level="warning",
                 )
         except Exception:

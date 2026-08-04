@@ -16,19 +16,19 @@ from app.models import AbuseAppeal, AbuseState, GooglePlacesUsage, GooglePlacesU
 class AbuseStateAdmin(admin.ModelAdmin):
     list_display = [
         "user_email",
-        "display_points",
+        "display_strikes",
         "status",
         "last_violation_at",
         "episode_started_at",
         "sensitive_count_in_episode",
     ]
-    list_filter = ["points"]
+    list_filter = ["strikes"]
     search_fields = ["user__email"]
     readonly_fields = [
         "user",
         "episode_started_at",
         "last_violation_at",
-        "last_points_update_at",
+        "last_strikes_update_at",
     ]
     ordering = ["-last_violation_at"]
 
@@ -37,12 +37,12 @@ class AbuseStateAdmin(admin.ModelAdmin):
         """Display user email."""
         return obj.user.email
 
-    @admin.display(description="Points")
-    def display_points(self, obj):
-        decayed = obj.decayed_points
-        if decayed != obj.points:
-            return format_html("{} → {}", obj.points, decayed)
-        return obj.points
+    @admin.display(description="Strikes")
+    def display_strikes(self, obj):
+        decayed = obj.decayed_strikes
+        if decayed != obj.strikes:
+            return format_html("{} → {}", obj.strikes, decayed)
+        return obj.strikes
 
     @admin.display(description="Status")
     def status(self, obj):
@@ -51,8 +51,8 @@ class AbuseStateAdmin(admin.ModelAdmin):
             return "PERMANENTLY BANNED"
         elif obj.is_in_cooldown():
             return f"Cooldown until {obj.cooldown_until}"
-        elif obj.points > 0:
-            return f"Active ({obj.points} points)"
+        elif obj.strikes > 0:
+            return f"Active ({obj.strikes} strikes)"
         else:
             return "Clean"
 
@@ -60,22 +60,22 @@ class AbuseStateAdmin(admin.ModelAdmin):
 
     @admin.action(description="Permanently ban selected users")
     def ban_user(self, request, queryset):
-        """Permanently ban users by setting points to threshold."""
-        queryset.update(points=config.ABUSE_PERMANENT_BAN_THRESHOLD)
+        """Permanently ban users by setting strikes to threshold."""
+        queryset.update(strikes=config.ABUSE_PERMANENT_BAN_THRESHOLD)
         self.message_user(request, f"{queryset.count()} users banned.")
 
     @admin.action(description="Unban selected users")
     def unban_user(self, request, queryset):
         """Unban users but keep them on thin ice (one more violation = banned)."""
         queryset.update(
-            points=config.ABUSE_PERMANENT_BAN_THRESHOLD - 1,
+            strikes=config.ABUSE_PERMANENT_BAN_THRESHOLD - 1,
             sensitive_count_in_episode=0,
             cooldown_until=None,
-            last_points_update_at=timezone.now(),
+            last_strikes_update_at=timezone.now(),
         )
         self.message_user(
             request,
-            f"{queryset.count()} users unbanned (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} points).",
+            f"{queryset.count()} users unbanned (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} strikes).",
         )
 
 
@@ -122,7 +122,7 @@ class AbuseAppealAdmin(admin.ModelAdmin):
         snapshot = obj.state_snapshot
         html = "<table style='border-collapse: collapse;'>"
         html += f"<tr><th style='text-align: left; padding: 4px;'>User Email:</th><td style='padding: 4px;'>{snapshot.get('user_email', '-')}</td></tr>"
-        html += f"<tr><th style='text-align: left; padding: 4px;'>Points:</th><td style='padding: 4px;'>{snapshot.get('points', '-')}</td></tr>"
+        html += f"<tr><th style='text-align: left; padding: 4px;'>Strikes:</th><td style='padding: 4px;'>{snapshot.get('strikes', '-')}</td></tr>"
         html += f"<tr><th style='text-align: left; padding: 4px;'>Permanently Banned:</th><td style='padding: 4px;'>{snapshot.get('is_permanently_banned', snapshot.get('permanently_banned', '-'))}</td></tr>"
         html += f"<tr><th style='text-align: left; padding: 4px;'>Episode Started:</th><td style='padding: 4px;'>{snapshot.get('episode_started_at', '-')}</td></tr>"
         html += f"<tr><th style='text-align: left; padding: 4px;'>Last Violation:</th><td style='padding: 4px;'>{snapshot.get('last_violation_at', '-')}</td></tr>"
@@ -142,15 +142,15 @@ class AbuseAppealAdmin(admin.ModelAdmin):
 
             # Unban: reset the abuse state to clean state
             state = appeal.abuse_state
-            state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
+            state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
             state.sensitive_count_in_episode = 0
             state.cooldown_until = None
-            state.last_points_update_at = timezone.now()
+            state.last_strikes_update_at = timezone.now()
             state.save()
 
         self.message_user(
             request,
-            f"{queryset.count()} appeals approved (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} points).",
+            f"{queryset.count()} appeals approved (set to {config.ABUSE_PERMANENT_BAN_THRESHOLD - 1} strikes).",
         )
 
     @admin.action(description="Deny selected appeals")
@@ -164,8 +164,8 @@ class AbuseAppealAdmin(admin.ModelAdmin):
 
             # Ensure user is banned
             state = appeal.abuse_state
-            state.points = config.ABUSE_PERMANENT_BAN_THRESHOLD
-            state.save(update_fields=["points"])
+            state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
+            state.save(update_fields=["strikes"])
 
         self.message_user(request, f"{queryset.count()} appeals denied (users banned).")
 

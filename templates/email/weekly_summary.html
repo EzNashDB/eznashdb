@@ -187,7 +187,7 @@
                         <th style="border: 1px solid #dee2e6;
                                    padding: 10px;
                                    text-align: left;
-                                   width: 60px">Points</th>
+                                   width: 60px">Strikes</th>
                         <th style="border: 1px solid #dee2e6;
                                    padding: 10px;
                                    text-align: left;
@@ -206,13 +206,13 @@
                     {% for state in abuse_states %}
                         <tr>
                             <td style="border: 1px solid #dee2e6; padding: 10px;">{{ state.user_email }}</td>
-                            <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">{{ state.points }}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">{{ state.strikes }}</td>
                             <td style="border: 1px solid #dee2e6; padding: 10px; font-size: 13px;">
                                 {% if state.is_permanently_banned %}
                                     <span style="color: #721c24; font-weight: 600;">PERMANENTLY BANNED</span>
                                 {% elif state.is_in_cooldown %}
                                     <span style="color: #721c24; font-weight: 500;">Blocked until {{ state.cooldown_until|date:"M d, g:i a" }}</span>
-                                {% elif state.points >= 1 %}
+                                {% elif state.strikes >= 1 %}
                                     <span style="color: #856404;">Active (CAPTCHA required)</span>
                                 {% else %}
                                     <span style="color: #666;">Clean</span>
