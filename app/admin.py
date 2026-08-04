@@ -20,7 +20,7 @@ class AbuseStateAdmin(admin.ModelAdmin):
         "status",
         "last_violation_at",
         "episode_started_at",
-        "sensitive_count_in_episode",
+        "points_in_episode",
     ]
     list_filter = ["strikes"]
     search_fields = ["user__email"]
@@ -69,7 +69,7 @@ class AbuseStateAdmin(admin.ModelAdmin):
         """Unban users but keep them on thin ice (one more violation = banned)."""
         queryset.update(
             strikes=config.ABUSE_PERMANENT_BAN_THRESHOLD - 1,
-            sensitive_count_in_episode=0,
+            points_in_episode=0,
             cooldown_until=None,
             last_strikes_update_at=timezone.now(),
         )
@@ -143,7 +143,7 @@ class AbuseAppealAdmin(admin.ModelAdmin):
             # Unban: reset the abuse state to clean state
             state = appeal.abuse_state
             state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
-            state.sensitive_count_in_episode = 0
+            state.points_in_episode = 0
             state.cooldown_until = None
             state.last_strikes_update_at = timezone.now()
             state.save()

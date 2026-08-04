@@ -15,14 +15,15 @@ ENTRIES = [
     # Abuse Prevention
     Entry(
         "ABUSE_RATE_LIMIT",
-        "30/60m",
-        "django-ratelimit rate string, e.g. '30/60m' = 30 requests per 60 minutes",
+        "120/60m",
+        "Rate string, e.g. '120/60m' = 120 budget units per 60 minutes "
+        "(see URL_ABUSE_POINTS in app/abuse_prevention.py for unit cost per endpoint)",
     ),
     Entry("ABUSE_EPISODE_INACTIVITY_MINUTES", 60, "Minutes of inactivity before an abuse episode ends"),
     Entry(
-        "ABUSE_SENSITIVE_CAP_PER_EPISODE",
-        10,
-        "Max sensitive requests allowed per episode before blocking",
+        "ABUSE_POINTS_CAP_PER_EPISODE",
+        40,
+        "Max budget units allowed per episode before blocking",
     ),
     Entry("ABUSE_STRIKES_DECAY_HOURS", 24, "Hours between each automatic 1-strike decay"),
     Entry("ABUSE_PERMANENT_BAN_THRESHOLD", 5, "Strikes at which a user is permanently banned"),
@@ -54,7 +55,7 @@ CONSTANCE_CONFIG_FIELDSETS = {
     "Abuse Prevention": [
         "ABUSE_RATE_LIMIT",
         "ABUSE_EPISODE_INACTIVITY_MINUTES",
-        "ABUSE_SENSITIVE_CAP_PER_EPISODE",
+        "ABUSE_POINTS_CAP_PER_EPISODE",
         "ABUSE_STRIKES_DECAY_HOURS",
         "ABUSE_PERMANENT_BAN_THRESHOLD",
         "ABUSE_CAPTCHA_THRESHOLD",
