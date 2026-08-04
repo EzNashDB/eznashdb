@@ -10,12 +10,12 @@ from django.utils import timezone
 from app.forms import AbuseAppealForm
 from app.models import AbuseState
 
-# Sensitive URL names that require abuse prevention checks
-SENSITIVE_URL_NAMES = [
-    "eznashdb:create_shul",
-    "eznashdb:update_shul",
-    "eznashdb:google_maps_proxy",
-]
+# Sensitive URL names and their associated abuse points
+URL_ABUSE_POINTS = {
+    "eznashdb:create_shul": 1,
+    "eznashdb:update_shul": 4,
+    "eznashdb:google_maps_proxy": 4,
+}
 
 
 class BlockReason(Enum):
@@ -63,10 +63,7 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
         )
 
     # 3. Episode cap (only reached if no cooldown was created)
-    if (
-        state.is_episode_active()
-        and state.sensitive_count_in_episode >= config.ABUSE_SENSITIVE_CAP_PER_EPISODE
-    ):
+    if state.is_episode_active() and state.points_in_episode >= config.ABUSE_POINTS_CAP_PER_EPISODE:
         return AbuseEnforcementResult(
             allowed=False,
             reason=BlockReason.EPISODE_CAP,
@@ -90,7 +87,7 @@ def get_cooldown_minutes(strikes):
     return ladder[effective_strikes]
 
 
-def record_abuse_violation(user, was_rate_limited: bool) -> None:
+def record_abuse_violation(user, was_rate_limited: bool, points: int = 1) -> None:
     """
     Record request outcome after processing.
 
@@ -99,15 +96,15 @@ def record_abuse_violation(user, was_rate_limited: bool) -> None:
     state = AbuseState.get_or_create(user)
 
     if was_rate_limited or state.is_episode_active():
-        state.record_violation()
+        state.record_violation(points)
 
 
-def is_sensitive_url(request):
-    """Check if URL name is a sensitive endpoint."""
+def get_request_points(request) -> int:
+    """Points this request costs against the rate budget."""
     if not hasattr(request, "resolver_match") or not request.resolver_match:
-        return False
+        return 0
     view_name = request.resolver_match.view_name
-    return view_name in SENSITIVE_URL_NAMES
+    return URL_ABUSE_POINTS.get(view_name, 0)
 
 
 def format_retry_time(minutes):

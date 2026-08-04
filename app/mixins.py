@@ -1,21 +1,19 @@
 from urllib.parse import urlencode
 
-from constance import config
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django_ratelimit.core import is_ratelimited
 from waffle import flag_is_active
 
 from app.abuse_prevention import (
     build_block_context,
-    is_sensitive_url,
+    get_request_points,
     process_abuse_state,
     record_abuse_violation,
 )
 from app.forms import CaptchaVerificationForm
-from app.rate_limiting import consume_captcha_token
+from app.rate_limiting import RATE_LIMITED_METHODS, consume_captcha_token, consume_rate_budget
 
 
 def is_rate_limiting_active(request):
@@ -42,7 +40,11 @@ class AbusePreventionMixin(HtmxRequestMixin):
     """Mixin to add user-based abuse prevention to views that expose sensitive data."""
 
     def dispatch(self, request, *args, **kwargs):
-        if self.should_pass_through(request):
+        if not request.user.is_authenticated or not is_rate_limiting_active(request):
+            return super().dispatch(request, *args, **kwargs)
+
+        points = get_request_points(request)
+        if points == 0:
             return super().dispatch(request, *args, **kwargs)
 
         # Check enforcement before processing request
@@ -55,30 +57,19 @@ class AbusePreventionMixin(HtmxRequestMixin):
         if abuse_enforcement_result.requires_captcha and not consume_captcha_token(request):
             return self.get_captcha_required_response()
 
-        # Apply django-ratelimit for rate tracking
-        was_limited = is_ratelimited(
-            request=request,
-            group="abuse_prevention",
-            key=lambda g, r: str(r.user.pk),
-            rate=config.ABUSE_RATE_LIMIT,
-            method=["GET", "POST"],
-            increment=True,
-        )
+        if request.method not in RATE_LIMITED_METHODS:
+            return super().dispatch(request, *args, **kwargs)
+
+        # Charge this request's points against the rolling budget
+        was_limited = consume_rate_budget(request, points)
 
         # Process the request
         response = super().dispatch(request, *args, **kwargs)
 
         # Record the outcome (was this request rate-limited?)
-        record_abuse_violation(request.user, was_limited)
+        record_abuse_violation(request.user, was_limited, points)
 
         return response
-
-    def should_pass_through(self, request):
-        return (
-            not is_sensitive_url(request)
-            or not is_rate_limiting_active(request)
-            or not request.user.is_authenticated
-        )
 
     def get_blocked_response(self, result):
         """Generate a response for a blocked request.

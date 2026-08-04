@@ -31,7 +31,7 @@ class AbuseState(models.Model):
     last_strikes_update_at = models.DateTimeField(auto_now_add=True)
     episode_started_at = models.DateTimeField(null=True, blank=True)
     last_violation_at = models.DateTimeField(null=True, blank=True)
-    sensitive_count_in_episode = models.PositiveIntegerField(default=0)
+    points_in_episode = models.PositiveIntegerField(default=0)
     cooldown_until = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -93,7 +93,7 @@ class AbuseState(models.Model):
 
         if (
             self.is_episode_active()
-            and self.sensitive_count_in_episode >= config.ABUSE_SENSITIVE_CAP_PER_EPISODE
+            and self.points_in_episode >= config.ABUSE_POINTS_CAP_PER_EPISODE
             and not self.is_in_cooldown()
         ):
             cooldown_minutes = get_cooldown_minutes(self.strikes)
@@ -101,7 +101,7 @@ class AbuseState(models.Model):
                 self.cooldown_until = timezone.now() + timedelta(minutes=cooldown_minutes)
                 self.save(update_fields=["cooldown_until"])
 
-    def record_violation(self) -> None:
+    def record_violation(self, points: int = 1) -> None:
         from app.abuse_prevention import get_cooldown_minutes
 
         """Record a sensitive request. Starts new episode if none active."""
@@ -110,7 +110,7 @@ class AbuseState(models.Model):
 
         if is_new_episode:
             self.strikes += 1
-            self.sensitive_count_in_episode = 1
+            self.points_in_episode = points
             self.episode_started_at = now
             self.last_strikes_update_at = now
 
@@ -122,8 +122,8 @@ class AbuseState(models.Model):
 
             self._log_violation_to_sentry()
         else:
-            # Existing episode - just increment count
-            self.sensitive_count_in_episode += 1
+            # Existing episode - just add points
+            self.points_in_episode += points
 
         self.last_violation_at = now
         self.save()

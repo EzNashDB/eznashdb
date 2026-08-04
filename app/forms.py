@@ -51,7 +51,7 @@ class AbuseAppealForm(forms.ModelForm):
             "last_violation_at": state.last_violation_at.isoformat()
             if state.last_violation_at
             else None,
-            "sensitive_count_in_episode": state.sensitive_count_in_episode,
+            "points_in_episode": state.points_in_episode,
         }
 
         if commit:
