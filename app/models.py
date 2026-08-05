@@ -33,6 +33,7 @@ class AbuseState(models.Model):
     last_violation_at = models.DateTimeField(null=True, blank=True)
     points_in_episode = models.PositiveIntegerField(default=0)
     cooldown_until = models.DateTimeField(null=True, blank=True)
+    captcha_verified_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Abuse State"
@@ -44,6 +45,21 @@ class AbuseState(models.Model):
     @property
     def is_permanently_banned(self):
         return self.strikes >= config.ABUSE_PERMANENT_BAN_THRESHOLD
+
+    @property
+    def captcha_verification_pending(self):
+        """Whether CAPTCHA still needs to be (re-)solved.
+
+        A verification stays valid until `strikes` next changes for any reason - decay or a new
+        violation both bump `last_strikes_update_at` past it.
+        """
+        return self.strikes >= config.ABUSE_CAPTCHA_THRESHOLD and (
+            self.captcha_verified_at is None or self.captcha_verified_at < self.last_strikes_update_at
+        )
+
+    def mark_captcha_verified(self) -> None:
+        self.captcha_verified_at = timezone.now()
+        self.save(update_fields=["captcha_verified_at"])
 
     @property
     def decayed_strikes(self):

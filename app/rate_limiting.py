@@ -1,13 +1,9 @@
 """Rate limiting and abuse prevention utilities."""
 
-import secrets
-
 from constance import config
 from django.conf import settings
 from django.core.cache import caches
 from django_ratelimit.core import EXPIRATION_FUDGE, _get_window, _make_cache_key, _split_rate
-
-CAPTCHA_TOKEN_SESSION_KEY = "_captcha_bypass_token"
 
 RATE_LIMIT_GROUP = "abuse_prevention"
 
@@ -51,25 +47,3 @@ def consume_rate_budget(request, points: int) -> bool:
         return not getattr(settings, "RATELIMIT_FAIL_OPEN", False)
 
     return count > limit
-
-
-def generate_captcha_token(request):
-    """
-    Generate a one-time bypass token after successful captcha verification.
-    Token is stored in session and can only be used once.
-    """
-    token = secrets.token_urlsafe(32)
-    request.session[CAPTCHA_TOKEN_SESSION_KEY] = token
-    return token
-
-
-def consume_captcha_token(request):
-    """
-    Check for and consume a one-time captcha bypass token.
-    Returns True if valid token was present (and is now consumed), False otherwise.
-    """
-    token = request.session.get(CAPTCHA_TOKEN_SESSION_KEY)
-    if token:
-        del request.session[CAPTCHA_TOKEN_SESSION_KEY]
-        return True
-    return False

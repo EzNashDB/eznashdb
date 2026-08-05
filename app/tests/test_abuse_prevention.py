@@ -22,7 +22,7 @@ from app.abuse_prevention import (
     process_abuse_state,
     record_abuse_violation,
 )
-from app.admin import AbuseAppealAdmin
+from app.admin import AbuseAppealAdmin, AbuseStateAdmin
 from app.models import AbuseAppeal, AbuseState
 from app.rate_limiting import consume_rate_budget
 
@@ -355,7 +355,7 @@ def describe_escalation_ladder():
 
         assert result.requires_captcha is False
 
-    def captcha_required_at_one_strike(test_user):
+    def captcha_required_at_one_strike_when_never_verified(test_user):
         """Should require CAPTCHA at 1+ strikes"""
         state = AbuseState.get_or_create(test_user)
         state.strikes = 1
@@ -389,6 +389,126 @@ def describe_escalation_ladder():
 
         assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD
         assert state.is_permanently_banned is True
+
+
+@pytest.mark.django_db
+def describe_captcha_verification_lifecycle():
+    """A CAPTCHA verification stays valid until `strikes` next changes, for any reason."""
+
+    def not_required_below_threshold_even_when_never_verified(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 0
+        state.save()
+
+        assert state.captcha_verification_pending is False
+
+    def not_required_after_verification(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 1
+        state.save()
+        state.mark_captcha_verified()
+
+        assert state.captcha_verification_pending is False
+
+    def stays_verified_across_repeated_checks(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 1
+        state.save()
+        state.mark_captcha_verified()
+
+        for _ in range(3):
+            result = process_abuse_state(test_user)
+            assert result.requires_captcha is False
+
+    def not_re_armed_by_more_points_in_the_same_episode(test_user):
+        """The same-episode branch of record_violation must not touch
+        last_strikes_update_at, or every subsequent request in the episode would
+        re-demand CAPTCHA."""
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 1
+        state.last_violation_at = timezone.now()
+        state.save()
+        state.mark_captcha_verified()
+
+        state.record_violation(points=4)
+
+        assert state.points_in_episode == 4
+        assert state.captcha_verification_pending is False
+
+    def re_armed_when_a_new_episode_adds_a_strike(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 1
+        state.last_violation_at = timezone.now() - timedelta(
+            minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES + 1
+        )
+        state.save()
+        state.mark_captcha_verified()
+
+        state.record_violation()
+
+        assert state.strikes == 2
+        assert state.captcha_verification_pending is True
+
+    def re_armed_when_strikes_decay(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 3
+        state.last_strikes_update_at = timezone.now() - timedelta(hours=25)
+        state.save()
+        state.mark_captcha_verified()
+
+        result = process_abuse_state(test_user)
+
+        state.refresh_from_db()
+        assert state.strikes == 2
+        assert result.requires_captcha is True
+
+    def verification_does_not_unblock_a_permanent_ban(test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.save()
+        state.mark_captcha_verified()
+
+        result = process_abuse_state(test_user)
+
+        assert result.allowed is False
+        assert result.reason == BlockReason.PERMANENTLY_BANNED
+
+    def re_armed_by_admin_unban(superuser, test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.save()
+        state.mark_captcha_verified()
+
+        rf = RequestFactory()
+        request = rf.post("/admin/")
+        request.user = superuser
+        request.session = {}
+        request._messages = FallbackStorage(request)
+
+        admin = AbuseStateAdmin(AbuseState, AdminSite())
+        queryset = AbuseState.objects.filter(pk=state.pk)
+        admin.unban_user(request, queryset)
+
+        state.refresh_from_db()
+        assert state.captcha_verification_pending is True
+
+    def re_armed_when_admin_edits_strikes_via_change_form(test_user):
+        """Editing `strikes` directly on the change form isn't covered by
+        record_violation/apply_strikes_decay, so AbuseStateAdmin.save_model must
+        re-stamp last_strikes_update_at itself."""
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 3
+        state.save()
+        state.mark_captcha_verified()
+
+        state.strikes = 1
+        fake_form = SimpleNamespace(changed_data=["strikes"])
+        admin = AbuseStateAdmin(AbuseState, AdminSite())
+        request = RequestFactory().post("/admin/")
+
+        admin.save_model(request, state, fake_form, True)
+
+        assert state.captcha_verification_pending is True
 
 
 @pytest.mark.django_db
@@ -511,6 +631,7 @@ def describe_appeal_admin_actions():
         state = AbuseState.get_or_create(test_user)
         state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
         state.save()
+        state.mark_captcha_verified()
 
         appeal = AbuseAppeal.objects.create(
             abuse_state=state,
@@ -540,6 +661,8 @@ def describe_appeal_admin_actions():
         assert state.strikes == config.ABUSE_PERMANENT_BAN_THRESHOLD - 1
         assert state.is_permanently_banned is False
         assert state.cooldown_until is None
+        # Unbanning re-arms CAPTCHA verification, same as any other strikes change
+        assert state.captcha_verification_pending is True
 
     def deny_appeal_updates_status(superuser, test_user):
         """Denying appeal should update status but keep abuse state"""

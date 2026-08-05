@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.utils import timezone
 
 from app.models import AbuseState
-from app.rate_limiting import CAPTCHA_TOKEN_SESSION_KEY
 
 
 def _block_with_cooldown(user, minutes=30) -> AbuseState:
@@ -24,6 +23,12 @@ def _require_captcha(user) -> AbuseState:
     state = AbuseState.get_or_create(user)
     state.strikes = config.ABUSE_CAPTCHA_THRESHOLD
     state.save()
+    return state
+
+
+def _require_captcha_and_verify(user) -> AbuseState:
+    state = _require_captcha(user)
+    state.mark_captcha_verified()
     return state
 
 
@@ -100,13 +105,9 @@ def describe_htmx_delivery():
         assert next_input is not None
         assert next_input["value"] == reverse("eznashdb:create_shul")
 
-    def proceeds_when_token_in_session(client, test_user):
+    def proceeds_when_captcha_already_verified(client, test_user):
         client.force_login(test_user)
-        _require_captcha(test_user)
-
-        session = client.session
-        session[CAPTCHA_TOKEN_SESSION_KEY] = "test-token"
-        session.save()
+        _require_captcha_and_verify(test_user)
 
         response = client.post(
             reverse("eznashdb:create_shul"), data=WIZARD_STEP1_DATA, headers={"HX-Request": "true"}
@@ -115,6 +116,27 @@ def describe_htmx_delivery():
         assert response.status_code == 200
         assert "X-Abuse-Enforcement" not in response
         assert b'id="shul_form"' in response.content
+
+    def captcha_gate_verify_and_retry_chain_end_to_end(client, test_user, mocker):
+        client.force_login(test_user)
+        _require_captcha(test_user)
+        mocker.patch("app.forms.CaptchaVerificationForm.is_valid", return_value=True)
+
+        gated = client.post(
+            reverse("eznashdb:create_shul"), data=WIZARD_STEP1_DATA, headers={"HX-Request": "true"}
+        )
+        assert gated["X-Abuse-Enforcement"] == "captcha"
+
+        verify = client.post(
+            reverse("captcha_verify"), data={"next": "/shuls/create/"}, headers={"HX-Request": "true"}
+        )
+        assert verify["HX-Trigger"] == "abuseCaptchaVerified"
+
+        retry = client.post(
+            reverse("eznashdb:create_shul"), data=WIZARD_STEP1_DATA, headers={"HX-Request": "true"}
+        )
+        assert retry.status_code == 200
+        assert "X-Abuse-Enforcement" not in retry
 
 
 @pytest.mark.django_db
@@ -156,6 +178,7 @@ def describe_non_htmx_delivery():
 def describe_captcha_verify_view():
     def htmx_success_returns_no_swap_and_triggers_event(client, test_user, mocker):
         client.force_login(test_user)
+        _require_captcha(test_user)
         mocker.patch("app.forms.CaptchaVerificationForm.is_valid", return_value=True)
 
         response = client.post(
@@ -167,10 +190,11 @@ def describe_captcha_verify_view():
         assert response.status_code == 200
         assert response["HX-Reswap"] == "none"
         assert response["HX-Trigger"] == "abuseCaptchaVerified"
-        assert CAPTCHA_TOKEN_SESSION_KEY in client.session
+        assert AbuseState.get_or_create(test_user).captcha_verified_at is not None
 
     def htmx_failure_rerenders_modal_with_error(client, test_user):
         client.force_login(test_user)
+        _require_captcha(test_user)
 
         response = client.post(
             reverse("captcha_verify"),
@@ -182,8 +206,33 @@ def describe_captcha_verify_view():
 
         assert response.status_code == 200
         assert "CAPTCHA verification failed" in str(soup)
-        assert CAPTCHA_TOKEN_SESSION_KEY not in client.session
+        assert AbuseState.get_or_create(test_user).captcha_verified_at is None
         assert response["HX-Trigger-After-Swap"] == "abuseCaptchaRequired"
+
+    def verifying_below_threshold_does_not_pre_arm(client, test_user, mocker):
+        client.force_login(test_user)
+        mocker.patch("app.forms.CaptchaVerificationForm.is_valid", return_value=True)
+
+        response = client.post(
+            reverse("captcha_verify"),
+            data={"next": "/shuls/create/"},
+            headers={"HX-Request": "true"},
+        )
+
+        assert response.status_code == 200
+        assert AbuseState.get_or_create(test_user).captcha_verified_at is None
+
+    def anonymous_user_can_complete_captcha_without_error(client, mocker):
+        mocker.patch("app.forms.CaptchaVerificationForm.is_valid", return_value=True)
+
+        response = client.post(
+            reverse("captcha_verify"),
+            data={"next": "/shuls/create/"},
+            headers={"HX-Request": "true"},
+        )
+
+        assert response.status_code == 200
+        assert not AbuseState.objects.exists()
 
     def non_htmx_get_renders_captcha_page(client, test_user):
         client.force_login(test_user)
@@ -196,6 +245,15 @@ def describe_captcha_verify_view():
         assert b"<html" in response.content
         assert "Verification Required" in str(soup)
         assert soup.find("input", {"name": "next"})["value"] == "/shuls/create/"
+
+    def redirects_to_next_when_rate_limiting_disabled(client, test_user, settings):
+        client.force_login(test_user)
+        settings.DEBUG = True
+
+        response = client.get(reverse("captcha_verify"), data={"next": "/shuls/create/"})
+
+        assert response.status_code == 302
+        assert response.url == "/shuls/create/"
 
     def non_htmx_success_still_redirects_to_next(client, test_user, mocker):
         client.force_login(test_user)

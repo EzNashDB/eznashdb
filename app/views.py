@@ -19,7 +19,6 @@ from app.emails import send_appeal_notification
 from app.forms import AbuseAppealForm, CaptchaVerificationForm
 from app.mixins import HtmxRequestMixin, is_rate_limiting_active
 from app.models import AbuseState
-from app.rate_limiting import generate_captcha_token
 
 
 def _validated_next(request, raw_next):
@@ -145,8 +144,9 @@ class ClientErrorReportView(View):
 class CaptchaVerifyView(HtmxRequestMixin, View):
     """
     Dedicated view for CAPTCHA verification.
-    After successful verification, generates a one-time token and redirects to 'next' URL
-    (or triggers abuseCaptchaVerified for htmx requests).
+    After successful verification, marks the user's AbuseState as verified (valid until their
+    strikes next change) and redirects to 'next' URL (or triggers abuseCaptchaVerified for htmx
+    requests).
     """
 
     def get_next_url(self):
@@ -157,7 +157,6 @@ class CaptchaVerifyView(HtmxRequestMixin, View):
         form = CaptchaVerificationForm()
         # Auto-bypass CAPTCHA if rate limiting feature is disabled
         if not is_rate_limiting_active(request):
-            generate_captcha_token(request)
             return redirect(self.get_next_url())
         return render(
             request,
@@ -176,8 +175,13 @@ class CaptchaVerifyView(HtmxRequestMixin, View):
         return self.handle_failure(request, form)
 
     def handle_success(self, request):
-        # Generate one-time bypass token
-        generate_captcha_token(request)
+        # Only mark verification if it was actually pending, so a user can't pre-arm a future
+        # verification while below the CAPTCHA threshold. Anonymous users are never gated
+        # (AbusePreventionMixin short-circuits for them), so there's no state to record.
+        if request.user.is_authenticated:
+            state = AbuseState.get_or_create(request.user)
+            if state.captcha_verification_pending:
+                state.mark_captcha_verified()
         if self.is_htmx:
             response = HttpResponse("")
             response["HX-Reswap"] = "none"
