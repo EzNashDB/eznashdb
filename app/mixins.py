@@ -13,7 +13,7 @@ from app.abuse_prevention import (
     record_abuse_violation,
 )
 from app.forms import CaptchaVerificationForm
-from app.rate_limiting import RATE_LIMITED_METHODS, consume_captcha_token, consume_rate_budget
+from app.rate_limiting import RATE_LIMITED_METHODS, consume_rate_budget
 
 
 def is_rate_limiting_active(request):
@@ -54,7 +54,7 @@ class AbusePreventionMixin(HtmxRequestMixin):
 
         # Check if CAPTCHA is required and user hasn't solved it yet
         # Do this BEFORE counting the request to avoid double-counting
-        if abuse_enforcement_result.requires_captcha and not consume_captcha_token(request):
+        if abuse_enforcement_result.requires_captcha:
             return self.get_captcha_required_response()
 
         if request.method not in RATE_LIMITED_METHODS:

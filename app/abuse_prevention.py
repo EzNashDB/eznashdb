@@ -71,7 +71,7 @@ def determine_enforcement(state: AbuseState) -> AbuseEnforcementResult:
         )
 
     # 4. CAPTCHA
-    requires_captcha = state.strikes >= config.ABUSE_CAPTCHA_THRESHOLD
+    requires_captcha = state.captcha_verification_pending
 
     return AbuseEnforcementResult(
         allowed=True,

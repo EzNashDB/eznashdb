@@ -29,8 +29,16 @@ class AbuseStateAdmin(admin.ModelAdmin):
         "episode_started_at",
         "last_violation_at",
         "last_strikes_update_at",
+        "captcha_verified_at",
     ]
     ordering = ["-last_violation_at"]
+
+    def save_model(self, request, obj, form, change):
+        # Editing strikes directly must re-arm CAPTCHA verification, same as the other paths
+        # that change strikes (apply_strikes_decay, record_violation, unban_user, approve_appeal).
+        if "strikes" in form.changed_data:
+            obj.last_strikes_update_at = timezone.now()
+        super().save_model(request, obj, form, change)
 
     @admin.display(description="User Email")
     def user_email(self, obj):
