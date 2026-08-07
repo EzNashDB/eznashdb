@@ -1,7 +1,13 @@
 {% extends "eznashdb/includes/base_shul_popup.html" %}
 
 {% block header_content %}
-    <span class="flex-grow-1">{{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area</span>
+    <span class="flex-grow-1">
+        {% if shuls %}
+            {{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area
+        {% else %}
+            No longer available
+        {% endif %}
+    </span>
 {% endblock %}
 
 {% block close_button_class %}{% endblock %}
@@ -9,7 +15,13 @@
 {% block accordion_id %}shuls-cluster-accordion{% endblock %}
 
 {% block accordion_content %}
-    {% for shul in shuls %}
-        {% include "eznashdb/includes/shul_accordion_item.html" with shul=shul accordion_id="shuls-cluster-accordion" item_id_prefix="shul" total_shuls=shuls|length is_last=forloop.last %}
-    {% endfor %}
+    {% if shuls %}
+        {% for shul in shuls %}
+            {% include "eznashdb/includes/shul_accordion_item.html" with shul=shul accordion_id="shuls-cluster-accordion" item_id_prefix="shul" total_shuls=shuls|length is_last=forloop.last is_expanded=shul.is_expanded %}
+        {% endfor %}
+    {% else %}
+        <div class="accordion-item border-0">
+            <div class="accordion-body text-muted">This shul is no longer available.</div>
+        </div>
+    {% endif %}
 {% endblock %}

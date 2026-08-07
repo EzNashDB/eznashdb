@@ -40,8 +40,7 @@ class ShulsFilterView(FilterView):
         # Group shuls by their display coordinates (excluding exact pin to prevent double-display)
         clusters_dict = defaultdict(list)
         for shul in clustered_shuls:
-            cluster_key = f"{shul.display_lat}_{shul.display_lon}"
-            clusters_dict[cluster_key].append(shul)
+            clusters_dict[shul.cluster_key].append(shul)
 
         context["clustered_shuls_list"] = clustered_shuls
         context["shul_clusters"] = dict(clusters_dict)
@@ -62,7 +61,7 @@ class ShulsFilterView(FilterView):
         Returns dict with cluster_key and offset values, or None if no offset needed.
         """
         MIN_SEPARATION_FROM_EXACT_PIN = 0.004
-        cluster_key = f"{exact_pin_shul.display_lat}_{exact_pin_shul.display_lon}"
+        cluster_key = exact_pin_shul.cluster_key
         if cluster_key not in clusters_dict:
             return None
 
@@ -96,6 +95,53 @@ class ShulsFilterView(FilterView):
         if self.request.htmx:
             return ["eznashdb/shuls.html#map_updates"]
         return super().get_template_names()
+
+
+class ShulClusterPopupView(View):
+    def get(self, request, *args, **kwargs):
+        cluster_key = request.GET.get("cluster_key", "")
+        if not cluster_key:
+            return HttpResponseBadRequest("Missing 'cluster_key'.")
+
+        qs = self.get_queryset()
+        shuls = self._shuls_in_cluster(qs, cluster_key)
+        self._mark_selected_shul(shuls, request.GET.get("selected_shul", ""))
+
+        return render(request, "eznashdb/includes/shul_cluster_popup.html", {"shuls": shuls})
+
+    def get_queryset(self):
+        """Shuls matching the page's active filters, minus any excluded shul."""
+        NON_FILTER_PARAMS = ("cluster_key", "exclude", "selected_shul")
+        filter_params = self.request.GET.copy()
+        for param in NON_FILTER_PARAMS:
+            filter_params.pop(param, None)
+
+        filterset = ShulFilterSet(
+            filter_params or None, queryset=Shul.objects.all(), request=self.request
+        )
+        # Mirrors default behavior from django_filter
+        qs = filterset.qs if not filterset.is_bound or filterset.is_valid() else Shul.objects.none()
+
+        exclude_id = self.request.GET.get("exclude", "")
+        if exclude_id.isdigit():
+            qs = qs.exclude(pk=exclude_id)
+
+        return qs
+
+    def _shuls_in_cluster(self, qs, cluster_key):
+        """Members of the given cluster, with rooms prefetched for rendering."""
+        # Scan without the rooms prefetch to find cluster membership cheaply,
+        # then re-fetch just those shuls with the prefetch for rendering.
+        member_ids = [
+            shul.pk
+            for shul in qs.prefetch_related(None).only("pk", "latitude", "longitude")
+            if shul.cluster_key == cluster_key
+        ]
+        return list(qs.filter(pk__in=member_ids).order_by("name", "pk"))
+
+    def _mark_selected_shul(self, shuls, selected_shul):
+        for shul in shuls:
+            shul.is_expanded = str(shul.pk) == selected_shul
 
 
 class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView):
