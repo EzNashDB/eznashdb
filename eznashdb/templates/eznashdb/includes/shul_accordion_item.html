@@ -20,7 +20,9 @@
                     <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
                 </span>
                 <span>
-                    <div class="badge text-bg-secondary">{{ shul.rooms.count }} Room{{ shul.rooms.count|pluralize }}</div>
+                    {% with room_count=shul.rooms.all|length %}
+                        <div class="badge text-bg-secondary">{{ room_count }} Room{{ room_count|pluralize }}</div>
+                    {% endwith %}
                 </span>
             </div>
         </button>
@@ -57,7 +59,7 @@
                     </div>
                 </div>
             {% endflag %}
-            {% if shul.rooms.exists %}
+            {% if shul.rooms.all %}
                 <ul class="list-group mt-3">
                     {% for room in shul.rooms.all %}
                         <li class="list-group-item">

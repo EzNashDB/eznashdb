@@ -1,6 +1,35 @@
 import pytest
+from django.template import Context, Template
 
 from eznashdb.models import Shul
+
+
+def describe_cluster_key():
+    def matches_the_template_rendered_display_coords():
+        """
+        The endpoint round-trips this string: JS reads it from the page, sends
+        it back as-is, and the server matches it against shul.cluster_key. If
+        the two ever diverge, clicking a pin silently does nothing.
+        """
+        shul = Shul.objects.create(name="S", latitude=40.7128, longitude=-74.0060)
+
+        rendered = Template("{{ shul.cluster_key }}").render(Context({"shul": shul}))
+
+        assert rendered == shul.cluster_key
+
+    def matches_even_when_python_str_would_use_scientific_notation():
+        """
+        Regression: Django's numberformat expands a float's scientific
+        notation (e.g. str() gives "-2e-05" but the template renders
+        "-0.00002"). cluster_key must render as a plain string so the two
+        never diverge - this shul's fuzzed longitude hits that case.
+        """
+        shul = Shul.objects.create(name="S", latitude=51.82, longitude=0.001)
+
+        assert "e" in str(shul.display_lon)  # sanity check this case is real
+        rendered = Template("{{ shul.cluster_key }}").render(Context({"shul": shul}))
+
+        assert rendered == shul.cluster_key
 
 
 def describe_get_map_url():

@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
-from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulsFilterView
 
@@ -20,74 +19,17 @@ def test_shows_app_name(GET_request):
     assert "Ezrat Nashim Database" in soup.get_text()
 
 
-def test_shows_room_name(GET_request, test_shul):
-    room = test_shul.rooms.create(name="test_room")
-
-    response = ShulsFilterView.as_view()(GET_request)
-    soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-    assert room.name in str(soup)
-
-
-def test_shul_name_is_escaped_in_the_map_script(GET_request, test_shul):
-    """A shul name must not break out of the escapejs'd popup string (audit CRITICAL-1)."""
-    test_shul.name = "'`</script><img src=x onerror=alert(1)>"
-    test_shul.save()
-
+@override_flag("kaddish", active=True)
+def test_shul_names_are_not_shipped_with_the_markers(GET_request, test_shul):
+    """
+    Privacy: marker positions are eager, but names + details are fetched on
+    demand per cluster (see ShulClusterPopupView) - a bare pin reveals nothing.
+    """
     content = ShulsFilterView.as_view()(GET_request).render().content.decode()
 
-    # The dangerous name never appears raw; escapejs + HTML-autoescape neutralise it.
     assert test_shul.name not in content
-    assert "<img src=x onerror" not in content
-    assert "</script><img" not in content
-
-
-def describe_rooms():
-    @pytest.mark.parametrize(("relative_size"), list(RelativeSize))
-    def test_shows_room_relative_size(test_shul, GET_request, relative_size):
-        test_shul.rooms.create(name="test_room", relative_size=relative_size)
-
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert relative_size.value in str(soup)
-
-    def test_displays_dash_for_unknown_relative_size(test_shul, GET_request):
-        test_shul.rooms.create(name="test_room", relative_size="", see_hear_score=SeeHearScore._3)
-
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert "--" in str(soup)
-
-    @pytest.mark.parametrize(("see_hear_score"), list(SeeHearScore))
-    def test_shows_room_see_hear_score(test_shul, GET_request, see_hear_score):
-        test_shul.rooms.create(name="test_room", see_hear_score=see_hear_score)
-
-        response = ShulsFilterView.as_view()(GET_request)
-        # decode() (not str(bytes)) so backslashes in the escapejs output aren't doubled
-        soup = BeautifulSoup(response.render().content.decode(), features="html.parser")
-        marker_script = soup.find(id="shul-markers-js")
-
-        expected_filled_star_count = int(see_hear_score.value)
-        expected_empty_star_count = 5 - expected_filled_star_count
-
-        # escapejs (applied to the popup HTML) hex-escapes "-", so fa-solid fa-star
-        # appears as fa-solid fa-star in the script source.
-        dash = "\\u002D"
-        filled_class = f"fa{dash}solid fa{dash}star"
-        empty_class = f"fa{dash}regular fa{dash}star"
-
-        assert str(marker_script).count(filled_class) == expected_filled_star_count
-        assert str(marker_script).count(empty_class) == expected_empty_star_count
-
-    def test_shows_dash_for_unknown_see_hear_score(test_shul, GET_request):
-        test_shul.rooms.create(name="test_room", see_hear_score="", relative_size=RelativeSize.M)
-
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert "--" in str(soup)
+    # Pins still render: coordinates are shipped eagerly.
+    assert str(test_shul.display_lat) in content
 
 
 def describe_kaddish_policy_filter():

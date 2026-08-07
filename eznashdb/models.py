@@ -60,6 +60,13 @@ class Shul(SafeDeleteModel):
         return self.rounded_lon + self.get_jitter("lon")
 
     @property
+    def cluster_key(self):
+        # Rendered as a string (not interpolated as a float in a template) so
+        # Django's numberformat can't expand scientific notation (e.g. -2e-05
+        # -> -0.00002) and diverge from this value.
+        return f"{self.display_lat}_{self.display_lon}"
+
+    @property
     def rounded_lat(self):
         return self.round_coord(self.latitude)
 

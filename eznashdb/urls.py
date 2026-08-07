@@ -6,6 +6,7 @@ app_name = "eznashdb"
 
 urlpatterns = [
     path("", views.ShulsFilterView.as_view(), name="shuls"),
+    path("shuls/popup/", views.ShulClusterPopupView.as_view(), name="cluster_popup"),
     path("shuls/create/", views.CreateUpdateShulView.as_view(), name="create_shul"),
     path("shuls/<pk>/update/", views.CreateUpdateShulView.as_view(), name="update_shul"),
     path("shuls/<int:pk>/undelete/", views.UndeleteShulView.as_view(), name="undelete_shul"),
