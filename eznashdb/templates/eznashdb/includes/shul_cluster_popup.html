@@ -3,7 +3,15 @@
 {% block header_content %}
     <span class="flex-grow-1">
         {% if shuls %}
-            {{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area
+            {% if user.is_authenticated %}
+                {{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area
+            {% else %}
+                <a href="{{ login_url }}"
+                   class="btn btn-sm btn-outline-primary"
+                   data-signin-link>
+                    <i class="fa-solid fa-lock"></i> Sign in to see more
+                </a>
+            {% endif %}
         {% else %}
             No longer available
         {% endif %}

@@ -1,5 +1,6 @@
 import pytest
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import AnonymousUser
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from waffle.testutils import override_flag
@@ -10,9 +11,11 @@ from eznashdb.views import ShulClusterPopupView
 
 
 @pytest.fixture
-def popup_GET(rf_GET):
-    def _get(**query_params):
-        return rf_GET("eznashdb:cluster_popup", query_params=query_params, htmx=True)
+def popup_GET(rf_GET, test_user):
+    def _get(user=test_user, **query_params):
+        request = rf_GET("eznashdb:cluster_popup", query_params=query_params, htmx=True)
+        request.user = user
+        return request
 
     return _get
 
@@ -217,3 +220,82 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
 
     with django_assert_num_queries(len(few_room_queries.captured_queries)):
         ShulClusterPopupView.as_view()(popup_GET(cluster_key=many_rooms.cluster_key))
+
+
+def describe_authenticated_users():
+    def test_sees_full_membership_and_real_count(popup_GET):
+        first = Shul.objects.create(name="First", latitude=40.7128, longitude=-74.0060)
+        second = Shul.objects.create(name="Second", latitude=40.7129, longitude=-74.0061)
+
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=first.cluster_key)
+        ).content.decode()
+
+        assert first.name in content
+        assert second.name in content
+        assert "2 Shuls in this area" in content
+
+
+def describe_anonymous_users():
+    def test_shul_name_is_never_sent(popup_GET, test_shul):
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
+        ).content.decode()
+
+        assert test_shul.name not in content
+        assert "text-blur" in content
+
+    def test_real_ratings_are_still_shown(popup_GET, test_shul):
+        test_shul.rooms.create(name="r", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._4)
+
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
+        ).content.decode()
+
+        assert str(RelativeSize.L.label) in content
+        assert content.count("fa-solid fa-star") == 4
+
+    def test_only_one_shul_shown_regardless_of_cluster_size(popup_GET):
+        shuls = [
+            Shul.objects.create(name=f"Shul {i}", latitude=40.7128, longitude=-74.0060) for i in range(5)
+        ]
+
+        soup = BeautifulSoup(
+            ShulClusterPopupView.as_view()(
+                popup_GET(cluster_key=shuls[0].cluster_key, user=AnonymousUser())
+            ).content.decode(),
+            features="html.parser",
+        )
+
+        assert len(soup.find_all(class_="text-blur")) == 1
+        page_text = soup.get_text()
+        for shul in shuls:
+            assert shul.name not in page_text
+
+    def test_header_shows_generic_cta_instead_of_count(popup_GET, test_shul):
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
+        ).content.decode()
+
+        assert "Sign in to see more" in content
+        assert "Shul in this area" not in content
+        assert "Shuls in this area" not in content
+
+    def test_login_url_has_no_next_param(popup_GET, test_shul):
+        """
+        `next` is set client-side (wireSignInRedirect in shuls.html) since the
+        popup only ever exists via JS rendering - the server-rendered link
+        intentionally carries no next of its own.
+        """
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
+        ).content.decode()
+
+        link = BeautifulSoup(content, features="html.parser").find(attrs={"data-signin-link": True})
+        assert link is not None
+        assert "next=" not in link["href"]
+
+    def test_empty_state_is_unaffected(popup_GET):
+        response = ShulClusterPopupView.as_view()(popup_GET(cluster_key="0.0_0.0", user=AnonymousUser()))
+
+        assert "no longer available" in response.content.decode().lower()

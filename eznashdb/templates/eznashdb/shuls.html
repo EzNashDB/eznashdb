@@ -227,6 +227,15 @@
                 if (shulId) URL_PARAMS_API.update({ selectedShul: shulId });
             }
 
+            // Update redirect url, accounting for map repositioning, etc.
+            function wireSignInRedirect(popupWrapper) {
+                const link = popupWrapper.querySelector('[data-signin-link]');
+                if (!link) return;
+                const url = new URL(link.href, window.location.origin);
+                url.searchParams.set('next', window.location.href);
+                link.href = url.toString();
+            }
+
             function scrollToShulHeader(item) {
                 if (window.SHUL_MAP_API?.map) {
                     setTimeout(() => {
@@ -335,6 +344,8 @@
 
                 if (cachedHtml) {
                     setOpenShulAsSelectedInURL(popupWrapper);
+                    // Re-wire sign-in redirect in case map has moved
+                    wireSignInRedirect(popupWrapper);
                     return;
                 }
 
@@ -351,6 +362,7 @@
                     }
                     if (html === null) return;
                     setOpenShulAsSelectedInURL(popupWrapper);
+                    wireSignInRedirect(popupWrapper);
                     if (selectedShulId) {
                         const item = popupWrapper.querySelector(`#shul-${selectedShulId}`)?.closest('.accordion-item');
                         if (item) scrollToShulHeader(item);

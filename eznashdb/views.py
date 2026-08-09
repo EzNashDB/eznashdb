@@ -16,6 +16,7 @@ from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
+from app.context_processors import get_login_url
 from app.mixins import AbusePreventionMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.filtersets import ShulFilterSet
@@ -104,10 +105,15 @@ class ShulClusterPopupView(View):
             return HttpResponseBadRequest("Missing 'cluster_key'.")
 
         qs = self.get_queryset()
-        shuls = self._shuls_in_cluster(qs, cluster_key)
+        shul_count_limit = None if request.user.is_authenticated else 1
+        shuls = self._shuls_in_cluster(qs, cluster_key, limit=shul_count_limit)
         self._mark_selected_shul(shuls, request.GET.get("selected_shul", ""))
 
-        return render(request, "eznashdb/includes/shul_cluster_popup.html", {"shuls": shuls})
+        context = {"shuls": shuls}
+        if not request.user.is_authenticated:
+            context["login_url"] = get_login_url(request)
+
+        return render(request, "eznashdb/includes/shul_cluster_popup.html", context)
 
     def get_queryset(self):
         """Shuls matching the page's active filters, minus any excluded shul."""
@@ -128,7 +134,7 @@ class ShulClusterPopupView(View):
 
         return qs
 
-    def _shuls_in_cluster(self, qs, cluster_key):
+    def _shuls_in_cluster(self, qs, cluster_key, limit: int | None = None):
         """Members of the given cluster, with rooms prefetched for rendering."""
         # Scan without the rooms prefetch to find cluster membership cheaply,
         # then re-fetch just those shuls with the prefetch for rendering.
@@ -137,7 +143,7 @@ class ShulClusterPopupView(View):
             for shul in qs.prefetch_related(None).only("pk", "latitude", "longitude")
             if shul.cluster_key == cluster_key
         ]
-        return list(qs.filter(pk__in=member_ids).order_by("name", "pk"))
+        return list(qs.filter(pk__in=member_ids).order_by("name", "pk"))[:limit]
 
     def _mark_selected_shul(self, shuls, selected_shul):
         for shul in shuls:
