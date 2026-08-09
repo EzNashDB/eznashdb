@@ -17,7 +17,15 @@
                 aria-controls="{{ item_id_prefix }}-{{ shul.id }}">
             <div class="d-flex w-100 pe-3 align-items-center">
                 <span class="fw-bold d-inline-block flex-grow-1">
-                    <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
+                    {% if user.is_authenticated %}
+                        <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
+                    {% else %}
+                        <div class="h5 m-0 d-inline-block text-blur"
+                             role="img"
+                             aria-label="Shul name hidden — sign in to view">
+                            <span aria-hidden="true">Shul Name</span>
+                        </div>
+                    {% endif %}
                 </span>
                 <span>
                     {% with room_count=shul.rooms.all|length %}

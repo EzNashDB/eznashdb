@@ -13,7 +13,7 @@ class NavbarItem:
     is_active: bool = False
 
 
-def _get_login_url(request):
+def get_login_url(request):
     """Return appropriate login URL based on environment and host."""
     google_login = "/accounts/google/login/"
     if not settings.DEBUG:
@@ -36,7 +36,7 @@ def navbar(request):
 
     # Authentication links - dropdown for authenticated users handled in template
     if not (hasattr(request, "user") and request.user.is_authenticated):
-        navbar_items.append(NavbarItem("Sign in", _get_login_url(request)))
+        navbar_items.append(NavbarItem("Sign in", get_login_url(request)))
 
     # Add admin link for staff users
     if hasattr(request, "user") and request.user.is_staff:
