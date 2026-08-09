@@ -1,6 +1,5 @@
 import pytest
 from bs4 import BeautifulSoup
-from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.models import Shul
@@ -19,7 +18,6 @@ def test_shows_app_name(GET_request):
     assert "Ezrat Nashim Database" in soup.get_text()
 
 
-@override_flag("kaddish", active=True)
 def test_shul_names_are_not_shipped_with_the_markers(GET_request, test_shul):
     """
     Privacy: marker positions are eager, but names + details are fetched on
@@ -30,22 +28,6 @@ def test_shul_names_are_not_shipped_with_the_markers(GET_request, test_shul):
     assert test_shul.name not in content
     # Pins still render: coordinates are shipped eagerly.
     assert str(test_shul.display_lat) in content
-
-
-def describe_kaddish_policy_filter():
-    @override_flag("kaddish", active=True)
-    def shows_kaddish_filter_when_flag_active(GET_request):
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert soup.find(attrs={"name": "kaddish_policy"})
-
-    @override_flag("kaddish", active=False)
-    def hides_kaddish_filter_when_flag_inactive(GET_request):
-        response = ShulsFilterView.as_view()(GET_request)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert not soup.find(attrs={"name": "kaddish_policy"})
 
 
 def describe_exact_pin_behavior():
