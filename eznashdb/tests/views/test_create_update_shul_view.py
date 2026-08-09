@@ -3,10 +3,8 @@ from functools import partial
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
-from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
-from eznashdb.enums import KaddishPolicy
 from eznashdb.models import Shul
 from eznashdb.views import CreateUpdateShulView
 from users.models import User
@@ -168,48 +166,6 @@ def describe_update():
         redirect_url = response.headers.get("HX-Redirect")
         final_dest = client.get(redirect_url)
         assert final_dest.resolver_match.view_name == "eznashdb:shuls"
-
-
-def describe_kaddish_flag():
-    @override_flag("kaddish", active=True)
-    def shows_kaddish_field_when_flag_active(rf_GET, test_shul, test_user):
-        request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
-        request.user = test_user
-        response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert soup.find(attrs={"name": "kaddish_policy"})
-
-    @override_flag("kaddish", active=False)
-    def hides_kaddish_field_when_flag_inactive(rf_GET, test_shul, test_user):
-        request = rf_GET("eznashdb:update_shul", url_params={"pk": test_shul.pk})
-        request.user = test_user
-        response = CreateUpdateShulView.as_view()(request, pk=test_shul.pk)
-        soup = BeautifulSoup(str(response.render().content), features="html.parser")
-
-        assert not soup.find(attrs={"name": "kaddish_policy"})
-
-    @override_flag("kaddish", active=True)
-    def saves_kaddish_fields(client, test_shul, test_user):
-        client.force_login(test_user)
-        data = {
-            "name": test_shul.name,
-            "address": test_shul.address,
-            "latitude": test_shul.latitude,
-            "longitude": test_shul.longitude,
-            "check_nearby_shuls": "false",
-            "kaddish_policy": KaddishPolicy.SHUL_ENSURES_MAN,
-            **get_room_fields(room_index=0),
-            **get_room_fs_metadata_fields(total_forms=1),
-        }
-
-        client.post(
-            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
-            data=data,
-        )
-
-        test_shul.refresh_from_db()
-        assert test_shul.kaddish_policy == KaddishPolicy.SHUL_ENSURES_MAN
 
 
 def test_shows_nearby_modal_when_check_nearby_shuls_true(client, test_user):

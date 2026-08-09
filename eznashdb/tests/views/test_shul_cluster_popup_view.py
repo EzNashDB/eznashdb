@@ -3,9 +3,8 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
-from waffle.testutils import override_flag
 
-from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
+from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulClusterPopupView
 
@@ -182,20 +181,6 @@ def test_expands_only_the_selected_shul(popup_GET):
     assert "show" not in soup.find(id=f"shul-{second.pk}")["class"]
 
 
-def describe_kaddish_flag():
-    @override_flag("kaddish", active=True)
-    def shows_kaddish_policy_when_flag_active(popup_GET, test_shul):
-        test_shul.kaddish_policy = KaddishPolicy.CAN_SAY_ALONE
-        test_shul.save()
-
-        content = ShulClusterPopupView.as_view()(
-            popup_GET(cluster_key=test_shul.cluster_key)
-        ).content.decode()
-
-        assert "Kaddish:" in content
-
-
-@override_flag("kaddish", active=True)
 def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num_queries):
     """
     Locks in the rooms prefetch (shul.rooms.all|length / {% if shul.rooms.all %}
@@ -209,11 +194,6 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
         many_rooms.rooms.create(
             name=f"r{i}", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._5
         )
-
-    # The waffle flag's first-ever lookup in a test process does several
-    # bootstrap queries (cache population); warm it up before measuring so
-    # that one-time cost doesn't pollute the comparison below.
-    ShulClusterPopupView.as_view()(popup_GET(cluster_key="warmup"))
 
     with CaptureQueriesContext(connection) as few_room_queries:
         ShulClusterPopupView.as_view()(popup_GET(cluster_key=few_rooms.cluster_key))

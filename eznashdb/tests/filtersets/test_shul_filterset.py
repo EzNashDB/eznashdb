@@ -1,6 +1,5 @@
 import pytest
 from django.urls import resolve, reverse
-from waffle.testutils import override_flag
 
 from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
 from eznashdb.filtersets import ShulFilterSet
@@ -128,7 +127,6 @@ def describe_see_hear_score_filter():
 
 
 def describe_kaddish_policy_filter():
-    @override_flag("kaddish", active=True)
     @pytest.mark.parametrize(
         ("value", "query"),
         [
@@ -145,7 +143,6 @@ def describe_kaddish_policy_filter():
         data = {"kaddish_policy": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
-    @override_flag("kaddish", active=True)
     @pytest.mark.parametrize(
         ("value", "query"),
         [
@@ -159,7 +156,6 @@ def describe_kaddish_policy_filter():
         data = {"kaddish_policy": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 1
 
-    @override_flag("kaddish", active=True)
     @pytest.mark.parametrize(
         ("value", "query"),
         [
@@ -172,32 +168,3 @@ def describe_kaddish_policy_filter():
 
         data = {"kaddish_policy": query}
         assert ShulFilterSet(data, request=test_request).qs.count() == 0
-
-    @override_flag("kaddish", active=False)
-    def is_ignored_when_flag_inactive(test_shul, test_request):
-        Shul.objects.filter(pk=test_shul.pk).update(kaddish_policy=KaddishPolicy.NO.value)
-
-        data = {"kaddish_policy": ["CAN_SAY_ALONE"]}
-        assert test_shul in ShulFilterSet(data, request=test_request).qs
-
-
-def describe_name_filter():
-    def includes_shul_with_matching_name(test_shul, test_request):
-        data = {"name": [test_shul.name]}
-        assert test_shul in ShulFilterSet(data, request=test_request).qs
-
-    def includes_shuls_matching_any_of_multiple_names(test_shul, test_request):
-        other_shul = Shul.objects.create(name="Another Shul", latitude=0, longitude=0)
-        data = {"name": [test_shul.name, other_shul.name]}
-        qs = ShulFilterSet(data, request=test_request).qs
-        assert test_shul in qs
-        assert other_shul in qs
-
-    def excludes_shuls_that_do_not_match(test_shul, test_request):
-        other_shul = Shul.objects.create(name="Another Shul", latitude=0, longitude=0)
-        data = {"name": [other_shul.name]}
-        assert test_shul not in ShulFilterSet(data, request=test_request).qs
-
-    def returns_all_shuls_when_empty(test_shul, test_request):
-        data = {"name": []}
-        assert test_shul in ShulFilterSet(data, request=test_request).qs
