@@ -47,7 +47,7 @@ class UserAdmin(BaseUserAdmin):
     add_form_template = None
 
     list_display = [
-        "email",
+        "email_display",
         "full_name",
         "shuls_created_count",
         "shuls_updated_count",
@@ -73,6 +73,10 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+    @admin.display(description="Email", ordering="email")
+    def email_display(self, obj):
+        return obj.email or "--"
 
     @admin.display(description="Name")
     def full_name(self, obj):
