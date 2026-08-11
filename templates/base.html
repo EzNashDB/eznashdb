@@ -11,7 +11,11 @@
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
 
-                gtag('config', 'G-XS4PGLT5WW');
+                gtag('config', 'G-XS4PGLT5WW', {
+                    'user_properties': {
+                        'logged_in': '{% if user.is_authenticated %}true{% else %}false{% endif %}'
+                    }
+                });
         </script>
         <title>
 
