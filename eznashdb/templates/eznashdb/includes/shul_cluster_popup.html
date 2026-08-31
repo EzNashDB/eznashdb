@@ -1,10 +1,31 @@
 {% extends "eznashdb/includes/base_shul_popup.html" %}
 
+{% block header_class %}
+    {% if is_rate_limited %}
+        {% if abuse_state.is_permanently_banned %}
+            bg-danger-subtle
+        {% else %}
+            bg-warning-subtle
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
 {% block header_content %}
     <span class="flex-grow-1">
         {% if shuls %}
-            {% if user.is_authenticated %}
+            {% if names_visible %}
                 {{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area
+            {% elif is_rate_limited %}
+                {% if abuse_state.is_permanently_banned %}
+                    <span class="text-danger-emphasis">
+                        <i class="fa-solid fa-lock"></i> Restricted.
+                        <a href="{% url 'eznashdb:contact_us' %}">Contact us</a> if this is a mistake
+                    </span>
+                {% else %}
+                    <span class="text-warning-emphasis">
+                        <i class="fa-solid fa-clock"></i> Too many requests. Try again in {{ retry_after }}.
+                    </span>
+                {% endif %}
             {% else %}
                 <a href="{{ login_url }}"
                    class="btn btn-sm btn-outline-primary"
@@ -25,7 +46,7 @@
 {% block accordion_content %}
     {% if shuls %}
         {% for shul in shuls %}
-            {% include "eznashdb/includes/shul_accordion_item.html" with shul=shul accordion_id="shuls-cluster-accordion" item_id_prefix="shul" total_shuls=shuls|length is_last=forloop.last is_expanded=shul.is_expanded %}
+            {% include "eznashdb/includes/shul_accordion_item.html" with shul=shul accordion_id="shuls-cluster-accordion" item_id_prefix="shul" total_shuls=shuls|length is_last=forloop.last is_expanded=shul.is_expanded names_visible=names_visible %}
         {% endfor %}
     {% else %}
         <div class="accordion-item border-0">

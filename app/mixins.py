@@ -96,7 +96,7 @@ class AbusePreventionMixin(HtmxRequestMixin):
         - Otherwise: redirect to the dedicated CAPTCHA page, carrying `next` so
           the client can continue to the original destination once verified.
         """
-        next_url = self.request.get_full_path()
+        next_url = self.get_captcha_next_url()
 
         if self.is_htmx:
             response = render(
@@ -109,6 +109,12 @@ class AbusePreventionMixin(HtmxRequestMixin):
 
         captcha_url = reverse("captcha_verify")
         return HttpResponseRedirect(f"{captcha_url}?{urlencode({'next': next_url})}")
+
+    def get_captcha_next_url(self):
+        """Where to send the user once CAPTCHA is solved. Defaults to the current URL; override
+        on fragment-only views where that would land the user on a bare partial with no base
+        template."""
+        return self.request.get_full_path()
 
     @staticmethod
     def _set_htmx_enforcement_headers(response, enforcement_type):

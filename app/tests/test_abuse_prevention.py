@@ -235,6 +235,11 @@ def describe_get_request_points():
 
         assert get_request_points(request) == 4
 
+    def cluster_popup_costs_four_units(rf_GET):
+        request = rf_GET("eznashdb:cluster_popup")
+
+        assert get_request_points(request) == 4
+
     def non_sensitive_url_costs_nothing(rf_GET):
         request = rf_GET("eznashdb:shuls")
 

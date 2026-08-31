@@ -1,6 +1,7 @@
 import math
 from collections import defaultdict
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
@@ -10,12 +11,13 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonRespon
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
 
+from app.abuse_prevention import format_retry_time, get_retry_minutes
 from app.context_processors import get_login_url
 from app.mixins import AbusePreventionMixin
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
@@ -98,22 +100,53 @@ class ShulsFilterView(FilterView):
         return super().get_template_names()
 
 
-class ShulClusterPopupView(View):
+class ShulClusterPopupView(AbusePreventionMixin, View):
     def get(self, request, *args, **kwargs):
-        cluster_key = request.GET.get("cluster_key", "")
+        return self._render_popup(names_visible=request.user.is_authenticated)
+
+    def get_blocked_response(self, result):
+        """
+        Unlike the default AbusePreventionMixin behavior, this is a 200 - the popup rendered
+        successfully, just rate-limited (logged-out view). Marked via a response header, not the
+        HTML, so the client can detect it - see onPopupContentSwapped's cache-skip in shuls.html.
+        """
+        response = self._render_popup(names_visible=False, enforcement_result=result)
+        response["X-Abuse-Enforcement"] = "rate_limited"
+        return response
+
+    def get_captcha_next_url(self):
+        """
+        The default (self.request.get_full_path()) points at this fragment-only endpoint, which
+        has no base template - land the user back on the map instead.
+        """
+        next_url = reverse("eznashdb:shuls")
+        selected_shul = self.request.GET.get("selected_shul", "")
+        if selected_shul:
+            next_url += f"?{urlencode({'selectedShul': selected_shul})}"
+        return next_url
+
+    def _render_popup(self, names_visible, enforcement_result=None):
+        cluster_key = self.request.GET.get("cluster_key", "")
         if not cluster_key:
             return HttpResponseBadRequest("Missing 'cluster_key'.")
 
         qs = self.get_queryset()
-        shul_count_limit = None if request.user.is_authenticated else 1
+        shul_count_limit = None if names_visible else 1
         shuls = self._shuls_in_cluster(qs, cluster_key, limit=shul_count_limit)
-        self._mark_selected_shul(shuls, request.GET.get("selected_shul", ""))
+        self._mark_selected_shul(shuls, self.request.GET.get("selected_shul", ""))
 
-        context = {"shuls": shuls}
-        if not request.user.is_authenticated:
-            context["login_url"] = get_login_url(request)
+        context = {"shuls": shuls, "names_visible": names_visible}
 
-        return render(request, "eznashdb/includes/shul_cluster_popup.html", context)
+        if enforcement_result is not None:
+            context["is_rate_limited"] = True
+            context["abuse_state"] = enforcement_result.abuse_state
+            minutes = get_retry_minutes(enforcement_result)
+            if minutes is not None:
+                context["retry_after"] = format_retry_time(minutes)
+        elif not names_visible:
+            context["login_url"] = get_login_url(self.request)
+
+        return render(self.request, "eznashdb/includes/shul_cluster_popup.html", context)
 
     def get_queryset(self):
         """Shuls matching the page's active filters, minus any excluded shul."""

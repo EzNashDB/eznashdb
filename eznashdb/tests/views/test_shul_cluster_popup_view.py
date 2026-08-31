@@ -1,9 +1,14 @@
+from datetime import timedelta
+
 import pytest
 from bs4 import BeautifulSoup
+from constance import config
 from django.contrib.auth.models import AnonymousUser
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
 
+from app.models import AbuseState
 from eznashdb.enums import RelativeSize, SeeHearScore
 from eznashdb.models import Shul
 from eznashdb.views import ShulClusterPopupView
@@ -185,6 +190,10 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
     """
     Locks in the rooms prefetch (shul.rooms.all|length / {% if shul.rooms.all %}
     in shul_accordion_item.html): more rooms must not mean more queries.
+
+    Uses an anonymous request to sidestep AbusePreventionMixin: its rate-limit cache
+    (a DatabaseCache) takes a different query path on a cold vs. a warm cache key, which
+    would otherwise swing the count between these two calls for reasons unrelated to rooms.
     """
     few_rooms = Shul.objects.create(name="Few Rooms", latitude=40.7128, longitude=-74.0060)
     few_rooms.rooms.create(name="r", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._5)
@@ -195,11 +204,12 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
             name=f"r{i}", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._5
         )
 
+    anon = AnonymousUser()
     with CaptureQueriesContext(connection) as few_room_queries:
-        ShulClusterPopupView.as_view()(popup_GET(cluster_key=few_rooms.cluster_key))
+        ShulClusterPopupView.as_view()(popup_GET(cluster_key=few_rooms.cluster_key, user=anon))
 
     with django_assert_num_queries(len(few_room_queries.captured_queries)):
-        ShulClusterPopupView.as_view()(popup_GET(cluster_key=many_rooms.cluster_key))
+        ShulClusterPopupView.as_view()(popup_GET(cluster_key=many_rooms.cluster_key, user=anon))
 
 
 def describe_authenticated_users():
@@ -279,3 +289,88 @@ def describe_anonymous_users():
         response = ShulClusterPopupView.as_view()(popup_GET(cluster_key="0.0_0.0", user=AnonymousUser()))
 
         assert "no longer available" in response.content.decode().lower()
+
+
+def describe_rate_limited_users():
+    """
+    The abuse state machine itself is covered by app/tests/test_abuse_prevention.py; these tests
+    cover what's specific to this view - a blocked user still gets a rate-limited popup, not a 429.
+    """
+
+    def test_cooldown_shows_rate_limited_popup(popup_GET, test_shul, test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 2
+        state.cooldown_until = timezone.now() + timedelta(minutes=45)
+        state.save()
+
+        response = ShulClusterPopupView.as_view()(popup_GET(cluster_key=test_shul.cluster_key))
+        content = response.content.decode()
+
+        assert response.status_code == 200
+        assert test_shul.name not in content
+        assert "text-blur" in content
+        assert "Too many requests" in content
+        assert "minute" in content
+        assert "Sign in to see more" not in content
+        # The client uses this header (not the HTML) to decide whether a swapped-in popup is safe
+        # to cache - see onPopupContentSwapped's rateLimited flag in shuls.html.
+        assert response["X-Abuse-Enforcement"] == "rate_limited"
+
+    def test_permanent_ban_shows_restricted_message(popup_GET, test_shul, test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = config.ABUSE_PERMANENT_BAN_THRESHOLD
+        state.save()
+
+        response = ShulClusterPopupView.as_view()(popup_GET(cluster_key=test_shul.cluster_key))
+        content = response.content.decode()
+
+        assert response.status_code == 200
+        assert "Restricted" in content
+        assert test_shul.name not in content
+
+    def test_captcha_pending_returns_captcha_modal_not_popup(popup_GET, test_shul, test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = config.ABUSE_CAPTCHA_THRESHOLD
+        state.save()
+
+        response = ShulClusterPopupView.as_view()(popup_GET(cluster_key=test_shul.cluster_key))
+
+        assert response["X-Abuse-Enforcement"] == "captcha"
+        assert response["HX-Retarget"] == "#abuse-modal-container"
+        assert test_shul.name not in response.content.decode()
+
+    def test_captcha_next_url_points_at_the_map_not_the_bare_fragment(popup_GET, test_shul, test_user):
+        """
+        The default next_url (this endpoint's own path) has no base template - it must be
+        overridden here, or abuse_modal.js's JS fallback (when the popup element is gone by the
+        time CAPTCHA is solved) and any non-htmx request would land on an unstyled fragment.
+        """
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = config.ABUSE_CAPTCHA_THRESHOLD
+        state.save()
+
+        response = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=test_shul.cluster_key, selected_shul=str(test_shul.pk))
+        )
+
+        modal = BeautifulSoup(response.content.decode(), features="html.parser").find(
+            id="abuse-captcha-modal"
+        )
+        assert modal["data-next"] == f"/?selectedShul={test_shul.pk}"
+
+    def test_rate_limited_request_does_not_consume_budget(popup_GET, test_shul, test_user):
+        """
+        The recovery path: hammering the popup while blocked must not add strikes or extend the
+        block - AbusePreventionMixin.dispatch returns from get_blocked_response before it ever
+        reaches consume_rate_budget/record_abuse_violation.
+        """
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 2
+        state.cooldown_until = timezone.now() + timedelta(minutes=45)
+        state.points_in_episode = 4
+        state.save()
+
+        ShulClusterPopupView.as_view()(popup_GET(cluster_key=test_shul.cluster_key))
+
+        state.refresh_from_db()
+        assert state.points_in_episode == 4

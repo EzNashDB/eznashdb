@@ -15,6 +15,7 @@ URL_ABUSE_POINTS = {
     "eznashdb:create_shul": 1,
     "eznashdb:update_shul": 4,
     "eznashdb:google_maps_proxy": 4,
+    "eznashdb:cluster_popup": 4,
 }
 
 
@@ -119,7 +120,28 @@ def format_retry_time(minutes):
     return " ".join(parts)
 
 
-def build_block_context(result):
+def get_retry_minutes(result: AbuseEnforcementResult) -> int | None:
+    """
+    Minutes until a blocked request can be retried, or None if not applicable
+    (e.g. a permanent ban, which has no retry time).
+    """
+    if result.reason == BlockReason.COOLDOWN:
+        remaining_seconds = (result.cooldown_until - timezone.now()).total_seconds()
+        return max(1, int(remaining_seconds / 60))
+
+    if result.reason == BlockReason.EPISODE_CAP:
+        state = result.abuse_state
+        if state and state.last_violation_at:
+            episode_ends = state.last_violation_at + timedelta(
+                minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES
+            )
+            remaining_seconds = (episode_ends - timezone.now()).total_seconds()
+            return max(1, int(remaining_seconds / 60))
+
+    return None
+
+
+def build_block_context(result: AbuseEnforcementResult):
     """
     Build the template context describing a blocked request.
     """
@@ -127,19 +149,9 @@ def build_block_context(result):
 
     if result.reason == BlockReason.PERMANENTLY_BANNED:
         context["appeal_form"] = AbuseAppealForm(initial={"abuse_state": result.abuse_state.id})
-    elif result.reason == BlockReason.COOLDOWN:
-        remaining_seconds = (result.cooldown_until - timezone.now()).total_seconds()
-        minutes = max(1, int(remaining_seconds / 60))
-        context["retry_after"] = format_retry_time(minutes)
-    elif result.reason == BlockReason.EPISODE_CAP:
-        # Calculate time until episode ends
-        state = result.abuse_state
-        if state and state.last_violation_at:
-            episode_ends = state.last_violation_at + timedelta(
-                minutes=config.ABUSE_EPISODE_INACTIVITY_MINUTES
-            )
-            remaining_seconds = (episode_ends - timezone.now()).total_seconds()
-            minutes = max(1, int(remaining_seconds / 60))
+    else:
+        minutes = get_retry_minutes(result)
+        if minutes is not None:
             context["retry_after"] = format_retry_time(minutes)
 
     return context
