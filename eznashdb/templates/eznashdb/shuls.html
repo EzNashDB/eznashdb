@@ -261,11 +261,14 @@
             const POPUP_SPINNER_HTML = `{% filter escapejs %}{% include "eznashdb/includes/popup_spinner.html" %}{% endfilter %}`;
             const POPUP_ERROR_HTML = `{% filter escapejs %}{% include "eznashdb/includes/popup_error.html" %}{% endfilter %}`;
 
-            function createPopupWrapper(initialHtml) {
+            function createPopupWrapper(initialHtml, requestValues) {
                 const popupWrapper = document.createElement("div");
                 // Need to include the form when loading the popup via htmx
                 // so only the relevant shuls are returned
                 popupWrapper.setAttribute("hx-include", "#filter-container form");
+                // Without this, solving a CAPTCHA mid-open would replay the request with no
+                // cluster_key, resulting in an error
+                popupWrapper.setAttribute("hx-vals", JSON.stringify(requestValues));
                 popupWrapper.innerHTML = initialHtml;
                 return popupWrapper;
             }
@@ -305,38 +308,35 @@
                 return { close: () => markerLayer.closePopup() };
             }
 
-            // Resolves with the loaded HTML (for caching), or null on error/abort.
-            function swapInPopupHtml(popupWrapper, clusterKey, selectedShulId) {
+            function swapInPopupHtml(popupWrapper) {
                 // A resolved htmx.ajax() promise doesn't guarantee a swap happened (e.g.
                 // a non-2xx response resolves too) - this is the real signal for that.
                 let swapped = false;
                 const onSwap = () => { swapped = true; };
                 popupWrapper.addEventListener("htmx:afterSwap", onSwap, { once: true });
 
-                const values = { cluster_key: clusterKey };
-                if (window.SHUL_MAP_API.exactPinId) values.exclude = window.SHUL_MAP_API.exactPinId;
-                if (selectedShulId) values.selected_shul = selectedShulId;
-
                 return htmx.ajax("GET", CLUSTER_POPUP_URL, {
-                    source: popupWrapper, // needed for hx-include
+                    source: popupWrapper, // needed for hx-include/hx-vals
                     target: popupWrapper,
                     swap: "innerHTML",
-                    values,
                 })
                     .catch(() => {}) // network error, or our own abort on close - both expected
                     .then(() => {
                         popupWrapper.removeEventListener("htmx:afterSwap", onSwap); // cleanup in case of error/abort
-                        if (!popupWrapper.isConnected) return null; // popup closed mid-fetch
-                        if (!swapped) {
-                            popupWrapper.innerHTML = POPUP_ERROR_HTML; // htmx didn't swap, so we do
-                            return null;
-                        }
-                        return popupWrapper.innerHTML;
+                        if (!popupWrapper.isConnected) return; // popup closed mid-fetch
+                        if (!swapped) popupWrapper.innerHTML = POPUP_ERROR_HTML; // htmx didn't swap, so we do
                     });
             }
 
             function openClusterPopup(markerLayer, clusterKey, cachedHtml) {
-                const popupWrapper = createPopupWrapper(cachedHtml || POPUP_SPINNER_HTML);
+                const selectedShulId = URL_PARAMS_API.get("selectedShul") || "";
+                const requestValues = {
+                    cluster_key: clusterKey,
+                    exclude: window.SHUL_MAP_API.exactPinId,
+                    selected_shul: selectedShulId,
+                };
+
+                const popupWrapper = createPopupWrapper(cachedHtml || POPUP_SPINNER_HTML, requestValues);
                 const { close } = isSmallScreen()
                     ? openAsOffcanvas(popupWrapper, clusterKey)
                     : openAsPopup(markerLayer, popupWrapper, clusterKey);
@@ -349,25 +349,31 @@
                     return;
                 }
 
-                const selectedShulId = URL_PARAMS_API.get("selectedShul");
-                swapInPopupHtml(popupWrapper, clusterKey, selectedShulId).then((html) => {
+                function onPopupContentSwapped(e) {
                     if (!popupWrapper.isConnected) return;
-                    if (html !== null && !selectedShulId) {
-                        window.SHUL_MAP_API.clusterPopupHtmlCache[clusterKey] = html;
+                    // Don't cache rate-limited responses, otherwise would stay blurred even after the limit resets.
+                    const rateLimited = e.detail.xhr?.getResponseHeader("X-Abuse-Enforcement") === "rate_limited";
+                    const shouldCache = !(selectedShulId || rateLimited);
+                    if (shouldCache) {
+                        window.SHUL_MAP_API.clusterPopupHtmlCache[clusterKey] = popupWrapper.innerHTML;
                     }
                     if (!isSmallScreen()) {
                         // resize popup + pan the map
                         const popup = markerLayer.getPopup();
                         if (popup && popup.isOpen()) popup.update();
                     }
-                    if (html === null) return;
                     setOpenShulAsSelectedInURL(popupWrapper);
                     wireSignInRedirect(popupWrapper);
                     if (selectedShulId) {
                         const item = popupWrapper.querySelector(`#shul-${selectedShulId}`)?.closest('.accordion-item');
                         if (item) scrollToShulHeader(item);
                     }
-                });
+                }
+
+                // Use htmx:afterSwap to trigger post-swap config, not swapInPopupHtml().then(),
+                // so it still gets triggered on a CAPTCHA-solved replay.
+                popupWrapper.addEventListener("htmx:afterSwap", onPopupContentSwapped);
+                swapInPopupHtml(popupWrapper);
             }
 
             function openPopupForShul(markerLayer, shulId) {

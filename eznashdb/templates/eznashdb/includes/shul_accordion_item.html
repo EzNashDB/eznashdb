@@ -1,5 +1,5 @@
 {# Shared accordion item for a single shul - used by both cluster and exact pin popups #}
-{# Parameters: shul, accordion_id, item_id_prefix, total_shuls (optional), is_expanded (optional bool), is_last (optional bool) #}
+{# Parameters: shul, accordion_id, item_id_prefix, names_visible (bool), total_shuls/is_expanded/is_last (optional) #}
 <div class="accordion-item border-0"
      x-init="SHUL_MAP_API.initShulAccordion($el, {{ shul.pk }})">
     <h2 class="accordion-header" style="scroll-margin-top: 15px">
@@ -16,12 +16,12 @@
                 aria-controls="{{ item_id_prefix }}-{{ shul.id }}">
             <div class="d-flex w-100 pe-3 align-items-center">
                 <span class="fw-bold d-inline-block flex-grow-1">
-                    {% if user.is_authenticated %}
+                    {% if names_visible %}
                         <div class="h5 m-0 d-inline-block">{{ shul.name }}</div>
                     {% else %}
                         <div class="h5 m-0 d-inline-block text-blur"
                              role="img"
-                             aria-label="Shul name hidden — sign in to view">
+                             aria-label="Shul name hidden">
                             <span aria-hidden="true">Shul Name</span>
                         </div>
                     {% endif %}
