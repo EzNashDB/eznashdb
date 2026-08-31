@@ -21,3 +21,6 @@ node_modules/
 static/dist
 **/static/*/dist
 static/dist
+
+# Compiled translations (generated at build time via compilemessages)
+locale/**/*.mo

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.i18n import JavaScriptCatalog
 
 from app.views import (
     AdminDashboardView,
@@ -10,6 +11,7 @@ from app.views import (
     CaptchaVerifyView,
     ClientErrorReportView,
     RestoreDBView,
+    set_language,
 )
 
 # Custom error handler that provides request context
@@ -25,6 +27,8 @@ urlpatterns = [
     path("report-error/", ClientErrorReportView.as_view(), name="report_error"),
     path("verify-captcha/", CaptchaVerifyView.as_view(), name="captcha_verify"),
     path("feedback/", include("feedback.urls")),
+    path("i18n/setlang/", set_language, name="set_language"),
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]
 
 if settings.DJANGO_ENV != "test":

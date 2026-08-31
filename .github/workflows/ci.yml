@@ -35,6 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
@@ -57,6 +60,9 @@ jobs:
       - name: Install python dependencies
         run: poetry install --no-interaction --no-root
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+      - name: Compile translations
+        run: poetry run python manage.py compilemessages
 
       - name: Run tests - python
         run: poetry run pytest -n auto
@@ -81,6 +87,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5

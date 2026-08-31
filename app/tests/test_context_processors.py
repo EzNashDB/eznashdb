@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress
+from waffle.testutils import override_flag
 
 from users.models import User
 
@@ -27,3 +28,17 @@ def describe_navbar():
         assert "Logout" in content  # In dropdown
         assert "test@example.com" in content  # Email shown in dropdown
         assert "Sign in" not in content  # No sign in link
+
+
+def describe_language_switcher():
+    @override_flag("hebrew_translation", active=False)
+    def hidden_by_default(client):
+        response = client.get("/")
+
+        assert "languageDropdown" not in str(response.content)
+
+    @override_flag("hebrew_translation", active=True)
+    def shown_when_flag_active(client):
+        response = client.get("/")
+
+        assert "languageDropdown" in str(response.content)

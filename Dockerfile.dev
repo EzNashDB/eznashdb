@@ -37,6 +37,7 @@ RUN apt-get update && \
     gnupg \
     curl \
     ca-certificates \
+    gettext \
     gcc \
     g++ \
     git \

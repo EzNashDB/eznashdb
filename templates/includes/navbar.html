@@ -1,4 +1,6 @@
 {% load svg %}
+{% load i18n %}
+{% load waffle_tags %}
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
     <div class="container">
         <div class="d-flex align-items-center justify-content-between flex-nowrap flex-grow-1 gap-1 min-w-0">
@@ -25,29 +27,53 @@
                 {% for item in navbar_items %}
                     {% include 'includes/navbar_item.html' %}
                 {% endfor %}
-                {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle"
-                           href="#"
-                           id="accountDropdown"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">Account</a>
-                        <ul class="dropdown-menu dropdown-menu-end"
-                            aria-labelledby="accountDropdown">
+                {% flag "hebrew_translation" %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       id="languageDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">{% get_current_language as CURRENT_LANGUAGE %}{{ CURRENT_LANGUAGE|upper }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end"
+                        aria-labelledby="languageDropdown">
+                        {% get_available_languages as LANGUAGES_LIST %}
+                        {% for lang_code, lang_name in LANGUAGES_LIST %}
                             <li>
-                                <h6 class="dropdown-header text-truncate" style="max-width: 250px;">{{ user.email }}</h6>
-                            </li>
-                            <li>
-                                <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
+                                <form method="POST" action="{% url 'set_language' %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">Logout</button>
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <input type="hidden" name="language" value="{{ lang_code }}">
+                                    <button type="submit" class="dropdown-item">{{ lang_name }}</button>
                                 </form>
                             </li>
-                        </ul>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endflag %}
+            {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       id="accountDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">Account</a>
+                    <ul class="dropdown-menu dropdown-menu-end"
+                        aria-labelledby="accountDropdown">
+                        <li>
+                            <h6 class="dropdown-header text-truncate" style="max-width: 250px;">{{ user.email }}</h6>
+                        </li>
+                        <li>
+                            <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            {% endif %}
+        </ul>
     </div>
+</div>
 </nav>

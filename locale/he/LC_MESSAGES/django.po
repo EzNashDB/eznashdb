@@ -1,0 +1,53 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 19:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+
+msgid "Equal or larger than men's"
+msgstr ""
+
+msgid "At least half men's size"
+msgstr ""
+
+msgid "Less than half men's size"
+msgstr ""
+
+msgid "No women's section"
+msgstr ""
+
+msgid "Mixed seating"
+msgstr ""
+
+msgid "Can say alone"
+msgstr ""
+
+msgid "Can say, a man will always join"
+msgstr ""
+
+msgid "Only with men (ask or plan ahead)"
+msgstr ""
+
+msgid "Not allowed"
+msgstr ""
+
+msgid "Mapping women's spaces in synagogues around the world"
+msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
+
+msgid "Activate this flag for users with any of these permissions."
+msgstr ""
