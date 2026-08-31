@@ -132,10 +132,12 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "app.middleware.HebrewTranslationGateMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "app.middleware.HTMXMessagesMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -180,6 +182,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "app.context_processors.navbar",
@@ -314,7 +317,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
+
+LANGUAGES = [
+    ("en", "English"),
+    ("he", "עברית"),
+]
+
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 TIME_ZONE = "UTC"
 

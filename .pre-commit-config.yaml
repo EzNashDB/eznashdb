@@ -50,3 +50,10 @@ repos:
         language: system
         pass_filenames: false
         files: '.*\.js$'
+
+      - id: translations
+        name: Django Translations
+        entry: scripts/check_translations.sh
+        language: system
+        pass_filenames: false
+        files: '.*\.(py|html|js)$'

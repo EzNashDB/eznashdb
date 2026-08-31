@@ -13,7 +13,7 @@ RUN pip install "poetry==$POETRY_VERSION"
 
 # Install system dependencies and PostgreSQL 15 client
 RUN apt-get update && \
-    apt-get install -y ca-certificates curl gnupg unzip && \
+    apt-get install -y ca-certificates curl gnupg unzip gettext && \
     curl https://rclone.org/install.sh | bash && \
     # Add PostgreSQL apt repository for version 15
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
@@ -47,6 +47,8 @@ COPY . /code/
 RUN npm install
 
 RUN npm run build
+
+RUN python manage.py compilemessages
 
 RUN python manage.py collectstatic --noinput
 

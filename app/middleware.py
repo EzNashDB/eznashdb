@@ -1,5 +1,7 @@
 from django.contrib import messages as django_messages
 from django.template.loader import render_to_string
+from django.utils import translation
+from waffle import flag_is_active
 
 
 class HTMXMessagesMiddleware:
@@ -36,3 +38,26 @@ class HTMXMessagesMiddleware:
                 response.content = response.content + messages_html.encode("utf-8")
 
         return response
+
+
+class HebrewTranslationGateMiddleware:
+    """
+    Forces English regardless of whatever LocaleMiddleware negotiated, until the
+    "hebrew_translation" flag is active.
+
+    LocaleMiddleware activates a non-English language from several independent
+    sources - the language cookie, or (notably) the browser's Accept-Language header -
+    and set_language's flag check only guards the cookie path. This is the single place
+    that enforces the flag regardless of how a language got activated, so a new
+    negotiation source added later can't silently reopen the gate.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if translation.get_language() != "en" and not flag_is_active(request, "hebrew_translation"):
+            translation.activate("en")
+            request.LANGUAGE_CODE = "en"
+
+        return self.get_response(request)

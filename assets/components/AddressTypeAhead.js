@@ -157,7 +157,7 @@ export const AddressTypeAhead = ({
         useCache={false}
         options={options}
         onInputChange={handleInputChange}
-        placeholder="Search name or address..."
+        placeholder={gettext("Search name or address...")}
         promptText={getPromptText()}
         inputProps={{
           name: "address",
