@@ -7,6 +7,7 @@ repos:
         exclude: ^static/vendor|dist/
       - id: check-yaml
       - id: check-added-large-files
+        exclude: ^static/vendor|dist/
 
   - repo: local
     hooks:

@@ -1,15 +1,8 @@
 {% load static %}
-{% load i18n %}
 {% load waffle_tags %}
 <!DOCTYPE html>
-{% get_current_language as LANGUAGE_CODE %}
-{% get_current_language_bidi as LANGUAGE_BIDI %}
-<html lang="{{ LANGUAGE_CODE }}"
-      dir="{% if LANGUAGE_BIDI %}
-               rtl
-           {% else %}
-               ltr
-           {% endif %}">
+{# LANGUAGE_CODE/LANGUAGE_BIDI come from the "django.template.context_processors.i18n" context processor (settings.py) #}
+<html lang="{{ LANGUAGE_CODE }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr' }}">
     <head>
         {% include 'includes/global_error_handler.html' %}
         <!-- Google tag (gtag.js) -->
@@ -46,7 +39,7 @@
               content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og_preview.png' %}">
         {# twitter bootstrap #}
         <link rel="stylesheet"
-              href="{% static 'vendor/bootstrap-5.3.0/bootstrap.min.css' %}"
+              href="{% if LANGUAGE_BIDI %}{% static 'vendor/bootstrap-5.3.0/bootstrap.rtl.min.css' %}{% else %}{% static 'vendor/bootstrap-5.3.0/bootstrap.min.css' %}{% endif %}"
               type="text/css" />
         {# font awesome #}
         <link rel="stylesheet"
@@ -86,7 +79,10 @@
         {# custom styling #}
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         <style>
-            div:has(> .{{ HONEYPOT_FIELD_CLASS }}) { position: absolute !important; left: -9999px !important; }
+            {# inset-inline-start (not left): "left" would push the honeypot off the inline-END #}
+            {# edge in RTL, where .main-scroll-container's overflow-y:auto makes it scrollable, #}
+            {# leaving 9999px of reachable blank space instead of hiding the field. #}
+            div:has(> .{{ HONEYPOT_FIELD_CLASS }}) { position: absolute !important; inset-inline-start: -9999px !important; }
         </style>
 
         {% block extra_media_top %}

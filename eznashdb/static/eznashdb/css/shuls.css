@@ -71,6 +71,12 @@
     user-select: none;
 }
 
+/* MarkerCluster.Default.css only sets margin-left to center this circle, which centers it */
+/* correctly in ltr by luck but not in rtl. Adding margin-right centers it in both. */
+.marker-cluster div {
+    margin-right: 5px;
+}
+
 /* Single cluster icon */
 .marker-cluster-wrapper {
     background: none;
