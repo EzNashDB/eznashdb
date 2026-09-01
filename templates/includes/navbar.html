@@ -8,8 +8,8 @@
                href="/">
                 <span class="navbar-logo" aria-hidden="true">{% inline_svg 'img/logo.svg' %}</span>
                 <span class="d-flex flex-column lh-1 text-truncate">
-                    <span class="text-truncate">The Ezrat Nashim Database</span>
-                    <small class="text-white-50 text-truncate navbar-subtitle">A project by Ari Abramowitz</small>
+                    <span class="text-truncate">{% trans "The Ezrat Nashim Database" %}</span>
+                    <small class="text-white-50 text-truncate navbar-subtitle">{% trans "A project by Ari Abramowitz" %}</small>
                 </span>
             </a>
             <button class="navbar-toggler flex-shrink-0"
@@ -18,7 +18,7 @@
                     data-bs-target="#navbarNav"
                     aria-controls="navbarNav"
                     aria-expanded="false"
-                    aria-label="Toggle navigation">
+                    aria-label="{% trans 'Toggle navigation' %}">
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
@@ -58,7 +58,7 @@
                        id="accountDropdown"
                        role="button"
                        data-bs-toggle="dropdown"
-                       aria-expanded="false">Account</a>
+                       aria-expanded="false">{% trans "Account" %}</a>
                     <ul class="dropdown-menu dropdown-menu-end"
                         aria-labelledby="accountDropdown">
                         <li>
@@ -67,7 +67,7 @@
                         <li>
                             <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" class="dropdown-item">Logout</button>
+                                <button type="submit" class="dropdown-item">{% trans "Logout" %}</button>
                             </form>
                         </li>
                     </ul>
