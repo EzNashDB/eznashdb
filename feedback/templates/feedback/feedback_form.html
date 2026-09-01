@@ -72,14 +72,17 @@
             if (offcanvas) offcanvas.hide();
         });
 
-        // Position feedback button to the left of scrollbar
+        // Position feedback button to the left of scrollbar (or right in RTL)
         (function() {
             const btn = document.querySelector('.feedback-tab');
             const container = document.querySelector('.main-scroll-container');
             if (!btn || !container) return;
 
+            const isRtl = document.documentElement.dir === 'rtl';
+
             const repositionButton = () => {
-                btn.style.right = (container.offsetWidth - container.clientWidth) + 'px';
+                const offset = (container.offsetWidth - container.clientWidth) + 'px';
+                btn.style[isRtl ? 'left' : 'right'] = offset;
             };
 
             // Watch for any size changes to the container

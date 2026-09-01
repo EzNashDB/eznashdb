@@ -26,7 +26,10 @@ const CustomZoomControl = ({ zoom }) => {
       L.DomEvent.disableClickPropagation(containerRef.current);
       L.DomEvent.disableScrollPropagation(containerRef.current);
     }
-  }, []);
+    if (document.documentElement.dir === "rtl" && map.attributionControl) {
+      map.attributionControl.setPosition("bottomleft");
+    }
+  }, [map]);
 
   return (
     <div

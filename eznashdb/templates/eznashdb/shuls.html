@@ -84,9 +84,8 @@
                         </div>
                     </span>
                     <div id="shuls-map" class="h-100">
-                        <div class="w-100 p-2 position-absolute top-0 start-50 pointer-events-none"
-                             style="transform: translateX(-50%);
-                                    z-index: 1000">
+                        <div class="w-100 p-2 position-absolute top-0 start-0 pointer-events-none"
+                             style="z-index: 1000">
                             <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
                                 <div class="badge text-bg-warning text-wrap pointer-events-auto">
                                     <i class="fa-solid fa-lock"></i>
@@ -412,6 +411,10 @@
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                 }).addTo(map);
                 document.getElementById(mapId).classList.add("rounded");
+
+                if (document.documentElement.dir === "rtl") {
+                    map.attributionControl.setPosition("bottomleft");
+                }
 
                 // Custom zoom controls
                 const zoomInBtn = document.getElementById("zoom-in-btn");
