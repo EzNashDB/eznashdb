@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from app.fields import HONEYPOT_FIELD_CLASS
 
@@ -28,19 +29,19 @@ def get_login_url(request):
 def navbar(request):
     # Define your navbar items here
     navbar_items = [
-        NavbarItem("Browse", reverse("eznashdb:shuls")),
-        NavbarItem("Add a Shul", reverse("eznashdb:create_shul")),
-        NavbarItem("About", "/about/"),
-        NavbarItem("Contact", reverse("eznashdb:contact_us")),
+        NavbarItem(_("Browse"), reverse("eznashdb:shuls")),
+        NavbarItem(_("Add a Shul"), reverse("eznashdb:create_shul")),
+        NavbarItem(_("About"), "/about/"),
+        NavbarItem(_("Contact"), reverse("eznashdb:contact_us")),
     ]
 
     # Authentication links - dropdown for authenticated users handled in template
     if not (hasattr(request, "user") and request.user.is_authenticated):
-        navbar_items.append(NavbarItem("Sign in", get_login_url(request)))
+        navbar_items.append(NavbarItem(_("Sign in"), get_login_url(request)))
 
     # Add admin link for staff users
     if hasattr(request, "user") and request.user.is_staff:
-        navbar_items.append(NavbarItem("Admin", reverse("admin_dashboard")))
+        navbar_items.append(NavbarItem(_("Admin"), reverse("admin_dashboard")))
 
     # Mark which item is active
     current_path = request.path

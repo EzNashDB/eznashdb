@@ -1,53 +1,111 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Hebrew translation for the Ezrat Nashim Database.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 19:43+0000\n"
+"POT-Creation-Date: 2026-09-01 20:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
 "1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
+msgid "Browse"
+msgstr "חיפוש"
+
+msgid "Add a Shul"
+msgstr "הוספת בית כנסת"
+
+msgid "About"
+msgstr "אודות"
+
+msgid "Contact"
+msgstr "יצירת קשר"
+
+msgid "Sign in"
+msgstr "התחברות"
+
+msgid "Admin"
+msgstr "ניהול"
+
 msgid "Equal or larger than men's"
-msgstr ""
+msgstr "שווה או גדולה מעזרת הגברים"
 
 msgid "At least half men's size"
-msgstr ""
+msgstr "לפחות מחצית מגודל עזרת הגברים"
 
 msgid "Less than half men's size"
-msgstr ""
+msgstr "פחות מחצי גודל עזרת הגברים"
 
 msgid "No women's section"
-msgstr ""
+msgstr "אין עזרת נשים"
 
 msgid "Mixed seating"
-msgstr ""
+msgstr "ישיבה מעורבת"
 
 msgid "Can say alone"
-msgstr ""
+msgstr "אפשר לומר לבד"
 
 msgid "Can say, a man will always join"
-msgstr ""
+msgstr "אפשר לומר, גבר תמיד יצטרף"
 
 msgid "Only with men (ask or plan ahead)"
-msgstr ""
+msgstr "רק בנוכחות גברים (יש לתאם מראש)"
 
 msgid "Not allowed"
-msgstr ""
+msgstr "אסור"
 
 msgid "Mapping women's spaces in synagogues around the world"
 msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
 
+msgid "The Ezrat Nashim Database"
+msgstr "מאגר \"עזרת נשים\""
+
+msgid "A project by Ari Abramowitz"
+msgstr "פרויקט מאת ארי אברמוביץ"
+
+msgid "Toggle navigation"
+msgstr "ניווט"
+
+msgid "Account"
+msgstr "חשבון"
+
+msgid "Logout"
+msgstr "התנתקות"
+
 msgid "Activate this flag for users with any of these permissions."
 msgstr ""
+
+#~ msgid "Shul Name"
+#~ msgstr "שם בית הכנסת"
+
+#~ msgid "Address"
+#~ msgstr "כתובת"
+
+#~ msgid "Room Name"
+#~ msgstr "שם החדר"
+
+#~ msgid "Main Sanctuary, Beit Midrash, etc."
+#~ msgstr "אולם ראשי, בית מדרש, וכו׳"
+
+#~ msgid "Size of Women's Section"
+#~ msgstr "גודל עזרת הנשים"
+
+#~ msgid "How large is the women's section?"
+#~ msgstr "כמה גדולה עזרת הנשים?"
+
+#~ msgid "Visibility & Audibility"
+#~ msgstr "ראייה ושמיעה"
+
+#~ msgid "Compared to men, how well can women see and hear?"
+#~ msgstr "בהשוואה לגברים, עד כמה נשים יכולות לראות ולשמוע?"
+
+#~ msgid "Kaddish"
+#~ msgstr "קדיש"
+
+#~ msgid "Can women say kaddish?"
+#~ msgstr "האם נשים יכולות לומר קדיש?"
