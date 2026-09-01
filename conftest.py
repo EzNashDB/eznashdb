@@ -2,10 +2,12 @@ from collections.abc import Callable
 
 import pytest
 from allauth.socialaccount.models import SocialApp
+from django.conf import settings as django_settings
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sites.models import Site
 from django.core.handlers.wsgi import WSGIRequest
 from django.urls import resolve, reverse
+from django.utils import translation
 
 from eznashdb.constants import DEFAULT_ARG
 from eznashdb.models import Shul
@@ -14,6 +16,20 @@ from eznashdb.models import Shul
 @pytest.fixture(autouse=True)
 def _override_settings_for_testing(settings):
     settings.STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+
+@pytest.fixture(autouse=True)
+def _reset_active_language():
+    """
+    LocaleMiddleware activates a language per-request but never deactivates it, relying on
+    the next request's middleware to activate the correct one. Real requests always go
+    through that middleware, but a test that activates a non-default language (e.g. via
+    Accept-Language) leaves it active for any later test in the same process that doesn't
+    go through a request cycle at all - silently, since it only breaks assertions on
+    strings that actually have a non-English translation.
+    """
+    yield
+    translation.activate(django_settings.LANGUAGE_CODE)
 
 
 @pytest.fixture(autouse=True)
