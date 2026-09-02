@@ -1,5 +1,7 @@
 {% extends "eznashdb/includes/base_shul_popup.html" %}
 
+{% load i18n %}
+
 {% block header_class %}
     {% if is_rate_limited %}
         {% if abuse_state.is_permanently_banned %}
@@ -14,27 +16,32 @@
     <span class="flex-grow-1">
         {% if shuls %}
             {% if names_visible %}
-                {{ shuls|length }} Shul{{ shuls|length|pluralize }} in this area
+                {% blocktrans trimmed count counter=shuls|length %}
+                    {{ counter }} Shul in this area
+                {% plural %}
+                    {{ counter }} Shuls in this area
+                {% endblocktrans %}
             {% elif is_rate_limited %}
                 {% if abuse_state.is_permanently_banned %}
                     <span class="text-danger-emphasis">
-                        <i class="fa-solid fa-lock"></i> Restricted.
-                        <a href="{% url 'eznashdb:contact_us' %}">Contact us</a> if this is a mistake
+                        <i class="fa-solid fa-lock"></i> {% trans "Restricted." %}
+                        <a href="{% url 'eznashdb:contact_us' %}">{% trans "Contact us" %}</a> {% trans "if this is a mistake" %}
                     </span>
                 {% else %}
                     <span class="text-warning-emphasis">
-                        <i class="fa-solid fa-clock"></i> Too many requests. Try again in {{ retry_after }}.
+                        <i class="fa-solid fa-clock"></i>
+                        {% blocktrans %}Too many requests. Try again in {{ retry_after }}.{% endblocktrans %}
                     </span>
                 {% endif %}
             {% else %}
                 <a href="{{ login_url }}"
                    class="btn btn-sm btn-outline-primary"
                    data-signin-link>
-                    <i class="fa-solid fa-lock"></i> Sign in to see more
+                    <i class="fa-solid fa-lock"></i> {% trans "Sign in to see more" %}
                 </a>
             {% endif %}
         {% else %}
-            No longer available
+            {% trans "No longer available" %}
         {% endif %}
     </span>
 {% endblock %}
@@ -50,7 +57,7 @@
         {% endfor %}
     {% else %}
         <div class="accordion-item border-0">
-            <div class="accordion-body text-muted">This shul is no longer available.</div>
+            <div class="accordion-body text-muted">{% trans "This shul is no longer available." %}</div>
         </div>
     {% endif %}
 {% endblock %}

@@ -1,8 +1,10 @@
 {% extends "eznashdb/includes/base_shul_popup.html" %}
 
+{% load i18n %}
+
 {% block header_content %}
     <span class="badge bg-success">
-        <i class="fa-solid fa-stopwatch"></i> Just Saved
+        <i class="fa-solid fa-stopwatch"></i> {% trans "Just Saved" %}
     </span>
 {% endblock %}
 

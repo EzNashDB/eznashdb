@@ -6,6 +6,7 @@ from enum import Enum, auto
 
 from constance import config
 from django.utils import timezone
+from django.utils.translation import ngettext
 
 from app.forms import AbuseAppealForm
 from app.models import AbuseState
@@ -111,13 +112,16 @@ def get_request_points(request) -> int:
 def format_retry_time(minutes):
     """Format retry time for display. Shows hours and minutes if >= 60 minutes."""
     if minutes < 60:
-        return f"{minutes} minute{'s' if minutes != 1 else ''}"
+        return ngettext("%(count)d minute", "%(count)d minutes", minutes) % {"count": minutes}
     hours = minutes // 60
     remaining_minutes = minutes % 60
-    parts = [f"{hours} hour{'s' if hours != 1 else ''}"]
-    if remaining_minutes > 0:
-        parts.append(f"{remaining_minutes} minute{'s' if remaining_minutes != 1 else ''}")
-    return " ".join(parts)
+    hours_str = ngettext("%(count)d hour", "%(count)d hours", hours) % {"count": hours}
+    if remaining_minutes == 0:
+        return hours_str
+    minutes_str = ngettext("%(count)d minute", "%(count)d minutes", remaining_minutes) % {
+        "count": remaining_minutes
+    }
+    return f"{hours_str} {minutes_str}"
 
 
 def get_retry_minutes(result: AbuseEnforcementResult) -> int | None:
