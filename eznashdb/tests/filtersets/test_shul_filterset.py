@@ -1,5 +1,6 @@
 import pytest
 from django.urls import resolve, reverse
+from django.utils import translation
 
 from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
 from eznashdb.filtersets import ShulFilterSet
@@ -124,6 +125,29 @@ def describe_see_hear_score_filter():
     def unknown_includes_shuls_without_rooms(test_shul, test_request):
         data = {"rooms__see_hear_score": [""]}
         assert test_shul in ShulFilterSet(data, request=test_request).qs
+
+
+def describe_translated_choices():
+    """
+    ShulFilterSet's choices are declared at class-body level, which only runs once, at
+    import time. If choices were built eagerly there (e.g. `choices=KaddishPolicy.get_...()`
+    instead of `choices=lambda: KaddishPolicy.get_...()`), they'd freeze in whatever
+    language happened to be active the first time this module was imported, and never
+    reflect the active language on any later request.
+    """
+
+    def kaddish_policy_choice_labels_reflect_the_active_language(test_request):
+        with translation.override("en"):
+            en_choices = dict(
+                ShulFilterSet(data={}, request=test_request).form.fields["kaddish_policy"].choices
+            )
+        with translation.override("he"):
+            he_choices = dict(
+                ShulFilterSet(data={}, request=test_request).form.fields["kaddish_policy"].choices
+            )
+
+        assert "Can say alone" in en_choices[KaddishPolicy.CAN_SAY_ALONE.value]
+        assert "אפשר לומר לבד" in he_choices[KaddishPolicy.CAN_SAY_ALONE.value]
 
 
 def describe_kaddish_policy_filter():

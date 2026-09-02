@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 20:07+0000\n"
+"POT-Creation-Date: 2026-09-02 08:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,11 +32,20 @@ msgstr "התחברות"
 msgid "Admin"
 msgstr "ניהול"
 
+msgid "Size of Women's Section"
+msgstr "גודל עזרת הנשים"
+
+msgid "Visibility & Audibility"
+msgstr "ראייה ושמיעה"
+
+msgid "Kaddish"
+msgstr "קדיש"
+
 msgid "Equal or larger than men's"
-msgstr "שווה או גדולה מעזרת הגברים"
+msgstr "שווה לעזרת הגברים או גדולה יותר"
 
 msgid "At least half men's size"
-msgstr "לפחות מחצית מגודל עזרת הגברים"
+msgstr "לפחות חצי גודל עזרת הגברים"
 
 msgid "Less than half men's size"
 msgstr "פחות מחצי גודל עזרת הגברים"
@@ -54,10 +63,19 @@ msgid "Can say, a man will always join"
 msgstr "אפשר לומר, גבר תמיד יצטרף"
 
 msgid "Only with men (ask or plan ahead)"
-msgstr "רק בנוכחות גברים (יש לתאם מראש)"
+msgstr "רק אם גבר מצטרף (לשאול או לתאם מראש)"
 
 msgid "Not allowed"
-msgstr "אסור"
+msgstr "לא מאפשרים"
+
+msgid "Filters"
+msgstr "סינון"
+
+msgid "Reset"
+msgstr "איפוס"
+
+msgid "Add Shul"
+msgstr "הוספת בי\"כ"
 
 msgid "Mapping women's spaces in synagogues around the world"
 msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
@@ -79,33 +97,3 @@ msgstr "התנתקות"
 
 msgid "Activate this flag for users with any of these permissions."
 msgstr ""
-
-#~ msgid "Shul Name"
-#~ msgstr "שם בית הכנסת"
-
-#~ msgid "Address"
-#~ msgstr "כתובת"
-
-#~ msgid "Room Name"
-#~ msgstr "שם החדר"
-
-#~ msgid "Main Sanctuary, Beit Midrash, etc."
-#~ msgstr "אולם ראשי, בית מדרש, וכו׳"
-
-#~ msgid "Size of Women's Section"
-#~ msgstr "גודל עזרת הנשים"
-
-#~ msgid "How large is the women's section?"
-#~ msgstr "כמה גדולה עזרת הנשים?"
-
-#~ msgid "Visibility & Audibility"
-#~ msgstr "ראייה ושמיעה"
-
-#~ msgid "Compared to men, how well can women see and hear?"
-#~ msgstr "בהשוואה לגברים, עד כמה נשים יכולות לראות ולשמוע?"
-
-#~ msgid "Kaddish"
-#~ msgstr "קדיש"
-
-#~ msgid "Can women say kaddish?"
-#~ msgstr "האם נשים יכולות לומר קדיש?"
