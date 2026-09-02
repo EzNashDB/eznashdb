@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 08:40+0000\n"
+"POT-Creation-Date: 2026-09-02 20:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,6 +13,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
 "1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+
+#, python-format
+msgid "%(count)d minute"
+msgid_plural "%(count)d minutes"
+msgstr[0] "%(count)d דקה"
+msgstr[1] "%(count)d דקות"
+msgstr[2] "%(count)d דקות"
+msgstr[3] "%(count)d דקות"
+
+#, python-format
+msgid "%(count)d hour"
+msgid_plural "%(count)d hours"
+msgstr[0] "%(count)d שעה"
+msgstr[1] "%(count)d שעות"
+msgstr[2] "%(count)d שעות"
+msgstr[3] "%(count)d שעות"
 
 msgid "Browse"
 msgstr "חיפוש"
@@ -68,6 +84,88 @@ msgstr "רק אם גבר מצטרף (לשאול או לתאם מראש)"
 msgid "Not allowed"
 msgstr "לא מאפשרים"
 
+msgid "Close"
+msgstr "סגירה"
+
+msgid "Just Saved"
+msgstr "נשמר כעת"
+
+msgid "Unable to load shul details."
+msgstr "לא ניתן לטעון את פרטי בית הכנסת."
+
+msgid "Loading..."
+msgstr "טוען..."
+
+msgid "Shul name hidden"
+msgstr "שם בית הכנסת מוסתר"
+
+msgid "Shul Name"
+msgstr "שם בית הכנסת"
+
+#, python-format
+msgid "%(counter)s Room"
+msgid_plural "%(counter)s Rooms"
+msgstr[0] "חדר אחד"
+msgstr[1] "%(counter)s חדרים"
+msgstr[2] "%(counter)s חדרים"
+msgstr[3] "%(counter)s חדרים"
+
+msgid "Edit"
+msgstr "עריכה"
+
+msgid "Directions"
+msgstr "ניווט"
+
+msgid "Updated"
+msgstr "עודכן"
+
+msgid "Kaddish:"
+msgstr "קדיש:"
+
+msgid "Size"
+msgstr "גודל"
+
+msgid "Vis. & Aud."
+msgstr "ראייה ושמיעה"
+
+#, python-format
+msgid "%(counter)s Shul in this area"
+msgid_plural "%(counter)s Shuls in this area"
+msgstr[0] "בית כנסת אחד באזור זה"
+msgstr[1] "%(counter)s בתי כנסת באזור זה"
+msgstr[2] "%(counter)s בתי כנסת באזור זה"
+msgstr[3] "%(counter)s בתי כנסת באזור זה"
+
+msgid "Restricted."
+msgstr "הגישה מוגבלת."
+
+msgid "Contact us"
+msgstr "ליצור קשר"
+
+msgid "if this is a mistake"
+msgstr "אם זו טעות"
+
+#, python-format
+msgid "Too many requests. Try again in %(retry_after)s."
+msgstr "יותר מדי בקשות. לנסות שוב בעוד %(retry_after)s."
+
+msgid "Sign in to see more"
+msgstr "התחברו לצפייה בפרטים נוספים"
+
+msgid "No longer available"
+msgstr "כבר לא זמין"
+
+msgid "This shul is no longer available."
+msgstr "בית הכנסת הזה כבר לא זמין."
+
+#, python-format
+msgid "%(counter)s shul found"
+msgid_plural "%(counter)s shuls found"
+msgstr[0] "בית כנסת אחד נמצא"
+msgstr[1] "%(counter)s בתי כנסת נמצאו"
+msgstr[2] "%(counter)s בתי כנסת נמצאו"
+msgstr[3] "%(counter)s בתי כנסת נמצאו"
+
 msgid "Filters"
 msgstr "סינון"
 
@@ -87,7 +185,7 @@ msgid "A project by Ari Abramowitz"
 msgstr "פרויקט מאת ארי אברמוביץ"
 
 msgid "Toggle navigation"
-msgstr "ניווט"
+msgstr "פתיחת תפריט"
 
 msgid "Account"
 msgstr "חשבון"

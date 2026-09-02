@@ -1,5 +1,6 @@
 {# Shared accordion item for a single shul - used by both cluster and exact pin popups #}
 {# Parameters: shul, accordion_id, item_id_prefix, names_visible (bool), total_shuls/is_expanded/is_last (optional) #}
+{% load i18n %}
 <div class="accordion-item border-0"
      x-init="SHUL_MAP_API.initShulAccordion($el, {{ shul.pk }})">
     <h2 class="accordion-header" style="scroll-margin-top: 15px">
@@ -21,14 +22,20 @@
                     {% else %}
                         <div class="h5 m-0 d-inline-block text-blur"
                              role="img"
-                             aria-label="Shul name hidden">
-                            <span aria-hidden="true">Shul Name</span>
+                             aria-label="{% trans 'Shul name hidden' %}">
+                            <span aria-hidden="true">{% trans "Shul Name" %}</span>
                         </div>
                     {% endif %}
                 </span>
                 <span>
                     {% with room_count=shul.rooms.all|length %}
-                        <div class="badge text-bg-secondary">{{ room_count }} Room{{ room_count|pluralize }}</div>
+                        <div class="badge text-bg-secondary">
+                            {% blocktrans trimmed count counter=room_count %}
+                                {{ counter }} Room
+                            {% plural %}
+                                {{ counter }} Rooms
+                            {% endblocktrans %}
+                        </div>
                     {% endwith %}
                 </span>
             </div>
@@ -43,24 +50,24 @@
                 <div class="d-flex flex-wrap gap-2 align-items-end">
                     <a class="btn btn-sm btn-outline-primary text-nowrap"
                        href="{% url 'eznashdb:update_shul' shul.id %}">
-                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                        <i class="fa-solid fa-pen-to-square"></i> {% trans "Edit" %}
                     </a>
                     <a target="_blank"
                        rel="noopener noreferrer"
                        href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
                        class="btn btn-sm btn-primary">
-                        <i class="fa-brands fa-google me-1"></i>
-                        Get Directions
+                        <i class="fa-solid fa-diamond-turn-right me-1"></i>
+                        {% trans "Directions" %}
                     </a>
                     <div class="flex-grow-1 text-end ms-auto small fst-italic text-muted">
-                        Updated <span data-utc="{{ shul.updated_at|date:'c' }}"
-       x-init="$el.textContent = new Date($el.dataset.utc).toLocaleString(undefined, {dateStyle: 'medium'})"></span>
+                        {% trans "Updated" %} <span data-utc="{{ shul.updated_at|date:'c' }}"
+       x-init="$el.textContent = new Date($el.dataset.utc).toLocaleString(document.documentElement.lang, {dateStyle: 'medium'})"></span>
                     </div>
                 </div>
                 <div class="">
                     <hr>
                     <div class="d-flex align-items-start gap-2">
-                        <span class="text-muted">Kaddish:</span>
+                        <span class="text-muted">{% trans "Kaddish:" %}</span>
                         <div>{{ shul.get_kaddish_policy_display|safe|default:"--" }}</div>
                     </div>
                 </div>
@@ -72,13 +79,13 @@
                                 <div class="row g-3">
                                     <div class="col-7">
                                         <div class="small text-muted mb-1 text-nowrap">
-                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> Size
+                                            <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> {% trans "Size" %}
                                         </div>
                                         <div>{{ room.get_relative_size_display|safe|default:"--" }}</div>
                                     </div>
                                     <div class="col-5">
                                         <div class="small text-muted mb-1 text-nowrap">
-                                            <i class="fa-solid fa-eye me-1"></i> Vis. & Aud.
+                                            <i class="fa-solid fa-eye me-1"></i> {% trans "Vis. & Aud." %}
                                         </div>
                                         <div>{{ room.get_see_hear_score_display|safe|default:"--" }}</div>
                                     </div>

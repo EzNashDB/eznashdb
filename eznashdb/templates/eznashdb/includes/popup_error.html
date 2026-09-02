@@ -1,6 +1,9 @@
+{% load i18n %}
 <div class="card border">
     <div class="card-header d-flex justify-content-end">
-        <button type="button" class="btn-close shul-popup-close" aria-label="Close"></button>
+        <button type="button"
+                class="btn-close shul-popup-close"
+                aria-label="{% trans 'Close' %}"></button>
     </div>
-    <div class="card-body p-3 text-muted">Unable to load shul details.</div>
+    <div class="card-body p-3 text-muted">{% trans "Unable to load shul details." %}</div>
 </div>

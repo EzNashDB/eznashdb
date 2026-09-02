@@ -1,3 +1,8 @@
+{% load i18n %}
 <span id="shuls-count" hx-swap-oob="true">
-    {{ object_list.count }} shul{{ object_list.count|pluralize }} found
+    {% blocktrans trimmed count counter=object_list.count %}
+        {{ counter }} shul found
+    {% plural %}
+        {{ counter }} shuls found
+    {% endblocktrans %}
 </span>

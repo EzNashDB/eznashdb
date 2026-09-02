@@ -12,12 +12,13 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.template.loader import render_to_string
 from django.test import RequestFactory
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django_ratelimit.core import _split_rate
 
 from app.abuse_prevention import (
     BlockReason,
     build_block_context,
+    format_retry_time,
     get_request_points,
     process_abuse_state,
     record_abuse_violation,
@@ -27,6 +28,35 @@ from app.models import AbuseAppeal, AbuseState
 from app.rate_limiting import consume_rate_budget
 
 User = get_user_model()
+
+
+def describe_format_retry_time():
+    @pytest.mark.parametrize(
+        ("minutes", "expected"),
+        [
+            (1, "1 minute"),
+            (5, "5 minutes"),
+            (60, "1 hour"),
+            (65, "1 hour 5 minutes"),
+            (125, "2 hours 5 minutes"),
+        ],
+    )
+    def formats_minutes_and_hours_in_english(minutes, expected):
+        assert format_retry_time(minutes) == expected
+
+    @pytest.mark.parametrize(
+        ("minutes", "expected"),
+        [
+            (1, "1 דקה"),
+            (5, "5 דקות"),
+            (60, "1 שעה"),
+            (65, "1 שעה 5 דקות"),
+            (125, "2 שעות 5 דקות"),
+        ],
+    )
+    def formats_minutes_and_hours_in_hebrew(minutes, expected):
+        with translation.override("he"):
+            assert format_retry_time(minutes) == expected
 
 
 @pytest.mark.django_db
