@@ -32,7 +32,10 @@ export default function initializeTomSelects() {
           const input = instance.control.querySelector("input");
           instance.control.insertBefore(placeholder, input);
         }
-        placeholder.textContent = numSelected + " items selected";
+        placeholder.textContent = interpolate(
+          ngettext("%s option selected", "%s options selected", numSelected),
+          [numSelected]
+        );
       } else {
         // Expanded or single item: show individual items
         selectedItems.forEach((item) => (item.hidden = false));
@@ -118,11 +121,11 @@ export default function initializeTomSelects() {
             uncheckedClassNames: ["ts-unchecked"],
           },
           remove_button: {
-            title: "Remove this item",
+            title: gettext("Remove this option"),
           },
         }),
         clear_button: {
-          title: (isMultiSelect && "Clear All") || "Clear",
+          title: (isMultiSelect && gettext("Clear All")) || gettext("Clear"),
         },
         no_backspace_delete: true,
       },

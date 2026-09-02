@@ -10,18 +10,18 @@ from eznashdb.models import Room, Shul
 class ShulFilterSet(FilterSet):
     kaddish_policy = MultiSelectModelFieldFilter(
         model_field="kaddish_policy",
-        choices=KaddishPolicy.get_display_choices(include_blank=True),
+        choices=lambda: KaddishPolicy.get_display_choices(include_blank=True),
         label=FieldsOptions.KADDISH_POLICY.filter_label,
     )
     rooms__relative_size = MultiSelectModelFieldFilter(
         model_field="rooms__relative_size",
-        choices=RelativeSize.get_display_choices(include_blank=True),
+        choices=lambda: RelativeSize.get_display_choices(include_blank=True),
         label=FieldsOptions.RELATIVE_SIZE.filter_label,
         method="filter_rooms__relative_size",
     )
     rooms__see_hear_score = MultiSelectModelFieldFilter(
         model_field="rooms__see_hear_score",
-        choices=SeeHearScore.get_display_choices(include_blank=True),
+        choices=lambda: SeeHearScore.get_display_choices(include_blank=True),
         label=FieldsOptions.SEE_HEAR.filter_label,
         method="filter_rooms__see_hear_score",
     )

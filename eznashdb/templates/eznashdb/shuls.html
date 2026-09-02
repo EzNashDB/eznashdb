@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load i18n %}
 {% load static %}
 {% load partials %}
 
@@ -40,7 +41,7 @@
                     <button id="filter-toggle-btn"
                             @click="toggleFilters()"
                             class="btn btn-secondary d-lg-none">
-                        <span>Filters (<span x-text="filterCount">0</span>)</span>
+                        <span>{% trans "Filters" %} (<span x-text="filterCount">0</span>)</span>
                         <i class="fa"
                            :class="filtersCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
                     </button>
@@ -48,12 +49,12 @@
                             class="btn btn-outline-secondary rounded-lg"
                             :disabled="filterCount === 0">
                         <i class="fa-solid fa-rotate-left"></i>
-                        Reset
+                        {% trans "Reset" %}
                     </button>
                 </div>
                 <!-- Add Shul button -->
                 <a href="{% url 'eznashdb:create_shul' %}" class="btn btn-primary">
-                    <i class="fa fa-plus"></i> Add Shul
+                    <i class="fa fa-plus"></i> {% trans "Add Shul" %}
                 </a>
             </div>
             <!-- Filters (collapsible on mobile, always visible on desktop) -->

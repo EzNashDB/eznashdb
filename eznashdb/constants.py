@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 DEFAULT_ARG = object()
 
@@ -53,19 +54,19 @@ class FieldsOptions:
         help_text="Main Sanctuary, Beit Midrash, etc.",
     )
     RELATIVE_SIZE = FieldOptions(
-        "Size of Women's Section",
+        _("Size of Women's Section"),
         "fa-solid fa-up-right-and-down-left-from-center",
         verbose_label_text="How large is the women's section?",
     )
     SEE_HEAR = FieldOptions(
-        "Visibility & Audibility",
+        _("Visibility & Audibility"),
         "fa-solid fa-eye",
         verbose_label_text="""
             Compared to men, how well can women see and hear?
         """,
     )
     KADDISH_POLICY = FieldOptions(
-        "Kaddish",
+        _("Kaddish"),
         "fa-solid fa-comment",
         verbose_label_text="Can women say kaddish?",
     )
