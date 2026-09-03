@@ -37,14 +37,14 @@
                        aria-expanded="false">{% get_current_language as CURRENT_LANGUAGE %}{{ CURRENT_LANGUAGE|upper }}</a>
                     <ul class="dropdown-menu dropdown-menu-end"
                         aria-labelledby="languageDropdown">
-                        {% get_available_languages as LANGUAGES_LIST %}
-                        {% for lang_code, lang_name in LANGUAGES_LIST %}
+                        {% get_language_info_list for LANGUAGES as languages %}
+                        {% for language in languages %}
                             <li>
                                 <form method="POST" action="{% url 'set_language' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                    <input type="hidden" name="language" value="{{ lang_code }}">
-                                    <button type="submit" class="dropdown-item">{{ lang_name }}</button>
+                                    <input type="hidden" name="language" value="{{ language.code }}">
+                                    <button type="submit" class="dropdown-item">{{ language.name_local }}</button>
                                 </form>
                             </li>
                         {% endfor %}
