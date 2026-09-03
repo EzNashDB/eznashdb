@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 20:14+0000\n"
+"POT-Creation-Date: 2026-09-03 17:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,11 +175,26 @@ msgstr "איפוס"
 msgid "Add Shul"
 msgstr "הוספת בי\"כ"
 
-msgid "Mapping women's spaces in synagogues around the world"
-msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
+msgid "Exact locations hidden for security reasons"
+msgstr "מיקומים מדויקים מוסתרים מטעמי אבטחה"
+
+msgid "Your Location"
+msgstr "המיקום שלך"
 
 msgid "The Ezrat Nashim Database"
 msgstr "מאגר \"עזרת נשים\""
+
+msgid "Mapping women's spaces in synagogues around the world"
+msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
+
+msgid "Built by"
+msgstr "נבנה על ידי"
+
+msgid "Ari Abramowitz logo"
+msgstr "לוגו ארי אברמוביץ"
+
+msgid "Ari Abramowitz"
+msgstr "ארי אברמוביץ"
 
 msgid "A project by Ari Abramowitz"
 msgstr "פרויקט מאת ארי אברמוביץ"
