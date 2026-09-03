@@ -10,7 +10,7 @@ body {
   /* fallback for Js load */
   height: var(--doc-height);
   overflow: hidden;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Noto Sans', 'Noto Sans Hebrew', sans-serif;
 }
 
 /* Navbar */
