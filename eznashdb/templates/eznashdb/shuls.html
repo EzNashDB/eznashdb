@@ -80,7 +80,7 @@
                                   style="width: 3rem;
                                          height: 3rem"
                                   role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">{% trans "Loading..." %}</span>
                             </span>
                         </div>
                     </span>
@@ -90,7 +90,7 @@
                             <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
                                 <div class="badge text-bg-warning text-wrap pointer-events-auto">
                                     <i class="fa-solid fa-lock"></i>
-                                    Map pins are approximate. Exact locations hidden for security reasons.
+                                    {% trans "Exact locations hidden for security reasons" %}
                                 </div>
                                 <div class="badge text-bg-dark pointer-events-auto">
                                     {% include "eznashdb/includes/shuls_count.html" %}
@@ -463,7 +463,7 @@
                             <div class="btn btn-info rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
                                 <i class="fa-solid fa-xmark"></i>
                             </div>
-                            <h6><span class="badge text-bg-dark">Your Location</span></h6>
+                            <h6><span class="badge text-bg-dark">{% trans "Your Location" %}</span></h6>
                         </div>
                         `,
                         className: '',
