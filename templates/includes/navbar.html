@@ -51,54 +51,35 @@
                     </li>
                 {% endif %}
                 {% flag "hebrew_translation" %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-1"
-                       href="#"
-                       id="languageDropdown"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
-                        {% get_current_language as CURRENT_LANGUAGE %}
-                        {% if CURRENT_LANGUAGE == 'he' %}
-                            <img src="{% static 'img/flags/il.svg' %}"
-                                 alt=""
-                                 width="20"
-                                 class="rounded-1">
-                        {% else %}
-                            <img src="{% static 'img/flags/us.svg' %}"
-                                 alt=""
-                                 width="20"
-                                 class="rounded-1">
-                        {% endif %}
-                        {{ CURRENT_LANGUAGE|upper }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end"
-                        aria-labelledby="languageDropdown">
-                        {% get_language_info_list for LANGUAGES as languages %}
-                        {% for language in languages %}
-                            <li>
-                                <form method="POST" action="{% url 'set_language' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                    <input type="hidden" name="language" value="{{ language.code }}">
-                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2">
-                                        {% if language.code == 'he' %}
-                                            <img src="{% static 'img/flags/il.svg' %}"
-                                                 alt=""
-                                                 width="20"
-                                                 class="rounded-1">
-                                        {% else %}
-                                            <img src="{% static 'img/flags/us.svg' %}"
-                                                 alt=""
-                                                 width="20"
-                                                 class="rounded-1">
-                                        {% endif %}
-                                        {{ language.name_local }}
-                                    </button>
-                                </form>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                {% get_current_language as CURRENT_LANGUAGE %}
+                {% if CURRENT_LANGUAGE == 'he' %}
+                    {% get_language_info for 'en' as other_language %}
+                {% else %}
+                    {% get_language_info for 'he' as other_language %}
+                {% endif %}
+                <li class="nav-item d-flex align-items-center">
+                    <form method="POST" action="{% url 'set_language' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="hidden" name="language" value="{{ other_language.code }}">
+                        <button type="submit"
+                                id="languageSwitcher"
+                                dir="{{ other_language.bidi|yesno:'rtl,ltr' }}"
+                                class="nav-link d-flex align-items-center gap-1 border-0 bg-transparent">
+                            {% if other_language.code == 'he' %}
+                                <img src="{% static 'img/flags/il.svg' %}"
+                                     alt=""
+                                     width="20"
+                                     class="rounded-1">
+                            {% else %}
+                                <img src="{% static 'img/flags/us.svg' %}"
+                                     alt=""
+                                     width="20"
+                                     class="rounded-1">
+                            {% endif %}
+                            {{ other_language.name_local }}
+                        </button>
+                    </form>
                 </li>
             {% endflag %}
         </ul>

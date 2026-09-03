@@ -35,10 +35,10 @@ def describe_language_switcher():
     def hidden_by_default(client):
         response = client.get("/")
 
-        assert "languageDropdown" not in str(response.content)
+        assert "languageSwitcher" not in str(response.content)
 
     @override_flag("hebrew_translation", active=True)
     def shown_when_flag_active(client):
         response = client.get("/")
 
-        assert "languageDropdown" in str(response.content)
+        assert "languageSwitcher" in str(response.content)
