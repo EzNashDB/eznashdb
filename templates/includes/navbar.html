@@ -1,6 +1,7 @@
 {% load svg %}
 {% load i18n %}
 {% load waffle_tags %}
+{% load static %}
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
     <div class="container">
         <div class="d-flex align-items-center justify-content-between flex-nowrap flex-grow-1 gap-1 min-w-0">
@@ -27,14 +28,50 @@
                 {% for item in navbar_items %}
                     {% include 'includes/navbar_item.html' %}
                 {% endfor %}
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           id="accountDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">{% trans "Account" %}</a>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="accountDropdown">
+                            <li>
+                                <h6 class="dropdown-header text-truncate" style="max-width: 250px;">{{ user.email }}</h6>
+                            </li>
+                            <li>
+                                <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">{% trans "Logout" %}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
                 {% flag "hebrew_translation" %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-1"
                        href="#"
                        id="languageDropdown"
                        role="button"
                        data-bs-toggle="dropdown"
-                       aria-expanded="false">{% get_current_language as CURRENT_LANGUAGE %}{{ CURRENT_LANGUAGE|upper }}</a>
+                       aria-expanded="false">
+                        {% get_current_language as CURRENT_LANGUAGE %}
+                        {% if CURRENT_LANGUAGE == 'he' %}
+                            <img src="{% static 'img/flags/il.svg' %}"
+                                 alt=""
+                                 width="20"
+                                 class="rounded-1">
+                        {% else %}
+                            <img src="{% static 'img/flags/us.svg' %}"
+                                 alt=""
+                                 width="20"
+                                 class="rounded-1">
+                        {% endif %}
+                        {{ CURRENT_LANGUAGE|upper }}
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end"
                         aria-labelledby="languageDropdown">
                         {% get_language_info_list for LANGUAGES as languages %}
@@ -44,35 +81,26 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                     <input type="hidden" name="language" value="{{ language.code }}">
-                                    <button type="submit" class="dropdown-item">{{ language.name_local }}</button>
+                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2">
+                                        {% if language.code == 'he' %}
+                                            <img src="{% static 'img/flags/il.svg' %}"
+                                                 alt=""
+                                                 width="20"
+                                                 class="rounded-1">
+                                        {% else %}
+                                            <img src="{% static 'img/flags/us.svg' %}"
+                                                 alt=""
+                                                 width="20"
+                                                 class="rounded-1">
+                                        {% endif %}
+                                        {{ language.name_local }}
+                                    </button>
                                 </form>
                             </li>
                         {% endfor %}
                     </ul>
                 </li>
             {% endflag %}
-            {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       id="accountDropdown"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">{% trans "Account" %}</a>
-                    <ul class="dropdown-menu dropdown-menu-end"
-                        aria-labelledby="accountDropdown">
-                        <li>
-                            <h6 class="dropdown-header text-truncate" style="max-width: 250px;">{{ user.email }}</h6>
-                        </li>
-                        <li>
-                            <form method="POST" action="{% url 'account_logout' %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item">{% trans "Logout" %}</button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            {% endif %}
         </ul>
     </div>
 </div>
