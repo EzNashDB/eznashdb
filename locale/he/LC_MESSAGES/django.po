@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-03 18:24+0000\n"
+"POT-Creation-Date: 2026-09-05 18:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,6 +47,9 @@ msgstr "התחברות"
 
 msgid "Admin"
 msgstr "ניהול"
+
+msgid "Form submission failed."
+msgstr "שליחת הטופס נכשלה."
 
 msgid "Size of Women's Section"
 msgstr "גודל עזרת הנשים"
@@ -180,6 +183,55 @@ msgstr "מיקומים מדויקים לא מוצגים מטעמי אבטחה"
 
 msgid "Your Location"
 msgstr "המיקום שלך"
+
+msgid "Details"
+msgstr "פרטים"
+
+msgid "What happened or what would you like to see?"
+msgstr "מה קרה, או מה תרצו לראות?"
+
+msgid "50-2000 characters"
+msgstr "50–2000 תווים"
+
+msgctxt "feedback form field"
+msgid "Email"
+msgstr "דוא\"ל"
+
+msgid "Screenshot"
+msgstr "צילום מסך"
+
+msgid "Up to 5mb"
+msgstr "עד 5MB"
+
+msgid "File size too large. Maximum size is 5MB."
+msgstr "הקובץ גדול מדי. הגודל המקסימלי הוא 5MB."
+
+msgid "File size must be less than 5MB"
+msgstr "גודל הקובץ חייב להיות עד 5MB"
+
+msgid "Send Feedback"
+msgstr "שליחת משוב"
+
+msgid "Cancel"
+msgstr "ביטול"
+
+msgid "Send"
+msgstr "שליחה"
+
+msgid "Submitting..."
+msgstr "שולח..."
+
+msgid "No file chosen"
+msgstr "לא נבחר קובץ"
+
+msgid "Choose File"
+msgstr "בחירת קובץ"
+
+msgid "Unable to submit feedback. Please try again."
+msgstr "לא הצלחנו לשלוח את המשוב. נסו שוב."
+
+msgid "Thanks! We received your feedback and will review it soon."
+msgstr "תודה! קיבלנו את המשוב שלכם ונבדוק אותו בקרוב."
 
 msgid "The Ezrat Nashim Database"
 msgstr "מאגר \"עזרת נשים\""

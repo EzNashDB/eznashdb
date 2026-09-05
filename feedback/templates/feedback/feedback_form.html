@@ -1,12 +1,14 @@
 {% load static %}
 {% load crispy_forms_tags %}
+{% load i18n %}
+{% trans "File size must be less than 5MB" as file_size_error %}
 <button class="feedback-tab btn btn-info btn-sm text-nowrap shadow-sm"
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#feedbackOffcanvas"
-        aria-label="Send Feedback">
+        aria-label="{% trans 'Send Feedback' %}">
     <i class="fa-solid fa-envelope"></i>
-    Send Feedback
+    {% trans "Send Feedback" %}
 </button>
 <div class="offcanvas offcanvas-end"
     tabindex="-1"
@@ -16,16 +18,19 @@
     {# djlint:off #}
      x-data="{
         screenshotPreview: null,
+        screenshotFileName: null,
         isSubmitting: false,
         handleScreenshotChange(event) {
           const file = event.target.files[0];
           if (file) {
             if (file.size > 5 * 1024 * 1024) {
-              alert('File size must be less than 5MB');
+              alert('{{ file_size_error|escapejs }}');
               event.target.value = '';
               this.screenshotPreview = null;
+              this.screenshotFileName = null;
               return;
             }
+            this.screenshotFileName = file.name;
             const reader = new FileReader();
             reader.onload = (e) => {
               this.screenshotPreview = e.target.result;
@@ -33,6 +38,7 @@
             reader.readAsDataURL(file);
           } else {
             this.screenshotPreview = null;
+            this.screenshotFileName = null;
           }
         },
         getBrowserInfo() {
@@ -44,11 +50,11 @@
     {# djlint:on #}
     >
     <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title" id="feedbackOffcanvasLabel">Send Feedback</h5>
+        <h5 class="offcanvas-title" id="feedbackOffcanvasLabel">{% trans "Send Feedback" %}</h5>
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
+                aria-label="{% trans 'Close' %}"></button>
     </div>
     <div class="offcanvas-body">
         <form id="feedbackForm"
