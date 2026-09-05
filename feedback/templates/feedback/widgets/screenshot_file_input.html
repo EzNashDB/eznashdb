@@ -1,0 +1,13 @@
+{% load i18n %}
+{% trans "No file chosen" as no_file_chosen_text %}
+<div class="form-control d-flex align-items-stretch p-0 overflow-hidden">
+    <label for="{{ widget.attrs.id }}"
+           class="btn btn-light border-0 border-end rounded-0 mb-0 px-3 d-flex align-items-center text-nowrap">
+        {% trans "Choose File" %}
+    </label>
+    <span class="flex-grow-1 text-truncate px-3 d-flex align-items-center"
+          x-text="screenshotFileName || '{{ no_file_chosen_text|escapejs }}'">{{ no_file_chosen_text }}</span>
+    <input type="file"
+           name="{{ widget.name }}"
+           {% include "django/forms/widgets/attrs.html" %}>
+</div>

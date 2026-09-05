@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 from django.views import View
 
 from app.emails import send_feedback_notification
@@ -88,7 +89,7 @@ class FeedbackView(View):
 
         if not issue_data:
             # GitHub API failed
-            messages.error(request, "Unable to submit feedback. Please try again.")
+            messages.error(request, _("Unable to submit feedback. Please try again."))
             return HttpResponse()
 
         # Send email notification to superusers
@@ -101,7 +102,7 @@ class FeedbackView(View):
         )
 
         # Success - trigger event to close offcanvas and show success message
-        messages.success(request, "Thanks! We received your feedback and will review it soon.")
+        messages.success(request, _("Thanks! We received your feedback and will review it soon."))
         # Send back blank form to reinitialize
         response = render(request, "feedback/feedback_form_fields.html", {"form": FeedbackForm()})
         response["HX-Trigger"] = "feedbackSubmitted"

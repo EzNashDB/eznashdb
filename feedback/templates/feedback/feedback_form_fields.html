@@ -1,8 +1,16 @@
 {% load crispy_forms_tags %}
+{% load i18n %}
 {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
 <div>{{ form.details|as_crispy_field }}</div>
 <div class="mb-3">
-    {{ form.screenshot|as_crispy_field }}
+    <label for="{{ form.screenshot.id_for_label }}" class="form-label">{{ form.screenshot.label }}</label>
+    {{ form.screenshot }}
+    {% if form.screenshot.help_text %}
+        <div class="form-text">{{ form.screenshot.help_text }}</div>
+    {% endif %}
+    {% if form.screenshot.errors %}
+        <div class="text-danger small mt-1">{{ form.screenshot.errors }}</div>
+    {% endif %}
     <div x-show="screenshotPreview" class="mt-2">
         <img :src="screenshotPreview"
              class="img-thumbnail"
@@ -16,16 +24,18 @@
 <div>{{ form.website }}</div>
 {# Submit Buttons #}
 <div class="d-flex gap-2">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">
+        {% trans "Cancel" %}
+    </button>
     <button type="submit"
             class="btn btn-primary flex-grow-1"
             :disabled="isSubmitting">
-        <span x-show="!isSubmitting">Submit Feedback</span>
+        <span x-show="!isSubmitting">{% trans "Send" %}</span>
         <span x-show="isSubmitting">
             <span class="spinner-border spinner-border-sm me-1"
                   role="status"
                   aria-hidden="true"></span>
-            Submitting...
+            {% trans "Submitting..." %}
         </span>
     </button>
 </div>
