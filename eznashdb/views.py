@@ -300,7 +300,7 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
             self.room_fs_valid(room_fs)
 
         success_url = self.get_success_url()
-        success_message = "Success! Your shul has been saved."
+        success_message = _("Success! Your shul has been saved.")
         messages.success(self.request, success_message)
         self.request.session[JUST_SAVED_SHUL_SESSION_KEY] = self.object.pk
         return HttpResponseClientRedirect(success_url)

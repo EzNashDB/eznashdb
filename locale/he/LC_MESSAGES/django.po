@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 17:15+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -301,6 +301,9 @@ msgstr "יש לתקן את שגיאות הטופס כדי להמשיך."
 
 msgid "Unable to delete. Please provide a valid reason."
 msgstr "לא ניתן למחוק. יש לתת סיבה תקינה."
+
+msgid "Success! Your shul has been saved."
+msgstr "בית הכנסת נשמר בהצלחה!"
 
 #, python-format
 msgid "'%(name)s' is not deleted."
