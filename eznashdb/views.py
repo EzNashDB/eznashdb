@@ -233,6 +233,7 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
         return self.reload_shul_form(form)
 
     def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         if "delete_shul" in request.POST:
             return self.handle_delete_submission()
         return super().post(request, *args, **kwargs)
@@ -256,7 +257,7 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
             messages.warning(self.request, warning_msg)
             return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))
         else:
-            messages.error(self.request, "Unable to delete. Please provide a valid reason.")
+            messages.error(self.request, _("Unable to delete. Please provide a valid reason."))
             return self.reload_shul_form(self.get_form())
 
     def handle_update_submit(self, form):
@@ -477,12 +478,12 @@ class UndeleteShulView(LoginRequiredMixin, View):
 
         # Check if it's actually deleted
         if not shul.deleted:
-            messages.info(request, f"'{shul.name}' is not deleted.")
+            messages.info(request, _("'%(name)s' is not deleted.") % {"name": shul.name})
         else:
             # Undelete and clear audit fields
             shul.undelete()
             shul.clear_deletion()
-            messages.success(request, f"'{shul.name}' has been restored.")
+            messages.success(request, _("'%(name)s' has been restored.") % {"name": shul.name})
 
         # Return to the browse page
         return HttpResponseRedirect(reverse_lazy("eznashdb:shuls"))

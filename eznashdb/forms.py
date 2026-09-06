@@ -112,17 +112,19 @@ class ShulDeleteForm(forms.Form):
             attrs={
                 "rows": 3,
                 "class": "form-control",
-                "placeholder": "Please explain why this shul should be deleted...",
+                "placeholder": _("Please explain why this shul should be deleted..."),
             }
         ),
-        help_text="This helps us monitor deletions and decide whether to restore the shul.",
+        help_text=_(
+            "Your answer will help us monitor deletions and decide whether to restore the shul."
+        ),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.fields["deletion_reason"].label = "Reason for deletion"
+        self.fields["deletion_reason"].label = _("Reason for deletion")
 
 
 RoomFormSet = inlineformset_factory(

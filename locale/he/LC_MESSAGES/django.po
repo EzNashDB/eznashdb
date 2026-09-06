@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 13:41+0000\n"
+"POT-Creation-Date: 2026-09-06 17:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -114,8 +114,19 @@ msgstr "נא לבחור כתובת תקינה."
 msgid "At least one room is required."
 msgstr "יש להוסיף לפחות חדר אחד."
 
-msgid "Update Shul"
-msgstr "עדכון בית כנסת"
+msgid "Please explain why this shul should be deleted..."
+msgstr "נא להסביר מדוע יש למחוק את בית הכנסת הזה..."
+
+msgid ""
+"Your answer will help us monitor deletions and decide whether to restore the "
+"shul."
+msgstr "התשובה שלכם תעזור לנו לעקוב אחר מחיקות ולהחליט אם לשחזר את בית הכנסת."
+
+msgid "Reason for deletion"
+msgstr "סיבת המחיקה"
+
+msgid "Edit Shul"
+msgstr "עריכת בית כנסת"
 
 msgid "The Ezrat Nashim Database"
 msgstr "מאגר \"עזרת נשים\""
@@ -123,6 +134,9 @@ msgstr "מאגר \"עזרת נשים\""
 #, python-format
 msgid "Edit Shul: %(shul_name)s"
 msgstr "עריכת בית כנסת: %(shul_name)s"
+
+msgid "Delete"
+msgstr "מחיקה"
 
 #, python-format
 msgid "Step %(wizard_step)s of 2"
@@ -143,14 +157,35 @@ msgstr "הבא: הוספת חדרים"
 msgid "Save"
 msgstr "שמירה"
 
+msgid "Delete Shul"
+msgstr "מחיקת בית כנסת"
+
+msgid "Close"
+msgstr "סגירה"
+
+msgid ""
+"The shul will be removed from public view immediately, but may be restored "
+"after review."
+msgstr "בית הכנסת יוסר מהתצוגה הציבורית מיד, אך ייתכן שישוחזר לאחר בדיקה."
+
+msgid "Cancel"
+msgstr "ביטול"
+
 msgid "Add another room"
 msgstr "הוספת עוד חדר"
 
 msgid "Delete room"
 msgstr "מחיקת חדר"
 
-msgid "Close"
-msgstr "סגירה"
+#, python-format
+msgid "'%(shul_name)s' has been deleted."
+msgstr "'%(shul_name)s' נמחק."
+
+msgid "Was this a mistake?"
+msgstr "האם זו טעות?"
+
+msgid "Undo"
+msgstr "לשחזר"
 
 msgid "Just Saved"
 msgstr "נשמר כעת"
@@ -163,9 +198,6 @@ msgstr "מצאנו עוד בתי כנסת בקרבת מקום. לערוך אחד
 
 msgid "Edit"
 msgstr "עריכה"
-
-msgid "Cancel"
-msgstr "ביטול"
 
 msgid "Continue Anyway"
 msgstr "להמשיך בכל זאת"
@@ -266,6 +298,17 @@ msgstr "לא ניתן לשמור. יש לבדוק את שגיאות הטופס."
 
 msgid "Fix the form errors to continue."
 msgstr "יש לתקן את שגיאות הטופס כדי להמשיך."
+
+msgid "Unable to delete. Please provide a valid reason."
+msgstr "לא ניתן למחוק. יש לתת סיבה תקינה."
+
+#, python-format
+msgid "'%(name)s' is not deleted."
+msgstr "'%(name)s' אינו מחוק."
+
+#, python-format
+msgid "'%(name)s' has been restored."
+msgstr "'%(name)s' שוחזר."
 
 msgid "Details"
 msgstr "פרטים"
