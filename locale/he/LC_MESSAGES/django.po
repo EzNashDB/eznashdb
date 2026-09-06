@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 12:08+0000\n"
+"POT-Creation-Date: 2026-09-06 13:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,6 +155,21 @@ msgstr "סגירה"
 msgid "Just Saved"
 msgstr "נשמר כעת"
 
+msgid "Nearby Shuls Found"
+msgstr "נמצאו בתי כנסת בקרבת מקום"
+
+msgid "We found other nearby shuls. Do you want to edit instead?"
+msgstr "מצאנו עוד בתי כנסת בקרבת מקום. לערוך אחד מהם במקום להוסיף חדש?"
+
+msgid "Edit"
+msgstr "עריכה"
+
+msgid "Cancel"
+msgstr "ביטול"
+
+msgid "Continue Anyway"
+msgstr "להמשיך בכל זאת"
+
 msgid "Unable to load shul details."
 msgstr "לא ניתן לטעון את פרטי בית הכנסת."
 
@@ -171,9 +186,6 @@ msgstr[0] "חדר אחד"
 msgstr[1] "%(counter)s חדרים"
 msgstr[2] "%(counter)s חדרים"
 msgstr[3] "%(counter)s חדרים"
-
-msgid "Edit"
-msgstr "עריכה"
 
 msgid "Directions"
 msgstr "ניווט"
@@ -282,9 +294,6 @@ msgstr "גודל הקובץ חייב להיות עד 5MB"
 
 msgid "Send Feedback"
 msgstr "שליחת משוב"
-
-msgid "Cancel"
-msgstr "ביטול"
 
 msgid "Send"
 msgstr "שליחה"
