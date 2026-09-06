@@ -29,7 +29,12 @@ export const AddressTypeAhead = ({
   const [sessionToken, setSessionToken] = useState(() => uuidv4());
   const [googleAvailable, setGoogleAvailable] = useState(true);
   const [showLimitedResultsModal, setShowLimitedResultsModal] = useState(false);
-  const inputIsHebrew = hasHebrew(inputValue.display_name);
+  // An empty value has no characters to detect, so follow the page's own
+  // direction instead of defaulting to LTR (which left-aligned the
+  // placeholder text even when the page itself is RTL).
+  const inputIsHebrew = inputValue.display_name
+    ? hasHebrew(inputValue.display_name)
+    : document.documentElement.dir === "rtl";
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
@@ -119,23 +124,22 @@ export const AddressTypeAhead = ({
   const filterBy = () => true;
 
   const genericSearchError = (
-    <div className="alert alert-danger m-0 py-1 px-2 text-wrap" role="alert">
-      An error occurred. Please try again.
+    <div className="alert alert-danger mx-2 my-1 text-wrap" role="alert">
+      {gettext("An error occurred. Please try again.")}
     </div>
   );
 
   const noResultsMessage = (
-    <div className="alert alert-info m-0 py-1 px-2 text-wrap" role="alert">
-      No results found. <br />
-      Try searching city or street, then drag the map.
+    <div className="alert alert-info mx-2 my-1 text-wrap" role="alert">
+      {gettext("No results found.")} <br />
+      {gettext("Try searching by city or street, then drag the map.")}
     </div>
   );
 
-  const getPromptText = () => {
+  const getEmptyLabel = () => {
     if (isSearchError) return genericSearchError;
-    if (hasSearched && !isLoading && options.length === 0)
-      return noResultsMessage;
-    return "Type to search...";
+    if (hasSearched) return noResultsMessage;
+    return null;
   };
 
   return (
@@ -157,14 +161,13 @@ export const AddressTypeAhead = ({
         useCache={false}
         options={options}
         onInputChange={handleInputChange}
-        placeholder={gettext("Search name or address...")}
-        promptText={getPromptText()}
+        placeholder={gettext("Search by name or address...")}
         inputProps={{
           name: "address",
-          className: `${!isValid && "is-invalid"}`,
+          className: !isValid ? "is-invalid" : "",
           autoComplete: "one-time-code",
-          dir: `${inputIsHebrew ? "rtl" : "ltr"}`,
-          lang: `${inputIsHebrew ? "he" : "en"}`,
+          dir: inputIsHebrew ? "rtl" : "ltr",
+          lang: inputIsHebrew ? "he" : "en",
         }}
         renderInput={({ inputRef, referenceElementRef, ...inputProps }) => (
           <Hint>
@@ -189,12 +192,28 @@ export const AddressTypeAhead = ({
             renderMenuItemChildren,
             ..._menuProps
           } = menuProps;
+          if (isLoading) {
+            return (
+              <Menu {..._menuProps} className="shadow-lg">
+                <div className="dropdown-item-text text-muted">
+                  {gettext("Searching...")}
+                </div>
+              </Menu>
+            );
+          }
+          if (results.length === 0) {
+            return (
+              <Menu {..._menuProps} className="shadow-lg" emptyLabel="">
+                {getEmptyLabel()}
+              </Menu>
+            );
+          }
           return (
             <Menu {..._menuProps} className="shadow-lg">
               {!googleAvailable && results.length > 0 && (
                 <div className="px-3 pb-2 border-bottom">
                   <small className="text-muted">
-                    Some results temporarily unavailable.{" "}
+                    {gettext("Some results currently unavailable.")}{" "}
                     <a
                       href="#"
                       onClick={(e) => {
@@ -202,7 +221,7 @@ export const AddressTypeAhead = ({
                         setShowLimitedResultsModal(true);
                       }}
                     >
-                      Why?
+                      {gettext("Why?")}
                     </a>
                   </small>
                 </div>

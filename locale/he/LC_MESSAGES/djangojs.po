@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 07:39+0000\n"
+"POT-Creation-Date: 2026-09-06 10:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,8 +14,61 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
 "1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
-msgid "Search name or address..."
-msgstr "חיפוש שם או כתובת..."
+msgid "Locate Me"
+msgstr "מיקום נוכחי"
+
+msgid "Reset"
+msgstr "איפוס"
+
+msgid "Please select a valid address."
+msgstr "נא לבחור כתובת תקינה."
+
+msgid "Select Location"
+msgstr "בחירת מיקום"
+
+msgid "An error occurred. Please try again."
+msgstr "אירעה שגיאה. נסו שוב."
+
+msgid "No results found."
+msgstr "לא נמצאו תוצאות."
+
+msgid "Try searching by city or street, then drag the map."
+msgstr "נסו לחפש לפי עיר או רחוב, ואז להזיז את המפה."
+
+msgid "Search by name or address..."
+msgstr "חיפוש לפי שם או כתובת..."
+
+msgid "Searching..."
+msgstr "מחפש..."
+
+msgid "Some results currently unavailable."
+msgstr "חלק מהתוצאות אינן זמינות כעת."
+
+msgid "Why?"
+msgstr "למה?"
+
+msgid "Why are some results unavailable?"
+msgstr "למה חלק מהתוצאות לא זמינות?"
+
+msgid ""
+"We usually show address search results from Google Maps and OpenStreetMap, "
+"but to keep costs low, we limit how many searches use Google each day."
+msgstr ""
+"בדרך כלל אנחנו מציגים תוצאות חיפוש כתובות מגוגל מפות ומ-OpenStreetMap, אבל "
+"כדי לשמור על עלויות נמוכות יש הגבלה על מספר החיפושים היומי מול גוגל."
+
+msgid "Right now, you're only seeing results from OpenStreetMap."
+msgstr "כרגע אתם רואים תוצאות מ-OpenStreetMap בלבד."
+
+msgid ""
+"If your shul doesn't appear in the results, try searching for the city or "
+"street, then drag the map to the right location."
+msgstr ""
+"אם בית הכנסת שלכם לא מופיע בתוצאות, נסו לחפש את העיר או הרחוב, ואז להזיז את "
+"המפה למיקום הנכון."
+
+msgid "Got it"
+msgstr "הבנתי"
 
 #, javascript-format
 msgid "%s option selected"

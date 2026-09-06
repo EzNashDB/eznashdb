@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
@@ -226,9 +227,9 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
         # Different messages based on context
         wizard_step = self.request.POST.get("wizard_step", "1")
         if self.is_update or wizard_step == "2":
-            messages.error(self.request, "Unable to save. Check the form for errors.")
+            messages.error(self.request, _("Unable to save. Check the form for errors."))
         else:
-            messages.error(self.request, "Fix the form errors to continue.")
+            messages.error(self.request, _("Fix the form errors to continue."))
         return self.reload_shul_form(form)
 
     def post(self, request, *args, **kwargs):
@@ -280,7 +281,7 @@ class CreateUpdateShulView(AbusePreventionMixin, LoginRequiredMixin, UpdateView)
         """Validate rooms, check nearby shuls, and save atomically"""
         room_fs = self.get_room_fs()
         if not room_fs.is_valid():
-            messages.error(self.request, "Unable to save. Check the form for errors.")
+            messages.error(self.request, _("Unable to save. Check the form for errors."))
             return self.reload_shul_form(form, wizard_step=wizard_step)
 
         nearby_response = self.check_and_show_nearby_shuls(form, wizard_step=wizard_step)

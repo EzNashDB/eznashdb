@@ -272,6 +272,23 @@ td.td-shrink {
   margin-inline-end: .5rem;
 }
 
+/*
+  react-bootstrap-typeahead's vendored CSS hardcodes its loading-spinner/clear-button
+  container (.rbt-aux) to the physical right edge, with no RTL variant. Our own search
+  icon already moves to the right edge in RTL via Bootstrap's own RTL-aware input-group
+  CSS, so .rbt-aux's unconditional right:0 collides with it instead of sitting at the
+  opposite (left) edge.
+*/
+[dir="rtl"] .rbt-aux {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .has-aux .form-control {
+  padding-right: .75rem;
+  padding-left: 2rem;
+}
+
 /* Enable clear button when focused or hovered (with items selected) */
 .ts-wrapper.plugin-clear_button.focus.has-items .clear-button,
 .ts-wrapper.plugin-clear_button:not(.disabled):hover.has-items .clear-button {
