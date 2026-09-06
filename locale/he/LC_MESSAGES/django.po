@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 10:12+0000\n"
+"POT-Creation-Date: 2026-09-06 11:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,14 +57,29 @@ msgstr "שם בית הכנסת"
 msgid "Address"
 msgstr "כתובת"
 
+msgid "Room Name"
+msgstr "שם החדר"
+
+msgid "E.g. Main Sanctuary, Beit Midrash"
+msgstr "לדוגמה: אולם תפילה, בית מדרש"
+
 msgid "Size of Women's Section"
 msgstr "גודל עזרת הנשים"
+
+msgid "How large is the women's section?"
+msgstr "כמה גדולה עזרת הנשים?"
 
 msgid "Visibility & Audibility"
 msgstr "ראייה ושמיעה"
 
+msgid "Compared to men, how well can women see and hear?"
+msgstr "בהשוואה לגברים, עד כמה אפשר לנשים לראות ולשמוע?"
+
 msgid "Kaddish"
 msgstr "קדיש"
+
+msgid "Can women say kaddish?"
+msgstr "האם אפשר לנשים לומר קדיש?"
 
 msgid "Equal or larger than men's"
 msgstr "שווה לעזרת הגברים או גדולה יותר"
@@ -88,13 +103,16 @@ msgid "Can say, a man will always join"
 msgstr "אפשר לומר, גבר תמיד יצטרף"
 
 msgid "Only with men (ask or plan ahead)"
-msgstr "רק אם גבר מצטרף (לשאול או לתאם מראש)"
+msgstr "רק אם גבר מצטרף (יש לשאול או לתאם מראש)"
 
 msgid "Not allowed"
 msgstr "לא מאפשרים"
 
 msgid "Please select a valid address."
 msgstr "נא לבחור כתובת תקינה."
+
+msgid "At least one room is required."
+msgstr "יש להוסיף לפחות חדר אחד."
 
 msgid "Update Shul"
 msgstr "עדכון בית כנסת"
@@ -106,11 +124,26 @@ msgstr "מאגר \"עזרת נשים\""
 msgid "Step %(wizard_step)s of 2"
 msgstr "שלב %(wizard_step)s מתוך 2"
 
+msgid "(optional)"
+msgstr "(לא חובה)"
+
+msgid "Rooms"
+msgstr "חדרים"
+
 msgid "Back to Home"
 msgstr "חזרה לדף הבית"
 
 msgid "Next: Add Rooms"
 msgstr "הבא: הוספת חדרים"
+
+msgid "Save"
+msgstr "שמירה"
+
+msgid "Add another room"
+msgstr "הוספת עוד חדר"
+
+msgid "Delete room"
+msgstr "מחיקת חדר"
 
 msgid "Close"
 msgstr "סגירה"
@@ -190,6 +223,12 @@ msgstr[0] "בית כנסת אחד נמצא"
 msgstr[1] "%(counter)s בתי כנסת נמצאו"
 msgstr[2] "%(counter)s בתי כנסת נמצאו"
 msgstr[3] "%(counter)s בתי כנסת נמצאו"
+
+msgid "Unnamed room"
+msgstr "חדר ללא שם"
+
+msgid "This room has errors. Click to review and fix."
+msgstr "יש שגיאות בחדר הזה. לחצו כדי לבדוק ולתקן."
 
 msgid "Filters"
 msgstr "סינון"

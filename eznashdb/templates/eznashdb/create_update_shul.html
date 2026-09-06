@@ -83,15 +83,15 @@
                                                 <div id="step2-scroll-anchor"></div>
                                                 <div class="row">
                                                     <h5 class="col-12 pt-3 mb-2" id="kaddish-form-header">
-                                                        Kaddish
-                                                        <span class="text-muted">(optional)</span>
+                                                        {% trans "Kaddish" %}
+                                                        <span class="text-muted">{% trans "(optional)" %}</span>
                                                     </h5>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-12">{{ form.kaddish_policy|as_crispy_field }}</div>
                                                 </div>
                                                 <div class="row">
-                                                    <h5 class="col-12 mb-2" id="rooms-form-header">Rooms</h5>
+                                                    <h5 class="col-12 mb-2" id="rooms-form-header">{% trans "Rooms" %}</h5>
                                                 </div>
                                                 <div class="row mb-3">
                                                     {{ room_fs.management_form }}
@@ -147,7 +147,7 @@
                                     {% trans "Next: Add Rooms" %}
                                     <i class="ms-2 fa-solid fa-arrow-right"></i>
                                 {% else %}
-                                    Save
+                                    {% trans "Save" %}
                                 {% endif %}
                             </button>
                         </div>
@@ -202,6 +202,8 @@
 
 {% block extra_media_bottom %}
     {{ block.super }}
+    {% trans "Add another room" as add_room_text %}
+    {% trans "Delete room" as delete_room_text %}
     <script type="text/javascript">
     window.htmxSubmitting = false;
     document.body.addEventListener("htmx:beforeRequest", (e) => {
@@ -235,10 +237,10 @@
             formsParentCssClass: 'room-formset',
             prefix: '{{ room_fs.prefix }}',
             addCssClass:'btn btn-secondary form-text mt-2',
-            addText: '<i class="fa fa-plus"></i> Add another room',
+            addText: '<i class="fa fa-plus"></i> {{ add_room_text|escapejs }}',
             addContainerClass: 'add-room-container',
             deleteCssClass:'delete-room btn btn-sm btn-outline-danger mt-3',
-            deleteText: '<i class="fa fa-trash"></i> Delete room',
+            deleteText: '<i class="fa fa-trash"></i> {{ delete_room_text|escapejs }}',
             deleteContainerClass: 'delete-room-container',
             hideLastAddForm: {% if room_fs.1 %} true {% else %} false {% endif %},
             prepareTemplate: (template) => {
