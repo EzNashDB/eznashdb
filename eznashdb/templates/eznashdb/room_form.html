@@ -1,4 +1,6 @@
 {% load crispy_forms_tags %}
+{% load i18n %}
+{% trans "Unnamed room" as unnamed_room_text %}
 <div class="accordion-item room-form" id="{{ room_fs.prefix }}-{{ forloop.counter0 }}-form"
     {# djlint:off #}
         x-data='{
@@ -53,22 +55,24 @@
                  x-cloak>
                 <div class="d-flex flex-column w-100">
                     {% if form.errors %}
-                        <div class="fw-bold text-danger mb-3">This room has errors. Click to review and fix.</div>
+                        <div class="fw-bold text-danger mb-3">{% trans "This room has errors. Click to review and fix." %}</div>
                     {% endif %}
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="h6 inline-block fw-bold" x-html='roomName || "Unnamed room"'></div>
-                        <span class="pe-3 text-primary text-nowrap">Edit</span>
+                        <div class="h6 inline-block fw-bold"
+                             x-html='roomName || "{{ unnamed_room_text|escapejs }}"'></div>
+                        <span class="pe-3 text-primary text-nowrap">{% trans "Edit" %}</span>
                     </div>
                     <div class="row g-3">
                         <div class="col-7">
                             <div class="small text-muted mb-1 text-nowrap">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i> Size
+                                <i class="fa-solid fa-up-right-and-down-left-from-center me-1"></i>
+                                {% trans "Size" %}
                             </div>
                             <div x-html="sizeBanner"></div>
                         </div>
                         <div class="col-5">
                             <div class="small text-muted mb-1 text-nowrap">
-                                <i class="fa-solid fa-eye me-1"></i> Vis. & Aud.
+                                <i class="fa-solid fa-eye me-1"></i> {% trans "Vis. & Aud." %}
                             </div>
                             <div x-html="seeHearBanner"></div>
                         </div>

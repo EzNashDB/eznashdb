@@ -102,7 +102,7 @@ class BaseRoomFormSet(BaseInlineFormSet):
                 for form in self.forms
             )
             if not has_room:
-                raise ValidationError("At least one room is required.")
+                raise ValidationError(_("At least one room is required."))
 
 
 class ShulDeleteForm(forms.Form):

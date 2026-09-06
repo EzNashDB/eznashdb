@@ -49,26 +49,24 @@ class FieldsOptions:
     SHUL_NAME = FieldOptions(_("Shul Name"), "fa-solid fa-synagogue")
     ADDRESS = FieldOptions(_("Address"), "fa-solid fa-location-dot")
     ROOM_NAME = FieldOptions(
-        "Room Name",
+        _("Room Name"),
         "fa-solid fa-tag",
-        help_text="Main Sanctuary, Beit Midrash, etc.",
+        help_text=_("E.g. Main Sanctuary, Beit Midrash"),
     )
     RELATIVE_SIZE = FieldOptions(
         _("Size of Women's Section"),
         "fa-solid fa-up-right-and-down-left-from-center",
-        verbose_label_text="How large is the women's section?",
+        verbose_label_text=_("How large is the women's section?"),
     )
     SEE_HEAR = FieldOptions(
         _("Visibility & Audibility"),
         "fa-solid fa-eye",
-        verbose_label_text="""
-            Compared to men, how well can women see and hear?
-        """,
+        verbose_label_text=_("Compared to men, how well can women see and hear?"),
     )
     KADDISH_POLICY = FieldOptions(
         _("Kaddish"),
         "fa-solid fa-comment",
-        verbose_label_text="Can women say kaddish?",
+        verbose_label_text=_("Can women say kaddish?"),
     )
 
 
