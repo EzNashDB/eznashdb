@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 11:17+0000\n"
+"POT-Creation-Date: 2026-09-06 12:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -119,6 +119,10 @@ msgstr "עדכון בית כנסת"
 
 msgid "The Ezrat Nashim Database"
 msgstr "מאגר \"עזרת נשים\""
+
+#, python-format
+msgid "Edit Shul: %(shul_name)s"
+msgstr "עריכת בית כנסת: %(shul_name)s"
 
 #, python-format
 msgid "Step %(wizard_step)s of 2"

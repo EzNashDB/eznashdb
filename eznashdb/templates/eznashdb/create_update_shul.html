@@ -47,7 +47,9 @@
                         <div class="col-12">
                             <h3 class="d-flex gap-3 justify-content-between align-items-center mb-0">
                                 {% if object %}
-                                    <span class="text-truncate">Edit Shul: {{ object.name }}</span>
+                                    <span class="text-truncate">
+                                        {% blocktrans with shul_name=object.name %}Edit Shul: {{ shul_name }}{% endblocktrans %}
+                                    </span>
                                     <button type="button"
                                             class="btn btn-sm btn-outline-danger text-nowrap"
                                             data-bs-toggle="modal"
