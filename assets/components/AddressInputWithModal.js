@@ -61,7 +61,7 @@ export const AddressInputWithModal = ({
         fullscreen="md-down"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Select Location</Modal.Title>
+          <Modal.Title>{gettext("Select Location")}</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ height: "70vh", maxHeight: "800px" }}>
           {isExpanded && (

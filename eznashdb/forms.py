@@ -3,6 +3,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import HiddenInput, ModelForm, TextInput, inlineformset_factory
 from django.forms.models import BaseInlineFormSet
+from django.utils.translation import gettext_lazy as _
 
 from eznashdb.constants import FieldsOptions
 from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
@@ -47,7 +48,7 @@ class ShulForm(ModelForm):
         cleaned_data = super().clean()
         empty_values = [None, ""]
         if any(cleaned_data.get(field_name) in empty_values for field_name in ["latitude", "longitude"]):
-            self.add_error("address", "Please select a valid address.")
+            self.add_error("address", _("Please select a valid address."))
         return cleaned_data
 
 

@@ -77,4 +77,4 @@ def describe_javascript_catalog():
         response = client.get("/jsi18n/")
 
         assert response.status_code == 200
-        assert "Search name or address..." in response.content.decode()
+        assert "Search by name or address..." in response.content.decode()

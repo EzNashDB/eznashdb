@@ -5,25 +5,28 @@ export const LimitedResultsModal = ({ show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Why are some results unavailable?</Modal.Title>
+        <Modal.Title>
+          {gettext("Why are some results unavailable?")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>
-          We use Google Maps to help find addresses, but to keep our costs low,
-          we limit how many searches use Google each day.
+          {gettext(
+            "We usually show address search results from Google Maps and OpenStreetMap, but to keep costs low, we limit how many searches use Google each day."
+          )}
         </p>
         <p>
-          Right now, you're seeing results from OpenStreetMap, a
-          community-maintained map.
+          {gettext("Right now, you're only seeing results from OpenStreetMap.")}
         </p>
         <p className="mb-0">
-          If your shul doesn't appear in the results, try searching for the city
-          or street, then drag the map to the right location.
+          {gettext(
+            "If your shul doesn't appear in the results, try searching for the city or street, then drag the map to the right location."
+          )}
         </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>
-          Got it
+          {gettext("Got it")}
         </Button>
       </Modal.Footer>
     </Modal>

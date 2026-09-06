@@ -106,9 +106,13 @@ export const AddressInput = ({
   return (
     <div className={isModal ? "d-flex flex-column h-100" : ""}>
       <div
-        className={`w-100 position-relative ${!isValid && "is-invalid"} ${
-          isModal ? "flex-grow-1" : "d-inline-block"
-        }`}
+        className={[
+          "w-100 position-relative",
+          !isValid && "is-invalid",
+          isModal ? "flex-grow-1" : "d-inline-block",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         style={{ minHeight: isModal ? "0" : "250px" }}
       >
         <AddressMap
@@ -157,7 +161,7 @@ export const AddressInput = ({
                 style={{ pointerEvents: "auto" }}
               >
                 <i className="fa-solid fa-location-crosshairs me-1"></i>
-                Locate Me
+                {gettext("Locate Me")}
               </Button>
             </div>
             <div className="w-fit-content" style={{ pointerEvents: "auto" }}>
@@ -169,7 +173,7 @@ export const AddressInput = ({
                 disabled={currLocation == initialLocation}
               >
                 <i className="fa-solid fa-rotate-left me-1"></i>
-                Reset
+                {gettext("Reset")}
               </Button>
             </div>
           </div>
@@ -178,30 +182,30 @@ export const AddressInput = ({
           type="hidden"
           name="latitude"
           id="id_latitude"
-          value={`${currLocation?.lat || ""}`}
+          value={currLocation?.lat || ""}
         ></input>
         <input
           type="hidden"
           name="longitude"
           id="id_longitude"
-          value={`${currLocation?.lon || ""}`}
+          value={currLocation?.lon || ""}
         ></input>
         <input
           type="hidden"
           name="place_id"
           id="id_place_id"
-          value={`${currLocation?.place_id || ""}`}
+          value={currLocation?.place_id || ""}
         ></input>
         <input
           type="hidden"
           name="zoom"
           id="id_zoom"
-          value={`${currLocation?.zoom || ""}`}
+          value={currLocation?.zoom || ""}
         ></input>
       </div>
       {!isModal && (
         <span className="invalid-feedback">
-          <strong>Please select a valid address.</strong>
+          <strong>{gettext("Please select a valid address.")}</strong>
         </span>
       )}
     </div>

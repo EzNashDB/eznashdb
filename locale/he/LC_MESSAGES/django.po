@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 18:27+0000\n"
+"POT-Creation-Date: 2026-09-06 10:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,6 +51,12 @@ msgstr "ניהול"
 msgid "Form submission failed."
 msgstr "שליחת הטופס נכשלה."
 
+msgid "Shul Name"
+msgstr "שם בית הכנסת"
+
+msgid "Address"
+msgstr "כתובת"
+
 msgid "Size of Women's Section"
 msgstr "גודל עזרת הנשים"
 
@@ -87,6 +93,25 @@ msgstr "רק אם גבר מצטרף (לשאול או לתאם מראש)"
 msgid "Not allowed"
 msgstr "לא מאפשרים"
 
+msgid "Please select a valid address."
+msgstr "נא לבחור כתובת תקינה."
+
+msgid "Update Shul"
+msgstr "עדכון בית כנסת"
+
+msgid "The Ezrat Nashim Database"
+msgstr "מאגר \"עזרת נשים\""
+
+#, python-format
+msgid "Step %(wizard_step)s of 2"
+msgstr "שלב %(wizard_step)s מתוך 2"
+
+msgid "Back to Home"
+msgstr "חזרה לדף הבית"
+
+msgid "Next: Add Rooms"
+msgstr "הבא: הוספת חדרים"
+
 msgid "Close"
 msgstr "סגירה"
 
@@ -101,9 +126,6 @@ msgstr "טוען..."
 
 msgid "Shul name hidden"
 msgstr "שם בית הכנסת מוסתר"
-
-msgid "Shul Name"
-msgstr "שם בית הכנסת"
 
 #, python-format
 msgid "%(counter)s Room"
@@ -184,6 +206,12 @@ msgstr "מיקומים מדויקים לא מוצגים מטעמי אבטחה"
 msgid "Your Location"
 msgstr "המיקום שלך"
 
+msgid "Unable to save. Check the form for errors."
+msgstr "לא ניתן לשמור. יש לבדוק את שגיאות הטופס."
+
+msgid "Fix the form errors to continue."
+msgstr "יש לתקן את שגיאות הטופס כדי להמשיך."
+
 msgid "Details"
 msgstr "פרטים"
 
@@ -232,9 +260,6 @@ msgstr "לא הצלחנו לשלוח את המשוב. נסו שוב."
 
 msgid "Thanks! We received your feedback and will review it soon."
 msgstr "תודה! קיבלנו את המשוב שלכם ונבדוק אותו בקרוב."
-
-msgid "The Ezrat Nashim Database"
-msgstr "מאגר \"עזרת נשים\""
 
 msgid "Mapping women's spaces in synagogues around the world"
 msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
