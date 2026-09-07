@@ -1,5 +1,6 @@
+{% load i18n %}
 {% if message %}<div class="alert alert-danger">{{ message }}</div>{% endif %}
 <p>
-    We've detected a high number of requests from your account. To continue, please verify you're human.
+    {% trans "We've detected a high number of requests from your account. Verification is required to continue." %}
 </p>
 {{ form.captcha }}

@@ -1,11 +1,13 @@
 {% extends "centered_card_base.html" %}
 
+{% load i18n %}
+
 {% block card_header %}
     <h4>
         {% if abuse_state.is_permanently_banned %}
-            Access Restricted
+            {% trans "Access Restricted" %}
         {% else %}
-            Temporarily Blocked
+            {% trans "Temporarily Blocked" %}
         {% endif %}
     </h4>
 {% endblock %}

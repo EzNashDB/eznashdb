@@ -1,5 +1,6 @@
 from crispy_forms.helper import FormHelper
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
@@ -24,11 +25,11 @@ class AbuseAppealForm(forms.ModelForm):
             "explanation": forms.Textarea(
                 attrs={
                     "rows": 5,
-                    "placeholder": "Please describe what you were doing when you got blocked...",
+                    "placeholder": _("Please describe what happened before you were blocked..."),
                 }
             )
         }
-        labels = {"explanation": "Why do you think this is a mistake?"}
+        labels = {"explanation": _("Why do you think this is a mistake?")}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
