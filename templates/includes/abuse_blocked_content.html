@@ -1,4 +1,5 @@
 {% load crispy_forms_tags %}
+{% load i18n %}
 <div class="alert
             {% if abuse_state.is_permanently_banned %}
                 alert-danger
@@ -7,30 +8,30 @@
             {% endif %}
             mb-0">
     {% if abuse_state.is_permanently_banned %}
-        <p>We've detected unusual activity from your account and have restricted access.</p>
+        <p>{% trans "We've detected unusual activity from your account and have restricted access." %}</p>
         {% if appeal_form %}
-            <p class="mb-0">If you believe this is a mistake, please submit an appeal below.</p>
+            <p class="mb-0">{% trans "If you believe this block is a mistake, please submit an appeal below." %}</p>
         {% else %}
+            {% url 'eznashdb:contact_us' as contact_url %}
             <p class="mb-0">
-                If you believe this is a mistake, please
-                <a href="{% url 'eznashdb:contact_us' %}">contact us</a>.
+                {% blocktrans %}If you believe this block is a mistake, please <a href="{{ contact_url }}">contact us</a>.{% endblocktrans %}
             </p>
         {% endif %}
     {% else %}
         <p class="mb-0">
-            We've detected too many requests from your account. Please wait <strong>{{ retry_after }}</strong> before trying again.
+            {% blocktrans %}We've detected too many requests from your account. Please wait <strong>{{ retry_after }}</strong> before trying again.{% endblocktrans %}
         </p>
     {% endif %}
 </div>
 {% if abuse_state.is_permanently_banned and appeal_form %}
     <div class="mt-4">
-        <h5>Submit an Appeal</h5>
+        <h5>{% trans "Submit an Appeal" %}</h5>
         <form method="post"
               action="{% url 'appeal_ban' %}"
               onsubmit="window.onbeforeunload = null">
             {% csrf_token %}
             {% crispy appeal_form %}
-            <button type="submit" class="btn btn-primary mt-3">Submit Appeal</button>
+            <button type="submit" class="btn btn-primary mt-3">{% trans "Submit Appeal" %}</button>
         </form>
     </div>
 {% endif %}

@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 from django.views.i18n import set_language as django_set_language
@@ -192,7 +193,7 @@ class CaptchaVerifyView(HtmxRequestMixin, View):
         return HttpResponseRedirect(self.get_next_url())
 
     def handle_failure(self, request, form):
-        message = "CAPTCHA verification failed. Please try again."
+        message = _("CAPTCHA verification failed. Please try again.")
         next_url = self.get_next_url()
         if self.is_htmx:
             response = render(
@@ -222,7 +223,7 @@ class AppealBanView(View):
             send_appeal_notification(appeal)
 
             messages.success(
-                request, "Your appeal has been submitted. We'll review it and get back to you."
+                request, _("Your appeal has been submitted. We'll review it and get back to you.")
             )
             return HttpResponseRedirect("/")
 

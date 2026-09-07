@@ -1,12 +1,16 @@
 {% extends "centered_card_base.html" %}
 
-{% block card_header %}<h4>Verification Required</h4>{% endblock %}
+{% load i18n %}
+
+{% block card_header %}
+    <h4>{% trans "Verification Required" %}</h4>
+{% endblock %}
 
 {% block card_body %}
     <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next_url }}">
         {% include "includes/captcha_content.html" %}
-        <button type="submit" class="btn btn-primary mt-3">Verify and Continue</button>
+        <button type="submit" class="btn btn-primary mt-3">{% trans "Continue" %}</button>
     </form>
 {% endblock %}

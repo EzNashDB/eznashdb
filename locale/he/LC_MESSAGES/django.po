@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 19:43+0000\n"
+"POT-Creation-Date: 2026-09-07 08:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,6 +50,18 @@ msgstr "ניהול"
 
 msgid "Form submission failed."
 msgstr "שליחת הטופס נכשלה."
+
+msgid "Please describe what happened before you were blocked..."
+msgstr "נא לתאר מה קרה לפני החסימה..."
+
+msgid "Why do you think this is a mistake?"
+msgstr "למה לדעתך זו טעות?"
+
+msgid "CAPTCHA verification failed. Please try again."
+msgstr "אימות ה-CAPTCHA נכשל. נסו שוב."
+
+msgid "Your appeal has been submitted. We'll review it and get back to you."
+msgstr "הערעור נשלח. נבדוק אותו ונחזור בהקדם."
 
 msgid "Shul Name"
 msgstr "שם בית הכנסת"
@@ -124,6 +136,12 @@ msgstr "התשובה שלכם תעזור לנו לעקוב אחר מחיקות �
 
 msgid "Reason for deletion"
 msgstr "סיבת המחיקה"
+
+msgid "Verification Required"
+msgstr "נדרש אימות"
+
+msgid "Continue"
+msgstr "להמשיך"
 
 msgid "Edit Shul"
 msgstr "עריכת בית כנסת"
@@ -203,7 +221,7 @@ msgid "Continue Anyway"
 msgstr "להמשיך בכל זאת"
 
 msgid "Unable to load shul details."
-msgstr "לא ניתן לטעון את פרטי בית הכנסת."
+msgstr "לא הצלחנו לטעון את פרטי בית הכנסת."
 
 msgid "Loading..."
 msgstr "טוען..."
@@ -359,8 +377,47 @@ msgstr "לא הצלחנו לשלוח את המשוב. נסו שוב."
 msgid "Thanks! We received your feedback and will review it soon."
 msgstr "תודה! קיבלנו את המשוב שלכם ונבדוק אותו בקרוב."
 
+msgid "Access Restricted"
+msgstr "הגישה מוגבלת"
+
+msgid "Temporarily Blocked"
+msgstr "חסימה זמנית"
+
 msgid "Mapping women's spaces in synagogues around the world"
 msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
+
+msgid ""
+"We've detected unusual activity from your account and have restricted access."
+msgstr "זיהינו פעילות חריגה בחשבון שלך והגישה הוגבלה."
+
+msgid "If you believe this block is a mistake, please submit an appeal below."
+msgstr "אם החסימה הזו היא טעות, אפשר להגיש ערעור למטה."
+
+#, python-format
+msgid ""
+"If you believe this block is a mistake, please <a href=\"%(contact_url)s"
+"\">contact us</a>."
+msgstr ""
+"אם החסימה הזו היא טעות, אפשר <a href=\"%(contact_url)s\">ליצור איתנו קשר</a>."
+
+#, python-format
+msgid ""
+"We've detected too many requests from your account. Please wait <strong>"
+"%(retry_after)s</strong> before trying again."
+msgstr ""
+"זיהינו יותר מדי בקשות מהחשבון הזה. יש להמתין <strong>%(retry_after)s</"
+"strong> ולנסות שוב."
+
+msgid "Submit an Appeal"
+msgstr "הגשת ערעור"
+
+msgid "Submit Appeal"
+msgstr "שליחת ערעור"
+
+msgid ""
+"We've detected a high number of requests from your account. Verification is "
+"required to continue."
+msgstr "זיהינו כמות גדולה של בקשות מהחשבון הזה. נדרש אימות כדי להמשיך."
 
 msgid "Built by"
 msgstr "נבנה על ידי"
