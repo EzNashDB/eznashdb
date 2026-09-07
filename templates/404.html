@@ -12,5 +12,5 @@
 
 {% block card_body %}
     <p class="mb-3">{% trans "The page you're looking for doesn't exist or may have been moved." %}</p>
-    <a href="/" class="btn btn-primary">{% trans "Back to Map" %}</a>
+    <a href="{% url 'eznashdb:shuls' %}" class="btn btn-primary">{% trans "Back to Map" %}</a>
 {% endblock %}

@@ -6,6 +6,7 @@ from constance import config
 from django.contrib.auth.models import AnonymousUser
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.urls import reverse
 from django.utils import timezone
 
 from app.models import AbuseState
@@ -356,7 +357,7 @@ def describe_rate_limited_users():
         modal = BeautifulSoup(response.content.decode(), features="html.parser").find(
             id="abuse-captcha-modal"
         )
-        assert modal["data-next"] == f"/?selectedShul={test_shul.pk}"
+        assert modal["data-next"] == f"{reverse('eznashdb:shuls')}?selectedShul={test_shul.pk}"
 
     def test_rate_limited_request_does_not_consume_budget(popup_GET, test_shul, test_user):
         """

@@ -1,4 +1,5 @@
 from django.contrib import messages as django_messages
+from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils import translation
 from waffle import flag_is_active
@@ -50,14 +51,22 @@ class HebrewTranslationGateMiddleware:
     and set_language's flag check only guards the cookie path. This is the single place
     that enforces the flag regardless of how a language got activated, so a new
     negotiation source added later can't silently reopen the gate.
+
+    A request to a "/he/..." URL (from i18n_patterns) is a stronger signal than a
+    negotiated language: the URL itself claims Hebrew. Downgrading it to English content
+    at a "/he/" address would be a confusing half-broken state, so those 404 outright
+    instead - "unreachable" per the flag, not "silently shown in the wrong language".
     """
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if translation.get_language() != "en" and not flag_is_active(request, "hebrew_translation"):
-            translation.activate("en")
-            request.LANGUAGE_CODE = "en"
+        if not flag_is_active(request, "hebrew_translation"):
+            if request.path_info.startswith("/he/"):
+                raise Http404
+            if translation.get_language() != "en":
+                translation.activate("en")
+                request.LANGUAGE_CODE = "en"
 
         return self.get_response(request)

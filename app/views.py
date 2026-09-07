@@ -9,6 +9,7 @@ from django.contrib.flatpages.views import flatpage
 from django.core.management import call_command
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import get_language
@@ -33,7 +34,7 @@ def _validated_next(request, raw_next):
         require_https=request.is_secure(),
     ):
         return raw_next
-    return "/"
+    return reverse("eznashdb:shuls")
 
 
 @method_decorator(staff_member_required, name="dispatch")
@@ -227,7 +228,7 @@ class AppealBanView(View):
             messages.success(
                 request, _("Your appeal has been submitted. We'll review it and get back to you.")
             )
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(reverse("eznashdb:shuls"))
 
         abuse_state = AbuseState.get_or_create(request.user)
         return render(request, "429.html", {"appeal_form": form, "abuse_state": abuse_state})

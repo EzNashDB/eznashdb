@@ -271,7 +271,7 @@ def describe_captcha_verify_view():
         response = client.post(reverse("captcha_verify"), data={"next": "https://evil.example/"})
 
         assert response.status_code == 302
-        assert response.url == "/"
+        assert response.url == reverse("eznashdb:shuls")
 
     def sanitizes_offsite_next_in_rendered_form(client, test_user):
         client.force_login(test_user)
@@ -281,4 +281,4 @@ def describe_captcha_verify_view():
         soup = BeautifulSoup(response.content, features="html.parser")
 
         assert response.status_code == 200
-        assert soup.find("input", {"name": "next"})["value"] == "/"
+        assert soup.find("input", {"name": "next"})["value"] == reverse("eznashdb:shuls")

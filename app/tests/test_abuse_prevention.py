@@ -600,7 +600,7 @@ def describe_appeal_ban_view():
         )
 
         assert response.status_code == 302
-        assert response.url == "/"
+        assert response.url == reverse("eznashdb:shuls")
 
         # Check appeal was created
         appeal = AbuseAppeal.objects.get(abuse_state=state)
