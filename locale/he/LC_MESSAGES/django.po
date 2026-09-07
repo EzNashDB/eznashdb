@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 18:26+0000\n"
+"POT-Creation-Date: 2026-09-07 18:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgid "CAPTCHA verification failed. Please try again."
 msgstr "אימות ה-CAPTCHA נכשל. נסו שוב."
 
 msgid "Your appeal has been submitted. We'll review it and get back to you."
-msgstr "הערעור נשלח. נבדוק אותו ונחזור בהקדם."
+msgstr "הערעור נשלח. נבדוק אותו ונחזור אליך בהקדם."
 
 msgid "Shul Name"
 msgstr "שם בית הכנסת"
@@ -79,7 +79,7 @@ msgid "Size of Women's Section"
 msgstr "גודל עזרת הנשים"
 
 msgid "How large is the women's section?"
-msgstr "כמה גדולה עזרת הנשים?"
+msgstr "מה גודל עזרת הנשים?"
 
 msgid "Visibility & Audibility"
 msgstr "ראייה ושמיעה"
@@ -97,10 +97,10 @@ msgid "Equal or larger than men's"
 msgstr "שווה לעזרת הגברים או גדולה יותר"
 
 msgid "At least half men's size"
-msgstr "לפחות חצי גודל עזרת הגברים"
+msgstr "לפחות חצי מגודל עזרת הגברים"
 
 msgid "Less than half men's size"
-msgstr "פחות מחצי גודל עזרת הגברים"
+msgstr "פחות מחצי מגודל עזרת הגברים"
 
 msgid "No women's section"
 msgstr "אין עזרת נשים"
@@ -112,7 +112,7 @@ msgid "Can say alone"
 msgstr "אפשר לומר לבד"
 
 msgid "Can say, a man will always join"
-msgstr "אפשר לומר, גבר תמיד יצטרף"
+msgstr "אפשר לומר, גבר תמיד מצטרף"
 
 msgid "Only with men (ask or plan ahead)"
 msgstr "רק אם גבר מצטרף (יש לשאול או לתאם מראש)"
@@ -153,7 +153,7 @@ msgid "Email:"
 msgstr "דוא\"ל:"
 
 msgid "Follow:"
-msgstr "עקבו:"
+msgstr "עקבו אחרינו:"
 
 msgid "Contact Form"
 msgstr "טופס יצירת קשר"
@@ -202,7 +202,7 @@ msgid "Cancel"
 msgstr "ביטול"
 
 msgid "Add another room"
-msgstr "הוספת עוד חדר"
+msgstr "עוד חדר"
 
 msgid "Delete room"
 msgstr "מחיקת חדר"
@@ -212,7 +212,7 @@ msgid "'%(shul_name)s' has been deleted."
 msgstr "'%(shul_name)s' נמחק."
 
 msgid "Was this a mistake?"
-msgstr "האם זו טעות?"
+msgstr "נמחק בטעות?"
 
 msgid "Undo"
 msgstr "לשחזר"
@@ -272,18 +272,14 @@ msgstr[1] "%(counter)s בתי כנסת באזור זה"
 msgstr[2] "%(counter)s בתי כנסת באזור זה"
 msgstr[3] "%(counter)s בתי כנסת באזור זה"
 
-msgid "Restricted."
-msgstr "הגישה מוגבלת."
-
-msgid "Contact us"
-msgstr "ליצור קשר"
-
-msgid "if this is a mistake"
-msgstr "אם זו טעות"
+#, python-format
+msgid ""
+"Restricted. <a href=\"%(contact_url)s\">Contact us</a> if this is a mistake."
+msgstr "הגישה מוגבלת. אם זו טעות, <a href=\"%(contact_url)s\">צרו איתנו קשר</a>."
 
 #, python-format
 msgid "Too many requests. Try again in %(retry_after)s."
-msgstr "יותר מדי בקשות. לנסות שוב בעוד %(retry_after)s."
+msgstr "יותר מדי בקשות. נסו שוב בעוד %(retry_after)s."
 
 msgid "Sign in to see more"
 msgstr "התחברו לצפייה בפרטים נוספים"
@@ -297,10 +293,10 @@ msgstr "בית הכנסת הזה כבר לא זמין."
 #, python-format
 msgid "%(counter)s shul found"
 msgid_plural "%(counter)s shuls found"
-msgstr[0] "בית כנסת אחד נמצא"
-msgstr[1] "%(counter)s בתי כנסת נמצאו"
-msgstr[2] "%(counter)s בתי כנסת נמצאו"
-msgstr[3] "%(counter)s בתי כנסת נמצאו"
+msgstr[0] "נמצא בית כנסת אחד"
+msgstr[1] "נמצאו %(counter)s בתי כנסת"
+msgstr[2] "נמצאו %(counter)s בתי כנסת"
+msgstr[3] "נמצאו %(counter)s בתי כנסת"
 
 msgid "Unnamed room"
 msgstr "חדר ללא שם"
@@ -318,7 +314,7 @@ msgid "Add Shul"
 msgstr "הוספת בי\"כ"
 
 msgid "Exact locations not displayed for security reasons"
-msgstr "מיקומים מדויקים לא מוצגים מטעמי אבטחה"
+msgstr "מטעמי ביטחון, המיקומים המדויקים אינם מוצגים"
 
 msgid "Your Location"
 msgstr "המיקום שלך"
@@ -333,7 +329,7 @@ msgid "Fix the form errors to continue."
 msgstr "יש לתקן את שגיאות הטופס כדי להמשיך."
 
 msgid "Unable to delete. Please provide a valid reason."
-msgstr "לא ניתן למחוק. יש לתת סיבה תקינה."
+msgstr "לא ניתן למחוק. נא לפרט את סיבת המחיקה."
 
 msgid "Success! Your shul has been saved."
 msgstr "בית הכנסת נשמר בהצלחה!"
@@ -396,7 +392,7 @@ msgid "Page Not Found"
 msgstr "הדף לא נמצא"
 
 msgid "The page you're looking for doesn't exist or may have been moved."
-msgstr "הדף המבוקש אינו קיים, או שאולי הועבר."
+msgstr "הדף המבוקש אינו קיים או שהועבר."
 
 msgid "Back to Map"
 msgstr "חזרה למפה"
@@ -435,8 +431,8 @@ msgid ""
 "We've detected too many requests from your account. Please wait <strong>"
 "%(retry_after)s</strong> before trying again."
 msgstr ""
-"זיהינו יותר מדי בקשות מהחשבון הזה. יש להמתין <strong>%(retry_after)s</"
-"strong> ולנסות שוב."
+"זיהינו יותר מדי בקשות מהחשבון שלך. נסו שוב בעוד <strong>%(retry_after)s</"
+"strong>."
 
 msgid "Submit an Appeal"
 msgstr "הגשת ערעור"
@@ -447,7 +443,7 @@ msgstr "שליחת ערעור"
 msgid ""
 "We've detected a high number of requests from your account. Verification is "
 "required to continue."
-msgstr "זיהינו כמות גדולה של בקשות מהחשבון הזה. נדרש אימות כדי להמשיך."
+msgstr "זיהינו מספר גדול של בקשות מהחשבון שלך. כדי להמשיך, נדרש אימות."
 
 msgid "Built by"
 msgstr "נבנה על ידי"
@@ -482,7 +478,7 @@ msgstr "לנסות שוב"
 
 msgctxt "page heading"
 msgid "Login Cancelled"
-msgstr "התחברות בוטלה"
+msgstr "ההתחברות בוטלה"
 
 msgid "You cancelled the Google login process."
 msgstr "תהליך ההתחברות עם גוגל בוטל."

@@ -23,9 +23,10 @@
                 {% endblocktrans %}
             {% elif is_rate_limited %}
                 {% if abuse_state.is_permanently_banned %}
+                    {% url 'eznashdb:contact_us' as contact_url %}
                     <span class="text-danger-emphasis">
-                        <i class="fa-solid fa-lock"></i> {% trans "Restricted." %}
-                        <a href="{% url 'eznashdb:contact_us' %}">{% trans "Contact us" %}</a> {% trans "if this is a mistake" %}
+                        <i class="fa-solid fa-lock"></i>
+                        {% blocktrans %}Restricted. <a href="{{ contact_url }}">Contact us</a> if this is a mistake.{% endblocktrans %}
                     </span>
                 {% else %}
                     <span class="text-warning-emphasis">
