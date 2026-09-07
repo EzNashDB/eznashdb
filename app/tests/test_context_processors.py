@@ -6,7 +6,7 @@ from users.models import User
 
 def describe_navbar():
     def shows_sign_in_for_anonymous(client):
-        response = client.get("/")
+        response = client.get("/", follow=True)
         content = str(response.content)
 
         assert "Sign in" in content
@@ -21,7 +21,7 @@ def describe_navbar():
         EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
         client.force_login(user)
 
-        response = client.get("/")
+        response = client.get("/", follow=True)
         content = str(response.content)
 
         assert "Account" in content  # Dropdown button
@@ -33,12 +33,12 @@ def describe_navbar():
 def describe_language_switcher():
     @override_flag("hebrew_translation", active=False)
     def hidden_by_default(client):
-        response = client.get("/")
+        response = client.get("/", follow=True)
 
         assert "languageSwitcher" not in str(response.content)
 
     @override_flag("hebrew_translation", active=True)
     def shown_when_flag_active(client):
-        response = client.get("/")
+        response = client.get("/", follow=True)
 
         assert "languageSwitcher" in str(response.content)
