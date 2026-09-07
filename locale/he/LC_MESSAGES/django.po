@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 08:29+0000\n"
+"POT-Creation-Date: 2026-09-07 09:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -377,11 +377,26 @@ msgstr "לא הצלחנו לשלוח את המשוב. נסו שוב."
 msgid "Thanks! We received your feedback and will review it soon."
 msgstr "תודה! קיבלנו את המשוב שלכם ונבדוק אותו בקרוב."
 
+msgid "Page Not Found"
+msgstr "הדף לא נמצא"
+
+msgid "The page you're looking for doesn't exist or may have been moved."
+msgstr "הדף המבוקש אינו קיים, או שאולי הועבר."
+
+msgid "Back to Map"
+msgstr "חזרה למפה"
+
 msgid "Access Restricted"
 msgstr "הגישה מוגבלת"
 
 msgid "Temporarily Blocked"
 msgstr "חסימה זמנית"
+
+msgid "Something Went Wrong"
+msgstr "משהו השתבש"
+
+msgid "We're sorry, something unexpected happened. Please try again."
+msgstr "מצטערים, קרתה תקלה לא צפויה. נסו שוב."
 
 msgid "Mapping women's spaces in synagogues around the world"
 msgstr "מיפוי עזרות נשים בבתי כנסת ברחבי העולם"
@@ -439,6 +454,23 @@ msgstr "חשבון"
 
 msgid "Logout"
 msgstr "התנתקות"
+
+msgid "Login Error"
+msgstr "שגיאת התחברות"
+
+msgid ""
+"An error occurred while attempting to login with Google. Please try again."
+msgstr "אירעה שגיאה בעת ניסיון ההתחברות עם גוגל. נסו שוב."
+
+msgid "Try Again"
+msgstr "לנסות שוב"
+
+msgctxt "page heading"
+msgid "Login Cancelled"
+msgstr "התחברות בוטלה"
+
+msgid "You cancelled the Google login process."
+msgstr "תהליך ההתחברות עם גוגל בוטל."
 
 msgid "Activate this flag for users with any of these permissions."
 msgstr ""

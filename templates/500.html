@@ -1,10 +1,16 @@
 {% extends "centered_card_base.html" %}
 
-{% block title %}Something Went Wrong | The Ezrat Nashim Database{% endblock %}
+{% load i18n %}
 
-{% block card_header %}<h4>Something Went Wrong</h4>{% endblock %}
+{% block title %}
+    {% trans "Something Went Wrong" %} | {% trans "The Ezrat Nashim Database" %}
+{% endblock %}
+
+{% block card_header %}
+    <h4>{% trans "Something Went Wrong" %}</h4>
+{% endblock %}
 
 {% block card_body %}
-    <p class="mb-3">We're sorry, something unexpected happened. Please try again.</p>
-    <a href="/" class="btn btn-primary">Back to Map</a>
+    <p class="mb-3">{% trans "We're sorry, something unexpected happened. Please try again." %}</p>
+    <a href="/" class="btn btn-primary">{% trans "Back to Map" %}</a>
 {% endblock %}
