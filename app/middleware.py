@@ -56,6 +56,12 @@ class HebrewTranslationGateMiddleware:
     negotiated language: the URL itself claims Hebrew. Downgrading it to English content
     at a "/he/" address would be a confusing half-broken state, so those 404 outright
     instead - "unreachable" per the flag, not "silently shown in the wrong language".
+
+    English is activated before that 404 is raised, not after: LocaleMiddleware has
+    already activated Hebrew from the URL prefix, and the 404 handler renders with
+    whatever language is active when the exception propagates. Raising first would serve
+    a fully Hebrew, RTL error page - Hebrew content at the very moment the flag says
+    Hebrew is unreachable.
     """
 
     def __init__(self, get_response):
@@ -63,10 +69,10 @@ class HebrewTranslationGateMiddleware:
 
     def __call__(self, request):
         if not flag_is_active(request, "hebrew_translation"):
-            if request.path_info.startswith("/he/"):
-                raise Http404
             if translation.get_language() != "en":
                 translation.activate("en")
                 request.LANGUAGE_CODE = "en"
+            if request.path_info.startswith("/he/"):
+                raise Http404
 
         return self.get_response(request)

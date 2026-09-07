@@ -55,6 +55,20 @@ def describe_hebrew_translation_gate():
 
         assert response.status_code == 404
 
+    @override_flag("hebrew_translation", active=False)
+    def it_renders_that_404_in_english(client):
+        """
+        LocaleMiddleware has already activated Hebrew from the URL prefix by the time the
+        gate runs, and the 404 handler renders in whatever language is active - so the
+        gate has to switch to English before raising, or the flag being off still serves
+        a fully Hebrew, RTL page.
+        """
+        response = client.get("/he/")
+
+        content = response.content.decode()
+        assert '<html lang="en" dir="ltr">' in content
+        assert "Page Not Found" in content
+
     @override_flag("hebrew_translation", active=True)
     def it_serves_a_hebrew_prefixed_url_when_flag_active(client):
         response = client.get("/he/")
