@@ -488,4 +488,4 @@ msgid "You cancelled the Google login process."
 msgstr "תהליך ההתחברות עם גוגל בוטל."
 
 msgid "Activate this flag for users with any of these permissions."
-msgstr ""
+msgstr "הפעלת הדגל הזה עבור משתמשים בעלי אחת מההרשאות האלה."
