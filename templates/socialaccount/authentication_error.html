@@ -1,16 +1,19 @@
 {% extends "account/base.html" %}
 
 {% load socialaccount %}
+{% load i18n %}
 
-{% block title %}Login Error - The Ezrat Nashim Database{% endblock %}
+{% block title %}
+    {% trans "Login Error" %} - {% trans "The Ezrat Nashim Database" %}
+{% endblock %}
 
 {% block account_content %}
-    <h2 class="mb-4">Login Error</h2>
+    <h2 class="mb-4">{% trans "Login Error" %}</h2>
     <div class="alert alert-danger" role="alert">
         <i class="fa-solid fa-circle-exclamation me-2"></i>
-        An error occurred while attempting to login with Google. Please try again.
+        {% trans "An error occurred while attempting to login with Google. Please try again." %}
     </div>
     <div class="d-grid gap-2 mt-4">
-        <a href="{% provider_login_url 'google' %}" class="btn btn-primary">Try Again</a>
+        <a href="{% provider_login_url 'google' %}" class="btn btn-primary">{% trans "Try Again" %}</a>
     </div>
 {% endblock %}
