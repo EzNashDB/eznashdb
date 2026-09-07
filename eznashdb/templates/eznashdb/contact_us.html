@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load i18n %}
 
-{% block title %}Contact Us | The Ezrat Nashim Database{% endblock %}
+{% block title %}
+    {% trans "Contact Us" %} | {% trans "The Ezrat Nashim Database" %}
+{% endblock %}
 
 {% block content %}
     <div class="row h-100">
         <div class="col h-100 d-flex flex-column">
             <div class="row mb-3">
                 <div class="col-12 text-center">
-                    <h1 class="mb-3">Contact Us</h1>
+                    <h1 class="mb-3">{% trans "Contact Us" %}</h1>
                     <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 text-muted mb-2">
-                        <span>Email: <a href="mailto:ezratnashimdb@gmail.com" class="text-decoration-none">ezratnashimdb@gmail.com</a></span>
+                        <span>{% trans "Email:" %} <a href="mailto:ezratnashimdb@gmail.com" class="text-decoration-none">ezratnashimdb@gmail.com</a></span>
                         <span class="vr d-none d-sm-inline"></span>
-                        <span>Follow:
+                        <span>{% trans "Follow:" %}
                             <a href="https://www.facebook.com/profile.php?id=61583770480933"
                                target="_blank"
                                rel="noopener"
@@ -32,10 +35,17 @@
                  style="min-height: 650px">
                 <div class="col-lg-8 pb-3 h-100">
                     <div class="ratio h-100 rounded shadow">
-                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc8oApWnbuXsosStSSvkfmavSvtZh2PU7Y5NCYsSs_l0lTmUw/viewform?embedded=true&amp;hl=en"
-                                title="Contact Form"
-                                loading="lazy">
-                        </iframe>
+                        {% if LANGUAGE_CODE == 'he' %}
+                            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeqLoX0uKE41oUOT-WwN_47FOaIkNWuDuXamS1ugTtd9hRPkg/viewform?embedded=true&amp;hl=iw"
+                                    title="{% trans 'Contact Form' %}"
+                                    loading="lazy">
+                            </iframe>
+                        {% else %}
+                            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc8oApWnbuXsosStSSvkfmavSvtZh2PU7Y5NCYsSs_l0lTmUw/viewform?embedded=true&amp;hl=en"
+                                    title="{% trans 'Contact Form' %}"
+                                    loading="lazy">
+                            </iframe>
+                        {% endif %}
                     </div>
                 </div>
             </div>
