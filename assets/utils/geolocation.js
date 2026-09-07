@@ -22,14 +22,14 @@ window.GeolocationUtils = (() => {
     const { onSuccess, onError } = options;
 
     if (!navigator.geolocation) {
-      const msg = "Geolocation is not supported by your browser";
+      const msg = gettext("Geolocation is not supported by your browser");
       if (onError) onError(msg);
       else alert(msg);
       return;
     }
 
     if (!window.isSecureContext) {
-      const msg = "Location requires a secure connection (HTTPS)";
+      const msg = gettext("Location requires a secure connection (HTTPS)");
       if (onError) onError(msg);
       else alert(msg);
       return;
@@ -62,17 +62,20 @@ window.GeolocationUtils = (() => {
         let message;
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message =
-              "Location access was denied. Check your browser's site settings to enable location.";
+            message = gettext(
+              "Location access was denied. Check your browser's site settings to enable location."
+            );
             break;
           case error.POSITION_UNAVAILABLE:
-            message = "Location information is unavailable. Please try again.";
+            message = gettext(
+              "Location information is unavailable. Please try again."
+            );
             break;
           case error.TIMEOUT:
-            message = "Location request timed out. Please try again.";
+            message = gettext("Location request timed out. Please try again.");
             break;
           default:
-            message = "Unable to retrieve your location.";
+            message = gettext("Unable to retrieve your location.");
         }
         if (onError) onError(message);
         else alert(message);

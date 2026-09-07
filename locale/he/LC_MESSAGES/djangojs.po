@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 10:04+0000\n"
+"POT-Creation-Date: 2026-09-07 08:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,3 +86,23 @@ msgstr "איפוס הכל"
 
 msgid "Clear"
 msgstr "איפוס"
+
+msgid "Geolocation is not supported by your browser"
+msgstr "הדפדפן שלכם לא תומך באיתור מיקום"
+
+msgid "Location requires a secure connection (HTTPS)"
+msgstr "איתור מיקום דורש חיבור מאובטח (HTTPS)"
+
+msgid ""
+"Location access was denied. Check your browser's site settings to enable "
+"location."
+msgstr "הגישה למיקום נדחתה. יש לבדוק את הגדרות האתר בדפדפן כדי לאפשר גישה למיקום."
+
+msgid "Location information is unavailable. Please try again."
+msgstr "נתוני מיקום אינם זמינים. נסו שוב."
+
+msgid "Location request timed out. Please try again."
+msgstr "תם הזמן הקצוב לבקשת המיקום. נסו שוב."
+
+msgid "Unable to retrieve your location."
+msgstr "לא הצלחנו לאתר את המיקום שלכם."
