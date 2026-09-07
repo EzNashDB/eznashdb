@@ -5,11 +5,13 @@ import sentry_sdk
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.contrib.flatpages.views import flatpage
 from django.core.management import call_command
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
@@ -235,6 +237,12 @@ def custom_500(request):
     """Custom 500 error handler that provides request context for waffle tags."""
 
     return render(request, "500.html", status=500)
+
+
+def about(request):
+    """Serve the About flatpage matching the current site language, at one stable URL."""
+    url = "/about-he/" if get_language() == "he" else "/about-en/"
+    return flatpage(request, url)
 
 
 def set_language(request):

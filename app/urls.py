@@ -11,6 +11,7 @@ from app.views import (
     CaptchaVerifyView,
     ClientErrorReportView,
     RestoreDBView,
+    about,
     set_language,
 )
 
@@ -19,6 +20,7 @@ handler500 = "app.views.custom_500"
 
 urlpatterns = [
     path("", include("eznashdb.urls")),
+    path("about/", about, name="about"),
     path("accounts/", include("allauth.urls")),
     path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
     path("admin/restore/", RestoreDBView.as_view(), name="restore_db"),
