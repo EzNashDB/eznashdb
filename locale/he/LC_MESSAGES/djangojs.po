@@ -58,13 +58,13 @@ msgstr ""
 "כדי לשמור על עלויות נמוכות יש הגבלה על מספר החיפושים היומי מול גוגל."
 
 msgid "Right now, you're only seeing results from OpenStreetMap."
-msgstr "כרגע אתם רואים תוצאות מ-OpenStreetMap בלבד."
+msgstr "כרגע מוצגות רק תוצאות מ-OpenStreetMap."
 
 msgid ""
 "If your shul doesn't appear in the results, try searching for the city or "
 "street, then drag the map to the right location."
 msgstr ""
-"אם בית הכנסת שלכם לא מופיע בתוצאות, נסו לחפש את העיר או הרחוב, ואז להזיז את "
+"אם בית הכנסת שלך לא מופיע בתוצאות, נסו לחפש את העיר או הרחוב, ואז להזיז את "
 "המפה למיקום הנכון."
 
 msgid "Got it"
@@ -88,7 +88,7 @@ msgid "Clear"
 msgstr "איפוס"
 
 msgid "Geolocation is not supported by your browser"
-msgstr "הדפדפן שלכם לא תומך באיתור מיקום"
+msgstr "הדפדפן שלך לא תומך באיתור מיקום"
 
 msgid "Location requires a secure connection (HTTPS)"
 msgstr "איתור מיקום דורש חיבור מאובטח (HTTPS)"
@@ -105,4 +105,4 @@ msgid "Location request timed out. Please try again."
 msgstr "תם הזמן הקצוב לבקשת המיקום. נסו שוב."
 
 msgid "Unable to retrieve your location."
-msgstr "לא הצלחנו לאתר את המיקום שלכם."
+msgstr "לא הצלחנו לאתר את המיקום שלך."

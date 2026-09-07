@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 09:06+0000\n"
+"POT-Creation-Date: 2026-09-07 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -132,7 +132,7 @@ msgstr "נא להסביר מדוע יש למחוק את בית הכנסת הזה
 msgid ""
 "Your answer will help us monitor deletions and decide whether to restore the "
 "shul."
-msgstr "התשובה שלכם תעזור לנו לעקוב אחר מחיקות ולהחליט אם לשחזר את בית הכנסת."
+msgstr "התשובה שלך תעזור לנו לעקוב אחר מחיקות ולהחליט אם לשחזר את בית הכנסת."
 
 msgid "Reason for deletion"
 msgstr "סיבת המחיקה"
@@ -143,11 +143,23 @@ msgstr "נדרש אימות"
 msgid "Continue"
 msgstr "להמשיך"
 
-msgid "Edit Shul"
-msgstr "עריכת בית כנסת"
+msgid "Contact Us"
+msgstr "יצירת קשר"
 
 msgid "The Ezrat Nashim Database"
 msgstr "מאגר \"עזרת נשים\""
+
+msgid "Email:"
+msgstr "דוא\"ל:"
+
+msgid "Follow:"
+msgstr "עקבו:"
+
+msgid "Contact Form"
+msgstr "טופס יצירת קשר"
+
+msgid "Edit Shul"
+msgstr "עריכת בית כנסת"
 
 #, python-format
 msgid "Edit Shul: %(shul_name)s"
@@ -335,7 +347,7 @@ msgid "Details"
 msgstr "פרטים"
 
 msgid "What happened or what would you like to see?"
-msgstr "מה קרה, או מה תרצו לראות?"
+msgstr "מה קרה, או מה נוכל לשפר או להוסיף?"
 
 msgid "50-2000 characters"
 msgstr "50–2000 תווים"
@@ -375,7 +387,7 @@ msgid "Unable to submit feedback. Please try again."
 msgstr "לא הצלחנו לשלוח את המשוב. נסו שוב."
 
 msgid "Thanks! We received your feedback and will review it soon."
-msgstr "תודה! קיבלנו את המשוב שלכם ונבדוק אותו בקרוב."
+msgstr "תודה! קיבלנו את המשוב שלך ונבדוק אותו בקרוב."
 
 msgid "Page Not Found"
 msgstr "הדף לא נמצא"
