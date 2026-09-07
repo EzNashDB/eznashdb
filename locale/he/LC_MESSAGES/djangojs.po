@@ -73,13 +73,13 @@ msgstr "הבנתי"
 #, javascript-format
 msgid "%s option selected"
 msgid_plural "%s options selected"
-msgstr[0] "%s אופציה נבחרה"
-msgstr[1] "%s אופציות נבחרו"
-msgstr[2] "%s אופציות נבחרו"
-msgstr[3] "%s אופציות נבחרו"
+msgstr[0] "נבחר פריט אחד"
+msgstr[1] "נבחרו %s פריטים"
+msgstr[2] "נבחרו %s פריטים"
+msgstr[3] "נבחרו %s פריטים"
 
 msgid "Remove this option"
-msgstr "הסרת אופציה זו"
+msgstr "הסרת האפשרות"
 
 msgid "Clear All"
 msgstr "איפוס הכל"
