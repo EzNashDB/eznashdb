@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
+{% load i18n %}
+
 {% block title %}
-    Redirecting to Google Maps | The Ezrat Nashim Database
+    {% trans "Redirecting to Google Maps..." %} | {% trans "The Ezrat Nashim Database" %}
 {% endblock title %}
 
 {% block content %}
-    <p>Opening Google Maps...</p>
+    <p>{% trans "Redirecting to Google Maps..." %}</p>
     <script>
     gtag('event', 'shul_map_redirect', {
         'shul_id': '{{ shul.id }}',
