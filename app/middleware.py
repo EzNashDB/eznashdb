@@ -41,6 +41,29 @@ class HTMXMessagesMiddleware:
         return response
 
 
+class AdminEnglishOnlyMiddleware:
+    """
+    Forces English on /admin/ (Django admin plus our custom admin views under the same
+    prefix), regardless of what LocaleMiddleware negotiated from the cookie or the
+    browser's Accept-Language header.
+
+    Admin is a tool for site maintainers, not a public-facing page covered by
+    i18n_patterns - it has no Hebrew translations of our own, but Django's contrib.admin
+    ships its own Hebrew catalog, so without this a Hebrew-negotiated request would
+    render a half-translated, RTL admin UI.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path_info.startswith("/admin/") and translation.get_language() != "en":
+            translation.activate("en")
+            request.LANGUAGE_CODE = "en"
+
+        return self.get_response(request)
+
+
 class HebrewTranslationGateMiddleware:
     """
     Forces English regardless of whatever LocaleMiddleware negotiated, until the

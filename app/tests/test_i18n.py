@@ -76,6 +76,33 @@ def describe_hebrew_translation_gate():
         assert response.status_code == 200
 
 
+def describe_admin_english_only():
+    """
+    Django's contrib.admin ships its own Hebrew catalog, so without this gate a
+    Hebrew-negotiated request (Accept-Language, or the language cookie once
+    hebrew_translation is active) would render a half-translated, RTL admin UI.
+    """
+
+    @override_flag("hebrew_translation", active=True)
+    def it_forces_english_on_the_admin_login_page_even_with_hebrew_negotiated(client):
+        client.post("/i18n/setlang/", {"language": "he", "next": "/"})
+
+        response = client.get("/admin/login/", HTTP_ACCEPT_LANGUAGE="he")
+
+        content = response.content.decode()
+        assert '<html lang="en"' in content
+        assert "Log in" in content
+
+    @override_flag("hebrew_translation", active=True)
+    def it_leaves_non_admin_pages_in_the_negotiated_language(client):
+        client.post("/i18n/setlang/", {"language": "he", "next": "/"})
+
+        response = client.get("/he/")
+
+        assert response.status_code == 200
+        assert '<html lang="he" dir="rtl">' in response.content.decode()
+
+
 def describe_rtl_layout():
     @override_flag("hebrew_translation", active=True)
     def it_marks_hebrew_pages_dir_rtl_and_loads_the_rtl_bootstrap_build(client):
