@@ -57,27 +57,29 @@
                 {% else %}
                     {% get_language_info for 'he' as other_language %}
                 {% endif %}
-                <li class="nav-item d-flex align-items-center">
+                <li class="nav-item">
                     <form method="POST" action="{% url 'set_language' %}">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
                         <input type="hidden" name="language" value="{{ other_language.code }}">
                         <button type="submit"
                                 id="languageSwitcher"
-                                dir="{{ other_language.bidi|yesno:'rtl,ltr' }}"
-                                class="nav-link d-flex align-items-center gap-1 border-0 bg-transparent">
-                            {% if other_language.code == 'he' %}
-                                <img src="{% static 'img/flags/il.svg' %}"
-                                     alt=""
-                                     width="20"
-                                     class="rounded-1">
-                            {% else %}
-                                <img src="{% static 'img/flags/us.svg' %}"
-                                     alt=""
-                                     width="20"
-                                     class="rounded-1">
-                            {% endif %}
-                            {{ other_language.name_local }}
+                                class="nav-link d-flex align-items-center gap-1 border-0 bg-transparent w-100">
+                            <span dir="{{ other_language.bidi|yesno:'rtl,ltr' }}"
+                                  class="d-flex align-items-center gap-1">
+                                {% if other_language.code == 'he' %}
+                                    <img src="{% static 'img/flags/il.svg' %}"
+                                         alt=""
+                                         width="20"
+                                         class="rounded-1">
+                                {% else %}
+                                    <img src="{% static 'img/flags/us.svg' %}"
+                                         alt=""
+                                         width="20"
+                                         class="rounded-1">
+                                {% endif %}
+                                {{ other_language.name_local }}
+                            </span>
                         </button>
                     </form>
                 </li>
