@@ -61,7 +61,9 @@ class FieldsOptions:
     SEE_HEAR = FieldOptions(
         _("Visibility & Audibility"),
         "fa-solid fa-eye",
-        verbose_label_text=_("Compared to men, how well can women see and hear?"),
+        verbose_label_text=_(
+            "How well can you see and hear from the women's section, compared to the men's?"
+        ),
     )
     KADDISH_POLICY = FieldOptions(
         _("Kaddish"),

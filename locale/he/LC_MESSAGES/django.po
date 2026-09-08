@@ -84,8 +84,8 @@ msgstr "מה גודל עזרת הנשים?"
 msgid "Visibility & Audibility"
 msgstr "ראייה ושמיעה"
 
-msgid "Compared to men, how well can women see and hear?"
-msgstr "בהשוואה לגברים, עד כמה אפשר לנשים לראות ולשמוע?"
+msgid "How well can you see and hear from the women's section, compared to the men's?"
+msgstr "בהשוואה לעזרת הגברים, עד כמה ניתן לראות ולשמוע מעזרת הנשים?"
 
 msgid "Kaddish"
 msgstr "קדיש"
