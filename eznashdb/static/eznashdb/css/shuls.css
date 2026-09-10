@@ -42,6 +42,15 @@
     pointer-events: none;
 }
 
+/* Tall enough that a single-room shul's accordion item (name/badge, edit/directions
+   row, kaddish, and one room card) fits without scrolling, assuming the shul and
+   room names don't wrap. The offcanvas switches in below a 600px viewport height
+   (see isSmallScreen() in shuls.html), so a non-offcanvas popup is never shown below
+   that - at that floor the map is still comfortably taller than this fixed value. */
+.shul-popup-body {
+    max-height: 360px;
+}
+
 .shul-cluster-popup .leaflet-popup-content {
     pointer-events: initial;
     max-width: 425px;
