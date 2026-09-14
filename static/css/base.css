@@ -7,8 +7,6 @@ body {
   padding: 0;
   margin: 0;
   height: 100%;
-  /* fallback for Js load */
-  height: var(--doc-height);
   overflow: hidden;
   font-family: 'Noto Sans', 'Noto Sans Hebrew', sans-serif;
 }
@@ -60,13 +58,14 @@ body {
 
 .spinner-overlay {
   z-index: 2000;
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  opacity: 0.5;
-  transform: translate(-50%, -50%);
   transition: 1s;
+}
+
+/* Shared by AddressInput.js and shul_form.html's #address-map-container - the React
+   map is rendered at this height, so the server-rendered placeholder needs to match it
+   exactly, or mounting the map changes the page's height. */
+.address-map-min-height {
+  min-height: 250px;
 }
 
 .click-through {
@@ -85,6 +84,11 @@ body {
    content size without overflow:hidden, which clips focus rings/shadows. */
 .min-w-0 {
   min-width: 0;
+}
+
+/* Same as .min-w-0 above, but for the cross axis of a column flex container. */
+.min-h-0 {
+  min-height: 0;
 }
 
 .pointer-events-none {

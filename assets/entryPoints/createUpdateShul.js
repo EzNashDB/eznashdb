@@ -3,21 +3,17 @@ import { createRoot } from "react-dom/client";
 import { AddressInputWithModal } from "../components/AddressInputWithModal";
 
 const initAddressInput = () => {
-  const addressInput = document.querySelector("input[name=address]");
-  if (!addressInput) return; // Exit if address input doesn't exist
-
-  // Check if already initialized
-  const existingContainer = addressInput.closest(
-    "div[data-address-input-initialized]"
-  );
-  if (existingContainer) return; // Exit if already initialized
-
-  const addressParent = addressInput.parentElement;
-  // Wrap input in container div to use as react root
-  const addressContainer = document.createElement("div");
-  addressContainer.setAttribute("data-address-input-initialized", "true");
-  addressContainer.appendChild(addressInput);
-  addressParent.appendChild(addressContainer);
+  // Server-rendered placeholder that already reserves the map's height, with
+  // the (hidden) address input already inside it - see shul_form.html. Skip
+  // if already initialized, or not rendered yet.
+  const addressContainer = document.getElementById("address-map-container");
+  if (!addressContainer || addressContainer.dataset.addressInputInitialized) {
+    return;
+  }
+  if (!addressContainer.querySelector("input[name=address]")) return;
+  addressContainer.dataset.addressInputInitialized = "true";
+  // createRoot() below replaces the placeholder (hidden input + spinner)
+  // with the rendered map.
   const getProps = () => {
     const propsToInputNames = {
       display_name: "address",

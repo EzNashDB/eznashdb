@@ -30,6 +30,7 @@ class ShulForm(ModelForm):
             "kaddish_policy": FieldsOptions.KADDISH_POLICY.form_label,
         }
         widgets = {
+            "address": HiddenInput(),  # Non-functional without JS
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),
             "place_id": HiddenInput(),

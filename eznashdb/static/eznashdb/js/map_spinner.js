@@ -42,4 +42,8 @@
   document.addEventListener("shulsDataLoaded", () => {
     spinnerManager.hide();
   });
+
+  document.addEventListener("mapInitialized", () => {
+    spinnerManager.hide();
+  });
 })();

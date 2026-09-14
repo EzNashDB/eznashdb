@@ -109,11 +109,12 @@ export const AddressInput = ({
         className={[
           "w-100 position-relative",
           !isValid && "is-invalid",
-          isModal ? "flex-grow-1" : "d-inline-block",
+          isModal
+            ? "flex-grow-1 min-h-0"
+            : "d-inline-block address-map-min-height",
         ]
           .filter(Boolean)
           .join(" ")}
-        style={{ minHeight: isModal ? "0" : "250px" }}
       >
         <AddressMap
           lat={currLocation.lat}

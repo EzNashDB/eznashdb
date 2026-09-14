@@ -1,11 +1,32 @@
 {% load crispy_forms_tags %}
 {% load static %}
+{% load i18n %}
 <div>
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    {% comment %}
+        address is rendered explicitly below (it needs its own label), so skip it
+        here to avoid a duplicate input/id.
+    {% endcomment %}
+    {% for hidden in form.hidden_fields %}
+        {% if hidden.name != "address" %}{{ hidden }}{% endif %}
+    {% endfor %}
 </div>
 <div class="row">
     <div class="col-12">{{ form.name|as_crispy_field }}</div>
     <div class="col-12">
-        <div class="w-100">{{ form.address|as_crispy_field }}</div>
+        {% comment %}
+            address is a HiddenInput (see ShulForm.Meta.widgets) so crispy skips its
+            usual label+wrapper entirely - render the same label by hand, flush
+            against the map placeholder below, then reserve that map's eventual size
+            up front with a spinner standing in until React mounts.
+        {% endcomment %}
+        {# djlint:off #}
+        {# No whitespace between label and asterisk, matching crispy's own field.html #}
+        <label for="{{ form.address.id_for_label }}" class="form-label{% if form.address.field.required %} requiredField{% endif %}">{{ form.address.label }}{% if form.address.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+        {# djlint:on #}
+        <div class="w-100 position-relative mb-3 address-map-min-height"
+             id="address-map-container">
+            {{ form.address }}
+            {% include "eznashdb/includes/spinner_overlay.html" %}
+        </div>
     </div>
 </div>

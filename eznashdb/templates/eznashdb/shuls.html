@@ -74,16 +74,7 @@
         <div class="col-12 col-lg-8 col-xxl-9 d-flex flex-column flex-grow-1">
             <div class="flex-grow-1 w-100">
                 <div class="border rounded h-100 position-relative map-container">
-                    <span class="spinner-overlay bg-secondary w-100 h-100 rounded text-center d-flex align-items-center opacity-0">
-                        <div class="flex-grow-1 text-center">
-                            <span class="spinner-border spinner-border-lg"
-                                  style="width: 3rem;
-                                         height: 3rem"
-                                  role="status">
-                                <span class="visually-hidden">{% trans "Loading..." %}</span>
-                            </span>
-                        </div>
-                    </span>
+                    {% include "eznashdb/includes/spinner_overlay.html" %}
                     <div id="shuls-map" class="h-100">
                         <div class="w-100 p-2 position-absolute top-0 start-0 pointer-events-none"
                              style="z-index: 1000">
@@ -705,6 +696,10 @@
                     FILTER_API.init();
                     // Call replaceMapShuls if the markers script has loaded
                     window.SHUL_MAP_API.replaceMapShuls?.();
+                    // Signal that the map itself (not just the shul data) is ready, so
+                    // the loading spinner - shown until now to cover the empty map area
+                    // while Leaflet loads - can be swapped out.
+                    document.dispatchEvent(new Event("mapInitialized"));
                 } else if (retriesLeft > 0) {
                     setTimeout(() => initWhenReady(retriesLeft - 1), 50);
                 } else {
@@ -712,6 +707,9 @@
                     window.logError(new Error('Leaflet library failed to load'), {
                         type: 'leaflet_timeout'
                     });
+                    // Still hide the spinner - an empty map area is better than one
+                    // stuck "Loading..." forever with no map ever coming.
+                    document.dispatchEvent(new Event("mapInitialized"));
                 }
             }
 
