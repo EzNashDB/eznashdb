@@ -37,13 +37,13 @@
         <meta property="og:title" content="{{ site_title|force_escape }}">
         <meta property="og:description"
               content="{{ site_description|force_escape }}">
+        {% if LANGUAGE_CODE == 'he' %}
+            {% static 'img/og_preview_he.png' as og_image %}
+        {% else %}
+            {% static 'img/og_preview.png' as og_image %}
+        {% endif %}
         <meta property="og:image"
-              content="{{ request.scheme }}://{{ request.get_host }}
-                       {% if LANGUAGE_CODE == 'he' %}
-                           {% static 'img/og_preview_he.png' %}
-                       {% else %}
-                           {% static 'img/og_preview.png' %}
-                       {% endif %}">
+              content="{{ request.scheme }}://{{ request.get_host }}{{ og_image }}">
         {# twitter bootstrap #}
         <link rel="stylesheet"
               href="{% if LANGUAGE_BIDI %}{% static 'vendor/bootstrap-5.3.0/bootstrap.rtl.min.css' %}{% else %}{% static 'vendor/bootstrap-5.3.0/bootstrap.min.css' %}{% endif %}"
