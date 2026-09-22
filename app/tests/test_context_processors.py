@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress
-from waffle.testutils import override_flag
 
 from users.models import User
 
@@ -31,14 +30,7 @@ def describe_navbar():
 
 
 def describe_language_switcher():
-    @override_flag("hebrew_translation", active=False)
-    def hidden_by_default(client):
-        response = client.get("/", follow=True)
-
-        assert "languageSwitcher" not in str(response.content)
-
-    @override_flag("hebrew_translation", active=True)
-    def shown_when_flag_active(client):
+    def shown(client):
         response = client.get("/", follow=True)
 
         assert "languageSwitcher" in str(response.content)

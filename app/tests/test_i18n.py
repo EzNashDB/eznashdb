@@ -1,76 +1,28 @@
 from django.conf import settings
-from waffle.testutils import override_flag
 
 
 def describe_set_language():
-    @override_flag("hebrew_translation", active=False)
-    def it_ignores_non_english_languages_when_flag_inactive(client):
-        response = client.post("/i18n/setlang/", {"language": "he", "next": "/"})
-
-        assert response.status_code == 302
-        assert response.url == "/"
-        cookie = client.cookies.get(settings.LANGUAGE_COOKIE_NAME)
-        assert cookie is None or cookie.value != "he"
-
-    @override_flag("hebrew_translation", active=True)
-    def it_allows_switching_to_hebrew_when_flag_active(client):
+    def it_allows_switching_to_hebrew(client):
         response = client.post("/i18n/setlang/", {"language": "he", "next": "/"})
 
         assert response.status_code == 302
         assert client.cookies[settings.LANGUAGE_COOKIE_NAME].value == "he"
 
-    @override_flag("hebrew_translation", active=False)
-    def it_always_allows_switching_to_english(client):
+    def it_allows_switching_to_english(client):
         response = client.post("/i18n/setlang/", {"language": "en", "next": "/"})
 
         assert response.status_code == 302
         assert client.cookies[settings.LANGUAGE_COOKIE_NAME].value == "en"
 
 
-def describe_hebrew_translation_gate():
-    """
-    LocaleMiddleware negotiates language from several independent sources - not just
-    the cookie set_language controls. This locks in that none of them can activate
-    Hebrew while the flag is off, and that a direct "/he/..." request is a hard 404
-    rather than being silently served in English at a URL that claims Hebrew.
-    """
-
-    @override_flag("hebrew_translation", active=False)
-    def it_ignores_the_accept_language_header_when_flag_inactive(client):
-        response = client.get("/", HTTP_ACCEPT_LANGUAGE="he", follow=True)
-
-        assert response.redirect_chain == [("/en/", 302)]
-        assert "Mapping women's spaces in synagogues around the world" in response.content.decode()
-
-    @override_flag("hebrew_translation", active=True)
-    def it_honors_the_accept_language_header_when_flag_active(client):
+def describe_language_negotiation():
+    def it_honors_the_accept_language_header(client):
         response = client.get("/", HTTP_ACCEPT_LANGUAGE="he", follow=True)
 
         assert response.redirect_chain == [("/he/", 302)]
         assert "מיפוי עזרות נשים בבתי כנסת ברחבי העולם" in response.content.decode()
 
-    @override_flag("hebrew_translation", active=False)
-    def it_404s_a_direct_request_for_a_hebrew_prefixed_url(client):
-        response = client.get("/he/")
-
-        assert response.status_code == 404
-
-    @override_flag("hebrew_translation", active=False)
-    def it_renders_that_404_in_english(client):
-        """
-        LocaleMiddleware has already activated Hebrew from the URL prefix by the time the
-        gate runs, and the 404 handler renders in whatever language is active - so the
-        gate has to switch to English before raising, or the flag being off still serves
-        a fully Hebrew, RTL page.
-        """
-        response = client.get("/he/")
-
-        content = response.content.decode()
-        assert '<html lang="en" dir="ltr">' in content
-        assert "Page Not Found" in content
-
-    @override_flag("hebrew_translation", active=True)
-    def it_serves_a_hebrew_prefixed_url_when_flag_active(client):
+    def it_serves_a_hebrew_prefixed_url(client):
         response = client.get("/he/")
 
         assert response.status_code == 200
@@ -79,11 +31,10 @@ def describe_hebrew_translation_gate():
 def describe_admin_english_only():
     """
     Django's contrib.admin ships its own Hebrew catalog, so without this gate a
-    Hebrew-negotiated request (Accept-Language, or the language cookie once
-    hebrew_translation is active) would render a half-translated, RTL admin UI.
+    Hebrew-negotiated request (Accept-Language, or the language cookie) would render a
+    half-translated, RTL admin UI.
     """
 
-    @override_flag("hebrew_translation", active=True)
     def it_forces_english_on_the_admin_login_page_even_with_hebrew_negotiated(client):
         client.post("/i18n/setlang/", {"language": "he", "next": "/"})
 
@@ -93,7 +44,6 @@ def describe_admin_english_only():
         assert '<html lang="en"' in content
         assert "Log in" in content
 
-    @override_flag("hebrew_translation", active=True)
     def it_leaves_non_admin_pages_in_the_negotiated_language(client):
         client.post("/i18n/setlang/", {"language": "he", "next": "/"})
 
@@ -104,7 +54,6 @@ def describe_admin_english_only():
 
 
 def describe_rtl_layout():
-    @override_flag("hebrew_translation", active=True)
     def it_marks_hebrew_pages_dir_rtl_and_loads_the_rtl_bootstrap_build(client):
         content = client.get("/he/").content.decode()
 
@@ -124,7 +73,6 @@ def describe_rtl_layout():
 
 
 def describe_javascript_catalog():
-    @override_flag("hebrew_translation", active=True)
     def it_serves_the_translated_catalog_for_the_active_language(client):
         client.post("/i18n/setlang/", {"language": "he", "next": "/he/"})
 

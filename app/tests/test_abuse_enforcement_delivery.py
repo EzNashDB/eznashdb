@@ -244,7 +244,8 @@ def describe_captcha_verify_view():
         assert response.status_code == 200
         assert b"<html" in response.content
         assert "Verification Required" in str(soup)
-        assert soup.find("input", {"name": "next"})["value"] == "/shuls/create/"
+        card_body = soup.find("div", class_="card-body")
+        assert card_body.find("input", {"name": "next"})["value"] == "/shuls/create/"
 
     def redirects_to_next_when_rate_limiting_disabled(client, test_user, settings):
         client.force_login(test_user)
@@ -281,4 +282,5 @@ def describe_captcha_verify_view():
         soup = BeautifulSoup(response.content, features="html.parser")
 
         assert response.status_code == 200
-        assert soup.find("input", {"name": "next"})["value"] == reverse("eznashdb:shuls")
+        card_body = soup.find("div", class_="card-body")
+        assert card_body.find("input", {"name": "next"})["value"] == reverse("eznashdb:shuls")

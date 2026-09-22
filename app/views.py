@@ -16,9 +16,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
-from django.views.i18n import set_language as django_set_language
 from sentry_sdk import capture_message, set_context, set_tag
-from waffle import flag_is_active
 
 from app.backups.core import list_gdrive_backups
 from app.emails import send_appeal_notification
@@ -244,20 +242,3 @@ def about(request):
     """Serve the About flatpage matching the current site language, at one stable URL."""
     url = "/about-he/" if get_language() == "he" else "/about-en/"
     return flatpage(request, url)
-
-
-def set_language(request):
-    """Wrap Django's built-in set_language view, gated by the "hebrew_translation" flag.
-
-    Translations and RTL styling aren't finished, so non-English languages must stay
-    unreachable even if someone POSTs directly to this endpoint while the flag is off.
-    """
-    requested_language = request.POST.get("language")
-    if (
-        requested_language
-        and requested_language != "en"
-        and not flag_is_active(request, "hebrew_translation")
-    ):
-        return HttpResponseRedirect(_validated_next(request, request.POST.get("next")))
-
-    return django_set_language(request)
