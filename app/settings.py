@@ -138,7 +138,6 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "app.middleware.HebrewTranslationGateMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "app.middleware.HTMXMessagesMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
