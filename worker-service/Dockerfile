@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.10-slim-bookworm
 
 # Install system dependencies and PostgreSQL 15 client
 RUN apt-get update && \
@@ -13,7 +13,7 @@ RUN apt-get update && \
     && ln -s /usr/bin/python3 /usr/bin/python \
     # Add PostgreSQL apt repository for version 15
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update \
     && apt-get remove -y postgresql-client-* || true \
     && apt-get install -y postgresql-client-15 \
