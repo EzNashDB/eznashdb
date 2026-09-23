@@ -48,16 +48,23 @@
         <div class="accordion-body">
             <div class="d-flex flex-column">
                 <div class="d-flex flex-wrap gap-2 align-items-end">
-                    <a class="btn btn-sm btn-outline-primary text-nowrap"
-                       href="{% url 'eznashdb:update_shul' shul.id %}">
+                    <a class="btn btn-sm btn-outline-primary text-nowrap
+                              {% if not names_visible %}disabled{% endif %}"
+                       {% if names_visible %}
+                           href="{% url 'eznashdb:update_shul' shul.id %}"
+                       {% else %}
+                           aria-disabled="true"
+                       {% endif %}>
                         <i class="fa-solid fa-pen-to-square"></i> {% trans "Edit" %}
                     </a>
-                    <a target="_blank"
-                       rel="noopener noreferrer"
-                       href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
-                       class="btn btn-sm btn-primary">
-                        <i class="fa-solid fa-diamond-turn-right me-1"></i>
-                        {% trans "Directions" %}
+                    <a {% if names_visible %}
+                           target="_blank" rel="noopener noreferrer" href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
+                       {% else %}
+                           aria-disabled="true"
+                       {% endif %}
+                       class="btn btn-sm btn-primary
+                              {% if not names_visible %}disabled{% endif %}">
+                        <i class="fa-solid fa-diamond-turn-right"></i> {% trans "Directions" %}
                     </a>
                     <div class="flex-grow-1 text-end ms-auto small fst-italic text-muted">
                         {% trans "Updated" %} <span data-utc="{{ shul.updated_at|date:'c' }}"
