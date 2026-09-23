@@ -263,12 +263,12 @@ def describe_anonymous_users():
         for shul in shuls:
             assert shul.name not in page_text
 
-    def test_header_shows_generic_cta_instead_of_count(popup_GET, test_shul):
+    def test_header_shows_sign_in_cta(popup_GET, test_shul):
         content = ShulClusterPopupView.as_view()(
             popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
         ).content.decode()
 
-        assert "Sign in to see more" in content
+        assert "Sign in for full access" in content
         assert "Shul in this area" not in content
         assert "Shuls in this area" not in content
 
@@ -312,7 +312,7 @@ def describe_rate_limited_users():
         assert "text-blur" in content
         assert "Too many requests" in content
         assert "minute" in content
-        assert "Sign in to see more" not in content
+        assert "Sign in" not in content
         # The client uses this header (not the HTML) to decide whether a swapped-in popup is safe
         # to cache - see onPopupContentSwapped's rateLimited flag in shuls.html.
         assert response["X-Abuse-Enforcement"] == "rate_limited"
