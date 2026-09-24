@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 16:16+0000\n"
+"POT-Creation-Date: 2026-09-24 20:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -315,6 +315,21 @@ msgstr "איפוס"
 
 msgid "Add Shul"
 msgstr "הוספת בי\"כ"
+
+msgid "No cities found."
+msgstr "לא נמצאו ערים."
+
+msgid "Search failed. Please try again."
+msgstr "החיפוש נכשל. נסו שוב."
+
+msgid "Clear search"
+msgstr "ניקוי חיפוש"
+
+msgid "Search for a city"
+msgstr "חיפוש לפי עיר"
+
+msgid "Search for a city..."
+msgstr "חיפוש לפי עיר..."
 
 msgid "Exact locations not displayed for security reasons"
 msgstr "מטעמי ביטחון, המיקומים המדויקים אינם מוצגים"

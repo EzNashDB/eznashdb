@@ -228,7 +228,14 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "rate_limit_cache",  # Table name
-    }
+    },
+    # Kept out of "default", which is small (300 entries) and shared with the rate limiters:
+    # a DatabaseCache culls by key order, so a flood of cached lookups could wipe their counters
+    "city_lookup": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "city_lookup",
+        "OPTIONS": {"MAX_ENTRIES": 5000},
+    },
 }
 
 AUTH_USER_MODEL = "users.User"

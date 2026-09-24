@@ -119,3 +119,15 @@
     font-size: 12px;
     z-index: 1;
 }
+
+/* Map city search: full width on narrow screens, fixed width beside the badges otherwise */
+.city-search {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .city-search {
+        flex: 0 0 320px;
+        width: 320px;
+    }
+}

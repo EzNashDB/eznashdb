@@ -177,6 +177,14 @@ def describe_osm_client():
                 }
             ]
 
+        def it_times_out_instead_of_hanging_on_a_stalled_provider(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            client.search("test query")
+
+            assert mock_get.call_args.kwargs["timeout"] == 5
+
         def it_returns_empty_list_on_invalid_json(client, mocker):
             mock_response = mocker.Mock()
             mock_response.json.return_value = {"error": "invalid"}  # Not a list
@@ -225,6 +233,300 @@ def describe_osm_client():
 
             assert "Israel" in results[0]["display_name"]
             assert "Palestinian Territory" not in results[0]["display_name"]
+
+    def describe_search_cities():
+        def _osm_result(**overrides):
+            return {
+                "place_id": 1,
+                "display_name": "Teaneck, Bergen County, New Jersey, United States",
+                "lat": "40.8976",
+                "lon": "-74.0116",
+                "addresstype": "town",
+                "boundingbox": ["40.86", "40.92", "-74.03", "-73.99"],
+                **overrides,
+            }
+
+        def it_requests_results_in_the_given_language(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            client.search_cities("teaneck", language="he")
+
+            assert all("accept-language=he" in call.args[0] for call in mock_get.call_args_list)
+
+        def it_searches_both_with_and_without_featuretype(client, mocker):
+            # Each finds places the other misses: featureType=settlement hides Ma'ale Shomron
+            # (tagged as a neighbourhood), while without it the country and county named
+            # "Lebanon" crowd every actual Lebanon out of the results
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            client.search_cities("lebanon")
+
+            urls = [call.args[0] for call in mock_get.call_args_list]
+            assert len(urls) == 2
+            assert sum("featureType=settlement" in url for url in urls) == 1
+
+        def it_merges_both_searches_with_unrestricted_results_first(client, mocker):
+            unrestricted = [
+                _osm_result(display_name="Ma'ale Shomron, Israel", addresstype="neighbourhood")
+            ]
+            settlements = [
+                _osm_result(display_name="Lebanon, Pennsylvania", lat="40.34", lon="-76.41"),
+                _osm_result(display_name="Lebanon, Ohio", lat="39.43", lon="-84.20"),
+            ]
+
+            def fake_get(url, **kwargs):
+                response = mocker.Mock()
+                response.json.return_value = settlements if "featureType" in url else unrestricted
+                return response
+
+            mocker.patch("requests.get", side_effect=fake_get)
+
+            results = client.search_cities("lebanon").places
+
+            assert [r["display_name"] for r in results] == [
+                "Ma'ale Shomron, Israel",
+                "Lebanon, Pennsylvania",
+                "Lebanon, Ohio",
+            ]
+
+        def it_still_returns_results_when_one_of_the_two_searches_fails(client, mocker):
+            def fake_get(url, **kwargs):
+                if "featureType" in url:
+                    raise requests.RequestException("boom")
+                response = mocker.Mock()
+                response.json.return_value = [_osm_result(display_name="Teaneck")]
+                return response
+
+            mocker.patch("requests.get", side_effect=fake_get)
+
+            result = client.search_cities("teaneck")
+
+            assert [r["display_name"] for r in result.places] == ["Teaneck"]
+            assert result.complete is False
+
+        def it_omits_language_when_not_given(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            client.search_cities("teaneck")
+
+            assert "accept-language" not in mock_get.call_args.args[0]
+
+        @pytest.mark.parametrize(
+            "addresstype",
+            ["city", "town", "village", "municipality"]
+            + ["suburb", "neighbourhood", "quarter", "city_district", "borough"],
+        )
+        def it_keeps_city_and_neighbourhood_level_results(client, mocker, addresstype):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [_osm_result(addresstype=addresstype)]
+
+            assert len(client.search_cities("teaneck").places) == 1
+
+        @pytest.mark.parametrize(
+            "addresstype", ["road", "building", "railway", "park", "hamlet", "county", "country"]
+        )
+        def it_drops_results_that_are_not_places_people_search_for(client, mocker, addresstype):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [_osm_result(addresstype=addresstype)]
+
+            assert client.search_cities("teaneck").places == []
+
+        @pytest.mark.parametrize("addresstype", ["state", "province", "region"])
+        def it_falls_back_to_regions_when_there_are_no_city_level_results(client, mocker, addresstype):
+            # e.g. Tokyo and Hong Kong, which OSM models as prefectures/regions, not cities
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [_osm_result(addresstype=addresstype)]
+
+            assert len(client.search_cities("tokyo").places) == 1
+
+        def it_keeps_neighbourhoods_alongside_cities_in_provider_order(client, mocker):
+            # Brooklyn (NYC) is a suburb in OSM, and the provider ranks it above the small towns
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(
+                    display_name="Brooklyn, New York", addresstype="suburb", lat="40.65", lon="-73.95"
+                ),
+                _osm_result(
+                    display_name="Brooklyn, Illinois", addresstype="village", lat="38.66", lon="-90.16"
+                ),
+                _osm_result(
+                    display_name="Brooklyn, Ohio", addresstype="town", lat="41.43", lon="-81.74"
+                ),
+            ]
+
+            results = client.search_cities("brooklyn").places
+
+            assert [r["display_name"] for r in results] == [
+                "Brooklyn, New York",
+                "Brooklyn, Illinois",
+                "Brooklyn, Ohio",
+            ]
+
+        def it_removes_results_with_identical_display_names(client, mocker):
+            # The provider returns e.g. Karnei Shomron twice (a node and a relation)
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="Elkana, Israel", place_id=1, lat="32.11", lon="35.03"),
+                _osm_result(display_name="Elkana, Israel", place_id=2, lat="32.50", lon="35.50"),
+                _osm_result(display_name="Elkana, Ohio", place_id=3, lat="40.10", lon="-81.10"),
+            ]
+
+            results = client.search_cities("elkana").places
+
+            assert [r["display_name"] for r in results] == ["Elkana, Israel", "Elkana, Ohio"]
+
+        def it_removes_the_same_place_listed_under_slightly_different_names(client, mocker):
+            # e.g. Har Nof comes back twice, once with "Yefe Nof" in its display name and once without
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="Har Nof, Yefe Nof, Jerusalem", lat="31.7880", lon="35.1740"),
+                _osm_result(display_name="Har Nof, Jerusalem", lat="31.7885", lon="35.1745"),
+            ]
+
+            results = client.search_cities("har nof").places
+
+            assert [r["display_name"] for r in results] == ["Har Nof, Yefe Nof, Jerusalem"]
+
+        def it_keeps_same_named_places_that_are_far_apart(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="Lebanon, Pennsylvania", lat="40.34", lon="-76.41"),
+                _osm_result(display_name="Lebanon, Ohio", lat="39.43", lon="-84.20"),
+            ]
+
+            assert len(client.search_cities("lebanon").places) == 2
+
+        def it_gives_regions_a_center_point_but_no_bounds(client, mocker):
+            # A region's bounding box can span far-flung parts (Tokyo's includes islands
+            # hundreds of km out to sea), so the map centers on the point instead
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(
+                    display_name="Tokyo, Japan",
+                    addresstype="province",
+                    lat="35.6768601",
+                    lon="139.7638947",
+                    boundingbox=["20.2", "35.9", "135.8", "154.2"],
+                )
+            ]
+
+            assert client.search_cities("tokyo").places == [
+                {"display_name": "Tokyo, Japan", "lat": 35.6768601, "lon": 139.7638947, "bounds": None}
+            ]
+
+        def it_includes_regions_alongside_cities_in_provider_order(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="New York City", addresstype="city", lat="40.71", lon="-74.00"),
+                _osm_result(
+                    display_name="New York State", addresstype="state", lat="42.95", lon="-75.53"
+                ),
+            ]
+
+            results = client.search_cities("new york").places
+
+            assert [r["display_name"] for r in results] == ["New York City", "New York State"]
+            assert results[0]["bounds"] is not None
+            assert results[1]["bounds"] is None  # regions are centered on their point instead
+
+        def it_skips_malformed_results_without_dropping_the_good_ones(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="no lat", lat=None),
+                {k: v for k, v in _osm_result(display_name="no lon").items() if k != "lon"},
+                _osm_result(display_name="bad bounds", boundingbox=["a", "b", "c", "d"]),
+                _osm_result(display_name="short bounds", boundingbox=["1", "2"]),
+                _osm_result(display_name="Teaneck"),
+            ]
+
+            results = client.search_cities("teaneck").places
+
+            assert [r["display_name"] for r in results] == ["Teaneck"]
+
+        def it_returns_display_name_coordinates_and_leaflet_bounds(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            # Nominatim's boundingbox is [south, north, west, east], as strings
+            mock_get.return_value.json.return_value = [_osm_result()]
+
+            assert client.search_cities("teaneck").places == [
+                {
+                    "display_name": "Teaneck, Bergen County, New Jersey, United States",
+                    "lat": 40.8976,
+                    "lon": -74.0116,
+                    "bounds": [[40.86, -74.03], [40.92, -73.99]],
+                }
+            ]
+
+        def it_replaces_palestinian_territory_with_israel(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="Efrat, Palestinian Territory")
+            ]
+
+            assert client.search_cities("efrat").places[0]["display_name"] == "Efrat, Israel"
+
+        def it_uses_the_hebrew_name_for_israel_when_the_language_is_hebrew(client, mocker):
+            # The provider returns "Palestinian Territory" in English even for accept-language=he
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [
+                _osm_result(display_name="מעלה שומרון, יהודה ושומרון, Palestinian Territory")
+            ]
+
+            results = client.search_cities("מעלה שומרון", language="he").places
+
+            assert results[0]["display_name"] == "מעלה שומרון, יהודה ושומרון, ישראל"
+
+        def it_skips_results_without_a_bounding_box(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [_osm_result(boundingbox=None)]
+
+            assert client.search_cities("teaneck").places == []
+
+        def it_is_complete_when_both_searches_succeeded(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = [_osm_result()]
+
+            assert client.search_cities("teaneck").complete is True
+
+        def it_is_complete_when_the_provider_genuinely_has_no_matches(client, mocker):
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            result = client.search_cities("qwertyuiop")
+
+            assert result.places == []
+            assert result.complete is True
+
+        @pytest.mark.parametrize("failure", ["exception", "non_list_response"])
+        def it_is_incomplete_when_either_search_fails(client, mocker, failure):
+            def fake_get(url, **kwargs):
+                if "featureType" not in url:
+                    return mocker.Mock(**{"json.return_value": [_osm_result()]})
+                if failure == "exception":
+                    raise requests.RequestException("boom")
+                return mocker.Mock(**{"json.return_value": {"error": "rate limited"}})
+
+            mocker.patch("requests.get", side_effect=fake_get)
+
+            assert client.search_cities("teaneck").complete is False
+
+        def it_uses_a_shorter_timeout_than_the_default(client, mocker):
+            # Blocking calls on a public endpoint, with only a few gunicorn threads to spare
+            mock_get = mocker.patch("requests.get")
+            mock_get.return_value.json.return_value = []
+
+            client.search_cities("teaneck")
+
+            timeouts = [call.kwargs["timeout"] for call in mock_get.call_args_list]
+            assert timeouts == [3, 3]
+
+        def it_returns_empty_list_on_request_exception(client, mocker):
+            mocker.patch("requests.get", side_effect=requests.RequestException("boom"))
+
+            assert client.search_cities("teaneck").places == []
 
     def describe_search_and_normalize():
         def it_normalizes_place_with_coordinates(client, mocker):

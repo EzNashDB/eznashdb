@@ -1,3 +1,4 @@
+import hashlib
 import math
 from collections import defaultdict
 from decimal import Decimal
@@ -6,17 +7,20 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import caches
 from django.db import transaction
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
+from django_ratelimit.core import is_ratelimited
 
 from app.abuse_prevention import format_retry_time, get_retry_minutes
 from app.context_processors import get_login_url
@@ -425,6 +429,54 @@ class AddressLookupView(LoginRequiredMixin, View):
         results = [place.as_dict() for place in normalized_results]
 
         return JsonResponse({"results": results, "google_available": use_google}, safe=False)
+
+
+CITY_LOOKUP_MIN_QUERY_LENGTH = 3
+CITY_LOOKUP_CACHE_SECONDS = 60 * 60 * 24 * 7
+CITY_LOOKUP_RATE = "30/m"
+
+
+def _client_ip(group, request):
+    # Behind Fly's proxy REMOTE_ADDR is the proxy itself, so it can't tell visitors apart
+    return request.headers.get("Fly-Client-IP") or request.META.get("REMOTE_ADDR", "")
+
+
+class CityLookupView(View):
+    """
+    Public city search for the homepage map. OSM only (no Google billing), so it's
+    open to signed-out visitors, but throttled per IP and cached since it proxies a
+    paid geocoding quota.
+    """
+
+    def get(self, request):
+        query = " ".join(request.GET.get("q", "").lower().split())
+        if len(query) < CITY_LOOKUP_MIN_QUERY_LENGTH:
+            return JsonResponse({"results": []})
+
+        if is_ratelimited(
+            request,
+            group="city_lookup",
+            key=_client_ip,
+            rate=CITY_LOOKUP_RATE,
+            method="GET",
+            increment=True,
+        ):
+            return JsonResponse({"error": "Too many requests"}, status=429)
+
+        language = get_language()
+        cache_key = "city_lookup:" + hashlib.sha256(f"{language}:{query}".encode()).hexdigest()
+        city_cache = caches["city_lookup"]
+        places = city_cache.get(cache_key)
+        if places is None:
+            osm_client = OSMClient(settings.BASE_OSM_URL, settings.MAPS_CO_API_KEY)
+            result = osm_client.search_cities(query, language=language)
+            places = result.places
+            # An incomplete result (a provider request failed) would otherwise be served
+            # for the whole cache period
+            if result.complete:
+                city_cache.set(cache_key, places, CITY_LOOKUP_CACHE_SECONDS)
+
+        return JsonResponse({"results": places})
 
 
 class AddressLookupDetailsView(LoginRequiredMixin, View):
