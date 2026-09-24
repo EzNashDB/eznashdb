@@ -76,9 +76,74 @@
                 <div class="border rounded h-100 position-relative map-container">
                     {% include "eznashdb/includes/spinner_overlay.html" %}
                     <div id="shuls-map" class="h-100">
-                        <div class="w-100 p-2 position-absolute top-0 start-0 pointer-events-none"
-                             style="z-index: 1000">
-                            <div class="fs-5 opacity-75 d-flex flex-wrap justify-content-between gap-1">
+                        {# z-index 1001, above the bottom controls (1000), so the search results can overlap them #}
+                        <div class="w-100 p-2 position-absolute top-0 start-0 pointer-events-none d-flex flex-column flex-md-row align-items-stretch align-items-md-start gap-1 gap-md-2"
+                             style="z-index: 1001">
+                            <div class="city-search pointer-events-auto position-relative"
+                                 x-data="citySearch()"
+                                 data-url="{% url 'eznashdb:city_lookup' %}"
+                                 data-empty-message="{% trans 'No cities found.' %}"
+                                 data-error-message="{% trans 'Search failed. Please try again.' %}"
+                                 @click.outside="isOpen = false">
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                    {# Before the input in the DOM so the input stays the last child and keeps its rounded end #}
+                                    <button type="button"
+                                            class="btn btn-link text-secondary position-absolute top-0 bottom-0 end-0 px-2 py-0"
+                                            style="z-index: 6"
+                                            aria-label="{% trans 'Clear search' %}"
+                                            x-show="query"
+                                            @click="clear()">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                    {# Empty inputs have no text to detect a direction from, so :dir follows the page's until there is some (dir="auto" alone would left-align the RTL placeholder) #}
+                                    {# pe-5 (not logical padding) reserves room on the page-direction end, where the clear button is, whatever the text's direction #}
+                                    <input type="text"
+                                           class="form-control text-truncate pe-5"
+                                           x-ref="input"
+                                           x-model="query"
+                                           :dir="query ? 'auto' : document.documentElement.dir"
+                                           autocomplete="off"
+                                           role="combobox"
+                                           aria-autocomplete="list"
+                                           aria-controls="city-search-results"
+                                           :aria-expanded="isOpen"
+                                           :aria-activedescendant="activeIndex >= 0 ? 'city-option-' + activeIndex : null"
+                                           aria-label="{% trans 'Search for a city' %}"
+                                           placeholder="{% trans 'Search for a city...' %}"
+                                           @input="onInput()"
+                                           @keydown.down.prevent="move(1)"
+                                           @keydown.up.prevent="move(-1)"
+                                           @keydown.enter.prevent="selectActive()"
+                                           @keydown.escape="isOpen = false">
+                                </div>
+                                <div class="visually-hidden" role="status" x-text="announcement"></div>
+                                <div class="dropdown-menu shadow-lg w-100 mt-1 start-0 top-100 overflow-auto"
+                                     style="max-height: min(240px, 35vh)"
+                                     :class="{ show: isOpen }">
+                                    <div id="city-search-results" role="listbox" x-ref="list">
+                                        <template x-for="(city, index) in results" :key="index">
+                                            <button type="button"
+                                                    class="dropdown-item text-wrap"
+                                                    role="option"
+                                                    dir="auto"
+                                                    :id="'city-option-' + index"
+                                                    :class="{ active: index === activeIndex }"
+                                                    :aria-selected="index === activeIndex"
+                                                    @mouseenter="activeIndex = index"
+                                                    @click="select(city)"
+                                                    x-text="city.display_name"></button>
+                                        </template>
+                                    </div>
+                                    <div class="dropdown-item-text text-muted" x-show="status === 'empty'">
+                                        {% trans "No cities found." %}
+                                    </div>
+                                    <div class="dropdown-item-text text-danger" x-show="status === 'error'">
+                                        {% trans "Search failed. Please try again." %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fs-5 opacity-75 d-flex flex-column align-items-end gap-1 flex-md-grow-1">
                                 <div class="badge text-bg-warning text-wrap pointer-events-auto">
                                     <i class="fa-solid fa-lock"></i>
                                     {% trans "Exact locations not displayed for security reasons" %}
@@ -815,4 +880,5 @@
     </script>
 {% endpartialdef map_updates %}
 <script defer src="{% static 'eznashdb/js/map_spinner.js' %}"></script>
+<script src="{% static 'eznashdb/js/city_search.js' %}"></script>
 {% endblock extra_media_bottom %}

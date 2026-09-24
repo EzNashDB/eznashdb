@@ -11,6 +11,7 @@ urlpatterns = [
     path("shuls/<pk>/update/", views.CreateUpdateShulView.as_view(), name="update_shul"),
     path("shuls/<int:pk>/undelete/", views.UndeleteShulView.as_view(), name="undelete_shul"),
     path("address-lookup/", views.AddressLookupView.as_view(), name="address_lookup"),
+    path("city-lookup/", views.CityLookupView.as_view(), name="city_lookup"),
     path(
         "address-lookup/details/",
         views.AddressLookupDetailsView.as_view(),

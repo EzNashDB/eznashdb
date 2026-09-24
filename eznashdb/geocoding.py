@@ -1,8 +1,10 @@
 """Geocoding client classes for Google Places and OpenStreetMap."""
 
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from json.decoder import JSONDecodeError
+from typing import NamedTuple
 
 import requests
 import sentry_sdk
@@ -13,6 +15,38 @@ from waffle import flag_is_active
 from app.models import GooglePlacesUsage, GooglePlacesUserUsage
 from eznashdb.enums import GeocodingProvider
 from eznashdb.place_search import NormalizedPlace
+
+# Nominatim `addresstype` values counted as a place when searching by city. Neighbourhoods
+# are included because that's often exactly what people are looking for: Brooklyn and Har Nof
+# are suburbs in OSM, and Ma'ale Shomron is tagged as a neighbourhood
+LOCALITY_ADDRESS_TYPES = {
+    "city",
+    "town",
+    "village",
+    "municipality",
+    "suburb",
+    "neighbourhood",
+    "quarter",
+    "city_district",
+    "borough",
+}
+# Also included, since some places people search for as cities are modeled as admin regions
+# in OSM (e.g. Tokyo is a province, Hong Kong a region)
+REGION_ADDRESS_TYPES = {"state", "province", "region"}
+
+# Stops a stalled provider from tying up a worker
+OSM_REQUEST_TIMEOUT_SECONDS = 5
+# Shorter for the public city search, which has only a few gunicorn threads to spare
+OSM_CITY_SEARCH_TIMEOUT_SECONDS = 3
+
+# Two same-named results closer than this (~2 km) are treated as the same place
+NEARBY_DEGREES = 0.02
+
+
+class CitySearchResult(NamedTuple):
+    places: list[dict]
+    # False if a provider request failed, so `places` may be missing results
+    complete: bool
 
 
 class GooglePlacesClient:
@@ -133,16 +167,23 @@ class OSMClient:
         self.base_url = base_url
         self.api_key = api_key
 
-    def search(self, query: str) -> list[dict]:
+    def search(self, query: str, **extra_params) -> list[dict]:
         """
         Search for locations using Nominatim API.
         Returns list of results with coordinates, or empty list on failure.
         """
+        return self._search(query, **extra_params) or []
+
+    def _search(
+        self, query: str, timeout: float = OSM_REQUEST_TIMEOUT_SECONDS, **extra_params
+    ) -> list[dict] | None:
+        """Like `search`, but returns None on failure, so it can be told apart from no matches."""
         params = {
             "format": "json",
             "addressdetails": 1,
             "namedetails": 1,
             "q": query,
+            **extra_params,
         }
 
         if self.api_key:
@@ -151,7 +192,7 @@ class OSMClient:
         url = self.base_url + "?" + urllib.parse.urlencode(params)
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=timeout)
 
             # Validate response is a list
             data = response.json()
@@ -160,7 +201,7 @@ class OSMClient:
                     f"OSM geocoding returned non-list response for query: {query}",
                     level="warning",
                 )
-                return []
+                return None
 
             return data
 
@@ -169,7 +210,7 @@ class OSMClient:
                 f"OSM geocoding failed for query '{query}': {e}",
                 level="warning",
             )
-            return []
+            return None
 
     def search_and_format_results(self, query: str) -> list[dict]:
         """
@@ -178,11 +219,13 @@ class OSMClient:
         """
         return self._format_results(self.search(query))
 
-    def _format_results(self, results: list[dict]) -> list[dict]:
+    def _format_results(self, results: list[dict], language: str | None = None) -> list[dict]:
         """Format OSM results to standardized structure."""
+        # The provider returns "Palestinian Territory" in English whatever language was asked for
+        israel = "ישראל" if language == "he" else "Israel"
         replacement_pairs = [
             ("الأراضي الفلسطينية", "ישראל"),
-            ("Palestinian Territory", "Israel"),
+            ("Palestinian Territory", israel),
         ]
 
         for result in results:
@@ -192,6 +235,98 @@ class OSMClient:
                 result["display_name"] = result.get("display_name", "").replace(original, replacement)
 
         return results
+
+    def search_cities(self, query: str, language: str | None = None) -> CitySearchResult:
+        """
+        Search for cities, towns, neighbourhoods and regions (no streets, buildings, or other
+        features), in the provider's own ranking. The same place listed more than once is
+        collapsed into one.
+        Places are Leaflet-ready dicts: display_name, lat, lon, and bounds ([[S, W], [N, E]],
+        None for regions, which the map centers on instead).
+        """
+        base_params = {"accept-language": language} if language else {}
+        # Two searches, because each finds places the other misses. Unrestricted finds
+        # neighbourhoods that featureType=settlement hides (Ma'ale Shomron), while
+        # featureType=settlement finds the towns that the unrestricted search's country and
+        # county matches crowd out (searching "lebanon"). Unrestricted goes first to keep the
+        # provider's own ranking (NYC's Brooklyn above the small-town Brooklyns).
+        param_sets = [base_params, {**base_params, "featureType": "settlement"}]
+        with ThreadPoolExecutor(max_workers=len(param_sets)) as executor:
+            result_lists = list(
+                executor.map(
+                    lambda params: self._search(
+                        query, timeout=OSM_CITY_SEARCH_TIMEOUT_SECONDS, **params
+                    ),
+                    param_sets,
+                )
+            )
+        complete = all(results is not None for results in result_lists)
+        raw_results = [result for results in result_lists for result in results or []]
+
+        places = []
+        for result in self._format_results(raw_results, language):
+            address_type = result.get("addresstype")
+            if address_type in LOCALITY_ADDRESS_TYPES:
+                with_bounds = True
+            elif address_type in REGION_ADDRESS_TYPES:
+                with_bounds = False
+            else:
+                continue
+            place = self._to_city(result, with_bounds)
+            if place and not self._is_duplicate(place, places):
+                places.append(place)
+
+        return CitySearchResult(places, complete)
+
+    @staticmethod
+    def _is_duplicate(place: dict, existing: list[dict]) -> bool:
+        """
+        True if `place` is already in `existing`: the same display name, or the same leading
+        name (e.g. "Har Nof") within ~2 km. The same place can come back under slightly
+        different display names, but same-named places far apart (Lebanon, PA and Lebanon, OH)
+        are different places.
+        """
+        name = place["display_name"].split(",")[0].strip().lower()
+        for other in existing:
+            if other["display_name"] == place["display_name"]:
+                return True
+            same_name = other["display_name"].split(",")[0].strip().lower() == name
+            close = (
+                abs(other["lat"] - place["lat"]) < NEARBY_DEGREES
+                and abs(other["lon"] - place["lon"]) < NEARBY_DEGREES
+            )
+            if same_name and close:
+                return True
+        return False
+
+    def _to_city(self, result: dict, with_bounds: bool) -> dict | None:
+        """
+        Shape a Nominatim result for the map, or None if it's missing usable coordinates.
+        Regions skip bounds: theirs can span far-flung parts (Tokyo's includes islands out
+        at sea), so the map centers on the point instead.
+        """
+        try:
+            bounds = None
+            if with_bounds:
+                bounds = self._leaflet_bounds(result.get("boundingbox"))
+                if not bounds:
+                    return None
+            return {
+                "display_name": result["display_name"],
+                "lat": float(result["lat"]),
+                "lon": float(result["lon"]),
+                "bounds": bounds,
+            }
+        except (KeyError, TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _leaflet_bounds(boundingbox) -> list[list[float]] | None:
+        """Convert Nominatim's [south, north, west, east] strings to Leaflet's [[S, W], [N, E]]."""
+        if not boundingbox or len(boundingbox) != 4:
+            return None
+        south, north, west, east = (float(value) for value in boundingbox)
+        return [[south, west], [north, east]]
 
     def search_and_normalize(self, query: str) -> list[NormalizedPlace]:
         """
