@@ -325,10 +325,10 @@ msgstr "החיפוש נכשל. נסו שוב."
 msgid "Clear search"
 msgstr "ניקוי חיפוש"
 
-msgid "Search for a city"
+msgid "Search by city"
 msgstr "חיפוש לפי עיר"
 
-msgid "Search for a city..."
+msgid "Search by city..."
 msgstr "חיפוש לפי עיר..."
 
 msgid "Exact locations not displayed for security reasons"
