@@ -168,6 +168,18 @@
 }
 
 /*
+  From tablets up there's room for the notice on one line, at its natural width. The credit keeps
+  its own width, and both stay aligned to the corner's edge (the floats' sides).
+*/
+@media (min-width: 768px) {
+    .leaflet-bottom .leaflet-control.approx-location-notice {
+        width: max-content;
+        min-width: 0;
+        white-space: nowrap;
+    }
+}
+
+/*
   The feedback tab (fixed to the screen's edge, from base.css) sits 78% down on phones, where the
   map's bottom corner (the notice and credit) can end up, since on tall phones the map stops well
   short of the screen's bottom. 53% clears both that corner and the count badge at the top-right
