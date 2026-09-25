@@ -131,3 +131,38 @@
         width: 320px;
     }
 }
+
+/*
+  The map's bottom corner (the credit, and the "Exact locations" notice above it) is inset, and
+  both are badge-styled like the other overlays on the map, instead of Leaflet's default flush strip.
+  The inset is padding on the corner itself so the notice can still match the credit's width:
+  width: 0 with min-width: 100% makes it as wide as the corner's content, which shrinks to fit its
+  widest control (the credit), whatever the notice's text wraps to.
+*/
+.leaflet-bottom {
+    padding-bottom: .5rem;
+}
+
+.leaflet-bottom.leaflet-right {
+    padding-right: .5rem;
+}
+
+.leaflet-bottom.leaflet-left {
+    padding-left: .5rem;
+}
+
+/* .badge's .75em is relative to the map's 12px, which would make the credit tiny. It shrinks
+   smoothly on narrow phones so it doesn't run over the zoom buttons, and the notice above
+   it (as wide as the credit) shrinks with it */
+.leaflet-container .leaflet-control-attribution {
+    font-size: clamp(10px, 3.2vw, .8rem);
+}
+
+/* Leaflet's default margins for controls are dropped: the corner's padding does the insetting,
+   and the gap above the credit comes from mb-1, the same gap as between the other overlays */
+.leaflet-bottom .leaflet-control.approx-location-notice {
+    width: 0;
+    min-width: 100%;
+    margin: 0;
+    font-size: .8rem;
+}

@@ -76,6 +76,13 @@
                 <div class="border rounded h-100 position-relative map-container">
                     {% include "eznashdb/includes/spinner_overlay.html" %}
                     <div id="shuls-map" class="h-100">
+                        {# Hidden here; initMap turns it into a Leaflet control in the attribution's corner #}
+                        <div id="approx-location-notice"
+                             class="approx-location-notice badge bg-white text-body border shadow-sm fw-normal px-2 py-1 lh-base text-wrap text-start mb-1"
+                             hidden>
+                            <i class="fa-solid fa-lock"></i>
+                            {% trans "Exact locations not displayed for security reasons" %}
+                        </div>
                         {# z-index 1001, above the bottom controls (1000), so the search results can overlap them #}
                         <div class="w-100 p-2 position-absolute top-0 start-0 pointer-events-none d-flex flex-column flex-md-row align-items-stretch align-items-md-start gap-1 gap-md-2"
                              style="z-index: 1001">
@@ -143,11 +150,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="fs-5 opacity-75 d-flex flex-column align-items-start align-items-md-end gap-1 flex-md-grow-1">
-                                <div class="badge text-bg-warning text-wrap pointer-events-auto">
-                                    <i class="fa-solid fa-lock"></i>
-                                    {% trans "Exact locations not displayed for security reasons" %}
-                                </div>
+                            <div class="fs-5 opacity-75 d-flex flex-column align-items-end gap-1 flex-md-grow-1">
                                 <div class="badge text-bg-dark pointer-events-auto">
                                     {% include "eznashdb/includes/shuls_count.html" %}
                                 </div>
@@ -471,6 +474,28 @@
 
                 if (document.documentElement.dir === "rtl") {
                     map.attributionControl.setPosition("bottomleft");
+                }
+
+                // The credit gets the same chip styling as the notice below, in place of Leaflet's flush
+                // strip. Padding is set with utilities because Leaflet's stylesheet loads after
+                // Bootstrap's and would otherwise win over .badge's
+                map.attributionControl
+                    .getContainer()
+                    .classList.add("badge", "bg-white", "text-body", "border", "shadow-sm", "fw-normal", "px-2", "py-1", "lh-base");
+
+                // Leaflet stacks controls sharing a corner, so this always sits above the credit,
+                // however tall that gets (it wraps on narrow screens), and follows it in RTL
+                const notice = document.getElementById("approx-location-notice");
+                if (notice) {
+                    const NoticeControl = L.Control.extend({
+                        onAdd() {
+                            notice.hidden = false;
+                            L.DomEvent.disableClickPropagation(notice);
+                            L.DomEvent.disableScrollPropagation(notice);
+                            return notice;
+                        },
+                    });
+                    new NoticeControl({ position: map.attributionControl.getPosition() }).addTo(map);
                 }
 
                 // Custom zoom controls
