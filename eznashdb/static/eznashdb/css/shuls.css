@@ -166,3 +166,17 @@
     margin: 0;
     font-size: .8rem;
 }
+
+/*
+  The feedback tab (fixed to the screen's edge, from base.css) sits 78% down on phones, where the
+  map's bottom corner (the notice and credit) can end up, since on tall phones the map stops well
+  short of the screen's bottom. 53% clears both that corner and the count badge at the top-right
+  (also at the right edge) on phone heights from 568px to 932px. Any lower and it overlaps the
+  corner on tall phones; any higher and it overlaps the count badge on short ones. This file
+  only loads on the map page, so other pages keep the tab where it is.
+*/
+@media (max-width: 768px) {
+    body .feedback-tab {
+        top: 53%;
+    }
+}
