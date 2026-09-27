@@ -192,3 +192,12 @@
         top: 53%;
     }
 }
+
+/*
+  The count badge lost its font size when its wrapper's fs-5 (sized for the old dark badge) was
+  dropped in favor of matching the bottom corner's white chips. .8rem matches those chips' base
+  size (the credit/notice), which .badge's own relative .75em can't reach from ambient body text.
+*/
+.shuls-count-badge {
+    font-size: .8rem;
+}

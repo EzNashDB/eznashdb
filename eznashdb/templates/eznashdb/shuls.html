@@ -150,13 +150,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="fs-5 opacity-75 d-flex flex-column align-items-end gap-1 flex-md-grow-1">
-                                <div class="badge text-bg-dark pointer-events-auto">
+                            {# Start-aligned on phones only: the feedback tab is fixed to the end edge on every page/size, and on phones its vertical position (tuned in shuls.css) can land level with this badge, so this moves to the opposite side instead of chasing that position #}
+                            <div class="d-flex flex-column align-items-start align-items-md-end gap-1 flex-md-grow-1">
+                                <div class="shuls-count-badge badge bg-white text-body border shadow-sm fw-normal px-2 py-1 lh-base pointer-events-auto">
                                     {% include "eznashdb/includes/shuls_count.html" %}
                                 </div>
                             </div>
                         </div>
-                        <div class="position-absolute bottom-0 start-0 p-2 d-flex flex-column gap-2 pointer-events-none"
+                        <div class="position-absolute bottom-0 start-0 p-2 d-flex flex-column gap-1 pointer-events-none"
                              style="z-index: 1000">
                             <div class="pointer-events-auto align-self-end">
                                 <button id="locate-me-btn" class="btn btn-light shadow-sm">
