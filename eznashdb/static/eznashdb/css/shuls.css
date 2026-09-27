@@ -10,17 +10,28 @@
     }
 }
 
-/* Cap map height on very tall screens */
-@media (min-height: 800px) {
-    .map-container {
-        max-height: 700px;
-    }
-}
-
-@media (min-height: 800px) {
+/*
+  Squeezes the map+sidebar to make room for the footer within one viewport ("above the fold")
+  on tall screens. This is a height question, not a device-category one: even the tallest current
+  phones (iPhone Pro Max, Pixel Pro, Moto G Power, ...) top out around 930-950px of CSS height, so
+  950px sits right above ordinary phones - where scrolling for the footer is the normal
+  pattern and the map, the page's main content, should get the space instead - while still
+  catching genuinely tall viewports (portrait tablets, a resized desktop window, ...) regardless
+  of width. The threshold was previously 800px with no floor at all, which also fired on ordinary
+  tall phones, shrinking their map to squeeze the footer into view unnecessarily.
+*/
+@media (min-height: 950px) {
     .shuls-scroll-container {
         display: flex;
         flex-direction: column;
+    }
+}
+
+/* Same threshold: without this cap the map (once the rule above lets it grow to fill the flex
+   column) could get absurdly tall on a very tall/large monitor. */
+@media (min-height: 950px) {
+    .map-container {
+        max-height: 700px;
     }
 }
 
