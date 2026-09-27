@@ -29,8 +29,16 @@
     display: none !important;
 }
 
+/*
+  Leaflet's own base CSS sets a blanket 12px on .leaflet-container ("general typography"), which
+  anything of ours placed inside the map (the notice, the credit, the count badge) inherits -
+  .badge's default .75em would compute against that instead of the normal 16px, rendering at 9px.
+  Reset here at the source instead of overriding each badge's own size (same fix
+  .leaflet-popup-content applies below, just for badges inside shul popups specifically).
+*/
 .leaflet-container {
     font-family: unset;
+    font-size: 1rem;
 }
 
 .shuls-found-control {
@@ -135,9 +143,6 @@
 /*
   The map's bottom corner (the credit, and the "Exact locations" notice above it) is inset, and
   both are badge-styled like the other overlays on the map, instead of Leaflet's default flush strip.
-  The inset is padding on the corner itself so the notice can still match the credit's width:
-  width: 0 with min-width: 100% makes it as wide as the corner's content, which shrinks to fit its
-  widest control (the credit), whatever the notice's text wraps to.
 */
 .leaflet-bottom {
     padding-bottom: .5rem;
@@ -151,32 +156,26 @@
     padding-left: .5rem;
 }
 
-/* .badge's .75em is relative to the map's 12px, which would make the credit tiny. It shrinks
-   smoothly on narrow phones so it doesn't run over the zoom buttons, and the notice above
-   it (as wide as the credit) shrinks with it */
-.leaflet-container .leaflet-control-attribution {
-    font-size: clamp(10px, 3.2vw, .8rem);
-}
-
 /* Leaflet's default margins for controls are dropped: the corner's padding does the insetting,
    and the gap above the credit comes from mb-1, the same gap as between the other overlays */
 .leaflet-bottom .leaflet-control.approx-location-notice {
-    width: 0;
-    min-width: 100%;
     margin: 0;
-    font-size: .8rem;
 }
 
 /*
-  From tablets up there's room for the notice on one line, at its natural width. The credit keeps
-  its own width, and both stay aligned to the corner's edge (the floats' sides).
+  Caps the CORNER (not the chips inside it directly: they're floated, shrink-to-fit children with
+  no definite width of their own, so a % max-width on them would resolve against that same
+  shrink-to-fit box - circular, and not what's wanted). 100vw is the viewport's actual width,
+  not relative to any ancestor, so this is a flat, reliable cap regardless of DOM nesting; the map
+  spans close to the full viewport width everywhere this matters (phones, where the sidebar
+  stacks above rather than beside it). 105px leaves room for the opposite corner's column (~42px)
+  plus its own inset and a gap, at any width whatsoever. Each chip then wraps within whatever
+  width that leaves it, rather than matching the other's width or shrinking its font indefinitely
+  (a fixed font floor still overlaps at some width).
 */
-@media (min-width: 768px) {
-    .leaflet-bottom .leaflet-control.approx-location-notice {
-        width: max-content;
-        min-width: 0;
-        white-space: nowrap;
-    }
+.leaflet-bottom.leaflet-right,
+.leaflet-bottom.leaflet-left {
+    max-width: calc(100vw - 105px);
 }
 
 /*
@@ -191,13 +190,4 @@
     body .feedback-tab {
         top: 53%;
     }
-}
-
-/*
-  The count badge lost its font size when its wrapper's fs-5 (sized for the old dark badge) was
-  dropped in favor of matching the bottom corner's white chips. .8rem matches those chips' base
-  size (the credit/notice), which .badge's own relative .75em can't reach from ambient body text.
-*/
-.shuls-count-badge {
-    font-size: .8rem;
 }

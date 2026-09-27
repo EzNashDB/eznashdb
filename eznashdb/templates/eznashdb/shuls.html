@@ -152,7 +152,7 @@
                             </div>
                             {# Start-aligned on phones only: the feedback tab is fixed to the end edge on every page/size, and on phones its vertical position (tuned in shuls.css) can land level with this badge, so this moves to the opposite side instead of chasing that position #}
                             <div class="d-flex flex-column align-items-start align-items-md-end gap-1 flex-md-grow-1">
-                                <div class="shuls-count-badge badge bg-white text-body border shadow-sm fw-normal px-2 py-1 lh-base pointer-events-auto">
+                                <div class="badge bg-white text-body border shadow-sm fw-normal px-2 py-1 lh-base pointer-events-auto">
                                     {% include "eznashdb/includes/shuls_count.html" %}
                                 </div>
                             </div>
@@ -482,7 +482,7 @@
                 // Bootstrap's and would otherwise win over .badge's
                 map.attributionControl
                     .getContainer()
-                    .classList.add("badge", "bg-white", "text-body", "border", "shadow-sm", "fw-normal", "px-2", "py-1", "lh-base");
+                    .classList.add("badge", "bg-white", "text-body", "border", "shadow-sm", "fw-normal", "px-2", "py-1", "lh-base", "text-wrap", "text-start");
 
                 // Leaflet stacks controls sharing a corner, so this always sits above the credit,
                 // however tall that gets (it wraps on narrow screens), and follows it in RTL
