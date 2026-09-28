@@ -1,5 +1,6 @@
 # app/views.py
 import json
+from urllib.parse import unquote, urlsplit
 
 import sentry_sdk
 from django.contrib import messages
@@ -10,12 +11,14 @@ from django.core.management import call_command
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
+from django.views.i18n import set_language
 from sentry_sdk import capture_message, set_context, set_tag
 
 from app.backups.core import list_gdrive_backups
@@ -33,6 +36,20 @@ def _validated_next(request, raw_next):
     ):
         return raw_next
     return reverse("eznashdb:shuls")
+
+
+def set_language_from_next(request):
+    """
+    Django's set_language swaps the /en/ or /he/ prefix of `next` via translate_url(),
+    which only resolves if that prefix matches the *active* language. This endpoint is
+    unprefixed, so the active language comes from the cookie / Accept-Language rather than
+    from the page being switched away from. Whenever the two disagree (e.g. a shared /he/
+    link opened with an "en" cookie) the redirect would land back on the same page.
+    """
+    next_path = unquote(urlsplit(request.POST.get("next", "")).path)
+    page_language = translation.get_language_from_path(next_path)
+    with translation.override(page_language or get_language()):
+        return set_language(request)
 
 
 @method_decorator(staff_member_required, name="dispatch")

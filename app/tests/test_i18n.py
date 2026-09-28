@@ -1,3 +1,4 @@
+import pytest
 from django.conf import settings
 
 
@@ -13,6 +14,34 @@ def describe_set_language():
 
         assert response.status_code == 302
         assert client.cookies[settings.LANGUAGE_COOKIE_NAME].value == "en"
+
+    @pytest.mark.parametrize("cookie_language", [None, "en", "he"])
+    @pytest.mark.parametrize(
+        ("current_url", "target_language", "expected_url"),
+        [
+            ("/he/", "en", "/en/"),
+            ("/en/", "he", "/he/"),
+            ("/he/?city=x", "en", "/en/?city=x"),
+        ],
+    )
+    def it_swaps_the_url_prefix_whatever_language_the_cookie_holds(
+        client, cookie_language, current_url, target_language, expected_url
+    ):
+        # The page's URL can disagree with the negotiated language (e.g. a shared /he/ link
+        # opened with no cookie or an "en" cookie), and the switch must still take effect.
+        if cookie_language:
+            client.cookies[settings.LANGUAGE_COOKIE_NAME] = cookie_language
+
+        response = client.post("/i18n/setlang/", {"language": target_language, "next": current_url})
+
+        assert response.status_code == 302
+        assert response["Location"] == expected_url
+        assert client.cookies[settings.LANGUAGE_COOKIE_NAME].value == target_language
+
+    def it_leaves_unprefixed_urls_alone(client):
+        response = client.post("/i18n/setlang/", {"language": "he", "next": "/accounts/login/"})
+
+        assert response["Location"] == "/accounts/login/"
 
 
 def describe_language_negotiation():
