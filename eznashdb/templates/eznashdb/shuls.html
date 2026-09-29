@@ -95,16 +95,22 @@
                                 <div class="input-group shadow-sm">
                                     <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
                                     {# Before the input in the DOM so the input stays the last child and keeps its rounded end #}
-                                    <button type="button"
-                                            class="btn btn-link text-secondary position-absolute top-0 bottom-0 end-0 px-2 py-0"
-                                            style="z-index: 6"
-                                            aria-label="{% trans 'Clear search' %}"
-                                            x-show="query"
-                                            @click="clear()">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
+                                    <span class="position-absolute top-0 bottom-0 end-0 d-flex align-items-center gap-2 pe-2"
+                                          style="z-index: 6">
+                                        <span class="spinner-border spinner-border-sm text-secondary"
+                                              role="status"
+                                              aria-hidden="true"
+                                              x-show="status === 'loading'"></span>
+                                        <button type="button"
+                                                class="btn btn-link text-secondary p-0"
+                                                aria-label="{% trans 'Clear search' %}"
+                                                x-show="query"
+                                                @click="clear()">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </span>
                                     {# Empty inputs have no text to detect a direction from, so :dir follows the page's until there is some (dir="auto" alone would left-align the RTL placeholder) #}
-                                    {# pe-5 (not logical padding) reserves room on the page-direction end, where the clear button is, whatever the text's direction #}
+                                    {# pe-5 (not logical padding) reserves room on the page-direction end, where the spinner and clear button sit, whatever the text's direction #}
                                     <input type="text"
                                            class="form-control text-truncate pe-5"
                                            x-ref="input"
