@@ -15,7 +15,7 @@ window.citySearch = () => {
     query: "",
     results: [],
     isOpen: false,
-    status: null, // null | "empty" | "error"
+    status: null, // null | "loading" | "empty" | "error"
     activeIndex: -1,
     // False from the moment the query changes until results for it arrive, so Enter can't
     // select a city from the previous query's results
@@ -57,6 +57,7 @@ window.citySearch = () => {
     },
 
     async search() {
+      this.status = "loading";
       const controller = new AbortController();
       this._controller = controller;
       const url = `${this.$root.dataset.url}?q=${encodeURIComponent(
