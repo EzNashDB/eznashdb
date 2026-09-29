@@ -2,6 +2,7 @@
 
 from calendar import monthrange
 from datetime import date
+from json.decoder import JSONDecodeError
 
 import pytest
 import requests
@@ -202,6 +203,22 @@ def describe_osm_client():
             results = client.search("test query")
 
             assert results == []
+
+        def it_reports_the_http_status_when_a_non_json_error_body_cant_be_parsed(client, mocker):
+            # e.g. a 429 from the provider's rate limit returns a plain-text body, which fails
+            # JSON parsing with an opaque "Expecting value" error that hides the real cause
+            mock_response = mocker.Mock()
+            mock_response.status_code = 429
+            mock_response.reason = "Too Many Requests"
+            mock_response.json.side_effect = JSONDecodeError("Expecting value", "", 0)
+            mocker.patch("requests.get", return_value=mock_response)
+            mock_capture = mocker.patch("eznashdb.geocoding.sentry_sdk.capture_message")
+
+            results = client.search("test query")
+
+            assert results == []
+            message = mock_capture.call_args.args[0]
+            assert "HTTP 429 Too Many Requests" in message
 
     def describe_search_and_format_results():
         def it_formats_results_with_osm_source(client, mocker):

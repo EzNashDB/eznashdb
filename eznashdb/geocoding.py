@@ -190,6 +190,7 @@ class OSMClient:
             params["api_key"] = self.api_key
 
         url = self.base_url + "?" + urllib.parse.urlencode(params)
+        response = None
 
         try:
             response = requests.get(url, timeout=timeout)
@@ -206,8 +207,15 @@ class OSMClient:
             return data
 
         except (JSONDecodeError, requests.RequestException) as e:
+            # A non-2xx response (e.g. the provider's rate limit) often returns a plain-text
+            # or HTML body, which surfaces here as an opaque JSON parse error rather than
+            # the actual cause
+            if response is not None and response.status_code >= 400:
+                detail = f"HTTP {response.status_code} {response.reason}"
+            else:
+                detail = str(e)
             sentry_sdk.capture_message(
-                f"OSM geocoding failed for query '{query}': {e}",
+                f"OSM geocoding failed for query '{query}': {detail}",
                 level="warning",
             )
             return None
