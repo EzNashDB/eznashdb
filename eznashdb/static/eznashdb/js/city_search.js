@@ -3,7 +3,12 @@
 // after this script has already run.
 window.citySearch = () => {
   const MIN_QUERY_LENGTH = 3;
-  const DEBOUNCE_MS = 300;
+  // Long enough that an ordinary mid-word pause (spelling out a tricky name, a multi-word
+  // place like "kibbutz lavi") doesn't fire a request that's immediately superseded. Aborting
+  // the fetch here only cancels the browser's connection - the backend's OSM calls it kicked
+  // off already run to completion, so a shorter debounce means more overlapping calls against
+  // the rate-limited provider for one search.
+  const DEBOUNCE_MS = 500;
   const REGION_ZOOM = 9; // metro scale
 
   return {
