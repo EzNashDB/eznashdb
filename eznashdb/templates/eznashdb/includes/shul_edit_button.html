@@ -1,11 +1,8 @@
 {# Parameters: shul, names_visible (bool) #}
 {% load i18n %}
-<a class="btn btn-sm btn-primary text-nowrap
-          {% if not names_visible %}disabled{% endif %}"
+<a class="btn btn-sm btn-primary text-nowrap"
    {% if names_visible %}
        href="{% url 'eznashdb:update_shul' shul.id %}"
-   {% else %}
-       aria-disabled="true"
    {% endif %}>
     <i class="fa-solid fa-pen-to-square"></i> {% trans "Edit" %}
 </a>

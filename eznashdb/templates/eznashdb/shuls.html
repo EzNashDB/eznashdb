@@ -311,6 +311,7 @@
                 }
 
                 const header = item.querySelector('.accordion-header');
+                if (!header) return;
                 scrollIntoViewWithinContainer(header, {
                     behavior: 'smooth',
                     block: 'start',

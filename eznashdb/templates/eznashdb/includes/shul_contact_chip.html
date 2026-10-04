@@ -2,13 +2,8 @@
 {% load i18n contact %}
 <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0 px-3 py-1 small rounded bg-body-secondary">
     {% if not names_visible %}
-        {# Like the shul name: never sent to viewers who can't see it, a blurred stand-in keeps the layout #}
         <i class="fa-solid fa-envelope text-muted" aria-hidden="true"></i>
-        <div class="text-blur"
-             role="img"
-             aria-label="{% trans 'Contact info hidden' %}">
-            <span aria-hidden="true">{% trans "Contact Info" %}</span>
-        </div>
+        <span>{% trans "Contact Info" %}</span>
     {% else %}
         {% with contact=shul.parsed_contact %}
             {% if contact %}

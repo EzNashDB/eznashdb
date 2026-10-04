@@ -1,0 +1,18 @@
+{# Parameters: shul, names_visible (bool). Edit, directions, contact and last-updated. #}
+{% load waffle_tags %}
+{% flag "contact_info" %}
+<div class="d-flex align-items-center gap-2">
+    {% include "eznashdb/includes/shul_updated_at.html" with shul=shul classes="flex-grow-1 min-w-0" %}
+    {% include "eznashdb/includes/shul_edit_button.html" with shul=shul names_visible=names_visible %}
+</div>
+<div class="d-flex align-items-stretch gap-2 mt-2">
+    {% include "eznashdb/includes/shul_directions_button.html" with shul=shul names_visible=names_visible classes="d-flex align-items-center gap-1" %}
+    {% include "eznashdb/includes/shul_contact_chip.html" with shul=shul names_visible=names_visible %}
+</div>
+{% else %}
+<div class="d-flex flex-wrap gap-2 align-items-end">
+    {% include "eznashdb/includes/shul_edit_button.html" with shul=shul names_visible=names_visible %}
+    {% include "eznashdb/includes/shul_directions_button.html" with shul=shul names_visible=names_visible %}
+    {% include "eznashdb/includes/shul_updated_at.html" with shul=shul classes="flex-grow-1 text-end ms-auto" %}
+</div>
+{% endflag %}
