@@ -23,13 +23,19 @@ class ShulForm(ModelForm):
             "longitude",
             "place_id",
             "kaddish_policy",
+            "contact",
         ]
         labels = {
             "name": FieldsOptions.SHUL_NAME.form_label,
             "address": FieldsOptions.ADDRESS.form_label,
-            "kaddish_policy": FieldsOptions.KADDISH_POLICY.form_label,
+            "kaddish_policy": FieldsOptions.KADDISH_POLICY.optional_form_label,
+            "contact": FieldsOptions.CONTACT.optional_form_label,
         }
         widgets = {
+            # Free-form URL/email/phone: don't let phones capitalize it, autocorrect it or underline it
+            "contact": TextInput(
+                attrs={"autocapitalize": "none", "autocorrect": "off", "spellcheck": "false"}
+            ),
             "address": HiddenInput(),  # Non-functional without JS
             "latitude": HiddenInput(),
             "longitude": HiddenInput(),

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 DEFAULT_ARG = object()
@@ -10,6 +12,7 @@ DEFAULT_ARG = object()
 class LabelWithIcon:
     label: str
     icon_class: str
+    optional: bool = False
 
     @property
     def icon_html(self):
@@ -20,7 +23,18 @@ class LabelWithIcon:
         """
 
     def __str__(self) -> str:
-        return mark_safe(f"""<span>{self.icon_html}{self.label}</span>""")
+        label_html = f"""<span>{self.icon_html}{self.label}</span>"""
+        if not self.optional:
+            return mark_safe(label_html)
+        # Pushed to the far end of the label line (see .form-label:has(.label-optional) in base.css)
+        # so it reads as a note about the field, not as part of a question label. Translated here,
+        # at render time, so it follows the active language.
+        return format_html(
+            '<span class="d-flex align-items-baseline gap-2">{}'
+            '<span class="label-optional ms-auto small text-muted">{}</span></span>',
+            mark_safe(label_html),
+            gettext("Optional"),
+        )
 
     def __getitem__(self, item):
         return str(self)[item]
@@ -43,6 +57,11 @@ class FieldOptions:
     @property
     def form_label(self) -> str:
         return self._with_icon(self.verbose_label_text or self.label_text)
+
+    @property
+    def optional_form_label(self) -> LabelWithIcon:
+        """The form label with a muted "Optional" at the end of its line."""
+        return LabelWithIcon(self.verbose_label_text or self.label_text, self.icon_class, optional=True)
 
 
 class FieldsOptions:
@@ -69,6 +88,11 @@ class FieldsOptions:
         _("Kaddish"),
         "fa-solid fa-comment",
         verbose_label_text=_("Can women say kaddish?"),
+    )
+    CONTACT = FieldOptions(
+        _("Contact Info"),
+        "fa-solid fa-address-book",
+        verbose_label_text=_("Website, phone, or email"),
     )
 
 

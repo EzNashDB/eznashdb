@@ -36,3 +36,29 @@ def describe_validation():
             }
         )
         assert form.is_valid() is is_valid
+
+
+def describe_contact_field():
+    def _valid_data(**extra):
+        return {
+            "name": "test shul",
+            "address": "some address",
+            "latitude": "1",
+            "longitude": "1",
+            **extra,
+        }
+
+    def is_optional():
+        assert ShulForm(_valid_data()).is_valid()
+
+    @pytest.mark.parametrize(
+        ("contact", "is_valid"),
+        [
+            ("212-555-1234 ext. 5", True),
+            ("rabbi@example.org", True),
+            ("shul.org", True),
+            ("hello", False),
+        ],
+    )
+    def validates_the_value(contact, is_valid):
+        assert ShulForm(_valid_data(contact=contact)).is_valid() is is_valid

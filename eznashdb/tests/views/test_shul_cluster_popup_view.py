@@ -8,6 +8,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
+from waffle.testutils import override_flag
 
 from app.models import AbuseState
 from eznashdb.enums import RelativeSize, SeeHearScore
@@ -195,6 +196,8 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
     Uses an anonymous request to sidestep AbusePreventionMixin: its rate-limit cache
     (a DatabaseCache) takes a different query path on a cold vs. a warm cache key, which
     would otherwise swing the count between these two calls for reasons unrelated to rooms.
+    The waffle flag lookup that picks the popup layout has the same cold/warm difference, so
+    caches are warmed with a throwaway request first.
     """
     few_rooms = Shul.objects.create(name="Few Rooms", latitude=40.7128, longitude=-74.0060)
     few_rooms.rooms.create(name="r", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._5)
@@ -206,6 +209,7 @@ def test_query_count_does_not_scale_with_room_count(popup_GET, django_assert_num
         )
 
     anon = AnonymousUser()
+    ShulClusterPopupView.as_view()(popup_GET(cluster_key=few_rooms.cluster_key, user=anon))
     with CaptureQueriesContext(connection) as few_room_queries:
         ShulClusterPopupView.as_view()(popup_GET(cluster_key=few_rooms.cluster_key, user=anon))
 
@@ -375,3 +379,75 @@ def describe_rate_limited_users():
 
         state.refresh_from_db()
         assert state.points_in_episode == 4
+
+
+def describe_contact():
+    @pytest.fixture
+    def shul_with_contact(test_shul):
+        test_shul.contact = "212-555-1234 x5"
+        test_shul.save()
+        return test_shul
+
+    def _popup_html(popup_GET, shul, **kwargs):
+        return ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=shul.cluster_key, **kwargs)
+        ).content.decode()
+
+    @override_flag("contact_info", active=True)
+    def test_shown_to_signed_in_users_when_the_flag_is_on(popup_GET, shul_with_contact):
+        content = _popup_html(popup_GET, shul_with_contact)
+
+        assert 'href="tel:2125551234"' in content
+        assert "x5" in content
+
+    @override_flag("contact_info", active=False)
+    def test_hidden_when_the_flag_is_off(popup_GET, shul_with_contact):
+        assert "tel:2125551234" not in _popup_html(popup_GET, shul_with_contact)
+
+    @override_flag("contact_info", active=True)
+    def test_never_sent_to_anonymous_users(popup_GET, shul_with_contact):
+        content = _popup_html(popup_GET, shul_with_contact, user=AnonymousUser())
+
+        assert "2125551234" not in content
+        assert "212-555-1234" not in content
+
+    @override_flag("contact_info", active=True)
+    def test_never_sent_to_rate_limited_users(popup_GET, shul_with_contact, test_user):
+        state = AbuseState.get_or_create(test_user)
+        state.strikes = 2
+        state.cooldown_until = timezone.now() + timedelta(minutes=45)
+        state.save()
+
+        assert "2125551234" not in _popup_html(popup_GET, shul_with_contact)
+
+    @override_flag("contact_info", active=True)
+    def test_shows_a_dash_when_the_shul_has_no_contact(popup_GET, test_shul):
+        chip = BeautifulSoup(_popup_html(popup_GET, test_shul), "html.parser").find(
+            class_="bg-body-secondary"
+        )
+
+        assert "--" in chip.get_text()
+        assert not chip.find("a")
+
+
+def describe_contact_layout():
+    @pytest.fixture
+    def shul_with_contact(test_shul):
+        test_shul.contact = "212-555-1234"
+        test_shul.save()
+        return test_shul
+
+    def _soup(popup_GET, shul, **kwargs):
+        response = ShulClusterPopupView.as_view()(popup_GET(cluster_key=shul.cluster_key, **kwargs))
+        return BeautifulSoup(response.content.decode(), "html.parser")
+
+    def _link(soup, href_part):
+        return next(a for a in soup.find_all("a") if href_part in (a.get("href") or ""))
+
+    @override_flag("contact_info", active=False)
+    def test_edit_and_directions_stay_together_when_the_flag_is_off(popup_GET, shul_with_contact):
+        soup = _soup(popup_GET, shul_with_contact)
+
+        directions = _link(soup, reverse("eznashdb:google_maps_proxy"))
+        edit = _link(soup, reverse("eznashdb:update_shul", args=[shul_with_contact.pk]))
+        assert edit.parent is directions.parent

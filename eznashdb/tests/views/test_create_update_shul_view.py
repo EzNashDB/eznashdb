@@ -3,6 +3,7 @@ from functools import partial
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
+from waffle.testutils import override_flag
 
 from eznashdb.constants import JUST_SAVED_SHUL_SESSION_KEY
 from eznashdb.models import Shul
@@ -429,3 +430,72 @@ def test_requires_authentication(client):
     response = client.get(reverse("eznashdb:create_shul"))
     assert response.status_code == 302
     assert settings.LOGIN_URL in response.url
+
+
+def describe_contact():
+    def _update_data(shul, **extra):
+        return {
+            "name": shul.name,
+            "address": shul.address,
+            "latitude": shul.latitude,
+            "longitude": shul.longitude,
+            "check_nearby_shuls": "false",
+            **get_room_fields(room_index=0),
+            **get_room_fs_metadata_fields(total_forms=1),
+            **extra,
+        }
+
+    @override_flag("contact_info", active=True)
+    def saves_the_contact_when_the_flag_is_on(client, test_shul, test_user):
+        client.force_login(test_user)
+        client.post(
+            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
+            data=_update_data(test_shul, contact="212-555-1234 x5"),
+        )
+        test_shul.refresh_from_db()
+        assert test_shul.contact == "212-555-1234 x5"
+
+    @override_flag("contact_info", active=False)
+    def keeps_the_contact_when_someone_without_the_flag_saves(client, test_shul, test_user):
+        # Their form has no contact field, so their POST has no contact key. Django leaves a
+        # model field that has a default untouched when it is missing from the POST.
+        test_shul.contact = "rabbi@example.org"
+        test_shul.save()
+        client.force_login(test_user)
+        client.post(
+            reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}),
+            data=_update_data(test_shul, name="Renamed"),
+        )
+        test_shul.refresh_from_db()
+        assert (test_shul.name, test_shul.contact) == ("Renamed", "rabbi@example.org")
+
+    @override_flag("contact_info", active=True)
+    def shows_the_field_when_the_flag_is_on(client, test_shul, test_user):
+        client.force_login(test_user)
+        response = client.get(reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}))
+        assert 'name="contact"' in response.content.decode()
+
+    @override_flag("contact_info", active=False)
+    def hides_the_field_when_the_flag_is_off(client, test_shul, test_user):
+        client.force_login(test_user)
+        response = client.get(reverse("eznashdb:update_shul", kwargs={"pk": test_shul.pk}))
+        assert 'name="contact"' not in response.content.decode()
+
+    @override_flag("contact_info", active=True)
+    def saves_the_contact_on_a_new_shul(client, test_user):
+        client.force_login(test_user)
+        client.post(
+            reverse("eznashdb:create_shul"),
+            data={
+                "name": "test shul",
+                "address": "123 Sesame Street",
+                "latitude": "1",
+                "longitude": "1",
+                "contact": "shul.org",
+                "wizard_step": "2",
+                "check_nearby_shuls": "false",
+                **get_room_fields(room_index=0),
+                **get_room_fs_metadata_fields(total_forms=1),
+            },
+        )
+        assert Shul.objects.get().contact == "shul.org"
