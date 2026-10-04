@@ -12,6 +12,13 @@ from tinymce.widgets import TinyMCE
 from eznashdb.models import DeletedShul, Room, Shul
 
 
+def truncated(text, max_length):
+    """The text cut to max_length, with the full text on hover."""
+    if len(text) <= max_length:
+        return text
+    return format_html('<span title="{}">{}</span>', text, text[:max_length] + "...")
+
+
 # Base admin with shared methods for Shul and DeletedShul
 class BaseShulAdmin(admin.ModelAdmin):
     """Base class with common display methods for Shul admins"""
@@ -29,6 +36,11 @@ class BaseShulAdmin(admin.ModelAdmin):
                 return format_html('<span title="{}">{}</span>', obj.address, truncated)
             return obj.address
         return "-"
+
+    @admin.display(description="Contact", ordering="contact")
+    def short_contact(self, obj):
+        """Just enough to see whether there is one"""
+        return truncated(obj.contact, 20) if obj.contact else "-"
 
     @admin.display(description="Map")
     def view_on_map(self, obj):
@@ -52,7 +64,10 @@ class BaseShulAdmin(admin.ModelAdmin):
         return format_html_join(
             mark_safe("<br>"),
             '<a href="{}">{}</a>',
-            ((reverse("admin:eznashdb_room_change", args=[room.pk]), room.name) for room in rooms),
+            (
+                (reverse("admin:eznashdb_room_change", args=[room.pk]), truncated(room.name, 20))
+                for room in rooms
+            ),
         )
 
 
@@ -61,6 +76,7 @@ class ShulAdmin(BaseShulAdmin):
     list_display = (
         "name",
         "short_address",
+        "short_contact",
         "view_on_map",
         "room_count",
         "rooms_links",
@@ -68,6 +84,7 @@ class ShulAdmin(BaseShulAdmin):
         "updated_at",
     )
     list_filter = ("created_at", "updated_at")
+    search_fields = ("name", "address", "city")
     readonly_fields = ("view_on_map", "rooms_links")
 
     def get_queryset(self, request):
