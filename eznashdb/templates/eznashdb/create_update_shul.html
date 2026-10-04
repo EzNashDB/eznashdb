@@ -4,6 +4,7 @@
 {% load crispy_forms_tags %}
 {% load partials %}
 {% load i18n %}
+{% load waffle_tags %}
 
 {% block title %}
     {% if not form.instance.pk %}
@@ -83,91 +84,90 @@
                                                     <hr />
                                                 </div>
                                                 <div id="step2-scroll-anchor"></div>
-                                                <div class="row">
-                                                    <h5 class="col-12 pt-3 mb-2" id="kaddish-form-header">
-                                                        {% trans "Kaddish" %}
-                                                        <span class="text-muted">{% trans "(optional)" %}</span>
-                                                    </h5>
+                                                {% flag "contact_info" %}
+                                                <div class="row mt-3 mb-3">
+                                                    <div class="col-12">{{ form.contact|as_crispy_field }}</div>
                                                 </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-12">{{ form.kaddish_policy|as_crispy_field }}</div>
+                                            {% endflag %}
+                                            <div class="row {% flag "contact_info" %}{% else %}mt-3{% endflag %} mb-3">
+                                                <div class="col-12">{{ form.kaddish_policy|as_crispy_field }}</div>
+                                            </div>
+                                            <div class="row">
+                                                <h5 class="col-12 mb-2" id="rooms-form-header">{% trans "Rooms" %}</h5>
+                                            </div>
+                                            <div class="row mb-3">
+                                                {{ room_fs.management_form }}
+                                                {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                                                <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
+                                                    {% if not shul.rooms.exists %}
+                                                        'rooms-0-form'
+                                                    {% else %}
+                                                        null
+                                                    {% endif %}
+                                                    }">
+                                                    {% for form in room_fs %}
+                                                        {% crispy form %}
+                                                    {% endfor %}
                                                 </div>
-                                                <div class="row">
-                                                    <h5 class="col-12 mb-2" id="rooms-form-header">{% trans "Rooms" %}</h5>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    {{ room_fs.management_form }}
-                                                    {% for error in room_fs.non_form_errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
-                                                    <div class="room-formset accordion" id="roomsAccordion" x-data="{ openRoom:
-                                                        {% if not shul.rooms.exists %}
-                                                            'rooms-0-form'
-                                                        {% else %}
-                                                            null
-                                                        {% endif %}
-                                                        }">
-                                                        {% for form in room_fs %}
-                                                            {% crispy form %}
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <div class="row justify-content-end">
-                                                            <div class="add-room-container col-12 d-flex justify-content-end"></div>
-                                                        </div>
+                                                <div class="col-12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="add-room-container col-12 d-flex justify-content-end"></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        {% endif %}
-                                    </div>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row border-top pt-3 mt-3">
-                        <div class="col-12 d-flex flex-column flex-md-row justify-content-center align-items-center gap-2">
-                            <a href="{% url 'eznashdb:shuls' %}"
-                               class="btn btn-link text-muted order-md-0 order-1">
-                                <i class="fa-solid fa-arrow-left me-1"></i>{% trans "Back to Home" %}
-                            </a>
-                            <button type="submit"
-                                class="btn btn-primary order-md-1 order-0 text-nowrap"
-                                style="min-width: 200px;"
-                                {# djlint:off #}
+                </div>
+                <div class="row border-top pt-3 mt-3">
+                    <div class="col-12 d-flex flex-column flex-md-row justify-content-center align-items-center gap-2">
+                        <a href="{% url 'eznashdb:shuls' %}"
+                           class="btn btn-link text-muted order-md-0 order-1">
+                            <i class="fa-solid fa-arrow-left me-1"></i>{% trans "Back to Home" %}
+                        </a>
+                        <button type="submit"
+                            class="btn btn-primary order-md-1 order-0 text-nowrap"
+                            style="min-width: 200px;"
+                            {# djlint:off #}
                                     hx-vals='js:{
                                         "check_nearby_shuls": (() => {
                                             const dirtyFields = Alpine.$data(document.getElementById("shul-form-state")).dirtyFields;
                                             return dirtyFields.has("latitude") || dirtyFields.has("longitude");
                                         })(),
                                     }'
-                                {# djlint:on #}
-                                hx-post='{{ request.path }}'
-                                hx-target='#shul_form'
-                                hx-swap='outerHTML'
-                                hx-disabled-elt="this">
-                                <span class="htmx-indicator spinner-border spinner-border-sm me-2"
-                                      role="status"
-                                      aria-hidden="true"></span>
-                                {% if wizard_step == '1' %}
-                                    {% trans "Next: Add Rooms" %}
-                                    <i class="ms-2 fa-solid fa-arrow-right"></i>
-                                {% else %}
-                                    {% trans "Save" %}
-                                {% endif %}
-                            </button>
-                        </div>
+                            {# djlint:on #}
+                            hx-post='{{ request.path }}'
+                            hx-target='#shul_form'
+                            hx-swap='outerHTML'
+                            hx-disabled-elt="this">
+                            <span class="htmx-indicator spinner-border spinner-border-sm me-2"
+                                  role="status"
+                                  aria-hidden="true"></span>
+                            {% if wizard_step == '1' %}
+                                {% trans "Next" %}
+                                <i class="ms-2 fa-solid fa-arrow-right"></i>
+                            {% else %}
+                                {% trans "Save" %}
+                            {% endif %}
+                        </button>
                     </div>
                 </div>
-                <script>
+            </div>
+            <script>
                     window.shulForm = {
                         errors: JSON.parse("{{ form.errors.as_json|escapejs }}"),
                     }
-                </script>
-                <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
-                {% if nearby_shuls %}
-                    {% include "eznashdb/includes/nearby_shuls_modal.html" %}
-                {% endif %}
-            </form>
-        {% endpartialdef %}
-    </div>
+            </script>
+            <script defer src="{% static 'dist/createUpdateShul.js' %}"></script>
+            {% if nearby_shuls %}
+                {% include "eznashdb/includes/nearby_shuls_modal.html" %}
+            {% endif %}
+        </form>
+    {% endpartialdef %}
+</div>
 </div>
 {% if object %}
     <div class="modal fade"

@@ -1,0 +1,11 @@
+{# Parameters: shul, names_visible (bool), classes (optional extra classes) #}
+{% load i18n %}
+<a {% if names_visible %}
+       target="_blank" rel="noopener noreferrer" href="{% url 'eznashdb:google_maps_proxy' %}?id={{ shul.pk }}"
+   {% else %}
+       aria-disabled="true"
+   {% endif %}
+   class="btn btn-sm btn-outline-primary text-nowrap {{ classes }}
+          {% if not names_visible %}disabled{% endif %}">
+    <i class="fa-solid fa-diamond-turn-right"></i> {% trans "Directions" %}
+</a>

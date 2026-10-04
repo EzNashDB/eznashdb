@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 06:22+0000\n"
+"POT-Creation-Date: 2026-10-04 08:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,6 +63,9 @@ msgstr "אימות ה-CAPTCHA נכשל. נסו שוב."
 msgid "Your appeal has been submitted. We'll review it and get back to you."
 msgstr "הערעור נשלח. נבדוק אותו ונחזור אליך בהקדם."
 
+msgid "Optional"
+msgstr "לא חובה"
+
 msgid "Shul Name"
 msgstr "שם בית הכנסת"
 
@@ -94,6 +97,15 @@ msgstr "קדיש"
 
 msgid "Can women say kaddish?"
 msgstr "האם אפשר לנשים לומר קדיש?"
+
+msgid "Contact Info"
+msgstr "פרטי קשר"
+
+msgid "Website, phone, or email"
+msgstr "אתר אינטרנט, טלפון או אימייל"
+
+msgid "Please enter a valid website, phone number, or email"
+msgstr "נא להזין אתר אינטרנט, מספר טלפון או אימייל תקין"
 
 msgid "Equal or larger than men's"
 msgstr "שווה לעזרת הגברים או גדולה יותר"
@@ -174,17 +186,14 @@ msgstr "מחיקה"
 msgid "Step %(wizard_step)s of 2"
 msgstr "שלב %(wizard_step)s מתוך 2"
 
-msgid "(optional)"
-msgstr "(לא חובה)"
-
 msgid "Rooms"
 msgstr "חדרים"
 
 msgid "Back to Home"
 msgstr "חזרה לדף הבית"
 
-msgid "Next: Add Rooms"
-msgstr "הבא: הוספת חדרים"
+msgid "Next"
+msgstr "הבא"
 
 msgid "Save"
 msgstr "שמירה"
@@ -251,12 +260,6 @@ msgstr[1] "%(counter)s חדרים"
 msgstr[2] "%(counter)s חדרים"
 msgstr[3] "%(counter)s חדרים"
 
-msgid "Directions"
-msgstr "ניווט"
-
-msgid "Updated"
-msgstr "עודכן"
-
 msgid "Kaddish:"
 msgstr "קדיש:"
 
@@ -292,6 +295,15 @@ msgstr "כבר לא זמין"
 
 msgid "This shul is no longer available."
 msgstr "בית הכנסת הזה כבר לא זמין."
+
+msgid "Contact info hidden"
+msgstr "פרטי קשר מוסתרים"
+
+msgid "Directions"
+msgstr "ניווט"
+
+msgid "Updated"
+msgstr "עודכן"
 
 #, python-format
 msgid "%(counter)s shul found"

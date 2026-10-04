@@ -8,6 +8,7 @@ from django.urls import reverse
 from safedelete.managers import SafeDeleteDeletedManager
 from safedelete.models import SafeDeleteModel
 
+from eznashdb.contact import parse_contact, validate_contact
 from eznashdb.enums import KaddishPolicy, RelativeSize, SeeHearScore
 
 
@@ -36,6 +37,9 @@ class Shul(SafeDeleteModel):
     kaddish_policy = models.CharField(
         max_length=50, blank=True, choices=KaddishPolicy.choices, default=""
     )
+    # A phone number, email or website, stored exactly as typed (see eznashdb.contact).
+    # Keep the default: with the contact_info flag off, saves omit this field and rely on it.
+    contact = models.CharField(max_length=255, blank=True, default="", validators=[validate_contact])
 
     class Meta:
         verbose_name = "shul"
@@ -50,6 +54,10 @@ class Shul(SafeDeleteModel):
             return KaddishPolicy(self.kaddish_policy).get_display()
         else:
             return ""
+
+    @property
+    def parsed_contact(self):
+        return parse_contact(self.contact)
 
     @property
     def display_lat(self):

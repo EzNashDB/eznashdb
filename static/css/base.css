@@ -346,3 +346,9 @@ td.td-shrink {
     top: 78%;
   }
 }
+
+/* A label with an "Optional" marker pushed to its far end (see LabelWithIcon in
+   eznashdb/constants.py) needs the full width of the field to push it against. */
+.form-label:has(.label-optional) {
+  display: block;
+}
