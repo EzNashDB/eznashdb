@@ -322,7 +322,9 @@ td.td-shrink {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1040;
+  /* Just under Bootstrap's offcanvas backdrop (1040), which is appended inside the page and so
+     loses a tie with this, since the tab comes last in the document. Still above the navbar. */
+  z-index: 1039;
   writing-mode: vertical-rl;
   text-orientation: sideways;
   color: var(--bs-dark);
