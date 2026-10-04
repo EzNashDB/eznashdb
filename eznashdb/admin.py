@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
 from safedelete.models import HARD_DELETE
 from tinymce.widgets import TinyMCE
 
@@ -48,12 +49,11 @@ class BaseShulAdmin(admin.ModelAdmin):
         if not rooms:
             return "-"
 
-        links = []
-        for room in rooms:
-            url = reverse("admin:eznashdb_room_change", args=[room.pk])
-            links.append(f'<a href="{url}">{room.name}</a>')
-
-        return format_html("<br>".join(links))
+        return format_html_join(
+            mark_safe("<br>"),
+            '<a href="{}">{}</a>',
+            ((reverse("admin:eznashdb_room_change", args=[room.pk]), room.name) for room in rooms),
+        )
 
 
 @admin.register(Shul)
