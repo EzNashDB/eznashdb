@@ -37,11 +37,6 @@ class BaseShulAdmin(admin.ModelAdmin):
             return obj.address
         return "-"
 
-    @admin.display(description="Contact", ordering="contact")
-    def short_contact(self, obj):
-        """Just enough to see whether there is one"""
-        return truncated(obj.contact, 20) if obj.contact else "-"
-
     @admin.display(description="Map")
     def view_on_map(self, obj):
         """Generate a link to view the shul on the map"""
@@ -76,7 +71,7 @@ class ShulAdmin(BaseShulAdmin):
     list_display = (
         "name",
         "short_address",
-        "short_contact",
+        "contact",
         "view_on_map",
         "room_count",
         "rooms_links",
@@ -84,6 +79,7 @@ class ShulAdmin(BaseShulAdmin):
         "updated_at",
     )
     list_filter = ("created_at", "updated_at")
+    list_editable = ("contact",)
     search_fields = ("name", "address", "city")
     readonly_fields = ("view_on_map", "rooms_links")
 
