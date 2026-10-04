@@ -238,7 +238,7 @@ def describe_anonymous_users():
         ).content.decode()
 
         assert test_shul.name not in content
-        assert "text-blur" in content
+        assert "Shul Name" in content
 
     def test_real_ratings_are_still_shown(popup_GET, test_shul):
         test_shul.rooms.create(name="r", relative_size=RelativeSize.L, see_hear_score=SeeHearScore._4)
@@ -262,19 +262,43 @@ def describe_anonymous_users():
             features="html.parser",
         )
 
-        assert len(soup.find_all(class_="text-blur")) == 1
+        assert len(soup.find_all(class_="accordion-collapse")) == 1
         page_text = soup.get_text()
         for shul in shuls:
             assert shul.name not in page_text
 
-    def test_header_shows_sign_in_cta(popup_GET, test_shul):
+    def test_header_does_not_reveal_how_many_shuls_are_in_the_cluster(popup_GET):
+        shuls = [
+            Shul.objects.create(name=f"Shul {i}", latitude=40.7128, longitude=-74.0060) for i in range(5)
+        ]
+
+        content = ShulClusterPopupView.as_view()(
+            popup_GET(cluster_key=shuls[0].cluster_key, user=AnonymousUser())
+        ).content.decode()
+
+        assert "5 Shuls in this area" not in content
+
+    def test_shows_the_sign_in_cta(popup_GET, test_shul):
         content = ShulClusterPopupView.as_view()(
             popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
         ).content.decode()
 
         assert "Sign in for full access" in content
-        assert "Shul in this area" not in content
-        assert "Shuls in this area" not in content
+
+    def test_only_the_close_button_and_sign_in_link_are_reachable_in_the_gated_top(popup_GET, test_shul):
+        soup = BeautifulSoup(
+            ShulClusterPopupView.as_view()(
+                popup_GET(cluster_key=test_shul.cluster_key, user=AnonymousUser())
+            ).content.decode(),
+            features="html.parser",
+        )
+
+        def is_inert(element):
+            return any(parent.has_attr("inert") for parent in element.parents)
+
+        assert not is_inert(soup.find(class_="shul-popup-close"))
+        assert not is_inert(soup.find(attrs={"data-signin-link": True}))
+        assert is_inert(soup.find(lambda tag: tag.name == "a" and "Directions" in tag.get_text()))
 
     def test_login_url_has_no_next_param(popup_GET, test_shul):
         """
@@ -313,7 +337,6 @@ def describe_rate_limited_users():
 
         assert response.status_code == 200
         assert test_shul.name not in content
-        assert "text-blur" in content
         assert "Too many requests" in content
         assert "minute" in content
         assert "Sign in" not in content

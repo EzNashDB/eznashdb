@@ -1,12 +1,14 @@
 {% load i18n %}
 <div class="card border">
     {# djlint:off #}
-    <div class="card-header{% block header_class %}{% endblock %}">
+    {% block popup_top %}
+    <div class="card-header">
         <div class="ps-1 w-100 d-flex align-items-center">
             {% block header_content %}{% endblock %}
             <button type="button" class="btn-close shul-popup-close{% block close_button_class %} ms-auto{% endblock %}" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
+    {% endblock %}
     {# djlint:on #}
     <div class="card-body p-0 overflow-auto d-flex flex-column shul-popup-body">
         <div class="flex-grow-1 overflow-auto">

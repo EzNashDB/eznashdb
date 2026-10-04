@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-04 08:52+0000\n"
+"POT-Creation-Date: 2026-10-04 16:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -249,17 +249,6 @@ msgstr "לא הצלחנו לטעון את פרטי בית הכנסת."
 msgid "Loading..."
 msgstr "טוען..."
 
-msgid "Shul name hidden"
-msgstr "שם בית הכנסת מוסתר"
-
-#, python-format
-msgid "%(counter)s Room"
-msgid_plural "%(counter)s Rooms"
-msgstr[0] "חדר אחד"
-msgstr[1] "%(counter)s חדרים"
-msgstr[2] "%(counter)s חדרים"
-msgstr[3] "%(counter)s חדרים"
-
 msgid "Kaddish:"
 msgstr "קדיש:"
 
@@ -277,6 +266,15 @@ msgstr[1] "%(counter)s בתי כנסת באזור זה"
 msgstr[2] "%(counter)s בתי כנסת באזור זה"
 msgstr[3] "%(counter)s בתי כנסת באזור זה"
 
+msgid "No longer available"
+msgstr "כבר לא זמין"
+
+msgid "This shul is no longer available."
+msgstr "בית הכנסת הזה כבר לא זמין."
+
+msgid "Directions"
+msgstr "ניווט"
+
 #, python-format
 msgid ""
 "Restricted. <a href=\"%(contact_url)s\">Contact us</a> if this is a mistake."
@@ -290,17 +288,13 @@ msgstr "יותר מדי בקשות. נסו שוב בעוד %(retry_after)s."
 msgid "Sign in for full access"
 msgstr "התחברו לגישה מלאה"
 
-msgid "No longer available"
-msgstr "כבר לא זמין"
-
-msgid "This shul is no longer available."
-msgstr "בית הכנסת הזה כבר לא זמין."
-
-msgid "Contact info hidden"
-msgstr "פרטי קשר מוסתרים"
-
-msgid "Directions"
-msgstr "ניווט"
+#, python-format
+msgid "%(counter)s Room"
+msgid_plural "%(counter)s Rooms"
+msgstr[0] "חדר אחד"
+msgstr[1] "%(counter)s חדרים"
+msgstr[2] "%(counter)s חדרים"
+msgstr[3] "%(counter)s חדרים"
 
 msgid "Updated"
 msgstr "עודכן"

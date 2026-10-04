@@ -2,45 +2,22 @@
 
 {% load i18n %}
 
-{% block header_class %}
-    {% if is_rate_limited %}
-        {% if abuse_state.is_permanently_banned %}
-            bg-danger-subtle
-        {% else %}
-            bg-warning-subtle
-        {% endif %}
+{% block popup_top %}
+    {% if shuls and not names_visible %}
+        {% include "eznashdb/includes/shul_popup_gate.html" with shul=shuls.0 %}
+    {% else %}
+        {{ block.super }}
     {% endif %}
 {% endblock %}
 
 {% block header_content %}
     <span class="flex-grow-1">
         {% if shuls %}
-            {% if names_visible %}
-                {% blocktrans trimmed count counter=shuls|length %}
-                    {{ counter }} Shul in this area
-                {% plural %}
-                    {{ counter }} Shuls in this area
-                {% endblocktrans %}
-            {% elif is_rate_limited %}
-                {% if abuse_state.is_permanently_banned %}
-                    {% url 'eznashdb:contact_us' as contact_url %}
-                    <span class="text-danger-emphasis">
-                        <i class="fa-solid fa-lock"></i>
-                        {% blocktrans %}Restricted. <a href="{{ contact_url }}">Contact us</a> if this is a mistake.{% endblocktrans %}
-                    </span>
-                {% else %}
-                    <span class="text-warning-emphasis">
-                        <i class="fa-solid fa-clock"></i>
-                        {% blocktrans %}Too many requests. Try again in {{ retry_after }}.{% endblocktrans %}
-                    </span>
-                {% endif %}
-            {% else %}
-                <a href="{{ login_url }}"
-                   class="btn btn-sm btn-primary"
-                   data-signin-link>
-                    <i class="fa-solid fa-lock"></i> {% trans "Sign in for full access" %}
-                </a>
-            {% endif %}
+            {% blocktrans trimmed count counter=shuls|length %}
+                {{ counter }} Shul in this area
+            {% plural %}
+                {{ counter }} Shuls in this area
+            {% endblocktrans %}
         {% else %}
             {% trans "No longer available" %}
         {% endif %}

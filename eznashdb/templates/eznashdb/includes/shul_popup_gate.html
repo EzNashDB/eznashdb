@@ -1,0 +1,59 @@
+{# Parameters: shul, is_rate_limited, abuse_state, retry_after, login_url #}
+{% load i18n %}
+<div class="position-relative border-bottom">
+    <div class="card-header">
+        <div class="ps-1 w-100 d-flex align-items-center">
+            <span class="flex-grow-1" aria-hidden="true">
+                {% blocktrans trimmed count counter=1 %}
+                    {{ counter }} Shul in this area
+                {% plural %}
+                    {{ counter }} Shuls in this area
+                {% endblocktrans %}
+            </span>
+            <button type="button"
+                    class="btn-close shul-popup-close ms-auto position-relative z-3"
+                    aria-label="{% trans 'Close' %}"></button>
+        </div>
+    </div>
+    <div class="accordion accordion-flush" inert aria-hidden="true">
+        <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" tabindex="-1">
+                    <div class="d-flex w-100 pe-3 align-items-center">
+                        <span class="fw-bold d-inline-block flex-grow-1">
+                            <div class="h5 m-0 d-inline-block">{% trans "Shul Name" %}</div>
+                        </span>
+                        <span>{% include "eznashdb/includes/shul_room_count_badge.html" with shul=shul %}</span>
+                    </div>
+                </button>
+            </h2>
+            <div class="accordion-body">
+                <div class="d-flex flex-column">
+                    {% include "eznashdb/includes/shul_action_rows.html" with shul=shul names_visible=False %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="shul-popup-gate position-absolute top-0 start-0 w-100 h-100 z-2 d-flex align-items-center justify-content-center p-3">
+        {% if is_rate_limited %}
+            {% if abuse_state.is_permanently_banned %}
+                {% url 'eznashdb:contact_us' as contact_url %}
+                <div class="alert alert-danger text-center mb-0 py-2 px-3">
+                    <i class="fa-solid fa-lock"></i>
+                    {% blocktrans %}Restricted. <a href="{{ contact_url }}">Contact us</a> if this is a mistake.{% endblocktrans %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning text-center mb-0 py-2 px-3">
+                    <i class="fa-solid fa-clock"></i>
+                    {% blocktrans %}Too many requests. Try again in {{ retry_after }}.{% endblocktrans %}
+                </div>
+            {% endif %}
+        {% else %}
+            <a href="{{ login_url }}"
+               class="btn btn-primary shadow-lg"
+               data-signin-link>
+                <i class="fa-solid fa-lock"></i> {% trans "Sign in for full access" %}
+            </a>
+        {% endif %}
+    </div>
+</div>

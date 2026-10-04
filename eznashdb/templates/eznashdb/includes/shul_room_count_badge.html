@@ -1,0 +1,11 @@
+{# Parameters: shul #}
+{% load i18n %}
+{% with room_count=shul.rooms.all|length %}
+    <div class="badge text-bg-secondary">
+        {% blocktrans trimmed count counter=room_count %}
+            {{ counter }} Room
+        {% plural %}
+            {{ counter }} Rooms
+        {% endblocktrans %}
+    </div>
+{% endwith %}
