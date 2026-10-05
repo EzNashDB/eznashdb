@@ -42,6 +42,11 @@ class Contact:
     def icon_class(self) -> str:
         return _ICON_CLASSES[self.method]
 
+    @property
+    def always_ltr(self) -> bool:
+        """Websites and emails read left to right even on a right-to-left (Hebrew) page."""
+        return self.method != ContactMethod.PHONE
+
 
 def parse_contact(value: str) -> Contact | None:
     """

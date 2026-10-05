@@ -9,7 +9,9 @@
             {% if contact %}
                 <i class="{{ contact.icon_class }} text-muted" aria-hidden="true"></i>
                 <span class="visually-hidden">{% trans "Contact Info" %}</span>
-                <div class="text-truncate min-w-0" title="{{ shul.contact }}">{% contact_link shul.contact %}</div>
+                <div class="text-truncate min-w-0"
+                     {% if contact.always_ltr %}dir="ltr"{% endif %}
+                     title="{{ shul.contact }}">{% contact_link shul.contact %}</div>
             {% else %}
                 <i class="fa-solid fa-envelope text-muted" aria-hidden="true"></i>
                 <span class="visually-hidden">{% trans "Contact Info" %}</span>
