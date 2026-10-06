@@ -170,6 +170,22 @@ def describe_send_weekly_summary():
             assert ">M<" in html
             assert "★★★★☆" in html
 
+        def includes_the_contact_as_a_link(superuser, recent_shul, mailoutbox):
+            recent_shul.contact = "212-555-1234 x5"
+            recent_shul.save()
+
+            call_command("send_weekly_summary")
+
+            html = mailoutbox[0].alternatives[0][0]
+            assert 'href="tel:2125551234"' in html
+            assert "x5" in html
+
+        def shows_a_dash_when_the_shul_has_no_contact(superuser, recent_shul, mailoutbox):
+            call_command("send_weekly_summary")
+
+            html = mailoutbox[0].alternatives[0][0]
+            assert ">-<" in html
+
         def extracts_country_from_address(superuser, recent_shul, mailoutbox):
             recent_shul.address = "123 Main St, Jerusalem, Israel"
             recent_shul.save()

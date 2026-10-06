@@ -32,6 +32,7 @@ class ShulData:
     name: str
     map_url: str
     country: str
+    contact: str
     rooms: list[RoomData]
     updated_at: object  # datetime object for template formatting
 
@@ -260,6 +261,7 @@ class Command(BaseCommand):
             name=shul.name,
             map_url=shul.get_map_url(absolute=True),
             country=self._get_country(shul.address),
+            contact=shul.contact,
             rooms=[self._prepare_room_data(room) for room in shul.rooms.all()],
             updated_at=shul.updated_at,
         )
